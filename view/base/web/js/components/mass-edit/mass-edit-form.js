@@ -29,9 +29,10 @@ define([
                     isAjax: true,
                     form_key: window.FORM_KEY,
                     shipping_address: this.source.get('data.shipping_address'),
-                    isNewShippingAddress : uiRegistry.get('ns =' + this.ns + ',index = new_shipping_address')
+                    isNewShippingAddress: uiRegistry.get('ns =' + this.ns + ',index = new_shipping_address')
                         .visible(),
-                    selectedSubsIds : this.source.get('data.selectedSubsIds')
+                    selectedSubsIds: this.source.get('data.selectedSubsIds'),
+                    region: this.source.get('data.region'),
                 };
 
             $('body').trigger('processStart');

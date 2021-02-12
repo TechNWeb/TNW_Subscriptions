@@ -1,65 +1,179 @@
 <?php
-
+/**
+ * Copyright © 2018 TechNWeb, Inc. All rights reserved.
+ * See TNW_LICENSE.txt for license details.
+ */
 namespace TNW\Subscriptions\Controller\Subscription\MassEdit;
 
 use Magento\Framework\App\Action\Action;
 use Magento\Framework\App\Action\Context;
-use Magento\Framework\App\ResponseInterface;
 use Magento\Framework\Controller\Result\JsonFactory;
-use Magento\Framework\Controller\ResultInterface;
 use Magento\Framework\Exception\NotFoundException;
 use Magento\Framework\Serialize\SerializerInterface;
+use TNW\Subscriptions\Model\SubscriptionProfile\Manager;
+use TNW\Subscriptions\Api\SubscriptionProfileRepositoryInterface;
+use Magento\Customer\Api\AddressRepositoryInterface;
+use Magento\Customer\Model\Address\Config as AddressConfig;
 
+/**
+ * Class ProcessShipping - shipping data process
+ */
 class ProcessShipping extends Action
 {
     /**
      * @var JsonFactory
      */
-    private JsonFactory $resultJsonFactory;
+    private $resultJsonFactory;
 
     /**
      * @var SerializerInterface
      */
-    private SerializerInterface $serializer;
+    private $serializer;
 
     /**
-     * MassEdit constructor.
+     * @var Manager
+     */
+    private $profileManager;
+
+    /**
+     * @var SubscriptionProfileRepositoryInterface
+     */
+    private $subscriptionProfileRepository;
+
+    /**
+     * @var AddressRepositoryInterface
+     */
+    private $customerAddressRepository;
+
+    /**
+     * @var AddressConfig
+     */
+    private $addressConfig;
+
+    /**
+     * ProcessShipping constructor.
      * @param Context $context
      * @param JsonFactory $resultJsonFactory
      * @param SerializerInterface $serializer
+     * @param Manager $profileManager
+     * @param SubscriptionProfileRepositoryInterface $subscriptionProfileRepository
+     * @param AddressRepositoryInterface $customerAddressRepository
+     * @param AddressConfig $addressConfig
      */
     public function __construct(
         Context $context,
         JsonFactory $resultJsonFactory,
-        SerializerInterface $serializer
+        SerializerInterface $serializer,
+        Manager $profileManager,
+        SubscriptionProfileRepositoryInterface $subscriptionProfileRepository,
+        AddressRepositoryInterface $customerAddressRepository,
+        AddressConfig $addressConfig
     ) {
         parent::__construct($context);
+        $this->customerAddressRepository = $customerAddressRepository;
         $this->resultJsonFactory = $resultJsonFactory;
         $this->serializer = $serializer;
+        $this->profileManager = $profileManager;
+        $this->subscriptionProfileRepository = $subscriptionProfileRepository;
+        $this->addressConfig = $addressConfig;
     }
 
-
     /**
-     * Execute action based on request and return result
-     *
-     * @return ResultInterface|ResponseInterface
+     * @return \Magento\Framework\Controller\Result\Json
      * @throws NotFoundException
+     * @throws \Magento\Framework\Exception\LocalizedException
      */
     public function execute()
     {
+        $params = $this->getRequest()->getParams();
+        $error = false;
+        $rates = [];
+        $addressLine = '';
+        if (array_key_exists('selectedSubsIds', $params) && is_array($params['selectedSubsIds'])) {
+            $profile = null;
+            foreach ($params['selectedSubsIds'] as $profileId) {
+                try {
+                    //TODO: add all the products to one profile so that shipping rates are calculated more accurate
+                    $profile = $this->subscriptionProfileRepository->getById($profileId);
+                    break;
+                } catch (\Exception $e) {
+                    $error = __('Invalid Subscription Id Provided.');
+                }
+            }
+            if ($profile) {
+                if (array_key_exists('shipping_address', $params)
+                    && is_array($params['shipping_address'])
+                ) {
+                    $addressData = [];
+                    if (array_key_exists('shipping_address_id', $params['shipping_address'])
+                        && $params['shipping_address']['shipping_address_id']
+                        && array_key_exists('isNewShippingAddress', $params)
+                        && $params['isNewShippingAddress'] == "false"
+                    ) {
+                        $addressId = $params['shipping_address']['shipping_address_id'];
+                        try {
+                            $address = $this->customerAddressRepository->getById($addressId);
+                            $addressData = [
+                                'firstname' => $address->getFirstname(),
+                                'region_id' => $address->getRegionId(),
+                                'country_id' => $address->getCountryId(),
+                                'company' => $address->getCompany(),
+                                'telephone' => $address->getTelephone(),
+                                'fax' => $address->getFax(),
+                                'postcode' => $address->getPostcode(),
+                                'city' => $address->getCity(),
+                                'lastname' => $address->getLastname(),
+                                'vat_id' => $address->getVatId(),
+                                'address_type' => 'shipping',
+                                'customer_address_id' => $addressId,
+                                'street' => $address->getStreet(),
+                            ];
+                            if ($address->getRegion()) {
+                                $addressData['region'] = $address->getRegion()->getRegion();
+                            }
+                        } catch (\Exception $e) {
+                            $error = __('Invalid Shipping Address Provided.');
+                        }
+                    } else {
+                        $addressData = $params['shipping_address'];
+                        $addressData['street'] = [
+                            $addressData['street0'],
+                            $addressData['street1'],
+                            $addressData['street2']
+                        ];
+                        $addressData['region'] = $params['region'];
+                        $addressData['address_type'] = 'shipping';
+                    }
+                    $profile->getShippingAddress()->setData($addressData);
+                    $renderer = $this->addressConfig->getFormatByCode('oneline')->getRenderer();
+                    $addressLine = $renderer->renderArray($addressData);
+                }
+                try {
+                    $tempQuote = $this->profileManager->getTempQuote($profile);
+                } catch (\Exception $e) {
+                    $tempQuote = null;
+                }
+                if ($tempQuote) {
+                    $shippingRates = $tempQuote->getShippingAddress()->getAllShippingRates();
+                } else {
+                    $shippingRates = null;
+                }
+                if ($shippingRates) {
+                    foreach ($shippingRates as $rate) {
+                        $rates[] = [
+                            'value' => $rate->getCode(),
+                            'label' => $rate->getCarrierTitle(),
+                        ];
+                    }
+                } else {
+                    $error = __('No shipping methods are available.');
+                }
+            }
+        }
         $response = [
-            'error' => false, //error string if error
-            'shipping_methods' => [
-                [
-                    'value' => 'flat_rate',
-                    'label' => 'Flat Rate'
-                ],
-                [
-                    'value' => 'fedex',
-                    'label' => 'Fedex Ground'
-                ]
-            ],
-            'shipping_address_summary' => 'Some Canada, <br>12345 Len oir, Montreal, <br>Alberta h1h1h1, Canada'
+            'error' => $error,
+            'shipping_methods' => $rates,
+            'shipping_address_summary' => $addressLine
         ];
 
         if ($this->getRequest()->getParam('isAjax', false)) {

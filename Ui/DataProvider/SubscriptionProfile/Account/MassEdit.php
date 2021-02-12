@@ -1,5 +1,8 @@
 <?php
-
+/**
+ * Copyright © 2018 TechNWeb, Inc. All rights reserved.
+ * See TNW_LICENSE.txt for license details.
+ */
 namespace TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Account;
 
 use Magento\Framework\Api\FilterBuilder;
@@ -11,6 +14,9 @@ use Magento\Framework\UrlInterface;
 use Magento\Framework\View\Element\UiComponent\DataProvider\DataProvider;
 use Magento\Ui\DataProvider\Modifier\PoolInterface;
 
+/**
+ * Class MassEdit - used as dataProvider for subscription profiles mass edit wizard
+ */
 class MassEdit extends DataProvider
 {
     const FORM_NAME = 'tnw_subscriptionprofile_account_massedit_form';
@@ -105,9 +111,6 @@ class MassEdit extends DataProvider
             if (method_exists($modifier, 'setAdditionalNamespace')) {
                 $modifier->setAdditionalNamespace(self::PAYMENT_DETAILS_FIELDSET);
             }
-//            if (method_exists($modifier, 'setListens')) {
-//                $modifier->setListens([]);
-//            }
             $meta = $modifier->modifyMeta($meta);
         }
 
@@ -136,10 +139,6 @@ class MassEdit extends DataProvider
         $configData['submit_url'] = $this->urlBuilder->getUrl(
             '*/subscription_massedit/save'
         );
-
-//        $configData['process_url'] = $this->urlBuilder->getUrl(
-//            '*/subscription_massedit/processpayment'
-//        );
 
         return $configData;
     }
