@@ -219,7 +219,10 @@ class Vault extends Base
     protected function getAdditionalFields()
     {
         $cards = [];
-        $paymentToken = $this->getProfile()->getPayment()->getPaymentToken();
+        $paymentToken = null;
+        if ($this->getProfile() && $this->getProfile()->getPayment()) {
+            $paymentToken = $this->getProfile()->getPayment()->getPaymentToken();
+        }
         if ($paymentToken) {
             try {
                 $vaultToken = $this->paymentTokenManagement->getByGatewayToken(
