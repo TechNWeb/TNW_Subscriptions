@@ -112,6 +112,7 @@ class ProcessShipping extends Action
                     ) {
                         $addressId = $params['shipping_address']['shipping_address_id'];
                         try {
+                            //TODO: Re-factor: place this functionality into separate method
                             $address = $this->customerAddressRepository->getById($addressId);
                             $addressData = [
                                 'firstname' => $address->getFirstname(),
@@ -128,11 +129,11 @@ class ProcessShipping extends Action
                                 'customer_address_id' => $addressId,
                                 'street' => $address->getStreet(),
                             ];
-                            if ($address->getRegion()) {
-                                $addressData['region'] = $address->getRegion()->getRegion();
-                            }
                         } catch (\Exception $e) {
                             $error = __('Invalid Shipping Address Provided.');
+                        }
+                        if (isset($address) && $address && $address->getRegion() && !$error) {
+                            $addressData['region'] = $address->getRegion()->getRegion();
                         }
                     } else {
                         $addressData = $params['shipping_address'];

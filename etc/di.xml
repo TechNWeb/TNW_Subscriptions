@@ -475,6 +475,11 @@
             <argument name="requestSaveProcessorsPool" xsi:type="object">TNW\Subscriptions\Model\SubscriptionProfile\Step\Save\Processor\Pool</argument>
         </arguments>
     </virtualType>
+    <type name="TNW\Subscriptions\Controller\Subscription\MassEdit\Save">
+        <arguments>
+            <argument name="saveProcessorPool" xsi:type="object">TNW\Subscriptions\Model\SubscriptionProfile\Edit\Save\Processor\Pool</argument>
+        </arguments>
+    </type>
     <virtualType name="TNW\Subscriptions\Model\SubscriptionProfile\Step\Save\Processor\Pool"
                  type="TNW\Subscriptions\Model\SubscriptionProfile\Process\Pool">
         <arguments>

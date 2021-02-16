@@ -42,10 +42,12 @@ define([
         next: function () {
             var parentForm = uiRegistry.get(this.ns + '.' + this.ns);
             if (this.selectedStep() === this.name + '.payment_method') {
+                parentForm.source.set('data.payment_set', true);
                 parentForm.beforeSubmit();
             } else if (this.selectedStep() === this.name + '.shipping_address') {
                 parentForm.submitShippingAddress();
             } else if (this.selectedStep() === this.name + '.summary') {
+                parentForm.source.set('data.payment_set', false);
                 parentForm.triggerSave();
             } else {
                 this._super();

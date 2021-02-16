@@ -39,7 +39,7 @@ class Details extends BaseSummary
     /**
      * @var SubscriptionProfile
      */
-    private $subscriptionProfile;
+    protected $subscriptionProfile;
 
     /**
      * Details constructor.
