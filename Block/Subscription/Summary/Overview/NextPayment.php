@@ -135,10 +135,7 @@ class NextPayment extends Template
      */
     public function getCostFormatting()
     {
-        $grandTotal = null;
-        foreach ($this->getSubscriptionProfile()->getProfileProducts() as $item) {
-            $grandTotal = $item->getPrice();
-        }
+        $grandTotal = $this->getSubscriptionProfile()->getGrandTotal();
         if ($grandTotal === false || $grandTotal < 0) {
             return '--';
         } else {
