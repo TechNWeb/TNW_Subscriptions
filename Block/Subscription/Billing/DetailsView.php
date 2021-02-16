@@ -24,6 +24,10 @@ class DetailsView extends Details
         return 'javascript:';
     }
 
+    /**
+     * @param $profile
+     * @return $this
+     */
     public function setSubscriptionProfile($profile)
     {
         $this->subscriptionProfile = $profile;

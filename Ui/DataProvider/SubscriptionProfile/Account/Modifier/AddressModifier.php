@@ -95,7 +95,7 @@ class AddressModifier implements ModifierInterface
     /**
      * @var ArrayManager
      */
-    private ArrayManager $arrayManager;
+    private $arrayManager;
 
     /**
      * @var string
@@ -151,12 +151,19 @@ class AddressModifier implements ModifierInterface
         $this->labelsVisible = $labelsVisible;
     }
 
+    /**
+     * @param array $data
+     * @return array
+     */
     public function modifyData(array $data)
     {
         return $data;
-        // TODO: Implement modifyData() method.
     }
 
+    /**
+     * @param array $meta
+     * @return array
+     */
     public function modifyMeta(array $meta)
     {
         $meta = $this->arrayManager->populate($this->fieldsetPath, $meta);
@@ -171,6 +178,9 @@ class AddressModifier implements ModifierInterface
         return $result;
     }
 
+    /**
+     * @return array
+     */
     private function getAddressFieldsMeta()
     {
         $attributes = $this->getAddressAttributes();
@@ -345,13 +355,12 @@ class AddressModifier implements ModifierInterface
     }
 
     /**
-     * Returns additional meta data for select/multiselect attributes.
-     *
      * @param Attribute $attribute
-     * @param array     $attributeMeta
-     * @param string    $elemLabel
-     * @param string    $additionalClasses
+     * @param array $attributeMeta
+     * @param $elemLabel
+     * @param $additionalClasses
      * @return array
+     * @throws \Magento\Framework\Exception\LocalizedException
      */
     private function getSourceAttributeMeta(
         Attribute $attribute,
