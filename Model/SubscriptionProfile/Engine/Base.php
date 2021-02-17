@@ -187,8 +187,7 @@ class Base implements EngineInterface
      */
     public function getProfilePaymentInfo(Payment $payment)
     {
-        $result['engine_code'] = $this->getVaultPaymentCode();
-        return $result;
+        return ['engine_code' => $this->getVaultPaymentCode()];
     }
 
     /**

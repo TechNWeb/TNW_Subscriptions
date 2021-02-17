@@ -252,8 +252,8 @@ class Vault extends Base
             $expDate = isset($ccToken->getConfig()['details']['expirationDate'])
                 ? $ccToken->getConfig()['details']['expirationDate']
                 : $ccToken->getConfig()['details']['cc_exp_month']
-                . '/'
-                . $ccToken->getConfig()['details']['cc_exp_year'];
+                    . '/'
+                    . $ccToken->getConfig()['details']['cc_exp_year'];
             $ccTitle = $ccTypeLabel
                 . ' ending '
                 . $maskedCC
@@ -261,11 +261,7 @@ class Vault extends Base
                 . $expDate
                 . ')';
             $pubHash = $ccToken->getConfig()['publicHash'];
-            if ($this->currentProfilePublicHash && $this->currentProfilePublicHash['value'] == $pubHash) {
-                $checked = true;
-            } else {
-                $checked = false;
-            }
+            $checked = $this->currentProfilePublicHash && $this->currentProfilePublicHash['value'] == $pubHash;
             $cards[$pubHash] = [
                 'arguments' => [
                     'data' => [
