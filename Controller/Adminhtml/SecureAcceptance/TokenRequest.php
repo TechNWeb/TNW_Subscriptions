@@ -96,7 +96,7 @@ class TokenRequest extends \Magento\Backend\App\Action
                 break;
             }
         }
-        if (!$billingAddress->getEmail() && !$billingAddress->getFirstname()) {
+        if (!$billingAddress->getEmail() || !$billingAddress->getFirstname() || !$billingAddress->getLastname()) {
             $billingAddress = $quote->getShippingAddress();
         }
         try {
