@@ -52,6 +52,11 @@ class BillingFrequencyManager
     private $actionFactory;
 
     /**
+     * @var ProductBillingFrequencyFactory
+     */
+    private $productBillingFrequencyFactory;
+
+    /**
      * BillingFrequencyManager constructor.
      * @param BillingFrequencyRepositoryInterface $billingFrequencyRepository
      * @param FilterBuilder $filterBuilder
@@ -59,6 +64,7 @@ class BillingFrequencyManager
      * @param ProductBillingFrequencyRepositoryInterface $productBillingFrequencyRepository
      * @param ProductBillingFrequencyCollectionFactory $productBillingFrequencyCollectionFactory
      * @param ActionFactory $actionFactory
+     * @param ProductBillingFrequencyFactory $productBillingFrequencyFactory
      */
     public function __construct(
         BillingFrequencyRepositoryInterface $billingFrequencyRepository,
@@ -66,7 +72,8 @@ class BillingFrequencyManager
         SearchCriteriaBuilder $searchCriteriaBuilder,
         ProductBillingFrequencyRepositoryInterface $productBillingFrequencyRepository,
         ProductBillingFrequencyCollectionFactory $productBillingFrequencyCollectionFactory,
-        ActionFactory $actionFactory
+        ActionFactory $actionFactory,
+        ProductBillingFrequencyFactory $productBillingFrequencyFactory
     ) {
         $this->productBillingFrequencyCollectionFactory = $productBillingFrequencyCollectionFactory;
         $this->productBillingFrequencyRepository = $productBillingFrequencyRepository;
@@ -74,6 +81,7 @@ class BillingFrequencyManager
         $this->filterBuilder = $filterBuilder;
         $this->searchCriteriaBuilder = $searchCriteriaBuilder;
         $this->actionFactory = $actionFactory;
+        $this->productBillingFrequencyFactory = $productBillingFrequencyFactory;
     }
 
     /**
@@ -93,6 +101,42 @@ class BillingFrequencyManager
             }
         }
         $this->billingFrequencyRepository->save($billingFrequency);
+        $this->saveLinkedProducts($billingFrequency);
+    }
+
+    /**
+     * @param BillingFrequency $billingFrequency
+     * @return BillingFrequency
+     * @throws \Magento\Framework\Exception\LocalizedException
+     */
+    public function saveLinkedProducts(BillingFrequency $billingFrequency)
+    {
+        $currentLinkedProducts = $this->productBillingFrequencyRepository
+            ->getListByFrequencyId($billingFrequency->getId())
+            ->getItems();
+        foreach ($currentLinkedProducts as $currentLinkedProduct) {
+            $this->productBillingFrequencyRepository->delete($currentLinkedProduct);
+        }
+
+        if ($billingFrequency->getData('links') && $billingFrequency->getData('links')['linked']) {
+            $linkedProductData = $billingFrequency->getData('links')['linked'];
+            $isDefaultDataNewProducts = $this->getIsDefaultBillingFrequencyForNewProductts(
+                $linkedProductData,
+                $currentLinkedProducts
+            );
+            $maxOrder = 0;
+            foreach ($linkedProductData as $data) {
+                $data['default_billing_frequency'] = $this->isDefaultBillingFrequency(
+                    $data,
+                    $currentLinkedProducts,
+                    $isDefaultDataNewProducts
+                );
+                $linkedProduct = $this->prepareLinkedProduct($billingFrequency, $data, $maxOrder++);
+                $this->productBillingFrequencyRepository->save($linkedProduct);
+            }
+        }
+
+        return $billingFrequency;
     }
 
     /**
@@ -183,5 +227,138 @@ class BillingFrequencyManager
         foreach ($productBillingFrequencyItems as $billingFrequencyItem) {
             $this->productBillingFrequencyRepository->save($billingFrequencyItem);
         }
+    }
+
+    /**
+     * @param array $newlinkedProductData
+     * @param array $currentLinkedProducts
+     * @return array
+     * @throws \Magento\Framework\Exception\LocalizedException
+     */
+    private function getIsDefaultBillingFrequencyForNewProductts(
+        array $newlinkedProductData,
+        array $currentLinkedProducts
+    ) {
+        $addedProductsIds = [];
+        $productsWithoutFrequencies = [];
+
+        //Search for added to billing frequency products.
+        foreach ($newlinkedProductData as $newProductData) {
+            $existedProduct = false;
+            foreach ($currentLinkedProducts as $currentLinkedProduct) {
+                if ($currentLinkedProduct->getMagentoProductId() == $newProductData['id']) {
+                    $existedProduct = true;
+                    break;
+                }
+            }
+
+            if (!$existedProduct) {
+                $addedProductsIds[] = $newProductData['id'];
+            }
+        }
+        //Search for products without billing frequencies.
+        if (!empty($addedProductsIds)) {
+            $this->searchCriteriaBuilder->addFilter(
+                ProductBillingFrequencyInterface::MAGENTO_PRODUCT_ID,
+                $addedProductsIds,
+                'in'
+            );
+
+            /** @var \Magento\Framework\Api\SearchCriteriaInterface $searchCriteria */
+            $searchCriteria = $this->searchCriteriaBuilder->create();
+            /** @var ProductBillingFrequencySearchResultsInterface $foundBillingFrequencies */
+            $foundBillingFrequencies = $this->productBillingFrequencyRepository->getList($searchCriteria);
+
+            foreach ($addedProductsIds as $addedProductId) {
+                $productHasFrequency = false;
+
+                foreach ($foundBillingFrequencies->getItems() as $productBillingFrequency) {
+                    if ($productBillingFrequency->getMagentoProductId() == $addedProductId) {
+                        $productHasFrequency = true;
+                        break;
+                    }
+                }
+
+                if (!$productHasFrequency) {
+                    $productsWithoutFrequencies[$addedProductId] = 1;
+                }
+            }
+        }
+
+        return $productsWithoutFrequencies;
+    }
+
+    /**
+     * Set default_billing_frequency value for product.
+     *
+     * @param array $data
+     * @param array $earlierLinkedProducts
+     * @param array $isDefaultDataNewProducts
+     * @return int
+     */
+    private function isDefaultBillingFrequency(
+        array $data,
+        array $earlierLinkedProducts,
+        array $isDefaultDataNewProducts
+    ) {
+        $isDefault = 0;
+        $productId = $data['id'];
+
+        foreach ($earlierLinkedProducts as $linkedProduct) {
+            if ($productId == $linkedProduct->getMagentoProductId()) {
+                $isDefault = $linkedProduct->getDefaultBillingFrequency();
+                break;
+            }
+        }
+
+        if (isset($isDefaultDataNewProducts[$productId]) && ($isDefaultDataNewProducts[$productId] == 1)) {
+            $isDefault = 1;
+        }
+
+        return $isDefault;
+    }
+
+    /**
+     * Prepares linked product.
+     *
+     * @param BillingFrequency $result
+     * @param array $data
+     * @param int $maxOrder
+     * @return ProductBillingFrequencyInterface
+     */
+    private function prepareLinkedProduct(
+        BillingFrequency $result,
+        array $data,
+        $maxOrder
+    ) {
+        $linkedProduct = $this->productBillingFrequencyFactory->create();
+        $resultData = [
+            ProductBillingFrequencyInterface::BILLING_FREQUENCY_ID => $result->getId(),
+            ProductBillingFrequencyInterface::MAGENTO_PRODUCT_ID => $this->prepareValue($data, 'id'),
+            ProductBillingFrequencyInterface::DEFAULT_BILLING_FREQUENCY => $this->prepareValue(
+                $data,
+                'default_billing_frequency'
+            ),
+            ProductBillingFrequencyInterface::PRICE => $this->prepareValue($data, 'price'),
+            ProductBillingFrequencyInterface::INITIAL_FEE => $this->prepareValue($data, 'initial_fee'),
+            ProductBillingFrequencyInterface::PRESET_QTY => $this->prepareValue($data, 'preset_qty'),
+            ProductBillingFrequencyInterface::IS_DISABLED => $this->prepareValue($data, 'is_disabled'),
+            'sort_order' => $maxOrder
+        ];
+        $linkedProduct->setData($resultData);
+
+        return $linkedProduct;
+    }
+
+    /**
+     * Prepares value before saving.
+     *
+     * @param [] $data
+     * @param string $field
+     * @return string
+     */
+    private function prepareValue($data, $field)
+    {
+        return !empty($data[$field]) ? $data[$field] : '';
     }
 }
