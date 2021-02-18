@@ -101,10 +101,8 @@ class CyberSource extends Base
      */
     public function getProfilePaymentInfo(Payment $payment)
     {
-        $cybersourceToken = $payment->getAdditionalInformation('cybersourse_token');
         $cyberSourceData = $payment->getAdditionalInformation();
         $result = parent::getProfilePaymentInfo($payment);
-        $result['token_hash'] = $cybersourceToken;
         $result['encoded_payment_additional_info'] = [
             OrderPaymentInterface::CC_TYPE => $payment->getCcType(),
             OrderPaymentInterface::CC_LAST_4 => $payment->getCcLast4(),
@@ -112,6 +110,20 @@ class CyberSource extends Base
             OrderPaymentInterface::CC_EXP_YEAR => $payment->getCcExpYear(),
             'cybersource_data' =>$cyberSourceData
         ];
+        $cybersourceToken = $payment->getAdditionalInformation('cybersourse_token');
+        if (!$cybersourceToken && $payment->getAdditionalInformation('public_hash')) {
+            $vaultToken = $this->paymentTokenManagement
+                ->getByPublicHash(
+                    $payment->getAdditionalInformation('public_hash'),
+                    $payment->getAdditionalInformation('customer_id')
+                );
+            if ($vaultToken) {
+                $token = $vaultToken->getGatewayToken();
+                $result['payment_token'] = $token;
+            }
+        } else {
+            $result['token_hash'] = $cybersourceToken;
+        }
         return $result;
     }
 
