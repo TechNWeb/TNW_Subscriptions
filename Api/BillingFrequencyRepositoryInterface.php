@@ -12,6 +12,7 @@ interface BillingFrequencyRepositoryInterface
 {
     /**
      * Save BillingFrequency
+     *
      * @param \TNW\Subscriptions\Api\Data\BillingFrequencyInterface $billingFrequency
      * @return \TNW\Subscriptions\Api\Data\BillingFrequencyInterface
      * @throws \Magento\Framework\Exception\LocalizedException
