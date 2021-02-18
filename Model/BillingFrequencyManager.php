@@ -187,9 +187,7 @@ class BillingFrequencyManager
                 $affectedProductIds[$productBillingFrequencyItem->getMagentoProductId()][]
                     = $productBillingFrequencyItem;
             }
-            $productsToDisableSubscriptionPossibility = [];
             foreach ($affectedProductIds as $productId => $productBillingFrequencies) {
-                $isDefaultSelected = false;
                 if (count($productBillingFrequencies) > 1) {
                     foreach ($productBillingFrequencies as $billingFrequencyProduct) {
                         if (!$billingFrequencyProduct->getIsDisabled()
@@ -199,22 +197,9 @@ class BillingFrequencyManager
                             )
                         ) {
                             $billingFrequencyProduct->setDefaultBillingFrequency(1);
-                            $isDefaultSelected = true;
-                        } elseif (!$billingFrequencyProduct->getIsDisabled()) {
-                            $isDefaultSelected = true;
                         }
                     }
                 }
-                if (!$isDefaultSelected) {
-                    $productsToDisableSubscriptionPossibility[] = $productId;
-                }
-            }
-            if ($productsToDisableSubscriptionPossibility) {
-                $this->actionFactory->create()->updateAttributes(
-                    $productsToDisableSubscriptionPossibility,
-                    [Attribute::SUBSCRIPTION_PURCHASE_TYPE => PurchaseType::ONE_TIME_PURCHASE_TYPE],
-                    $websiteId
-                );
             }
         } else {
             $productBillingFrequencyItems = $this->productBillingFrequencyRepository
