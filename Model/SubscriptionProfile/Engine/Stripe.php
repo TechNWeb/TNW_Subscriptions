@@ -117,8 +117,8 @@ class Stripe extends Base
                     : ["", ""];
             }
         }
-        $result = [
-            'encoded_payment_additional_info' => [
+        $result = parent::getProfilePaymentInfo($payment);
+        $result['encoded_payment_additional_info'] = [
                 OrderPaymentInterface::CC_TYPE => isset($additionalInfo[OrderPaymentInterface::CC_TYPE])
                     ? $additionalInfo[OrderPaymentInterface::CC_TYPE]
                     : $cardDetails['type'],
@@ -130,7 +130,6 @@ class Stripe extends Base
                     ? $additionalInfo[OrderPaymentInterface::CC_EXP_YEAR]
                     : $expirationDate[1],
                 'stripe_data' => $additionalInfo
-            ]
         ];
         return $result;
     }

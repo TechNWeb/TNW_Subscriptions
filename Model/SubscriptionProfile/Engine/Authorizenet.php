@@ -96,20 +96,19 @@ class Authorizenet extends Base
             ];
             $expirationDate = [$payment->getCcExpMonth(), $payment->getCcExpYear()];
         }
-        $result = [
-            'encoded_payment_additional_info' => [
-                OrderPaymentInterface::CC_TYPE => isset($additionalInfo[OrderPaymentInterface::CC_TYPE])
-                    ? $additionalInfo[OrderPaymentInterface::CC_TYPE]
-                    : $cardDetails['type'],
-                OrderPaymentInterface::CC_LAST_4 => $payment->getCcLast4(),
-                OrderPaymentInterface::CC_EXP_MONTH => isset($additionalInfo[OrderPaymentInterface::CC_EXP_MONTH])
-                    ? $additionalInfo[OrderPaymentInterface::CC_EXP_MONTH]
-                    : $expirationDate[0],
-                OrderPaymentInterface::CC_EXP_YEAR => isset($additionalInfo[OrderPaymentInterface::CC_EXP_YEAR])
-                    ? $additionalInfo[OrderPaymentInterface::CC_EXP_YEAR]
-                    : $expirationDate[1],
-                'authorizenet_data' => $additionalInfo
-            ]
+        $result = parent::getProfilePaymentInfo($payment);
+        $result['encoded_payment_additional_info'] = [
+            OrderPaymentInterface::CC_TYPE => isset($additionalInfo[OrderPaymentInterface::CC_TYPE])
+                ? $additionalInfo[OrderPaymentInterface::CC_TYPE]
+                : $cardDetails['type'],
+            OrderPaymentInterface::CC_LAST_4 => $payment->getCcLast4(),
+            OrderPaymentInterface::CC_EXP_MONTH => isset($additionalInfo[OrderPaymentInterface::CC_EXP_MONTH])
+                ? $additionalInfo[OrderPaymentInterface::CC_EXP_MONTH]
+                : $expirationDate[0],
+            OrderPaymentInterface::CC_EXP_YEAR => isset($additionalInfo[OrderPaymentInterface::CC_EXP_YEAR])
+                ? $additionalInfo[OrderPaymentInterface::CC_EXP_YEAR]
+                : $expirationDate[1],
+            'authorizenet_data' => $additionalInfo
         ];
         return $result;
     }
