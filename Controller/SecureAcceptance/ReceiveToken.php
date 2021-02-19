@@ -12,12 +12,11 @@ use Magento\Framework\App\CsrfAwareActionInterface;
 use Magento\Framework\App\RequestInterface;
 use Magento\Framework\App\Request\InvalidRequestException;
 use Magento\Framework\Controller\Result\JsonFactory;
+use Magento\Framework\Controller\ResultInterface;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Message\ManagerInterface;
-use Magento\Framework\Registry;
 use Magento\Framework\View\Element\AbstractBlock;
 use Magento\Framework\View\Result\LayoutFactory;
-use Magento\Payment\Block\Transparent\Iframe;
 use TNW\Subscriptions\Api\Data\SubscriptionProfileInterface;
 use TNW\Subscriptions\Model\SubscriptionProfile\Manager as ProfileManager;
 use TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Form\Modifier\SummaryInsertForm;
@@ -29,11 +28,6 @@ use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Customer\Account\Pa
  */
 class ReceiveToken extends Action implements CsrfAwareActionInterface
 {
-    /**
-     * @var Registry
-     */
-    private $coreRegistry;
-
     /**
      * @var LayoutFactory
      */
@@ -64,7 +58,6 @@ class ReceiveToken extends Action implements CsrfAwareActionInterface
      * @param Context $context
      * @param JsonFactory $resultJsonFactory
      * @param Session $customerSession
-     * @param Registry $coreRegistry
      * @param LayoutFactory $resultLayoutFactory
      * @param ProfileManager $profileManager
      * @param ManagerInterface $messageManager
@@ -73,7 +66,6 @@ class ReceiveToken extends Action implements CsrfAwareActionInterface
         Context $context,
         JsonFactory $resultJsonFactory,
         Session $customerSession,
-        Registry $coreRegistry,
         LayoutFactory $resultLayoutFactory,
         ProfileManager $profileManager,
         ManagerInterface $messageManager
@@ -81,14 +73,13 @@ class ReceiveToken extends Action implements CsrfAwareActionInterface
         parent::__construct($context);
         $this->customerSession = $customerSession;
         $this->resultJsonFactory = $resultJsonFactory;
-        $this->coreRegistry = $coreRegistry;
         $this->resultLayoutFactory = $resultLayoutFactory;
         $this->profileManager = $profileManager;
         $this->messageManager = $messageManager;
     }
 
     /**
-     * @return \Magento\Framework\App\ResponseInterface|\Magento\Framework\Controller\ResultInterface|\Magento\Framework\View\Result\Layout
+     * @return ResultInterface
      */
     public function execute()
     {
