@@ -42,7 +42,9 @@
             </item>
         </argument>
     </dataSource>
-    <fieldset name="shipping_methods">
+    <fieldset name="shipping_methods"
+              component="TNW_Subscriptions/js/form/subscription-profile/shipping/fieldset"
+              template="TNW_Subscriptions/form/subscription-profile/shipping/fieldset">
         <settings>
             <label translate="true">Shipping Method</label>
         </settings>

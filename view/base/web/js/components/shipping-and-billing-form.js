@@ -1,6 +1,9 @@
 define([
-    'Magento_Ui/js/form/form'
-], function (Form) {
+    'jquery',
+    'Magento_Ui/js/form/form',
+    'uiRegistry',
+    'mage/translate'
+], function ($, Form, registry) {
     return Form.extend({
 
         /**
@@ -9,7 +12,15 @@ define([
          */
         onPaymentFormResponse: function (responseData) {
             if (!responseData.error) {
-                this.save();
+                if (this.source.data.shipping_method !== "") {
+                    this.save();
+                } else {
+                    var firstFieldSet = registry.get('index = shipping_methods');
+                    if (firstFieldSet !== undefined) {
+                        firstFieldSet.resetErrors();
+                        firstFieldSet.set('shipping_errors', [$.mage.__('Please select shipping.')]);
+                    }
+                }
             }
         }
     })
