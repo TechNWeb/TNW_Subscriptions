@@ -12,9 +12,7 @@ use TNW\Subscriptions\Api\ProductBillingFrequencyRepositoryInterface;
 use TNW\Subscriptions\Model\ResourceModel\ProductBillingFrequency\CollectionFactory
     as ProductBillingFrequencyCollectionFactory;
 use TNW\Subscriptions\Api\Data\ProductBillingFrequencyInterface;
-use TNW\Subscriptions\Model\Product\Attribute;
 use Magento\Catalog\Model\ResourceModel\Product\ActionFactory;
-use TNW\Subscriptions\Model\Config\Source\PurchaseType;
 
 /**
  * Class BillingFrequencyManager - used as manager for billing frequency
@@ -90,18 +88,15 @@ class BillingFrequencyManager
      */
     public function saveBillingFrequency($billingFrequency)
     {
+        $storedData = [];
         if ($billingFrequency->getId()) {
             $storedData = $billingFrequency->getStoredData();
-            if ($billingFrequency->getStatus() != $storedData[$billingFrequency::STATUS]) {
-                $this->processStatusUpdate(
-                    $billingFrequency->getId(),
-                    $billingFrequency->getStatus(),
-                    $billingFrequency->getWebsiteId()
-                );
-            }
         }
         $this->billingFrequencyRepository->save($billingFrequency);
         $this->saveLinkedProducts($billingFrequency);
+        if ($storedData && $billingFrequency->getStatus() != $storedData[$billingFrequency::STATUS]) {
+            $this->processStatusUpdate($billingFrequency->getId(), $billingFrequency->getStatus());
+        }
     }
 
     /**
@@ -120,7 +115,7 @@ class BillingFrequencyManager
 
         if ($billingFrequency->getData('links') && $billingFrequency->getData('links')['linked']) {
             $linkedProductData = $billingFrequency->getData('links')['linked'];
-            $isDefaultDataNewProducts = $this->getIsDefaultBillingFrequencyForNewProductts(
+            $isDefaultDataNewProducts = $this->getIsDefaultBillingFrequencyForNewProducts(
                 $linkedProductData,
                 $currentLinkedProducts
             );
@@ -142,10 +137,9 @@ class BillingFrequencyManager
     /**
      * @param $billingFrequencyId
      * @param $status
-     * @param $websiteId
      * @throws \Magento\Framework\Exception\LocalizedException
      */
-    private function processStatusUpdate($billingFrequencyId, $status, $websiteId)
+    private function processStatusUpdate($billingFrequencyId, $status)
     {
         if ($status == 0) {
             $productIds = $this->productBillingFrequencyCollectionFactory
@@ -215,20 +209,19 @@ class BillingFrequencyManager
     }
 
     /**
-     * @param array $newlinkedProductData
+     * @param array $newLinkedProductData
      * @param array $currentLinkedProducts
      * @return array
      * @throws \Magento\Framework\Exception\LocalizedException
      */
-    private function getIsDefaultBillingFrequencyForNewProductts(
-        array $newlinkedProductData,
+    private function getIsDefaultBillingFrequencyForNewProducts(
+        array $newLinkedProductData,
         array $currentLinkedProducts
     ) {
         $addedProductsIds = [];
         $productsWithoutFrequencies = [];
-
         //Search for added to billing frequency products.
-        foreach ($newlinkedProductData as $newProductData) {
+        foreach ($newLinkedProductData as $newProductData) {
             $existedProduct = false;
             foreach ($currentLinkedProducts as $currentLinkedProduct) {
                 if ($currentLinkedProduct->getMagentoProductId() == $newProductData['id']) {
@@ -236,7 +229,6 @@ class BillingFrequencyManager
                     break;
                 }
             }
-
             if (!$existedProduct) {
                 $addedProductsIds[] = $newProductData['id'];
             }
@@ -248,22 +240,16 @@ class BillingFrequencyManager
                 $addedProductsIds,
                 'in'
             );
-
-            /** @var \Magento\Framework\Api\SearchCriteriaInterface $searchCriteria */
             $searchCriteria = $this->searchCriteriaBuilder->create();
-            /** @var ProductBillingFrequencySearchResultsInterface $foundBillingFrequencies */
             $foundBillingFrequencies = $this->productBillingFrequencyRepository->getList($searchCriteria);
-
             foreach ($addedProductsIds as $addedProductId) {
                 $productHasFrequency = false;
-
                 foreach ($foundBillingFrequencies->getItems() as $productBillingFrequency) {
                     if ($productBillingFrequency->getMagentoProductId() == $addedProductId) {
                         $productHasFrequency = true;
                         break;
                     }
                 }
-
                 if (!$productHasFrequency) {
                     $productsWithoutFrequencies[$addedProductId] = 1;
                 }
@@ -288,18 +274,15 @@ class BillingFrequencyManager
     ) {
         $isDefault = 0;
         $productId = $data['id'];
-
         foreach ($earlierLinkedProducts as $linkedProduct) {
             if ($productId == $linkedProduct->getMagentoProductId()) {
                 $isDefault = $linkedProduct->getDefaultBillingFrequency();
                 break;
             }
         }
-
         if (isset($isDefaultDataNewProducts[$productId]) && ($isDefaultDataNewProducts[$productId] == 1)) {
             $isDefault = 1;
         }
-
         return $isDefault;
     }
 
@@ -311,11 +294,8 @@ class BillingFrequencyManager
      * @param int $maxOrder
      * @return ProductBillingFrequencyInterface
      */
-    private function prepareLinkedProduct(
-        BillingFrequency $result,
-        array $data,
-        $maxOrder
-    ) {
+    private function prepareLinkedProduct(BillingFrequency $result, array $data, $maxOrder)
+    {
         $linkedProduct = $this->productBillingFrequencyFactory->create();
         $resultData = [
             ProductBillingFrequencyInterface::BILLING_FREQUENCY_ID => $result->getId(),
