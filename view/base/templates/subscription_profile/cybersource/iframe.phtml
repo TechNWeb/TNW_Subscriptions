@@ -16,7 +16,7 @@ $errors = !empty($params['error_messages']) ? $params['error_messages'] : [];
     var require = window.top.require;
     require(['uiRegistry'], function(registry) {
         var form = registry.get('index = <?php echo $block->getData('index')?>');
-        form.source.data.payment.chcybersource.payment_token = '<?= $params['payment_token'] ?>';
+        form.source.data.payment.chcybersource.payment_token = '<?= $block->getData('payment_token') ?>';
         form.triggerSave(
             <?php /* @noEscape */ echo $this->helper(\Magento\Framework\Json\Helper\Data::class)->jsonEncode($errors); ?>
         )
