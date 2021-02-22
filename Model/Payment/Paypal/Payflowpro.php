@@ -18,7 +18,7 @@ class Payflowpro extends Base
      */
     public function getDebugReplacePrivateDataKeys()
     {
-        return (array)$this->_debugReplacePrivateDataKeys;
+        return (array) $this->_debugReplacePrivateDataKeys;
     }
 
     /**
