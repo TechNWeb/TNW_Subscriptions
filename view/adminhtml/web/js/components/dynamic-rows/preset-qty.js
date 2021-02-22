@@ -4,15 +4,16 @@
  */
 
 define([
-    'Magento_Ui/js/form/element/abstract'
-], function (Abstract) {
+    'Magento_Ui/js/form/element/abstract',
+    'uiRegistry',
+], function (Abstract, registry) {
     'use strict';
 
     return Abstract.extend({
         defaults: {
             imports: {
                 updateValidation: 'index = tnw_subscr_unlock_preset_qty:checked',
-                disabled: '!index = tnw_subscr_unlock_preset_qty:checked',
+                setDisabled: '!index = tnw_subscr_unlock_preset_qty:checked',
                 updateDisabledField: 'index = tnw_subscr_unlock_preset_qty:checked',
             },
             oldPresetQtyValue : ''
@@ -39,8 +40,16 @@ define([
          * @param {boolean} presetQtyFlag
          * @return {void}
          */
-        updateValidation: function(presetQtyFlag) {
+        updateValidation: function (presetQtyFlag) {
             this.setValidation('required-entry', presetQtyFlag);
+            this.setValidation('validate-greater-than-zero', presetQtyFlag);
+        },
+
+        setDisabled: function (value) {
+            if (registry.get('dataScope = ' + this.parentScope + ',index = container_option').disabled) {
+                return this.disabled(true)
+            }
+            this.disabled(value)
         }
     });
 });
