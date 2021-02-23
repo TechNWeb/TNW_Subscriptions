@@ -110,6 +110,20 @@ class Authorizenet extends Base
                 : $expirationDate[1],
             'authorizenet_data' => $additionalInfo
         ];
+        $authorizenetToken = $payment->getAdditionalInformation('token_hash');
+        if (!$authorizenetToken && $payment->getAdditionalInformation('public_hash')) {
+            $vaultToken = $this->paymentTokenManagement
+                ->getByPublicHash(
+                    $payment->getAdditionalInformation('public_hash'),
+                    $payment->getAdditionalInformation('customer_id')
+                );
+            if ($vaultToken) {
+                $token = $vaultToken->getGatewayToken();
+                $result['payment_token'] = $token;
+            }
+        } else {
+            $result['token_hash'] = $authorizenetToken;
+        }
         return $result;
     }
 
