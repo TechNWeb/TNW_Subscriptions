@@ -301,11 +301,13 @@ class Base implements EngineInterface
         $paymentData['method'] = $this->getVaultPaymentCode();
         $paymentData['additional_data'] = array_merge($paymentData, $additionalData);
 
-        $this->vaultPaymentAuthorization->processPreAuthForTrial(
-            $paymentData,
-            $this->manager->getTempQuote($this->getProfile())
-        );
-        $this->populateProfilePayment($paymentToken);
+        if ($paymentToken->getGatewayToken() !== $this->getProfile()->getPayment()->getPaymentToken()) {
+            $this->vaultPaymentAuthorization->processPreAuthForTrial(
+                $paymentData,
+                $this->manager->getTempQuote($this->getProfile())
+            );
+            $this->populateProfilePayment($paymentToken);
+        }
         return $this;
     }
 
