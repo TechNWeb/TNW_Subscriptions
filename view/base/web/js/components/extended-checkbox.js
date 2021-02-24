@@ -89,5 +89,9 @@ define([
 
             return this;
         },
+
+        setDisabled: function (value) {
+            this.disabled(value)
+        }
     });
 });

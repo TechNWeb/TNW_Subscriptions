@@ -88,6 +88,12 @@ class RecurringOptions extends BaseModifier
     /**#@-*/
 
     /**#@+
+     * Disabled frequencies data key
+     */
+    const DISABLED_FREQUENCIES_DATA = 'disabled_frequencies';
+    /**#@-*/
+
+    /**#@+
      * Import options values
      */
     const RECURRING_OPTIONS_LISTING = 'tnw_product_billingfrequency_index'; //todo product_recurring_options_listing
@@ -244,7 +250,9 @@ class RecurringOptions extends BaseModifier
                     $productId => [
                         static::DATA_SOURCE_DEFAULT => [
                             static::FIELD_ENABLE => 1,
-                            static::GRID_OPTIONS_NAME => $options
+                            static::GRID_OPTIONS_NAME => $options,
+                            static::DISABLED_FREQUENCIES_DATA =>
+                                $this->getBillingFrequencies()[static::DISABLED_FREQUENCIES_DATA]
                         ]
                     ]
                 ]
@@ -423,9 +431,16 @@ class RecurringOptions extends BaseModifier
                                 'data' => [
                                     'config' => [
                                         'componentType' => Fieldset::NAME,
+                                        'component' => 'TNW_Subscriptions/js/components/dynamic-rows/row-fieldset',
                                         'label' => null,
                                         'sortOrder' => 10,
                                         'opened' => true,
+                                        'imports' => [
+                                            'setDisabled' => '${ $.provider }:data.product.disabled_frequencies',
+                                            '__disableTmpl' => [
+                                                'setDisabled' => false
+                                            ]
+                                        ]
                                     ],
                                 ],
                             ],
@@ -576,12 +591,19 @@ class RecurringOptions extends BaseModifier
                         'options' => $billingFrequenciesData['options'],
                         'disableLabel' => true,
                         'multiple' => false,
+                        'imports' => [
+                            'disabled' => 'dataScope = ${ $.parentScope }, index = container_option:disabled',
+                            '__disableTmpl' => [
+                                'disabled' => false
+                            ]
+                        ],
                         'selectedPlaceholders' => [
                             'defaultPlaceholder' => __('-- Please select --'),
                         ],
                         'validation' => [
                             'required-entry' => true,
-                            'validate-billing-frequency-selected-option' => true
+                            'validate-billing-frequency-selected-option' => true,
+                            'validate-disabled-frequency-selected-option' => true
                         ],
                         'notice' => __('Recurring schedule to be picked by the customer'),
                         'periodLabels' => $billingFrequenciesData['periodLabels']
@@ -620,8 +642,10 @@ class RecurringOptions extends BaseModifier
                         'imports' => [
                             'disabled' => 'parentScope = ${ $.parentScope }, index = '
                                 . static::FIELD_IS_DISABLED . ':checked',
+                            'setDisabled' => 'dataScope = ${ $.parentScope }, index = container_option:disabled',
                             '__disableTmpl' => [
-                                'disabled' => false
+                                'disabled' => false,
+                                'setDisabled' => false
                             ]
                         ],
                         'default' => '1',
@@ -654,8 +678,10 @@ class RecurringOptions extends BaseModifier
                         'imports' => [
                             'disabled' => 'parentScope = ${ $.parentScope }, index = '
                                 . static::FIELD_IS_DEFAULT_NAME . ':checked',
+                            'setDisabled' => 'dataScope = ${ $.parentScope }, index = container_option:disabled',
                             '__disableTmpl' => [
-                                'disabled' => false
+                                'disabled' => false,
+                                'setDisabled' => false
                             ]
                         ],
                         'visible' => !$this->getIsConfigurableProduct(),
@@ -715,12 +741,20 @@ class RecurringOptions extends BaseModifier
                         ],
                         'visible' => !$this->getIsConfigurableProduct(),
                         'imports' => [
-                            'disabled' => 'ns = ${ $.ns }, index = ' . Attribute::SUBSCRIPTION_LOCK_PRODUCT_PRICE . ':checked',
+                            'setDisabled'
+                                => '${ $.provider }:data.product.' . Attribute::SUBSCRIPTION_LOCK_PRODUCT_PRICE,
                             'changeCommentAndValue' => 'index = price:value',
-                            'changeCommentLockPrice' => 'index = ' . Attribute::SUBSCRIPTION_LOCK_PRODUCT_PRICE  . ':checked',
-                            'changeCommentOfferDiscount' => 'index = ' . Attribute::SUBSCRIPTION_OFFER_FLAT_DISCOUNT . ':checked',
-                            'changeCommentDiscountAmount' => 'index = ' . Attribute::SUBSCRIPTION_DISCOUNT_AMOUNT . ':value',
-                            'changeCommentDiscountType' => 'index = ' . Attribute::SUBSCRIPTION_DISCOUNT_TYPE . ':value',
+                            'changeCommentLockPrice' => 'index = ' . Attribute::SUBSCRIPTION_LOCK_PRODUCT_PRICE
+                                . ':checked',
+                            'changeCommentOfferDiscount' => 'index = ' . Attribute::SUBSCRIPTION_OFFER_FLAT_DISCOUNT
+                                . ':checked',
+                            'changeCommentDiscountAmount' => 'index = ' . Attribute::SUBSCRIPTION_DISCOUNT_AMOUNT
+                                . ':value',
+                            'changeCommentDiscountType' => 'index = ' . Attribute::SUBSCRIPTION_DISCOUNT_TYPE
+                                . ':value',
+                            '__disableTmpl' => [
+                                'setDisabled' => false
+                            ]
                         ],
                         'priceFormat' => $this->getPriceFormatData(),
                     ],
@@ -774,6 +808,12 @@ class RecurringOptions extends BaseModifier
                         'dataType' => Number::NAME,
                         'addbefore' => $this->getCurrencySymbol(),
                         'sortOrder' => $sortOrder,
+                        'imports' => [
+                            'disabled' => 'dataScope = ${ $.parentScope }, index = container_option:disabled',
+                            '__disableTmpl' => [
+                                'disabled' => false
+                            ]
+                        ],
                         'validation' => [
                             'validate-zero-or-greater' => true
                         ],
@@ -786,7 +826,6 @@ class RecurringOptions extends BaseModifier
         ];
     }
 
-
     /**
      * Get data for drop-down control with billing frequencies
      *
@@ -796,6 +835,7 @@ class RecurringOptions extends BaseModifier
     {
         $options = [];
         $periodLabels = [];
+        $disabledFrequencies = [];
 
         /** @var SearchCriteria $searchCriteria */
         $searchCriteria = $this->searchCriteriaBuilder->create();
@@ -807,14 +847,16 @@ class RecurringOptions extends BaseModifier
                 'label' => $item->getLabel(),
             ];
             $periodLabels[$item->getId()] = $this->billingFrequencyRepository->getBillingFrequencyPeriodLabel($item);
+            if ($item->getStatus() === '0') {
+                $disabledFrequencies[] = $item->getId();
+            }
         }
 
-        $data = [
+        return [
             'options' => $options,
             'periodLabels' => $periodLabels,
+            static::DISABLED_FREQUENCIES_DATA => $disabledFrequencies
         ];
-
-        return $data;
     }
 
     /**
