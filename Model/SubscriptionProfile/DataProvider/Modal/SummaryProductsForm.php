@@ -151,7 +151,12 @@ class SummaryProductsForm extends ModifyForm
         $data = [];
         /** @var SubscriptionProfileInterface $subQuote */
         foreach ($this->getObjects() as $subQuote) {
-            $data[$subQuote->getId()]['billing_frequency_id'] = $subQuote->getBillingFrequencyId();
+            $billingFrequencyId = $subQuote->getBillingFrequencyId();
+            $data[$subQuote->getId()]['billing_frequency_id'] = $billingFrequencyId;
+            $data[$subQuote->getId()]['billing_frequency_label'] = $this->formContext
+                ->getFrequencyRepository()
+                ->getById($billingFrequencyId)
+                ->getLabel();
             $data[$subQuote->getId()]['subscription_profile_id'] = $subQuote->getId();
             $data[$subQuote->getId()]['subscription_shipping'] = (float)$subQuote->getData('shipping');
             $data[$subQuote->getId()]['changed_price'] = false;
@@ -169,7 +174,7 @@ class SummaryProductsForm extends ModifyForm
                 $startOn = isset($trialStartDate) ? $trialStartDate : $subQuote->getOriginalStartDate();
                 $data[$subQuote->getId()]['item_' . $item->getId()] = [
                     'price' => $itemPrice,
-                    'billing_frequency' => $subQuote->getBillingFrequencyId(),
+                    'billing_frequency' => $billingFrequencyId,
                     'frequency_data' => $this->getFrequenciesData(false, $product->getId()),
                     'term' => (string)$term,
                     'period' => $subQuote->getTotalBillingCycles(),
