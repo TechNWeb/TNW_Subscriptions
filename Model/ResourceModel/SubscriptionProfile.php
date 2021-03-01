@@ -29,7 +29,7 @@ class SubscriptionProfile extends AbstractEntity
     /**
      * @var $invoiceItems
      */
-    private $invoiceItems;
+    private $invoiceItems = [];
 
     /**
      * SubscriptionProfile constructor.
@@ -203,7 +203,7 @@ class SubscriptionProfile extends AbstractEntity
      */
     private function getInvoiceItems(\Magento\Framework\Model\AbstractModel $object)
     {
-        if (!$this->invoiceItems) {
+        if (!array_key_exists($object->getId(), $this->invoiceItems)) {
             $select = $this->getConnection()->select()
                 ->from(
                     ['invoiceItem' => $this->getTable('sales_invoice_item')]
@@ -219,8 +219,8 @@ class SubscriptionProfile extends AbstractEntity
                     []
                 )
                 ->where('profileItem.subscription_profile_id = ?', $object->getId());
-            $this->invoiceItems = $this->getConnection()->fetchAll($select);
+            $this->invoiceItems[$object->getId()] = $this->getConnection()->fetchAll($select);
         }
-        return $this->invoiceItems;
+        return $this->invoiceItems[$object->getId()];
     }
 }
