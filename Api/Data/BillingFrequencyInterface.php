@@ -113,6 +113,7 @@ interface BillingFrequencyInterface
 
     /**
      * Get frequency
+     *
      * @return string|null
      */
     public function getFrequency();
@@ -123,4 +124,12 @@ interface BillingFrequencyInterface
      * @return \TNW\Subscriptions\Api\Data\BillingFrequencyInterface
      */
     public function setFrequency($frequency);
+
+    /**
+     * Checks if data attribute is allowed for modification
+     *
+     * @param $attributeCode
+     * @return bool
+     */
+    public function isAllowedModification($attributeCode);
 }

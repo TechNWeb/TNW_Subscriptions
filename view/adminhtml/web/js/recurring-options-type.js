@@ -71,6 +71,7 @@ define([
             this.validationParams.currentElement = this;
             this.validationParams.allElements = this.retrieveElements(this.index);
             this.validate('validate-billing-frequency-selected-option', currentValue);
+            this.validate('validate-disabled-frequency-selected-option', currentValue);
 
             this.updateComponents(currentValue);
             this.updateHeader(currentValue);
@@ -173,8 +174,19 @@ define([
          * @param {String} index
          * @return {Array}
          */
-        retrieveElements: function(index) {
+        retrieveElements: function (index) {
             return registry.filter('index = ' + index + '');
+        },
+
+        /**
+         * Don't execute if disabled state
+         * @param data
+         * @param event
+         */
+        toggleListVisible: function (data, event) {
+            if (!this.disabled()) {
+                this._super(data, event)
+            }
         }
     });
 });
