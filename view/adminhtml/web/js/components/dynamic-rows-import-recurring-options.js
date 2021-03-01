@@ -60,7 +60,7 @@ define([
             this._super();
             initMaxId(this.recordData());
 
-            var current = this;
+            var self = this;
             validator.addRule(
                 'validate-billing-frequency-selected-option',
                 function (currentValue, rule, params) {
@@ -78,6 +78,16 @@ define([
                 },
                 $.mage.__('The same billing frequency is selected.')
             );
+            validator.addRule(
+                'validate-disabled-frequency-selected-option',
+                function (currentValue) {
+                    if (_.contains(self.source.get('data.product.disabled_frequencies'), currentValue)) {
+                        return false
+                    }
+                    return true
+                },
+                $.mage.__('This billing frequency is disabled globally.')
+            )
             this.setDefaultRecords();
             return this;
         },
@@ -153,19 +163,19 @@ define([
          * @param {String} index
          * @return {Array}
          */
-        retrieveElements: function(index) {
+        retrieveElements: function (index) {
             return registry.filter('parentSelections = ' + this.index + ', index = ' + index + '');
         },
 
         /**
          * Hide pager if there are no items in grid.
          */
-        hidePager: function() {
+        hidePager: function () {
             var childs = this.getChildItems(),
                 grid,
                 pager;
 
-            if (childs.length == 0) {
+            if (childs.length === 0) {
                 grid = $('.recurring-options');
 
                 if (grid.length > 0) {
@@ -274,7 +284,9 @@ define([
                 recordsToDelete = _.filter(this.recordData(), function (elem) {
                     return elem && elem['is_delete'] === '1';
                 });
-            if (_.isEmpty(recordsToDelete)) return;
+            if (_.isEmpty(recordsToDelete)) {
+                return;
+            }
 
             activeRecords = _.indexBy(activeRecords, 'billing_frequency_id');
             recordsToDelete = _.indexBy(recordsToDelete, 'billing_frequency_id');

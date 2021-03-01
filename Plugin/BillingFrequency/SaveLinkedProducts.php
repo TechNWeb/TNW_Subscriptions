@@ -16,6 +16,8 @@ use Magento\Framework\Api\SearchCriteriaBuilder;
 
 /**
  * Plugin to save links between billing frequency and products.
+ *
+ * @deprecated in favor of \TNW\Subscriptions\Model\BillingFrequencyManager::saveBillingFrequency
  */
 class SaveLinkedProducts
 {

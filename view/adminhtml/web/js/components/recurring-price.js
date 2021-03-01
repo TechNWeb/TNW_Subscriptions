@@ -35,7 +35,7 @@ define([
         /**
          * Fires to change comment.
          */
-        changeCommentAndValue: function() {
+        changeCommentAndValue: function () {
             //Get current price format
             var priceFormat = this.getPriceFormat(),
                 notice = '',
@@ -122,7 +122,7 @@ define([
          *
          * @returns {*}
          */
-        getPriceFormat: function() {
+        getPriceFormat: function () {
             var priceFormat = null;
             if (typeof this.priceFormat != 'undefined' && this.priceFormat != null) {
                 priceFormat = $.parseJSON(this.priceFormat);
@@ -136,7 +136,7 @@ define([
          *
          * @returns {number}
          */
-        getProductPriceComponentValue: function() {
+        getProductPriceComponentValue: function () {
             var priceFormat = this.getPriceFormat();
             var productPrice = 0;
             var productPriceComponent = registry.get('index=price, dataScope=data.product.price');
@@ -177,6 +177,13 @@ define([
          */
         changeCommentDiscountType: function () {
             this.changeCommentAndValue();
+        },
+
+        setDisabled: function (value) {
+            if (registry.get('dataScope = ' + this.parentScope + ',index = container_option').disabled) {
+                return this.disabled(true)
+            }
+            this.disabled(value === '1')
         }
     });
 });

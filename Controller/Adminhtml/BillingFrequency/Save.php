@@ -46,6 +46,11 @@ class Save extends \Magento\Backend\App\Action
     protected $billingFrequencyFactory;
 
     /**
+     * @var \TNW\Subscriptions\Model\BillingFrequencyManager
+     */
+    private $billingFrequencyManager;
+
+    /**
      * Save constructor.
      * @param \Magento\Backend\App\Action\Context $context
      * @param \Magento\Framework\App\Request\DataPersistorInterface $dataPersistor
@@ -54,6 +59,7 @@ class Save extends \Magento\Backend\App\Action
      * @param \Magento\Framework\Api\FilterBuilder $filterBuilder
      * @param \Magento\Framework\Api\SearchCriteriaBuilder $searchCriteriaBuilder
      * @param \TNW\Subscriptions\Model\BillingFrequencyFactory $billingFrequencyFactory
+     * @param \TNW\Subscriptions\Model\BillingFrequencyManager $billingFrequencyManager
      */
     public function __construct(
         \Magento\Backend\App\Action\Context $context,
@@ -62,7 +68,8 @@ class Save extends \Magento\Backend\App\Action
         \TNW\Subscriptions\Api\BillingFrequencyRepositoryInterface $billingFrequencyRepository,
         \Magento\Framework\Api\FilterBuilder $filterBuilder,
         \Magento\Framework\Api\SearchCriteriaBuilder $searchCriteriaBuilder,
-        \TNW\Subscriptions\Model\BillingFrequencyFactory $billingFrequencyFactory
+        \TNW\Subscriptions\Model\BillingFrequencyFactory $billingFrequencyFactory,
+        \TNW\Subscriptions\Model\BillingFrequencyManager $billingFrequencyManager
     ) {
         $this->billingFrequencyFactory = $billingFrequencyFactory;
         $this->billingFrequencyRepository = $billingFrequencyRepository;
@@ -70,6 +77,7 @@ class Save extends \Magento\Backend\App\Action
         $this->dataPersistor = $dataPersistor;
         $this->filterBuilder = $filterBuilder;
         $this->searchCriteriaBuilder = $searchCriteriaBuilder;
+        $this->billingFrequencyManager = $billingFrequencyManager;
         parent::__construct($context);
     }
 
@@ -96,7 +104,10 @@ class Save extends \Magento\Backend\App\Action
                 }
                 $canBeModified = true;
                 foreach ($model->getData() as $dataKey => $storedDataValue) {
-                    if (isset($data[$dataKey]) && $data[$dataKey] != $storedDataValue) {
+                    if (isset($data[$dataKey])
+                        && $data[$dataKey] != $storedDataValue
+                        && !$model->isAllowedModification($dataKey)
+                    ) {
                         $canBeModified = false;
                         break;
                     }
@@ -136,7 +147,7 @@ class Save extends \Magento\Backend\App\Action
             $model->setData($data);
 
             try {
-                $model->save();
+                $this->billingFrequencyManager->saveBillingFrequency($model);
                 $this->messageManager->addSuccessMessage(__('You saved the Billing Frequency.'));
                 $this->dataPersistor->clear('tnw_subscriptions_billingfrequency');
 
