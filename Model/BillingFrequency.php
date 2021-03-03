@@ -12,6 +12,16 @@ class BillingFrequency extends \Magento\Framework\Model\AbstractModel implements
 {
 
     /**
+     * The list of allowed for modification attributes in any scenarios
+     *
+     * @var array
+     */
+    private $allowedForModificationAttributes = [
+        self::STATUS,
+        self::LABEL
+    ];
+
+    /**
      * @return void
      */
     protected function _construct()
@@ -131,5 +141,14 @@ class BillingFrequency extends \Magento\Framework\Model\AbstractModel implements
     public function setFrequency($frequency)
     {
         return $this->setData(self::FREQUENCY, $frequency);
+    }
+
+    /**
+     * @param $attributeCode
+     * @return bool
+     */
+    public function isAllowedModification($attributeCode)
+    {
+        return in_array($attributeCode, $this->allowedForModificationAttributes);
     }
 }
