@@ -17,7 +17,8 @@ class BillingFrequency extends \Magento\Framework\Model\AbstractModel implements
      * @var array
      */
     private $allowedForModificationAttributes = [
-        self::STATUS
+        self::STATUS,
+        self::LABEL
     ];
 
     /**
