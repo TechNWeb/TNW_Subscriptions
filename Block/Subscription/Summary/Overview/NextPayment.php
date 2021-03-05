@@ -135,7 +135,7 @@ class NextPayment extends Template
      */
     public function getCostFormatting()
     {
-        $grandTotal = $this->getCost();
+        $grandTotal = $this->getSubscriptionProfile()->getGrandTotal();
         if ($grandTotal === false || $grandTotal < 0) {
             return '--';
         } else {
