@@ -89,7 +89,7 @@ class UpdateQuoteItem
                 );
             }
         }
-        if ($request->getAddtocartType()) {
+        if ($request->getAddtocartType() !== null) {
             return [$product, $request, $processMode];
         }
         $modifiedRequest = $request;

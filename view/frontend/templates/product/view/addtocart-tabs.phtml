@@ -25,10 +25,13 @@
             }
         </script>
     <?php elseif ($block->isOneTimeAndSubscribePurchase()): ?>
-        <input type="hidden" name="subscribe_active" value="1" />
+        <input type="hidden" name="subscribe_active" value="<?= $block->isSubscriptionDefault() ? 1 : 0 ?>" />
         <div class="tnw-addtocart-container">
             <div class="addtocart-onetime">
-                <input type="radio" id="addtocart_onetime" name="addtocart_type" value="0"/>
+                <input type="radio" id="addtocart_onetime"
+                       name="addtocart_type" value="0"
+                    <?= $block->isSubscriptionDefault() ?: 'checked' ?>
+                />
                 <label for="addtocart_onetime"><?= /* @escapeNotVerified */ __('One Time Purchase') ?></label>
                 <div class="onetime-final-price"></div>
                 <div class="addtocart-wrapper">
@@ -37,7 +40,10 @@
             </div>
             <div class="addtocart-subscribe">
                 <div class="box-tocart">
-                <input type="radio" id="addtocart_subscribe" name="addtocart_type" value="1" checked/>
+                <input type="radio" id="addtocart_subscribe"
+                       name="addtocart_type" value="1"
+                    <?= $block->isSubscriptionDefault() ? 'checked' : '' ?>
+                />
                 <label for="addtocart_subscribe"><?= /* @escapeNotVerified */ __('Subscribe') ?></label>
                 <div class="subscription-price-with-savings"></div>
                 <div class="addtocart-wrapper">

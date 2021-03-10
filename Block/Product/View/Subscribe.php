@@ -524,6 +524,15 @@ class Subscribe extends View
     }
 
     /**
+     * @return bool
+     */
+    public function isSubscriptionDefault()
+    {
+        return (!$this->preconfiguredValue('qty') && !$this->preconfiguredValue('subscription_data'))
+        || ($this->preconfiguredValue('qty') && $this->preconfiguredValue('subscription_data'));
+    }
+
+    /**
      * Get preconfigured options for configurable product
      *
      * @return array|null
