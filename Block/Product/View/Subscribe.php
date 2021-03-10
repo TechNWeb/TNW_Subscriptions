@@ -7,6 +7,7 @@
 
 namespace TNW\Subscriptions\Block\Product\View;
 
+use Magento\Bundle\Model\Product\Type as TypeBundle;
 use Magento\Catalog\Api\Data\ProductInterface;
 use Magento\Catalog\Api\ProductRepositoryInterface;
 use Magento\Catalog\Block\Product\Context;
@@ -193,8 +194,11 @@ class Subscribe extends View
      */
     public function isSubscribeAvailable()
     {
-        return ( $this->getPurchaseType() ===  PurchaseType::RECURRING_PURCHASE_TYPE
-                || $this->getPurchaseType() === PurchaseType::ONE_TIME_AND_RECURRING_PURCHASE_TYPE )
+        if ($this->getProduct()->getTypeId() === TypeBundle::TYPE_CODE) {
+            return false;
+        }
+        return ($this->getPurchaseType() ===  PurchaseType::RECURRING_PURCHASE_TYPE
+                || $this->getPurchaseType() === PurchaseType::ONE_TIME_AND_RECURRING_PURCHASE_TYPE)
             && $this->subscriptionProductViewConfig->isSubscribeAvailable($this->getProduct());
     }
 
