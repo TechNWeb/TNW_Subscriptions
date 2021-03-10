@@ -21,7 +21,14 @@ class UpdateCartItems
     {
         $proceed($data);
         foreach ($data as $itemId => $itemInfo) {
-            $subject->updateItem($itemId, $itemInfo);
+            if (is_array($itemInfo) && isset($itemInfo['subscribe_active'])) {
+                /**
+                 * If update is triggered by 'Update Shopping Cart' button in cart
+                 * we need to update not only qty, but also subscription options,
+                 * only if they present in request
+                 */
+                $subject->updateItem($itemId, $itemInfo);
+            }
         }
         return $subject;
     }
