@@ -18,10 +18,13 @@ define([
          * @param value
          */
         setCompletePreviewLabel: function (value) {
-            var label = value,
+            var label,
                 indexedOptions = _.indexBy(this.options, 'value');
+
             if (indexedOptions[value] !== undefined) {
                 label = indexedOptions[value].label;
+            } else {
+                label = this.source.get('data.billing_frequency_label') ?? value;
             }
             this.completePreviewLabel(label);
         }
