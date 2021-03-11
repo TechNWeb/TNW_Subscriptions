@@ -114,7 +114,6 @@ class UpgradeSchema implements UpgradeSchemaInterface
             $this->addSkipBillingCyclesColumn($setup);
         }
 
-
         if (version_compare($context->getVersion(), '2.3.16', '<')) {
             $setup->getConnection()
                 ->addColumn(
