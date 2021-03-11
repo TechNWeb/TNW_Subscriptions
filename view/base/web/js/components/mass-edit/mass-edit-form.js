@@ -73,7 +73,7 @@ define([
         },
 
         processResponseData: function (data) {
-            if (data.error) {
+            if (data.error && !(data.mass_edit_result && data.mass_edit_result.error)) {
                 var message = '';
 
                 if (data.error_messages && data.error_messages.length) {
