@@ -152,7 +152,7 @@ class Cybersource extends Base
                 "type" => $paymentData['cc_type'],
                 "maskedCC" => "****-****-****-" . substr($paymentData['cc_number'], -4),
                 "incrementId" => null,
-                "expirationDate" => $paymentData['cc_exp_month'] . "\/" . $paymentData['cc_exp_year'],
+                "expirationDate" => $paymentData['cc_exp_month'] . "/" . $paymentData['cc_exp_year'],
                 "title"=>"CyberSource Stored Cards"
             ]
         );
