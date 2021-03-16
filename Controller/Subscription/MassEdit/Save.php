@@ -170,10 +170,10 @@ class Save extends Action
                         && is_array($data['summary'])
                         && array_key_exists('payment_info', $data['summary'])
                     ) {
-                        $paymentData = json_decode($data['summary']['payment_info'], true);
-                        $profile->getPayment()->setEngineCode($paymentData['method']);
-                        $profile->getPayment()->setEncodedPaymentAdditionalInfo($paymentData['additional_info']);
-                        $profile->getPayment()->setPaymentToken($paymentData['token']);
+                        $this->populateProcessedPaymentData(
+                            $profile,
+                            json_decode($data['summary']['payment_info'], true)
+                        );
                     } else {
                         $processor->process($data);
                     }
@@ -248,6 +248,24 @@ class Save extends Action
             ])
         ];
         return $this->resultJsonFactory->create()->setJsonData($this->serializer->serialize($response));
+    }
+
+    /**
+     * @param $profile
+     * @param $paymentData
+     * @return $this
+     */
+    private function populateProcessedPaymentData($profile, $paymentData)
+    {
+        $profile->getPayment()->setEngineCode($paymentData['method']);
+        if ($paymentData['additional_info']) {
+            $profile->getPayment()->setEncodedPaymentAdditionalInfo($paymentData['additional_info']);
+            $profile->getPayment()->setPaymentToken($paymentData['token']);
+        } else {
+            $profile->getPayment()->setPaymentAdditionalInfo('');
+            $profile->getPayment()->setTokenHash('');
+        }
+        return $this;
     }
 
     /**
