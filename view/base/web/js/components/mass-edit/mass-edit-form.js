@@ -88,9 +88,10 @@ define([
                 $('body').trigger('processStop');
                 return false;
             }
-            if (data.payment_summary && data.billing_address_summary) {
+            if (data.payment_summary && data.billing_address_summary && data.payment) {
                 this.source.set('data.summary.payment_method', data.payment_summary);
                 this.source.set('data.summary.billing_address', data.billing_address_summary);
+                this.source.set('data.summary.payment_info', data.payment);
             }
             if (data.mass_edit_result
                 && data.mass_edit_result.message

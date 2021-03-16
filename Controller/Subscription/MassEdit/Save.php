@@ -19,6 +19,7 @@ use Magento\Framework\View\Result\PageFactory;
 use TNW\Subscriptions\Block\Subscription\Billing\DetailsView;
 use Magento\Customer\Model\Address\Config as AddressConfig;
 use Magento\Payment\Gateway\Command\CommandException;
+use TNW\Subscriptions\Model\SubscriptionProfile\Edit\Request\Save\Profile\Payment as PaymentProcessor;
 
 /**
  * Class Save - process update profiles data via wizard
@@ -127,7 +128,7 @@ class Save extends Action
         $profiles = null;
 
         $data = $this->getRequest()->getParams();
-        $updateProfiles = (array_key_exists('payment_set', $data) && $data['payment_set'] == 'false');
+        $updateProfiles = (array_key_exists('payment_set', $data) && $data['payment_set'] == "false");
         $this->modifyRequestData($data);
         if (array_key_exists('selectedSubsIds', $data) && is_array($data['selectedSubsIds'])) {
             $filter = $this->filterBuilder
@@ -164,7 +165,18 @@ class Save extends Action
                 $this->profileManager->reset();
                 $this->profileManager->setProfile($profile);
                 foreach ($instances as $processor) {
-                    $processor->process($data);
+                    if ($processor instanceof PaymentProcessor
+                        && array_key_exists('summary', $data)
+                        && is_array($data['summary'])
+                        && array_key_exists('payment_info', $data['summary'])
+                    ) {
+                        $paymentData = json_decode($data['summary']['payment_info'], true);
+                        $profile->getPayment()->setEngineCode($paymentData['method']);
+                        $profile->getPayment()->setEncodedPaymentAdditionalInfo($paymentData['additional_info']);
+                        $profile->getPayment()->setPaymentToken($paymentData['token']);
+                    } else {
+                        $processor->process($data);
+                    }
                     $messages = array_merge($messages, $processor->getErrors());
                 }
                 $passedProfile = $profile;
@@ -229,6 +241,11 @@ class Save extends Action
                 ->getRenderer()
                 ->renderArray($profile->getBillingAddress()->getData()),
             'payment_summary' => $paymentDetailsBlock,
+            'payment' => json_encode([
+                'method' => $passedProfile->getPayment()->getEngineCode(),
+                'token' => $passedProfile->getPayment()->getPaymentToken(),
+                'additional_info' => $passedProfile->getPayment()->getDecodedPaymentAdditionalInfo()
+            ])
         ];
         return $this->resultJsonFactory->create()->setJsonData($this->serializer->serialize($response));
     }
@@ -246,11 +263,17 @@ class Save extends Action
             && $data['billing_address']['same_as_shipping'] == '1'
         ) {
             $data['billing_address'] = $data['shipping_address'];
-            $data['billing_address']['customer_billing_address_id'] = $data['shipping_address']['shipping_address_id'];
+            if (array_key_exists('shipping_address_id',$data['shipping_address'])) {
+                $data['billing_address']['customer_billing_address_id']
+                    = $data['shipping_address']['shipping_address_id'];
+            }
         } else {
             $data['billing_address']['customer_billing_address_id'] = $data['billing_address']['billing_address_id'];
         }
-        $data['shipping_address']['customer_shipping_address_id'] = $data['shipping_address']['shipping_address_id'];
+        if (array_key_exists('shipping_address_id',$data['shipping_address'])) {
+            $data['shipping_address']['customer_shipping_address_id']
+                = $data['shipping_address']['shipping_address_id'];
+        }
 
         return $data;
     }
