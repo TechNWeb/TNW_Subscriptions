@@ -218,6 +218,7 @@ class Save extends Action
             foreach ($profiles as $profile) {
                 $this->profileManager->reset();
                 try {
+                    $profile->setCustomAttributes([]);
                     $this->profileManager->setProfile($profile);
                     $this->profileManager->saveProfile();
                 } catch (\Exception $e) {
@@ -292,7 +293,9 @@ class Save extends Action
             $data['shipping_address']['customer_shipping_address_id']
                 = $data['shipping_address']['shipping_address_id'];
         }
-
+        if (array_key_exists('shipping_method',$data)) {
+            $data['shipping_method_id'] = $data['shipping_method'];
+        }
         return $data;
     }
 }
