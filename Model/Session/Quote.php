@@ -33,7 +33,7 @@ class Quote extends QuoteSession
      */
     public function getCustomerId()
     {
-        return (int)$this->getCustomerSession()->getCustomerId();
+        return (int) $this->getCustomerSession()->getCustomerId();
     }
 
     /**
@@ -41,7 +41,7 @@ class Quote extends QuoteSession
      */
     public function getStoreId()
     {
-        return (int)$this->getCurrentStore()->getId();
+        return (int) $this->getCurrentStore()->getId();
     }
 
     /**
@@ -49,15 +49,17 @@ class Quote extends QuoteSession
      */
     public function getCurrencyId()
     {
-        return (string)$this->getCurrentStore()->getCurrentCurrencyCode();
+        return (string) $this->getCurrentStore()->getCurrentCurrencyCode();
     }
 
     /**
      * @return int
+     * @throws \Magento\Framework\Exception\LocalizedException
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
     public function getCustomerGroupId()
     {
-        return (int)$this->getCustomerSession()->getCustomerGroupId();
+        return (int) $this->getCustomerSession()->getCustomerGroupId();
     }
 
     /**
@@ -120,6 +122,7 @@ class Quote extends QuoteSession
 
     /**
      * @return StoreInterface
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
     private function getCurrentStore()
     {

@@ -861,6 +861,69 @@
             }
         }
     }
+
+    .steps-wizard.subscription-options-wizard {
+        .fieldset-wrapper-title {
+            &.block-title {
+                margin-top: 0;
+            }
+        }
+        .fieldset {
+            margin-bottom: 0;
+        }
+        .field.payment-checkbox {
+            margin-bottom: 0;
+
+            .label {
+                display: none;
+            }
+        }
+        .payment-additional-fieldset {
+            margin-top: 1.5rem;
+            margin-left: 2.3rem;
+
+            .field[name*="cc_vault"] {
+                .label {
+                    display: none;
+                }
+            }
+        }
+        .checkbox-with-notice {
+            .lib-vendor-prefix-display(flex);
+            .lib-vendor-box-align(center);
+            .lib-vendor-prefix-flex-direction(row-reverse);
+            justify-content: flex-end;
+
+            input.admin__control-checkbox {
+                opacity: .01;
+            }
+            .control {
+                position: relative;
+            }
+            .admin__field-option {
+                padding: 0;
+            }
+        }
+        .admin__fieldset {
+            >.field {
+                max-width: 40rem;
+                margin-bottom: 1rem;
+            }
+        }
+        .summary-fieldset {
+            .fieldset-wrapper {
+                float: left;
+                width: 50%;
+                &:nth-child(4) {
+                    clear: both;
+                }
+            }
+        }
+        .admin__control-radio:checked + label:after {
+            left: 4px;
+            top: 5px;
+        }
+    }
 }
 //
 //  Desktop
