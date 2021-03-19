@@ -122,10 +122,7 @@ class DataProvider extends AbstractDataProvider
             )->columns(
                 $columns
             );
-
-
             $arrItems['totalRecords'] = $this->getCollection()->getSize();
-
             foreach ($this->getCollection()->getItems() as $item) {
                 $arrItems['items'][] = $this->prepareItemData($item);
             }
