@@ -50,6 +50,10 @@ class DataProvider extends AbstractDataProvider
      */
     public function getData()
     {
+        $arrItems = [
+            'totalRecords' => $this->getCollection()->getSize(),
+            'items' => [],
+        ];
         $profileId = $this->request->getParam('subscription_profile_id', 0);
         if ($profileId) {
             $this->getCollection()->addFieldToFilter('relation.subscription_profile_id', $profileId);
@@ -58,17 +62,11 @@ class DataProvider extends AbstractDataProvider
                 'main_table.entity_id=relation.' . SubscriptionProfileOrderInterface::MAGENTO_ORDER_ID,
                 []
             );
+            $arrItems['totalRecords'] = $this->getCollection()->getSize();
+            foreach ($this->getCollection() as $item) {
+                $arrItems['items'][] = $item->toArray([]);
+            }
         }
-
-        $arrItems = [
-            'totalRecords' => $this->getCollection()->getSize(),
-            'items' => [],
-        ];
-
-        foreach ($this->getCollection() as $item) {
-            $arrItems['items'][] = $item->toArray([]);
-        }
-
         return $arrItems;
     }
 }
