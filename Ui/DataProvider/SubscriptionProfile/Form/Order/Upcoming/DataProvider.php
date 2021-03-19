@@ -82,6 +82,10 @@ class DataProvider extends AbstractDataProvider
     public function getData()
     {
         $profileId = $this->request->getParam('subscription_profile_id', 0);
+        $arrItems = [
+            'totalRecords' => $this->getCollection()->getSize(),
+            'items' => [],
+        ];
         if ($profileId) {
             $columns = [
                 'entity_id' => 'main_table.entity_id',
@@ -103,11 +107,13 @@ class DataProvider extends AbstractDataProvider
                 []
             )->join(
                 ['shipping_address_table' => $this->getCollection()->getTable(self::MAGENTO_QUOTE_ADDRESS_TABLE)],
-                'main_table.entity_id=shipping_address_table.' . self::MAGENTO_QUOTE_ADDRESS_CONDITION_ID . ' AND shipping_address_table.address_type = \'shipping\'',
+                'main_table.entity_id=shipping_address_table.' . self::MAGENTO_QUOTE_ADDRESS_CONDITION_ID
+                . ' AND shipping_address_table.address_type = \'shipping\'',
                 []
             )->join(
                 ['billing_address_table' => $this->getCollection()->getTable(self::MAGENTO_QUOTE_ADDRESS_TABLE)],
-                'main_table.entity_id=billing_address_table.' . self::MAGENTO_QUOTE_ADDRESS_CONDITION_ID . ' AND billing_address_table.address_type = \'billing\'',
+                'main_table.entity_id=billing_address_table.' . self::MAGENTO_QUOTE_ADDRESS_CONDITION_ID
+                . ' AND billing_address_table.address_type = \'billing\'',
                 []
             )->where(
                 'relation.' . SubscriptionProfileOrderInterface::MAGENTO_ORDER_ID . ' is NULL'
@@ -116,15 +122,10 @@ class DataProvider extends AbstractDataProvider
             )->columns(
                 $columns
             );
-        }
-
-        $arrItems = [
-            'totalRecords' => $this->getCollection()->getSize(),
-            'items' => [],
-        ];
-
-        foreach ($this->getCollection()->getItems() as $item) {
-            $arrItems['items'][] = $this->prepareItemData($item);
+            $arrItems['totalRecords'] = $this->getCollection()->getSize();
+            foreach ($this->getCollection()->getItems() as $item) {
+                $arrItems['items'][] = $this->prepareItemData($item);
+            }
         }
 
         return $arrItems;
