@@ -10,8 +10,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
- * Class Products
- * @package Babenkocommerce\Catalog\Console\Command
+ * Class ProcessExpiredCardCommand - send expired card notifications
  */
 class ProcessExpiredCardCommand extends \Symfony\Component\Console\Command\Command
 {
