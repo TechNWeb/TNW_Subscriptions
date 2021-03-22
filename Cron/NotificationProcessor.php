@@ -16,11 +16,10 @@ use Magento\Framework\App\State;
 use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfile\Payment\CollectionFactory as Payment;
 use TNW\Subscriptions\Model\Source\ProfileStatus;
 use TNW\Subscriptions\Model\Queue\Manager;
-use TNW\Subscriptions\Cron\ProfileProcessor;
+use TNW\Subscriptions\Model\Config as SubscriptionConfig;
 
 /**
- * Class NotificationProcessor
- * @package TNW\Subscriptions\Cron
+ * Class NotificationProcessor - used for profile notifications
  */
 class NotificationProcessor
 {
@@ -69,10 +68,35 @@ class NotificationProcessor
      */
     private $paymentFactory;
 
+    /**
+     * @var Manager
+     */
     private $queueManager;
 
+    /**
+     * @var \TNW\Subscriptions\Cron\ProfileProcessor
+     */
     private $processor;
 
+    /**
+     * @var SubscriptionConfig
+     */
+    private $subscriptionConfig;
+
+    /**
+     * NotificationProcessor constructor.
+     * @param EmailNotifierFactory $emailNotifierFactory
+     * @param ScopeConfigInterface $scopeConfig
+     * @param CollectionFactory $subscriptionProfileFactory
+     * @param TimezoneInterface $timezone
+     * @param ProfileCcUtilsFactory $ccUtilsFactory
+     * @param SubscriptionProfileRepositoryInterface $subscriptionProfileRepository
+     * @param State $appState
+     * @param Payment $paymentFactory
+     * @param Manager $queueManager
+     * @param \TNW\Subscriptions\Cron\ProfileProcessor $processor
+     * @param SubscriptionConfig $subscriptionConfig
+     */
     public function __construct(
         EmailNotifierFactory $emailNotifierFactory,
         ScopeConfigInterface $scopeConfig,
@@ -83,8 +107,10 @@ class NotificationProcessor
         State $appState,
         Payment $paymentFactory,
         Manager $queueManager,
-        ProfileProcessor $processor
+        ProfileProcessor $processor,
+        SubscriptionConfig $subscriptionConfig
     ) {
+        $this->subscriptionConfig = $subscriptionConfig;
         $this->processor = $processor;
         $this->queueManager = $queueManager;
         $this->appState = $appState;
@@ -107,12 +133,16 @@ class NotificationProcessor
         } catch (\Magento\Framework\Exception\LocalizedException $e) {
             //NOTHING TO SET
         }
-        $this->sendRenewalNotifications();
-        $this->sendExpiredCardsNotifications();
+        if ($this->subscriptionConfig->getIsActiveCronNotifications()) {
+            $this->sendRenewalNotifications();
+            $this->sendExpiredCardsNotifications();
+        }
     }
 
     /**
-     *
+     * @throws \Magento\Framework\Exception\LocalizedException
+     * @throws \Magento\Framework\Exception\MailException
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
     public function sendRenewalNotifications()
     {
@@ -134,7 +164,8 @@ class NotificationProcessor
     }
 
     /**
-     *
+     * @throws \Magento\Framework\Exception\LocalizedException
+     * @throws \Magento\Framework\Exception\MailException
      */
     public function sendExpiredCardsNotifications()
     {
@@ -159,31 +190,6 @@ class NotificationProcessor
                 }
             }
         }
-    }
-
-    /**
-     * @param $dayModifier
-     * @return mixed
-     */
-    private function getFutureOrderCollection($dayModifier)
-    {
-        if (!$dayModifier || !isset($this->loadedCollections[$dayModifier])) {
-            $currentDate = $this->timezone->date();
-            if ($dayModifier) {
-                $currentDate->modify($dayModifier);
-            }
-            $this->loadedCollections[$dayModifier] = $this->subscriptionProfileFactory->create()
-                ->addFieldToFilter('scheduled_at', [
-                    'date' => true,
-                    'from' => $currentDate->format('Y-m-d 00:00:00'),
-                    'to' => $currentDate->format('Y-m-d 23:59:59')
-                ])
-                ->addFieldToFilter('magento_order_id', ['null' => true])
-                ->addFieldToSelect('subscription_profile_id')
-                ->addFieldToSelect('scheduled_at')
-            ;
-        }
-        return $this->loadedCollections[$dayModifier];
     }
 
     /**
