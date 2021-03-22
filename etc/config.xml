@@ -11,6 +11,7 @@
         <tnw_subscriptions_general>
             <general>
                 <active>0</active>
+                <disable_cron>0</disable_cron>
             </general>
             <advanced>
                 <db_log_status>1</db_log_status>
