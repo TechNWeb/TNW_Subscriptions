@@ -30,7 +30,7 @@ class Config
      * Config xml path for General section
      */
     private $xmlIsActive = 'tnw_subscriptions_general/general/active';
-
+    private $xmlActiveCronNotification = 'tnw_subscriptions_general/general/disable_cron';
     private $xmlPurchaseType = 'tnw_subscriptions_product/general/purchase_type';
     private $xmlStartDateType = 'tnw_subscriptions_product/general/start_date_type';
     private $xmlLockProductPriceStatus = 'tnw_subscriptions_product/general/lock_product_price_status';
@@ -663,6 +663,14 @@ class Config
     public function getDbLogStatus()
     {
         return $this->scopeConfig->isSetFlag('tnw_subscriptions_general/advanced/db_log_status');
+    }
+
+    /**
+     * @return bool
+     */
+    public function getIsActiveCronNotifications()
+    {
+        return !$this->scopeConfig->isSetFlag($this->xmlActiveCronNotification);
     }
 
     /**
