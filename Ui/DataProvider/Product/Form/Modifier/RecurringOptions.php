@@ -217,7 +217,7 @@ class RecurringOptions extends BaseModifier
                     'status',
                     $searchStatuses,
                     'in'
-                )->create();
+                )->setPageSize(1)->setCurrentPage(1)->create();
 
                 $subscriptionProfiles = $this->profileRepository->getList($searchCriteria);
                 if (!empty($subscriptionProfiles->getItems())) {
