@@ -20,7 +20,7 @@ abstract class SubscriptionProfile extends Action
     /**
      * Authorization level
      */
-    const ADMIN_RESOURCE = 'TNW_Subscriptions::top_level';
+    const ADMIN_RESOURCE = 'TNW_Subscriptions::SubscriptionProfile';
 
     /**
      * @var Registry
