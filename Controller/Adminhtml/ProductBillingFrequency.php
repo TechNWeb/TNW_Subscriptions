@@ -10,7 +10,7 @@ abstract class ProductBillingFrequency extends \Magento\Backend\App\Action
 {
 
     protected $_coreRegistry;
-    const ADMIN_RESOURCE = 'TNW_Subscriptions::top_level';
+    const ADMIN_RESOURCE = 'TNW_Subscriptions::ProductSubscriptionProfile';
 
     /**
      * @param \Magento\Backend\App\Action\Context $context

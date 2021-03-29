@@ -50,12 +50,12 @@ class Product extends Create
      *
      * @var DataObject
      */
-    private $buyRequest;
+    protected $buyRequest;
 
     /**
      * @var []
      */
-    private $data;
+    protected $data;
 
     /**
      * Quote item extension attribute manager.
@@ -74,7 +74,7 @@ class Product extends Create
      *
      * @var MagentoProduct
      */
-    private $product;
+    protected $product;
 
     /**
      * Current used child product.
@@ -93,7 +93,7 @@ class Product extends Create
      *
      * @var DataObject
      */
-    private $productDataObject;
+    protected $productDataObject;
 
     /**
      * @var ProductBillingFrequencyRepository
