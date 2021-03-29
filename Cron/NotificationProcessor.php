@@ -16,7 +16,7 @@ use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfileOrder\CollectionFac
 use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfile\Payment\CollectionFactory as Payment;
 use TNW\Subscriptions\Model\Source\ProfileStatus;
 use TNW\Subscriptions\Model\Queue\Manager;
-use TNW\Subscriptions\Model\Config as  SubscriptionsConfig;
+use TNW\Subscriptions\Model\Config as SubscriptionsConfig;
 
 /**
  * Class NotificationProcessor - cron
