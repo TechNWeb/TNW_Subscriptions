@@ -9,7 +9,7 @@ namespace TNW\Subscriptions\Controller\Adminhtml;
 abstract class ProductSubscriptionProfile extends \Magento\Backend\App\Action
 {
 
-    const ADMIN_RESOURCE = 'TNW_Subscriptions::top_level';
+    const ADMIN_RESOURCE = 'TNW_Subscriptions::ProductSubscriptionProfile';
     protected $_coreRegistry;
 
     /**
