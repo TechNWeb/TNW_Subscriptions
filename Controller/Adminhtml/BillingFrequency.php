@@ -18,7 +18,7 @@ abstract class BillingFrequency extends \Magento\Backend\App\Action
     /**
      * ACL value
      */
-    const ADMIN_RESOURCE = 'TNW_Subscriptions::top_level';
+    const ADMIN_RESOURCE = 'TNW_Subscriptions::BillingFrequency';
 
     /**
      * @param \Magento\Backend\App\Action\Context $context
