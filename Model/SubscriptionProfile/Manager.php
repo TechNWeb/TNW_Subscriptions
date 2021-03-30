@@ -593,7 +593,7 @@ class Manager
                 $this->historyLogger->log($message, $this->getProfile()->getId());
             } else {
                 $ccTypeOld = isset($additionalInfoOld['cc_type']) ? $additionalInfoOld['cc_type'] : null;
-                $ccTypeOld = $ccTypeOld ? $types[$ccTypeOld] : $ccTypeOld;
+                $ccTypeOld = $ccTypeOld ? $this->processCardType($types, $ccTypeOld) : $ccTypeOld;
                 if (strcasecmp($ccType, $ccTypeOld) !== 0) {
                     $message = __('Card type was changed from <b>%1</b> to <b>%2</b>', $ccTypeOld, $ccType);
                     $this->historyLogger->log($message, $this->getProfile()->getId());
@@ -1514,5 +1514,23 @@ class Manager
             }
         }
         return true;
+    }
+
+    /**
+     * @param $cardTypes
+     * @param $cardTypeToProcess
+     * @return mixed
+     */
+    private function processCardType($cardTypes, $cardTypeToProcess)
+    {
+        if (array_key_exists($cardTypeToProcess, $cardTypes)) {
+            return $cardTypes[$cardTypeToProcess];
+        }
+        foreach ($cardTypes as $cardCode => $cardType) {
+            if (strtolower($cardTypeToProcess) == strtolower($cardType)) {
+                return $cardType;
+            }
+        }
+        return $cardTypeToProcess;
     }
 }
