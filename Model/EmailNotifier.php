@@ -5,6 +5,8 @@
  */
 namespace TNW\Subscriptions\Model;
 
+use TNW\Subscriptions\Model\Source\ProfileStatus;
+
 /**
  * Class EmailNotifier
  * @package TNW\Subscriptions\Model
@@ -251,43 +253,47 @@ class EmailNotifier
     public function renewal($subscriptionProfile, $date)
     {
         if ($this->checkEmailTemplateSetting(self::XML_PATH_RENEWAL)) {
-            $subscriptionProfiles = [];
-            if (is_numeric($subscriptionProfile)) {
-                try {
-                    $subscriptionProfiles[] = $this->subscriptionProfileRepository->getById($subscriptionProfile);
-                } catch (\Exception $e) {
-                    $subscriptionProfiles = [];
-                }
-            } elseif (is_array($subscriptionProfile)) {
-                foreach ($subscriptionProfile as $profileId) {
+            if ($subscriptionProfile->getStatus() == ProfileStatus::STATUS_PAST_DUE
+                || $subscriptionProfile->getStatus() == ProfileStatus::STATUS_ACTIVE
+            ) {
+                $subscriptionProfiles = [];
+                if (is_numeric($subscriptionProfile)) {
                     try {
-                        $subscriptionProfiles[] = $this->subscriptionProfileRepository->getById($profileId);
+                        $subscriptionProfiles[] = $this->subscriptionProfileRepository->getById($subscriptionProfile);
                     } catch (\Exception $e) {
+                        $subscriptionProfiles = [];
                     }
+                } elseif (is_array($subscriptionProfile)) {
+                    foreach ($subscriptionProfile as $profileId) {
+                        try {
+                            $subscriptionProfiles[] = $this->subscriptionProfileRepository->getById($profileId);
+                        } catch (\Exception $e) {
+                        }
+                    }
+                } else {
+                    $subscriptionProfiles[] = $subscriptionProfile;
                 }
-            } else {
-                $subscriptionProfiles[] = $subscriptionProfile;
-            }
 
-            if ($subscriptionProfiles) {
-                $subscriptionProfile =  reset($subscriptionProfiles);
-                $customer = $subscriptionProfile->getCustomer();
-                $this->sendNotificationEmail(
-                    $this->scopeConfig->getValue(
-                        self::XML_PATH_RENEWAL,
-                        \Magento\Store\Model\ScopeInterface::SCOPE_STORE
-                    ),
-                    $customer->getStoreId(),
-                    [
-                        'subscriptions' => $subscriptionProfiles,
-                        'customer' => $customer,
-                        'date' => date('F jS, Y', strtotime($date))
-                    ],
-                    [
-                        'email' => $customer->getEmail(),
-                        'name' => $customer->getFirstname() . ' ' . $customer->getLastName()
-                    ]
-                );
+                if ($subscriptionProfiles) {
+                    $subscriptionProfile = reset($subscriptionProfiles);
+                    $customer = $subscriptionProfile->getCustomer();
+                    $this->sendNotificationEmail(
+                        $this->scopeConfig->getValue(
+                            self::XML_PATH_RENEWAL,
+                            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+                        ),
+                        $customer->getStoreId(),
+                        [
+                            'subscriptions' => $subscriptionProfiles,
+                            'customer' => $customer,
+                            'date' => date('F jS, Y', strtotime($date))
+                        ],
+                        [
+                            'email' => $customer->getEmail(),
+                            'name' => $customer->getFirstname() . ' ' . $customer->getLastName()
+                        ]
+                    );
+                }
             }
         }
     }
