@@ -5,6 +5,8 @@
  */
 namespace TNW\Subscriptions\Model;
 
+use TNW\Subscriptions\Model\Source\ProfileStatus;
+
 /**
  * Class EmailNotifier - used for email notifications
  */
@@ -258,44 +260,48 @@ class EmailNotifier
     public function renewal($subscriptionProfile, $date)
     {
         if ($this->checkEmailTemplateSetting(self::XML_PATH_RENEWAL)) {
-            $subscriptionProfiles = [];
-            if (is_numeric($subscriptionProfile)) {
-                try {
-                    $subscriptionProfiles[] = $this->subscriptionProfileRepository->getById($subscriptionProfile);
-                } catch (\Exception $e) {
-                    $subscriptionProfiles = [];
-                }
-            } elseif (is_array($subscriptionProfile)) {
-                foreach ($subscriptionProfile as $profileId) {
+            if ($subscriptionProfile->getStatus() == ProfileStatus::STATUS_PAST_DUE
+            || $subscriptionProfile->getStatus() == ProfileStatus::STATUS_ACTIVE
+            ) {
+                $subscriptionProfiles = [];
+                if (is_numeric($subscriptionProfile)) {
                     try {
-                        $subscriptionProfiles[] = $this->subscriptionProfileRepository->getById($profileId);
+                        $subscriptionProfiles[] = $this->subscriptionProfileRepository->getById($subscriptionProfile);
                     } catch (\Exception $e) {
-                        continue;
+                        $subscriptionProfiles = [];
                     }
+                } elseif (is_array($subscriptionProfile)) {
+                    foreach ($subscriptionProfile as $profileId) {
+                        try {
+                            $subscriptionProfiles[] = $this->subscriptionProfileRepository->getById($profileId);
+                        } catch (\Exception $e) {
+                            continue;
+                        }
+                    }
+                } else {
+                    $subscriptionProfiles[] = $subscriptionProfile;
                 }
-            } else {
-                $subscriptionProfiles[] = $subscriptionProfile;
-            }
 
-            if ($subscriptionProfiles) {
-                $subscriptionProfile = reset($subscriptionProfiles);
-                list($storeId, $customerEmail, $customerName) = $this->getCustomerVars($subscriptionProfile);
-                $this->sendNotificationEmail(
-                    $this->scopeConfig->getValue(
-                        self::XML_PATH_RENEWAL,
-                        \Magento\Store\Model\ScopeInterface::SCOPE_STORE
-                    ),
-                    $storeId,
-                    [
-                        'subscriptions' => $subscriptionProfiles,
-                        'customerName' => $customerName,
-                        'date' => date('F jS, Y', strtotime($date))
-                    ],
-                    [
-                        'email' => $customerEmail,
-                        'name' => $customerName
-                    ]
-                );
+                if ($subscriptionProfiles) {
+                    $subscriptionProfile = reset($subscriptionProfiles);
+                    list($storeId, $customerEmail, $customerName) = $this->getCustomerVars($subscriptionProfile);
+                    $this->sendNotificationEmail(
+                        $this->scopeConfig->getValue(
+                            self::XML_PATH_RENEWAL,
+                            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+                        ),
+                        $storeId,
+                        [
+                            'subscriptions' => $subscriptionProfiles,
+                            'customerName' => $customerName,
+                            'date' => date('F jS, Y', strtotime($date))
+                        ],
+                        [
+                            'email' => $customerEmail,
+                            'name' => $customerName
+                        ]
+                    );
+                }
             }
         }
     }
