@@ -260,31 +260,30 @@ class EmailNotifier
     public function renewal($subscriptionProfile, $date)
     {
         if ($this->checkEmailTemplateSetting(self::XML_PATH_RENEWAL)) {
-            if ($subscriptionProfile->getStatus() == ProfileStatus::STATUS_PAST_DUE
-            || $subscriptionProfile->getStatus() == ProfileStatus::STATUS_ACTIVE
-            ) {
-                $subscriptionProfiles = [];
-                if (is_numeric($subscriptionProfile)) {
-                    try {
-                        $subscriptionProfiles[] = $this->subscriptionProfileRepository->getById($subscriptionProfile);
-                    } catch (\Exception $e) {
-                        $subscriptionProfiles = [];
-                    }
-                } elseif (is_array($subscriptionProfile)) {
-                    foreach ($subscriptionProfile as $profileId) {
-                        try {
-                            $subscriptionProfiles[] = $this->subscriptionProfileRepository->getById($profileId);
-                        } catch (\Exception $e) {
-                            continue;
-                        }
-                    }
-                } else {
-                    $subscriptionProfiles[] = $subscriptionProfile;
+            $subscriptionProfiles = [];
+            if (is_numeric($subscriptionProfile)) {
+                try {
+                    $subscriptionProfiles[] = $this->subscriptionProfileRepository->getById($subscriptionProfile);
+                } catch (\Exception $e) {
+                    $subscriptionProfiles = [];
                 }
+            } elseif (is_array($subscriptionProfile)) {
+                foreach ($subscriptionProfile as $profileId) {
+                    try {
+                        $subscriptionProfiles[] = $this->subscriptionProfileRepository->getById($profileId);
+                    } catch (\Exception $e) {
+                        continue;
+                    }
+                }
+            } else {
+                $subscriptionProfiles[] = $subscriptionProfile;
+            }
 
-                if ($subscriptionProfiles) {
-                    $subscriptionProfile = reset($subscriptionProfiles);
-                    list($storeId, $customerEmail, $customerName) = $this->getCustomerVars($subscriptionProfile);
+            if ($subscriptionProfiles) {
+                $subscriptionProfile = reset($subscriptionProfiles);
+                list($storeId, $customerEmail, $customerName) = $this->getCustomerVars($subscriptionProfile);
+                if ($subscriptionProfile->getStatus() == ProfileStatus::STATUS_PAST_DUE
+                    || $subscriptionProfile->getStatus() == ProfileStatus::STATUS_ACTIVE) {
                     $this->sendNotificationEmail(
                         $this->scopeConfig->getValue(
                             self::XML_PATH_RENEWAL,
