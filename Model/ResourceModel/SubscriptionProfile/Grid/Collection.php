@@ -63,6 +63,7 @@ class Collection extends SearchResult
         $this->_initialFieldsToSelect = array_merge(
             $this->_initialFieldsToSelect,
             [
+                'billing_frequency_id',
                 'website_id',
                 'status',
                 'trial_start_date',
@@ -118,7 +119,9 @@ class Collection extends SearchResult
                 ]
             )
             ->joinLeft(
-                ['payment' => $this->getTable(SubscriptionProfilePaymentInterface::SUBSCRIPTIONS_PROFILE_PAYMENT_TABLE)],
+                ['payment' => $this->getTable(
+                    SubscriptionProfilePaymentInterface::SUBSCRIPTIONS_PROFILE_PAYMENT_TABLE
+                )],
                 'main_table.entity_id = payment.subscription_profile_id',
                 [
                     'engine_code' => 'payment.engine_code',
@@ -135,8 +138,7 @@ class Collection extends SearchResult
                     'parent_id' => 'profile_product.parent_id',
                     'product_options' => 'profile_product.custom_options'
                 ]
-            )
-            ->where('parent_id IS NULL');
+            )->where('parent_id IS NULL');
 
         return $this;
     }
@@ -157,7 +159,8 @@ class Collection extends SearchResult
         )->where(
             SubscriptionProfileOrderInterface::MAGENTO_ORDER_ID . ' IS NULL'
         )->where(
-            'main_table.status not in (?)', [
+            'main_table.status not in (?)',
+            [
                 ProfileStatus::STATUS_COMPLETE,
                 ProfileStatus::STATUS_CANCELED,
             ]
