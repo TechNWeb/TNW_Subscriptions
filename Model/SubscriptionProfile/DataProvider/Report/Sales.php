@@ -8,6 +8,7 @@ namespace TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Report;
 use Magento\Ui\DataProvider\AbstractDataProvider;
 use TNW\Subscriptions\Model\ResourceModel\Report\Sales\SubscriptionsFactory;
 use Magento\Framework\App\RequestInterface;
+use TNW\Subscriptions\Model\ResourceModel\Report\Sales\Subscriptions;
 
 /**
  * Class Sales - dataProvider for sales report
@@ -95,7 +96,7 @@ class Sales extends AbstractDataProvider
     }
 
     /**
-     * @return \Magento\Framework\Model\ResourceModel\Db\Collection\AbstractCollection|\TNW\Subscriptions\Model\ResourceModel\Report\Sales\Subscriptions
+     * @return Subscriptions
      */
     public function getCollection()
     {
@@ -196,7 +197,7 @@ class Sales extends AbstractDataProvider
     }
 
     /**
-     * @return \Magento\Framework\Api\Search\SearchResultInterface|\Magento\Framework\Model\ResourceModel\Db\Collection\AbstractCollection|\TNW\Subscriptions\Model\ResourceModel\Report\Sales\Subscriptions
+     * @return Subscriptions
      */
     public function getSearchResult()
     {
@@ -273,19 +274,17 @@ class Sales extends AbstractDataProvider
                         case 'day':
                             $periodStartTime = date("Y-m-d 00:00:00", $itemDateTime);
                             $periodEndingTime = date("Y-m-d 23:59:59", $itemDateTime);
-                            $periodGroupValue = date("Y-m-d", $itemDateTime);
                             break;
                         case 'month':
                             $periodStartTime = date("Y-m-1 00:00:00", $itemDateTime);
                             $periodEndingTime = date("Y-m-t 23:59:59", $itemDateTime);
-                            $periodGroupValue = date("Y-m", $itemDateTime);
                             break;
                         default:
                             $periodStartTime = date("Y-1-1 00:00:00", $itemDateTime);
                             $periodEndingTime = date("Y-12-31 23:59:59", $itemDateTime);
-                            $periodGroupValue = date("Y", $itemDateTime);
                             break;
                     }
+                    $periodGroupValue = $periodEndingTime;
                 }
                 if (array_key_exists($periodGroupValue, $processedItemsGroupedByPeriods)
                     && array_key_exists($itemData['sku'], $processedItemsGroupedByPeriods[$periodGroupValue])

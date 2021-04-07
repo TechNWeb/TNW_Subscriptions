@@ -7,6 +7,9 @@ namespace TNW\Subscriptions\Controller\Adminhtml\Report\Sales;
 
 use Magento\Backend\App\Action;
 
+/**
+ * Class Subscriptions -controller for report form/grid
+ */
 class Subscriptions extends Action
 {
     /**
