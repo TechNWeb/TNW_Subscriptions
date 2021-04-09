@@ -191,10 +191,18 @@ class Subscriptions extends Collection implements SearchResultInterface
         if (!$this->_items && !$this->isLoaded() && $this->_filters) {
             foreach ($this->_filters as $filterName => $filter) {
                 switch ($filterName) {
-                    case 'from': $fromDate = $filter->getData($filterName)['eq']; break;
-                    case 'to': $toDate = $filter->getData($filterName)['eq']; break;
-                    case 'date': $date = $filter->getData($filterName)['eq']; break;
-                    case 'order_status': $status = $filter->getData($filterName)['eq'];break;
+                    case 'from':
+                        $fromDate = $filter->getData($filterName)['eq'];
+                        break;
+                    case 'to':
+                        $toDate = $filter->getData($filterName)['eq'];
+                        break;
+                    case 'date':
+                        $date = $filter->getData($filterName)['eq'];
+                        break;
+                    case 'order_status':
+                        $status = $filter->getData($filterName)['eq'];
+                        break;
                     default: //TODO: make possibility to apply other filters to collection
                         break;
                 }
@@ -237,15 +245,15 @@ class Subscriptions extends Collection implements SearchResultInterface
                     )->where(
                         $this->connection->getConnection()->prepareSqlCondition(
                             'order.' . $date,
-                            array(
+                            [
                                 "from" => date('Y-m-d 00:00:00', strtotime($fromDate)),
                                 "to" => date('Y-m-d 23:59:59', strtotime($toDate))
-                            )
+                            ]
                         )
                     )->where(
                         $this->connection->getConnection()->prepareSqlCondition(
                             'order.status',
-                            $status
+                            $status == 'any' ? ["notnull" => true] : $status
                         )
                     )->where(
                         $this->connection->getConnection()->prepareSqlCondition(

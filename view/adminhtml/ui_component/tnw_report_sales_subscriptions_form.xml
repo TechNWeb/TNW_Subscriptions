@@ -1,0 +1,180 @@
+<?xml version="1.0" ?>
+<!--
+/**
+ * Copyright © 2018 TechNWeb, Inc. All rights reserved.
+ * See TNW_LICENSE.txt for license details.
+ */
+-->
+<form xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd"
+      component="TNW_Subscriptions/js/form/report/report-sales-form">
+    <argument name="data" xsi:type="array">
+        <item name="js_config" xsi:type="array">
+            <item name="provider" xsi:type="string">tnw_report_sales_subscriptions_form.tnw_report_sales_subscriptions_form_data_source</item>
+            <item name="grid_source_name" xsi:type="string">tnw_report_sales_subscriptions.tnw_report_sales_subscriptions_data_source</item>
+        </item>
+        <item name="template" xsi:type="string">templates/form/collapsible</item>
+    </argument>
+    <settings>
+        <deps>
+            <dep>tnw_report_sales_subscriptions_form.tnw_report_sales_subscriptions_form_data_source</dep>
+        </deps>
+    </settings>
+    <dataSource name="tnw_report_sales_subscriptions_form_data_source" component="Magento_Ui/js/form/provider">
+        <dataProvider class="TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Report\SalesForm"
+                      name="tnw_report_sales_subscriptions_form_data_source">
+            <settings>
+                <requestFieldName>id</requestFieldName>
+                <primaryFieldName>id</primaryFieldName>
+            </settings>
+        </dataProvider>
+    </dataSource>
+    <fieldset name="subscriptions_form_fields">
+        <settings>
+            <label translate="true">Filter</label>
+            <collapsible>true</collapsible>
+            <opened>true</opened>
+            <dataScope>data</dataScope>
+        </settings>
+        <field name="date" formElement="select">
+            <settings>
+                <notice translate="true">The Order Updated report is created in real time and does not require a refresh</notice>
+                <dataType>text</dataType>
+                <label translate="true">Date Used</label>
+                <validation>
+                    <rule name="required-entry" xsi:type="boolean">true</rule>
+                    <rule name="validate-select" xsi:type="boolean">true</rule>
+                </validation>
+            </settings>
+            <formElements>
+                <select>
+                    <settings>
+                        <options>
+                            <option name="0" xsi:type="array">
+                                <item name="value" xsi:type="string">created_at</item>
+                                <item name="label" xsi:type="string">Order Created</item>
+                            </option>
+                            <option name="1" xsi:type="array">
+                                <item name="value" xsi:type="string">updated_at</item>
+                                <item name="label" xsi:type="string">Order Updated</item>
+                            </option>
+                        </options>
+                        <caption translate="true">-- Please Select --</caption>
+                    </settings>
+                </select>
+            </formElements>
+        </field>
+        <field name="period" formElement="select">
+            <settings>
+                <dataType>text</dataType>
+                <label translate="true">Period</label>
+                <validation>
+                    <rule name="required-entry" xsi:type="boolean">true</rule>
+                    <rule name="validate-select" xsi:type="boolean">true</rule>
+                </validation>
+            </settings>
+            <formElements>
+                <select>
+                    <settings>
+                        <options>
+                            <option name="0" xsi:type="array">
+                                <item name="value" xsi:type="string">day</item>
+                                <item name="label" xsi:type="string">Day</item>
+                            </option>
+                            <option name="1" xsi:type="array">
+                                <item name="value" xsi:type="string">month</item>
+                                <item name="label" xsi:type="string">Month</item>
+                            </option>
+                            <option name="2" xsi:type="array">
+                                <item name="value" xsi:type="string">year</item>
+                                <item name="label" xsi:type="string">Year</item>
+                            </option>
+                        </options>
+                        <caption translate="true">-- Please Select --</caption>
+                    </settings>
+                </select>
+            </formElements>
+        </field>
+        <field name="from" formElement="date">
+            <settings>
+                <label translate="true">From</label>
+                <dataType>text</dataType>
+                <validation>
+                    <rule name="required-entry" xsi:type="boolean">true</rule>
+                    <rule name="validate-date" xsi:type="boolean">true</rule>
+                </validation>
+            </settings>
+            <formElements>
+                <date>
+                    <settings>
+                        <options>
+                            <option name="dateFormat" xsi:type="string">YY-MM-DD</option>
+                            <option name="showsTime" xsi:type="boolean">false</option>
+                        </options>
+                    </settings>
+                </date>
+            </formElements>
+        </field>
+        <field name="to" formElement="date">
+            <settings>
+                <label translate="true">To</label>
+                <dataType>text</dataType>
+                <validation>
+                    <rule name="required-entry" xsi:type="boolean">true</rule>
+                    <rule name="validate-date" xsi:type="boolean">true</rule>
+                </validation>
+            </settings>
+            <formElements>
+                <date>
+                    <settings>
+                        <options>
+                            <option name="dateFormat" xsi:type="string">YY-MM-DD</option>
+                            <option name="showsTime" xsi:type="boolean">false</option>
+                        </options>
+                    </settings>
+                </date>
+            </formElements>
+        </field>
+        <field name="order_status" formElement="select">
+            <settings>
+                <notice translate="true">Applies to Any of the Specified Order Statuses except canceled orders</notice>
+                <dataType>text</dataType>
+                <label translate="true">Order Status</label>
+                <validation>
+                    <rule name="required-entry" xsi:type="boolean">true</rule>
+                    <rule name="validate-select" xsi:type="boolean">true</rule>
+                </validation>
+            </settings>
+            <formElements>
+                <select>
+                    <settings>
+                        <options class="TNW\Subscriptions\Ui\Component\Field\OrderStatusOptions"/>
+                        <caption translate="true">-- Please Select --</caption>
+                    </settings>
+                </select>
+            </formElements>
+        </field>
+        <button name="submit_filter">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="buttonClasses" xsi:type="string">primary</item>
+                    <item name="actions" xsi:type="array">
+                        <item name="0" xsi:type="array">
+                            <item name="targetName" xsi:type="string">index = tnw_report_sales_subscriptions_form</item>
+                            <item name="actionName" xsi:type="string">filter</item>
+                        </item>
+                    </item>
+                </item>
+            </argument>
+            <settings>
+                <title translate="true">Generate Report</title>
+            </settings>
+        </button>
+    </fieldset>
+    <insertListing name="tnw_report_sales_subscriptions_insert">
+        <settings>
+            <autoRender>true</autoRender>
+            <ns>tnw_report_sales_subscriptions</ns>
+        </settings>
+    </insertListing>
+</form>

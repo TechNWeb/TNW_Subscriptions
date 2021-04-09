@@ -10,83 +10,69 @@
     <argument name="data" xsi:type="array">
         <item name="js_config" xsi:type="array">
             <item name="provider" xsi:type="string">tnw_report_sales_subscriptions.tnw_report_sales_subscriptions_data_source</item>
-            <item name="deps" xsi:type="string">tnw_report_sales_subscriptions.tnw_report_sales_subscriptions_data_source</item>
         </item>
-        <item name="spinner" xsi:type="string">tnw_report_sales_subscriptions_columns</item>
         <item name="acl" xsi:type="string">TNW_Subscriptions::report_sales_subscriptions</item>
     </argument>
-    <dataSource name="tnw_report_sales_subscriptions_data_source">
-        <argument name="dataProvider" xsi:type="configurableObject">
-            <argument name="class" xsi:type="string">TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Report\Sales</argument>
-            <argument name="name" xsi:type="string">tnw_report_sales_subscriptions_data_source</argument>
-            <argument name="primaryFieldName" xsi:type="string">entity_id</argument>
-            <argument name="requestFieldName" xsi:type="string">id</argument>
-            <argument name="data" xsi:type="array">
-                <item name="config" xsi:type="array">
-                    <item name="component" xsi:type="string">Magento_Ui/js/grid/provider</item>
-                    <item name="update_url" xsi:type="url" path="mui/index/render"/>
-                    <item name="storageConfig" xsi:type="array">
-                        <item name="cacheRequests" xsi:type="boolean">false</item>
-                    </item>
-                    <item name="filter_url_params" xsi:type="array">
-                        <item name="from" xsi:type="string">*</item>
-                        <item name="to" xsi:type="string">*</item>
-                        <item name="date" xsi:type="string">*</item>
-                        <item name="period" xsi:type="string">*</item>
-                        <item name="order_status" xsi:type="string">*</item>
-                    </item>
-                </item>
-            </argument>
-        </argument>
+    <settings>
+        <deps>
+            <dep>tnw_report_sales_subscriptions.tnw_report_sales_subscriptions_data_source</dep>
+        </deps>
+        <spinner>tnw_report_sales_subscriptions_columns</spinner>
+    </settings>
+    <dataSource name="tnw_report_sales_subscriptions_data_source" component="Magento_Ui/js/grid/provider">
+        <settings>
+            <filterUrlParams>
+                <param name="from">*</param>
+                <param name="to">*</param>
+                <param name="date">*</param>
+                <param name="period">*</param>
+                <param name="order_status">*</param>
+            </filterUrlParams>
+            <storageConfig>
+                <param name="cacheRequests" xsi:type="boolean">false</param>
+            </storageConfig>
+            <updateUrl path="mui/index/render"/>
+        </settings>
+        <dataProvider name="tnw_report_sales_subscriptions_data_source"
+                      class="TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Report\Sales">
+            <settings>
+                <primaryFieldName>entity_id</primaryFieldName>
+                <requestFieldName>id</requestFieldName>
+            </settings>
+        </dataProvider>
     </dataSource>
-    <listingToolbar name="listing_top">
-        <exportButton name="export_button" />
-    </listingToolbar>
     <columns name="tnw_report_sales_subscriptions_columns">
-        <column name="interval" class="TNW\Subscriptions\Ui\Component\Listing\Column\Report\Date">
-            <argument name="data" xsi:type="array">
-                <item name="config" xsi:type="array">
-                    <item name="filter" xsi:type="string">dateRange</item>
-                    <item name="dataType" xsi:type="string">date</item>
-                    <item name="component" xsi:type="string">Magento_Ui/js/grid/columns/date</item>
-                    <item name="label" xsi:type="string" translate="true">Interval</item>
-                    <item name="sortOrder" xsi:type="number">10</item>
-                </item>
-            </argument>
+        <column name="interval" sortOrder="10"
+                class="TNW\Subscriptions\Ui\Component\Listing\Column\Report\Date"
+                component="Magento_Ui/js/grid/columns/date">
+            <settings>
+                <filter>dateRange</filter>
+                <dataType>date</dataType>
+                <label translate="true">Interval</label>
+            </settings>
         </column>
-        <column name="name">
-            <argument name="data" xsi:type="array">
-                <item name="config" xsi:type="array">
-                    <item name="filter" xsi:type="string">text</item>
-                    <item name="label" xsi:type="string" translate="true">Product Name</item>
-                    <item name="sortOrder" xsi:type="number">20</item>
-                </item>
-            </argument>
+        <column name="name" sortOrder="20">
+            <settings>
+                <filter>text</filter>
+                <label translate="true">Product Name</label>
+            </settings>
         </column>
-        <column name="sku">
-            <argument name="data" xsi:type="array">
-                <item name="config" xsi:type="array">
-                    <item name="filter" xsi:type="string">text</item>
-                    <item name="label" xsi:type="string" translate="true">SKU</item>
-                    <item name="sortOrder" xsi:type="number">30</item>
-                </item>
-            </argument>
+        <column name="sku" sortOrder="30">
+            <settings>
+                <filter>text</filter>
+                <label translate="true">SKU</label>
+            </settings>
         </column>
-        <column name="qty">
-            <argument name="data" xsi:type="array">
-                <item name="config" xsi:type="array">
-                    <item name="label" xsi:type="string" translate="true">Total Qty</item>
-                    <item name="sortOrder" xsi:type="number">40</item>
-                </item>
-            </argument>
+        <column name="qty" sortOrder="40">
+            <settings>
+                <label translate="true">Total Qty</label>
+            </settings>
         </column>
-        <column name="total" class="Magento\Sales\Ui\Component\Listing\Column\Price">
-            <argument name="data" xsi:type="array">
-                <item name="config" xsi:type="array">
-                    <item name="filter" xsi:type="string">textRange</item>
-                    <item name="label" translate="true" xsi:type="string">Total Price</item>
-                </item>
-            </argument>
+        <column name="total" class="Magento\Sales\Ui\Component\Listing\Column\Price" sortOrder="50">
+            <settings>
+                <filter>textRange</filter>
+                <label translate="true">Total Price</label>
+            </settings>
         </column>
     </columns>
 </listing>
