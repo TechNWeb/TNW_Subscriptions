@@ -16,6 +16,7 @@ use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfileOrder\CollectionFac
 use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfile\Payment\CollectionFactory as Payment;
 use TNW\Subscriptions\Model\Source\ProfileStatus;
 use TNW\Subscriptions\Model\Queue\Manager;
+use TNW\Subscriptions\Model\Config as SubscriptionsConfig;
 
 /**
  * Class NotificationProcessor - cron
@@ -78,6 +79,11 @@ class NotificationProcessor
     private $processor;
 
     /**
+     * @var SubscriptionsConfig
+     */
+    private $subscriptionsConfig;
+
+    /**
      * NotificationProcessor constructor.
      * @param EmailNotifierFactory $emailNotifierFactory
      * @param ScopeConfigInterface $scopeConfig
@@ -89,6 +95,7 @@ class NotificationProcessor
      * @param Payment $paymentFactory
      * @param Manager $queueManager
      * @param ProfileProcessor $processor
+     * @param SubscriptionsConfig $subscriptionsConfig
      */
     public function __construct(
         EmailNotifierFactory $emailNotifierFactory,
@@ -100,8 +107,10 @@ class NotificationProcessor
         State $appState,
         Payment $paymentFactory,
         Manager $queueManager,
-        ProfileProcessor $processor
+        ProfileProcessor $processor,
+        SubscriptionsConfig $subscriptionsConfig
     ) {
+        $this->subscriptionsConfig = $subscriptionsConfig;
         $this->processor = $processor;
         $this->queueManager = $queueManager;
         $this->appState = $appState;
@@ -125,8 +134,10 @@ class NotificationProcessor
             //area already set check
             $this->appState->getAreaCode();
         }
-        $this->sendRenewalNotifications();
-        $this->sendExpiredCardsNotifications();
+        if ($this->subscriptionsConfig->getIsActiveCronNotifications()) {
+            $this->sendRenewalNotifications();
+            $this->sendExpiredCardsNotifications();
+        }
     }
 
     /**

@@ -11,6 +11,7 @@ use Magento\Customer\Helper\Address;
 use Magento\Customer\Model\Address\Mapper;
 use Magento\Framework\Api\FilterBuilder;
 use Magento\Framework\Api\SearchCriteriaBuilder;
+use Magento\Framework\App\Area;
 use Magento\Framework\App\RequestInterface;
 use Magento\Framework\App\State;
 use Magento\Framework\Escaper;
@@ -154,17 +155,15 @@ class CustomerAddress implements OptionSourceInterface
         }
 
         if (count($optionList) > 0) {
-            $label = '';
-            if ($this->appState->getAreaCode() === \Magento\Framework\App\Area::AREA_FRONTEND) {
-                $label = __('Please select address');
-            }
-
-            $optionList[] = [
-                'value' => 0,
-                'label' => $label,
-                'empty' => true
-            ];
-
+            $isFrontend = $this->appState->getAreaCode() === Area::AREA_FRONTEND;
+            array_unshift(
+                $optionList,
+                [
+                    'value' => $isFrontend ? '' : 0,
+                    'label' => $isFrontend ? __('Please select address') : '',
+                    'empty' => true
+                ]
+            );
         }
 
         return $optionList;
@@ -280,7 +279,7 @@ class CustomerAddress implements OptionSourceInterface
      */
     private function getProfileId()
     {
-        $field = $this->appState->getAreaCode() === \Magento\Framework\App\Area::AREA_FRONTEND
+        $field = $this->appState->getAreaCode() === Area::AREA_FRONTEND
             ? 'entity_id'
             : SummaryInsertForm::FORM_DATA_KEY;
 

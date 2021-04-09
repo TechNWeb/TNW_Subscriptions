@@ -144,23 +144,25 @@ class Save extends AbstractSave
 
                 $errors = $this->processRequestData($request);
 
-                if ($profile->hasDataChanges()) {
-                    $profile->setNeedRecollect('1');
-                }
-                $profile->setDataChanges($profileDataChanges || $profile->hasDataChanges());
-                $this->profileManager->saveProfile();
-                if ((strtotime(date('Y-m-d')) < strtotime($originalStartDate))
-                    && ($frequencyChanged || $startOnChanged)
-                ) {
-                    $nextDate = $trialLength
-                        ? $profile->getStartDate()
-                        : $this->billingCyclesManager->calculateBillingCycleDate($profile);
-                    $this->profileOrderManager->updateNextPaymentDate($profile, $nextDate);
-                }
-                if ($frequencyChanged) {
-                    $this->messageManager->addSuccessMessage(__(
-                        'New Billing Frequency will take effect after the next order.'
-                    ));
+                if (!$errors) {
+                    if ($profile->hasDataChanges()) {
+                        $profile->setNeedRecollect('1');
+                    }
+                    $profile->setDataChanges($profileDataChanges || $profile->hasDataChanges());
+                    $this->profileManager->saveProfile();
+                    if ((strtotime(date('Y-m-d')) < strtotime($originalStartDate))
+                        && ($frequencyChanged || $startOnChanged)
+                    ) {
+                        $nextDate = $trialLength
+                            ? $profile->getStartDate()
+                            : $this->billingCyclesManager->calculateBillingCycleDate($profile);
+                        $this->profileOrderManager->updateNextPaymentDate($profile, $nextDate);
+                    }
+                    if ($frequencyChanged) {
+                        $this->messageManager->addSuccessMessage(__(
+                            'New Billing Frequency will take effect after the next order.'
+                        ));
+                    }
                 }
             } catch (\Exception $e) {
                 $errors[] = $e->getMessage();

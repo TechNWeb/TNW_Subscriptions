@@ -45,6 +45,27 @@
             </item>
         </argument>
         <filters name="listing_filters"/>
+        <massaction name="listing_massaction">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="selectProvider" xsi:type="string">tnw_subscriptionprofile_account_index.tnw_subscriptionprofile_account_index.tnw_subscriptionprofile_columns.ids</item>
+                    <item name="component" xsi:type="string">Magento_Ui/js/grid/tree-massactions</item>
+                    <item name="indexField" xsi:type="string">entity_id</item>
+                </item>
+            </argument>
+            <action name="delete">
+                <argument name="data" xsi:type="array">
+                    <item name="config" xsi:type="array">
+                        <item name="type" xsi:type="string">edit</item>
+                        <item name="label" xsi:type="string" translate="true">Change Shipping Address &amp; Method</item>
+                        <item name="callback" xsi:type="array">
+                            <item name="provider" xsi:type="string">index = tnw_subscriptionprofile_account_massedit_form</item>
+                            <item name="target" xsi:type="string">startMassEdit</item>
+                        </item>
+                    </item>
+                </argument>
+            </action>
+        </massaction>
     </listingToolbar>
     <columns name="tnw_subscriptionprofile_columns">
         <argument name="data" xsi:type="array">
@@ -62,6 +83,13 @@
                 </item>
             </item>
         </argument>
+        <selectionsColumn name="ids">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="indexField" xsi:type="string">entity_id</item>
+                </item>
+            </argument>
+        </selectionsColumn>
         <column name="entity_id">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">

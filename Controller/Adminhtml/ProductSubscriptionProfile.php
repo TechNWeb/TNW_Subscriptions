@@ -13,7 +13,7 @@ abstract class ProductSubscriptionProfile extends \Magento\Backend\App\Action
     /**
      * ACL value
      */
-    const ADMIN_RESOURCE = 'TNW_Subscriptions::top_level';
+    const ADMIN_RESOURCE = 'TNW_Subscriptions::ProductSubscriptionProfile';
 
     /**
      * @var \Magento\Framework\Registry

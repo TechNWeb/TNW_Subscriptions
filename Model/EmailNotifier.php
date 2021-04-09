@@ -5,6 +5,8 @@
  */
 namespace TNW\Subscriptions\Model;
 
+use TNW\Subscriptions\Model\Source\ProfileStatus;
+
 /**
  * Class EmailNotifier - used for email notifications
  */
@@ -280,22 +282,25 @@ class EmailNotifier
             if ($subscriptionProfiles) {
                 $subscriptionProfile = reset($subscriptionProfiles);
                 list($storeId, $customerEmail, $customerName) = $this->getCustomerVars($subscriptionProfile);
-                $this->sendNotificationEmail(
-                    $this->scopeConfig->getValue(
-                        self::XML_PATH_RENEWAL,
-                        \Magento\Store\Model\ScopeInterface::SCOPE_STORE
-                    ),
-                    $storeId,
-                    [
-                        'subscriptions' => $subscriptionProfiles,
-                        'customerName' => $customerName,
-                        'date' => date('F jS, Y', strtotime($date))
-                    ],
-                    [
-                        'email' => $customerEmail,
-                        'name' => $customerName
-                    ]
-                );
+                if ($subscriptionProfile->getStatus() == ProfileStatus::STATUS_PAST_DUE
+                    || $subscriptionProfile->getStatus() == ProfileStatus::STATUS_ACTIVE) {
+                    $this->sendNotificationEmail(
+                        $this->scopeConfig->getValue(
+                            self::XML_PATH_RENEWAL,
+                            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+                        ),
+                        $storeId,
+                        [
+                            'subscriptions' => $subscriptionProfiles,
+                            'customerName' => $customerName,
+                            'date' => date('F jS, Y', strtotime($date))
+                        ],
+                        [
+                            'email' => $customerEmail,
+                            'name' => $customerName
+                        ]
+                    );
+                }
             }
         }
     }

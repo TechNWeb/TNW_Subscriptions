@@ -163,8 +163,15 @@ class VaultPaymentAuthorization
         $messages = [];
         $errorsSource = array_merge($result->getErrorCodes(), $result->getFailsDescription());
         foreach ($errorsSource as $errorCodeOrMessage) {
-            $errorCodeOrMessage = (string) $errorCodeOrMessage;
-            $this->logger->critical('Payment Error: ' . $errorCodeOrMessage);
+            $errorMessage = '';
+            if (is_array($errorCodeOrMessage)) {
+                foreach ($errorCodeOrMessage as $message) {
+                    $errorMessage .= (string) $message;
+                }
+            } else {
+                $errorMessage = (string) $errorCodeOrMessage;
+            }
+            $this->logger->critical('Payment Error: ' . $errorMessage);
         }
 
         if ($withoutException) {

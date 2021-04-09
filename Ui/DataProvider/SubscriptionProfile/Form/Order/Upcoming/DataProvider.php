@@ -80,6 +80,10 @@ class DataProvider extends AbstractDataProvider
     public function getData()
     {
         $profileId = $this->request->getParam('subscription_profile_id', 0);
+        $arrItems = [
+            'totalRecords' => $this->getCollection()->getSize(),
+            'items' => [],
+        ];
         if ($profileId) {
             $columns = [
                 'entity_id' => 'main_table.entity_id',
@@ -116,15 +120,10 @@ class DataProvider extends AbstractDataProvider
             )->columns(
                 $columns
             );
-        }
-
-        $arrItems = [
-            'totalRecords' => $this->getCollection()->getSize(),
-            'items' => [],
-        ];
-
-        foreach ($this->getCollection()->getItems() as $item) {
-            $arrItems['items'][] = $this->prepareItemData($item);
+            $arrItems['totalRecords'] = $this->getCollection()->getSize();
+            foreach ($this->getCollection()->getItems() as $item) {
+                $arrItems['items'][] = $this->prepareItemData($item);
+            }
         }
 
         return $arrItems;
