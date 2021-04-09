@@ -5,6 +5,8 @@
  */
 namespace TNW\Subscriptions\Model;
 
+use TNW\Subscriptions\Model\Source\ProfileStatus;
+
 /**
  * Class EmailNotifier
  * @package TNW\Subscriptions\Model
@@ -263,6 +265,7 @@ class EmailNotifier
                     try {
                         $subscriptionProfiles[] = $this->subscriptionProfileRepository->getById($profileId);
                     } catch (\Exception $e) {
+                        continue;
                     }
                 }
             } else {
@@ -270,24 +273,28 @@ class EmailNotifier
             }
 
             if ($subscriptionProfiles) {
-                $subscriptionProfile =  reset($subscriptionProfiles);
+                $subscriptionProfile = reset($subscriptionProfiles);
                 $customer = $subscriptionProfile->getCustomer();
-                $this->sendNotificationEmail(
-                    $this->scopeConfig->getValue(
-                        self::XML_PATH_RENEWAL,
-                        \Magento\Store\Model\ScopeInterface::SCOPE_STORE
-                    ),
-                    $customer->getStoreId(),
-                    [
-                        'subscriptions' => $subscriptionProfiles,
-                        'customer' => $customer,
-                        'date' => date('F jS, Y', strtotime($date))
-                    ],
-                    [
-                        'email' => $customer->getEmail(),
-                        'name' => $customer->getFirstname() . ' ' . $customer->getLastName()
-                    ]
-                );
+                if ($subscriptionProfile->getStatus() == ProfileStatus::STATUS_PAST_DUE
+                    || $subscriptionProfile->getStatus() == ProfileStatus::STATUS_ACTIVE
+                ) {
+                    $this->sendNotificationEmail(
+                        $this->scopeConfig->getValue(
+                            self::XML_PATH_RENEWAL,
+                            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+                        ),
+                        $customer->getStoreId(),
+                        [
+                            'subscriptions' => $subscriptionProfiles,
+                            'customer' => $customer,
+                            'date' => date('F jS, Y', strtotime($date))
+                        ],
+                        [
+                            'email' => $customer->getEmail(),
+                            'name' => $customer->getFirstname() . ' ' . $customer->getLastName()
+                        ]
+                    );
+                }
             }
         }
     }
