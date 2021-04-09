@@ -48,6 +48,13 @@ define(
                             tab.setMessagesData(message.message);
                         });
                     }
+                } else {
+                    var profileSummary = registry.get('tnw_subscriptionprofile_form.areas.summary');
+                    if (result.messages && _.isArray(result.messages) && profileSummary) {
+                        result.messages.forEach(function (message) {
+                            profileSummary.setMessagesData(message)
+                        })
+                    }
                 }
             },
 

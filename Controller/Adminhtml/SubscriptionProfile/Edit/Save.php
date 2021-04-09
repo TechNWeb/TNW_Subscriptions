@@ -75,23 +75,28 @@ class Save extends AbstractSave
     public function execute()
     {
         $result = $this->initProfile();
+        $messages = [];
         if ($result) {
             try {
                 /** @var SubscriptionProfile $profile */
                 $profile = $this->profileManager->getProfile();
                 $profileDataChanges = $profile->hasDataChanges();
                 $profile->setDataChanges(false);
-                $this->processRequestData();
+                $messages = $this->processRequestData();
                 if ($profile->hasDataChanges()) {
                     $profile->setNeedRecollect('1');
                 }
-                $profile->setDataChanges($profileDataChanges || $profile->hasDataChanges());
-                $this->profileManager->saveProfile();
+                if (!$messages) {
+                    $profile->setDataChanges($profileDataChanges || $profile->hasDataChanges());
+                    $this->profileManager->saveProfile();
+                } else {
+                    $result = false;
+                }
             } catch (\Exception $e) {
                 $result = false;
             }
         }
-        $response = $this->createResponse($result);
+        $response = $this->createResponse($result, $messages);
         return $this->jsonFactory->create()->setJsonData($response->toJson());
     }
 
@@ -119,18 +124,17 @@ class Save extends AbstractSave
     {
         $requestData = $this->getRequest()->getParams();
         $requestData['admin_modification'] = true;
-        $this->getSaveProcessor()->processSave($requestData);
+        return $this->getSaveProcessor()->processSave($requestData);
     }
 
     /**
-     * Creates response object
-     *
      * @param $result
+     * @param array $messages
      * @return DataObject
      */
-    private function createResponse($result)
+    private function createResponse($result, $messages = [])
     {
-        $messages = $this->profileManager->handleMessages();
+        $messages = array_merge($this->profileManager->handleMessages(), $messages);
         $response = new DataObject();
         $response->setData(
             [
