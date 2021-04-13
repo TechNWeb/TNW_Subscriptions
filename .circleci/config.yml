@@ -9,6 +9,7 @@ jobs:
           name: Deploy Over SSH
           command: |
             ssh $SSH_USER@$SSH_HOST "./release"
+ 
   tag-release:
     machine:
       enabled: true
@@ -23,13 +24,13 @@ jobs:
             chmod +x git_release.sh
             ./git_release.sh
 
-  m233-commerce-php72: &base-image
+  m242-commerce-php74: &base-image
     docker:
-      - image: powersync/magento-builds:m233-commerce-php72
+      - image: powersync/magento-builds:m242-commerce-php74
         auth:
           username: $DOCKER_USER
           password: $DOCKER_PASS
-      - image: circleci/mysql:5.7
+      - image: circleci/mysql:8.0
         environment:
           MYSQL_PASSWORD: mage
           MYSQL_USER: mage
@@ -76,7 +77,6 @@ jobs:
 
               composer require --no-update --prefer-source tnw/${moduleNameLower}:"${COMPOSER_BRANCH} as ${COMPOSER_TAG}"
             done
-
       - run:
           name: Install the Extension
           command: |
@@ -91,55 +91,84 @@ jobs:
             cd /var/www/html/magento
             php bin/magento setup:di:compile
             php bin/magento deploy:mode:set developer
-  m233-open_source-php71:
+  
+  m242-open_source-php74:
     <<: *base-image
     docker:
-      - image: powersync/magento-builds:m233-open_source-php71
+      - image: powersync/magento-builds:m242-open_source-php74
         auth:
           username: $DOCKER_USER
           password: $DOCKER_PASS
-      - image: circleci/mysql:5.7
+      - image: circleci/mysql:8.0
         environment:
           MYSQL_PASSWORD: mage
           MYSQL_USER: mage
           MYSQL_DATABASE: magento
           MYSQL_ROOT_PASSWORD: docker
-
-  m234-commerce-php72:
+  
+  m241-commerce-php74:
     <<: *base-image
     docker:
-      - image: powersync/magento-builds:m234-commerce-php72
+      - image: powersync/magento-builds:m241-commerce-php74
         auth:
           username: $DOCKER_USER
           password: $DOCKER_PASS
-      - image: circleci/mysql:5.7
+      - image: circleci/mysql:8.0
         environment:
           MYSQL_PASSWORD: mage
           MYSQL_USER: mage
           MYSQL_DATABASE: magento
           MYSQL_ROOT_PASSWORD: docker
-
-  m234-open_source-php72:
+ 
+  m241-open_source-php74:
     <<: *base-image
     docker:
-      - image: powersync/magento-builds:m234-open_source-php72
+      - image: powersync/magento-builds:m241-open_source-php74
         auth:
           username: $DOCKER_USER
           password: $DOCKER_PASS
-      - image: circleci/mysql:5.7
+      - image: circleci/mysql:8.0
         environment:
           MYSQL_PASSWORD: mage
           MYSQL_USER: mage
           MYSQL_DATABASE: magento
           MYSQL_ROOT_PASSWORD: docker
-
+ 
+  m240-commerce-php74:
+    <<: *base-image
+    docker:
+      - image: powersync/magento-builds:m240-commerce-php74
+        auth:
+          username: $DOCKER_USER
+          password: $DOCKER_PASS
+      - image: circleci/mysql:8.0
+        environment:
+          MYSQL_PASSWORD: mage
+          MYSQL_USER: mage
+          MYSQL_DATABASE: magento
+          MYSQL_ROOT_PASSWORD: docker
+  
+  m240-open_source-php74:
+    <<: *base-image
+    docker:
+      - image: powersync/magento-builds:m240-open_source-php74
+        auth:
+          username: $DOCKER_USER
+          password: $DOCKER_PASS
+      - image: circleci/mysql:8.0
+        environment:
+          MYSQL_PASSWORD: mage
+          MYSQL_USER: mage
+          MYSQL_DATABASE: magento
+          MYSQL_ROOT_PASSWORD: docker
+  
   magento-coding-standard:
     docker:
-      - image: powersync/magento-builds:m234-commerce-php72
+      - image: powersync/magento-builds:m242-commerce-php74
         auth:
           username: $DOCKER_USER
           password: $DOCKER_PASS
-      - image: circleci/mysql:5.7
+      - image: circleci/mysql:8.0
         environment:
           MYSQL_PASSWORD: mage
           MYSQL_USER: mage
@@ -156,17 +185,16 @@ jobs:
   check-composer-installation:
     <<: *base-image
     docker:
-      - image: powersync/magento-builds:m233-open_source-php72
+      - image: powersync/magento-builds:m242-open_source-php74
         auth:
           username: $DOCKER_USER
           password: $DOCKER_PASS
-      - image: circleci/mysql:5.7
+      - image: circleci/mysql:8.0
         environment:
           MYSQL_PASSWORD: mage
           MYSQL_USER: mage
           MYSQL_DATABASE: magento
           MYSQL_ROOT_PASSWORD: docker
-
     steps:
       - run:
           name: Wait for DB
@@ -184,7 +212,6 @@ jobs:
             cd /var/www/html/magento/
             composer config -g http-basic.dist.powersync.biz $TECHWEB_REPO_LOGIN $TECHNWEB_REPO_PASSWORD
             composer config --global repositories.powersync composer https://dist.powersync.biz
-
       - run:
           name: Checkout related modules
           command: |
@@ -193,7 +220,6 @@ jobs:
               NEW_MODULE_VERSION=(`composer show -al $package |grep '^latest '|awk '{print $3}'|sed 's/,//'`);
               composer require $package=$NEW_MODULE_VERSION
             done
-
       - run:
           name: Install the Extension
           command: |
@@ -211,7 +237,7 @@ jobs:
 
   update-wiki:
     docker:
-      - image: circleci/php:7.1-apache-stretch-node-browsers
+      - image: circleci/php:7.4-apache-stretch-node-browsers
     steps:
       - run:
           name: Prepare for wiki update
@@ -266,53 +292,53 @@ jobs:
 
             done
 
-
 workflows:
   version: 2
 
   test-deploy-wiki:
     jobs:
-#      - m234-commerce-php72:
-#          context: powersync
-#          filters:
-#            branches:
-#              only: /.*/
-#
-#      - m234-open_source-php72:
-#          context: powersync
-#          filters:
-#            branches:
-#              only:
-#                - master
-#                - master-2.4.x
-#
-#      - m233-commerce-php72:
-#          context: powersync
-#          filters:
-#            branches:
-#              only:
-#                - master
-#                - master-2.4.x
-#
-#      - m233-open_source-php71:
-#          context: powersync
-#          filters:
-#            branches:
-#              only:
-#                - master
-#                - master-2.4.x
+     
+      - m240-commerce-php74:
+          context: powersync
+          filters:
+            branches:
+              only:
+                - master-2.4.x
 
-#      - m2210-commerce-php72:
-#          context: powersync
-#          filters:
-#            branches:
-#              only: master
-#
-#      - m2210-open_source-php71:
-#          context: powersync
-#          filters:
-#            branches:
-#              only: master
+      - m240-open_source-php74:
+          context: powersync
+          filters:
+            branches:
+              only:
+                - master-2.4.x
+
+      - m241-commerce-php74:
+          context: powersync
+          filters:
+            branches:
+              only:
+                - master-2.4.x
+
+      - m241-open_source-php74:
+          context: powersync
+          filters:
+            branches:
+              only:
+                - master-2.4.x
+
+      - m242-commerce-php74:
+          context: powersync
+          filters:
+            branches:
+              only:
+                - master-2.4.x
+
+      - m242-open_source-php74:
+          context: powersync
+          filters:
+            branches:
+              only:
+                - master-2.4.x
 
       - magento-coding-standard:
           context: powersync
@@ -324,7 +350,6 @@ workflows:
       - deploy:
           context: powersync
           requires:
-            - magento-coding-standard
             - tag-release
           filters:
             branches:
@@ -335,18 +360,18 @@ workflows:
           context: powersync
           requires:
             - magento-coding-standard
+            - check-composer-installation
 
       - check-composer-installation:
           context: powersync
           requires:
             - deploy
 
-      - update-wiki:
-          context: powersync
-          requires:
-            - check-composer-installation
-          filters:
-            branches:
-              only:
-                - master
-                - master-2.4.x
+#      - update-wiki:
+#          context: powersync
+#          requires:
+#            - check-composer-installation
+#          filters:
+#            branches:
+#              only:
+#                - master-2.4.x
