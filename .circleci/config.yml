@@ -36,6 +36,15 @@ jobs:
           MYSQL_USER: mage
           MYSQL_DATABASE: magento
           MYSQL_ROOT_PASSWORD: docker
+      - image: elasticsearch:7.12.0
+        environment:
+          - cluster.name: elasticsearch
+          - transport.host: localhost
+          - network.host: 127.0.0.1
+          - http.port: 9200
+          - discovery.type: single-node
+          - xpack.security.enabled: false
+          - ES_JAVA_OPTS: -Xms750m -Xmx750m
     working_directory: ~/tnw_extension
     steps:
       - checkout
