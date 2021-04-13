@@ -360,7 +360,6 @@ workflows:
           context: powersync
           requires:
             - magento-coding-standard
-            - check-composer-installation
 
       - check-composer-installation:
           context: powersync
