@@ -114,6 +114,15 @@ jobs:
           MYSQL_USER: mage
           MYSQL_DATABASE: magento
           MYSQL_ROOT_PASSWORD: docker
+      - image: elasticsearch:7.12.0
+        environment:
+          - cluster.name: elasticsearch
+          - transport.host: localhost
+          - network.host: 127.0.0.1
+          - http.port: 9200
+          - discovery.type: single-node
+          - xpack.security.enabled: false
+          - ES_JAVA_OPTS: -Xms750m -Xmx750m
   
   m241-commerce-php74:
     <<: *base-image
@@ -128,7 +137,16 @@ jobs:
           MYSQL_USER: mage
           MYSQL_DATABASE: magento
           MYSQL_ROOT_PASSWORD: docker
- 
+      - image: elasticsearch:7.12.0
+        environment:
+          - cluster.name: elasticsearch
+          - transport.host: localhost
+          - network.host: 127.0.0.1
+          - http.port: 9200
+          - discovery.type: single-node
+          - xpack.security.enabled: false
+          - ES_JAVA_OPTS: -Xms750m -Xmx750m
+
   m241-open_source-php74:
     <<: *base-image
     docker:
@@ -142,7 +160,16 @@ jobs:
           MYSQL_USER: mage
           MYSQL_DATABASE: magento
           MYSQL_ROOT_PASSWORD: docker
- 
+      - image: elasticsearch:7.12.0
+        environment:
+          - cluster.name: elasticsearch
+          - transport.host: localhost
+          - network.host: 127.0.0.1
+          - http.port: 9200
+          - discovery.type: single-node
+          - xpack.security.enabled: false
+          - ES_JAVA_OPTS: -Xms750m -Xmx750m
+
   m240-commerce-php74:
     <<: *base-image
     docker:
@@ -156,7 +183,16 @@ jobs:
           MYSQL_USER: mage
           MYSQL_DATABASE: magento
           MYSQL_ROOT_PASSWORD: docker
-  
+      - image: elasticsearch:7.12.0
+        environment:
+          - cluster.name: elasticsearch
+          - transport.host: localhost
+          - network.host: 127.0.0.1
+          - http.port: 9200
+          - discovery.type: single-node
+          - xpack.security.enabled: false
+          - ES_JAVA_OPTS: -Xms750m -Xmx750m
+ 
   m240-open_source-php74:
     <<: *base-image
     docker:
@@ -170,6 +206,15 @@ jobs:
           MYSQL_USER: mage
           MYSQL_DATABASE: magento
           MYSQL_ROOT_PASSWORD: docker
+      - image: elasticsearch:7.12.0
+        environment:
+          - cluster.name: elasticsearch
+          - transport.host: localhost
+          - network.host: 127.0.0.1
+          - http.port: 9200
+          - discovery.type: single-node
+          - xpack.security.enabled: false
+          - ES_JAVA_OPTS: -Xms750m -Xmx750m
   
   magento-coding-standard:
     docker:
@@ -177,12 +222,6 @@ jobs:
         auth:
           username: $DOCKER_USER
           password: $DOCKER_PASS
-      - image: circleci/mysql:8.0
-        environment:
-          MYSQL_PASSWORD: mage
-          MYSQL_USER: mage
-          MYSQL_DATABASE: magento
-          MYSQL_ROOT_PASSWORD: docker
     working_directory: ~/tnw_extension
     steps:
       - checkout
@@ -204,6 +243,15 @@ jobs:
           MYSQL_USER: mage
           MYSQL_DATABASE: magento
           MYSQL_ROOT_PASSWORD: docker
+      - image: elasticsearch:7.12.0
+        environment:
+          - cluster.name: elasticsearch
+          - transport.host: localhost
+          - network.host: 127.0.0.1
+          - http.port: 9200
+          - discovery.type: single-node
+          - xpack.security.enabled: false
+          - ES_JAVA_OPTS: -Xms750m -Xmx750m          
     steps:
       - run:
           name: Wait for DB
