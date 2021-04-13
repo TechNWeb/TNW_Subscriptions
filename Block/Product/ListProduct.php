@@ -20,6 +20,9 @@ use TNW\Subscriptions\Model\Product\Attribute;
 use TNW\Subscriptions\Model\Product\Attribute as SubscriptionProductAttributes;
 use TNW\Subscriptions\Model\ProductBillingFrequency\PriceCalculator;
 use TNW\Subscriptions\Model\Config\Source\PurchaseType;
+use TNW\Subscriptions\Model\Config\Product\SubscriptionProductView;
+use Magento\Catalog\Model\Product\Type;
+use Magento\Downloadable\Model\Product\Type as DownloadableType;
 
 /**
  *  Subscription Product list.
@@ -54,6 +57,11 @@ class ListProduct extends OrigListProduct
     private $frequencyOptionRepository;
 
     /**
+     * @var SubscriptionProductView
+     */
+    private $productView;
+
+    /**
      * ListProduct constructor.
      * @param Context $context
      * @param PostHelper $postDataHelper
@@ -64,6 +72,7 @@ class ListProduct extends OrigListProduct
      * @param PriceCurrencyInterface $priceCurrency
      * @param PriceCalculator $priceCalculator
      * @param FrequencyOptionRepository $frequencyOptionRepository
+     * @param SubscriptionProductView $productView
      * @param array $data
      */
     public function __construct(
@@ -76,6 +85,7 @@ class ListProduct extends OrigListProduct
         PriceCurrencyInterface $priceCurrency,
         PriceCalculator $priceCalculator,
         FrequencyOptionRepository $frequencyOptionRepository,
+        SubscriptionProductView $productView,
         array $data = []
     ) {
         parent::__construct($context, $postDataHelper, $layerResolver, $categoryRepository, $urlHelper, $data);
@@ -83,6 +93,7 @@ class ListProduct extends OrigListProduct
         $this->priceCurrency = $priceCurrency;
         $this->priceCalculator = $priceCalculator;
         $this->frequencyOptionRepository = $frequencyOptionRepository;
+        $this->productView = $productView;
     }
 
     /**
@@ -219,6 +230,30 @@ class ListProduct extends OrigListProduct
         $precision = PriceCurrencyInterface::DEFAULT_PRECISION
     ) {
         return $this->priceCurrency->format($amount, $includeContainer, $precision);
+    }
+
+    /**
+     * Checking is subscription price
+     *
+     * @param $product
+     * @return bool
+     */
+    public function isSubscriptionPrice($product)
+    {
+        return $this->productView->getCustomerGroupLimitation($product);
+    }
+
+    /**
+     * Checking for allowed types
+     *
+     * @param $product
+     * @return bool
+     */
+    public function isAllowedProductType($product)
+    {
+        return $product->getTypeId() == Type::TYPE_SIMPLE
+            || $product->getTypeId() == Type::TYPE_VIRTUAL
+            || $product->getTypeId() == DownloadableType::TYPE_DOWNLOADABLE;
     }
 
     /**

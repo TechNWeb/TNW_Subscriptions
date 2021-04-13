@@ -74,6 +74,9 @@
                 <can_cancel>1</can_cancel>
                 <until_canceled>1</until_canceled>
             </profile_actions>
+            <profile_subscribe_limitations>
+                <sallowspecific>0</sallowspecific>
+            </profile_subscribe_limitations>
         </tnw_subscriptions_customer>
     </default>
 </config>

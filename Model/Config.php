@@ -15,6 +15,7 @@ use Magento\Store\Api\Data\StoreInterface;
 use TNW\Subscriptions\Block\Adminhtml\System\Config\PaymentMethods\ActiveMethods;
 use Magento\Framework\Module\Manager;
 use Magento\Framework\ObjectManagerInterface;
+use Magento\Customer\Model\ResourceModel\Group\Collection;
 
 /**
  * Class Config - config model for subscriptions
@@ -81,6 +82,8 @@ class Config
      */
     private $xmlCanHoldProfile = 'tnw_subscriptions_customer/profile_actions/can_hold';
     private $xmlCanCancelProfile = 'tnw_subscriptions_customer/profile_actions/can_cancel';
+    private $xmlAllowAllCustomerGroups = 'tnw_subscriptions_customer/profile_subscribe_limitations/sallowspecific';
+    private $xmlCustomerGroupLimit = 'tnw_subscriptions_customer/profile_subscribe_limitations/specificcountry';
     /**#@-*/
 
     private $xmlUntilCanceled = 'tnw_subscriptions_customer/profile_actions/until_canceled';
@@ -123,7 +126,8 @@ class Config
         StoreManagerInterface $storeManager,
         Http $request,
         Manager $moduleManager,
-        ObjectManagerInterface $objectManager
+        ObjectManagerInterface $objectManager,
+        Collection $customerGroupCollection
     ) {
         if ($moduleManager->isEnabled("Magento_Paypal")) {
              $this->paypalConfig = $objectManager->get(\Magento\Paypal\Model\Config::class);
@@ -131,6 +135,7 @@ class Config
         $this->scopeConfig = $scopeConfig;
         $this->storeManager = $storeManager;
         $this->request = $request;
+        $this->customerGroupCollectionequest = $customerGroupCollection;
     }
 
     /**
@@ -716,5 +721,33 @@ class Config
             ScopeInterface::SCOPE_STORE,
             $storeId
         );
+    }
+
+    /**
+     * @param null $websiteId
+     * @return mixed|string|null
+     */
+    public function getAllowAllCustomerGroups($websiteId = null)
+    {
+        if ($this->getStoreConfig($this->xmlAllowAllCustomerGroups, $websiteId) === "0") {
+            $result = implode(',', $this->customerGroupCollectionequest->getAllIds());
+        } else {
+            $result = $this->getStoreConfig($this->xmlAllowAllCustomerGroups, $websiteId);
+        }
+        return $result;
+    }
+
+    /**
+     * @param null $websiteId
+     * @return mixed|string|null
+     */
+    public function getCustomerGroupLimit($websiteId = null)
+    {
+        if ($this->getStoreConfig($this->xmlCustomerGroupLimit, $websiteId) === null) {
+            $result = implode(',', $this->customerGroupCollectionequest->getAllIds());
+        } else {
+            $result = $this->getStoreConfig($this->xmlCustomerGroupLimit, $websiteId);
+        }
+        return $result;
     }
 }
