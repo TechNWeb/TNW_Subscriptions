@@ -10,7 +10,7 @@
         <attribute code="tnw_subscription_price" type="string" />
     </extension_attributes>
     <extension_attributes for="Magento\Quote\Api\Data\CartItemInterface">
-        <attribute code="subs_initial_fees" type="TNW\Subscriptions\Model\Sales\ExtensionAttributes\QuoteItem">
+        <attribute code="subs_initial_fees" type="TNW\Subscriptions\Api\Data\SalesExtensionAttributesInterface">
             <join reference_table="tnw_subscriptions_quote_item_extension_entity" join_on_field="item_id" reference_field="item_id">
                 <field>subs_initial_fee</field>
                 <field>base_subs_initial_fee</field>
@@ -30,7 +30,7 @@
         </attribute>
     </extension_attributes>
     <extension_attributes for="Magento\Sales\Api\Data\OrderItemInterface">
-        <attribute code="subs_initial_fees" type="TNW\Subscriptions\Model\Sales\ExtensionAttributes\OrderItem">
+        <attribute code="subs_initial_fees" type="TNW\Subscriptions\Api\Data\OrderItemExtensionAttributesInterface">
             <join reference_table="tnw_subscriptions_order_item_extension_entity" join_on_field="item_id" reference_field="magento_item_id">
                 <field>subs_initial_fee</field>
                 <field>base_subs_initial_fee</field>
@@ -39,7 +39,7 @@
         <attribute code="proposed_shipping_date" type="string" />
     </extension_attributes>
     <extension_attributes for="Magento\Sales\Api\Data\InvoiceItemInterface">
-        <attribute code="subs_initial_fees" type="TNW\Subscriptions\Model\Sales\ExtensionAttributes\InvoiceItem">
+        <attribute code="subs_initial_fees" type="TNW\Subscriptions\Api\Data\SalesExtensionAttributesInterface">
             <join reference_table="tnw_subscriptions_invoice_item_extension_entity" join_on_field="entity_id" reference_field="item_id">
                 <field>subs_initial_fee</field>
                 <field>base_subs_initial_fee</field>
@@ -59,7 +59,7 @@
         </attribute>
     </extension_attributes>
     <extension_attributes for="Magento\Sales\Api\Data\CreditmemoItemInterface">
-        <attribute code="subs_initial_fees" type="TNW\Subscriptions\Model\Sales\ExtensionAttributes\CreditmemoItem">
+        <attribute code="subs_initial_fees" type="TNW\Subscriptions\Api\Data\SalesExtensionAttributesInterface">
             <join reference_table="tnw_subscriptions_creditmemo_item_extension_entity" join_on_field="entity_id" reference_field="item_id">
                 <field>subs_initial_fee</field>
                 <field>base_subs_initial_fee</field>
