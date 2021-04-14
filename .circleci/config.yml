@@ -228,7 +228,7 @@ jobs:
       - run:
           name: Run Magento Coding Standard
           command: |
-            /var/www/html/vendor/bin/phpcs --standard=Magento2 --extensions=php,phtml --error-severity=10 --ignore-annotations $CIRCLE_WORKING_DIRECTORY
+            /var/www/html/magento/vendor/bin/phpcs --standard=Magento2 --extensions=php,phtml --error-severity=10 --ignore-annotations $CIRCLE_WORKING_DIRECTORY
 
   check-composer-installation:
     <<: *base-image
@@ -357,6 +357,8 @@ workflows:
      
       - m240-commerce-php74:
           context: powersync
+          requires:
+            - magento-coding-standard
           filters:
             branches:
               only:
@@ -364,6 +366,8 @@ workflows:
 
       - m240-open_source-php74:
           context: powersync
+          requires:
+            - magento-coding-standard
           filters:
             branches:
               only:
@@ -371,6 +375,8 @@ workflows:
 
       - m241-commerce-php74:
           context: powersync
+          requires:
+            - magento-coding-standard
           filters:
             branches:
               only:
@@ -378,6 +384,8 @@ workflows:
 
       - m241-open_source-php74:
           context: powersync
+          requires:
+            - magento-coding-standard
           filters:
             branches:
               only:
@@ -385,6 +393,8 @@ workflows:
 
       - m242-commerce-php74:
           context: powersync
+          requires:
+            - magento-coding-standard
           filters:
             branches:
               only:
@@ -392,6 +402,8 @@ workflows:
 
       - m242-open_source-php74:
           context: powersync
+          requires:
+            - magento-coding-standard
           filters:
             branches:
               only:
