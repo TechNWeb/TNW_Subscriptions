@@ -7,7 +7,7 @@
 namespace TNW\Subscriptions\Model\ResourceModel\Sales\ExtensionAttributes;
 
 use Magento\Framework\Model\ResourceModel\Db\AbstractDb;
-use \TNW\Subscriptions\Api\Data\InvoiceItemExtensionAttributesInterface;
+use TNW\Subscriptions\Api\Data\InvoiceItemExtensionAttributesInterface;
 
 /**
  * Resource class for invoice item extension attribute.
