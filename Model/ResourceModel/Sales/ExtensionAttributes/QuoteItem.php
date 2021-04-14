@@ -6,7 +6,7 @@
 namespace TNW\Subscriptions\Model\ResourceModel\Sales\ExtensionAttributes;
 
 use Magento\Framework\Model\ResourceModel\Db\AbstractDb;
-use TNW\Subscriptions\Api\Data\SalesExtensionAttributesInterface;
+use TNW\Subscriptions\Api\Data\QuoteItemExtensionAttributesInterface;
 
 /**
  * Resource class for quote item extension attribute.
@@ -21,8 +21,8 @@ class QuoteItem extends AbstractDb
     protected function _construct()
     {
         $this->_init(
-            SalesExtensionAttributesInterface::QUOTE_ITEM_EXTENSION_TABLE,
-            SalesExtensionAttributesInterface::MAGENTO_ITEM_ID
+            QuoteItemExtensionAttributesInterface::QUOTE_ITEM_EXTENSION_TABLE,
+            QuoteItemExtensionAttributesInterface::MAGENTO_ITEM_ID
         );
     }
 }

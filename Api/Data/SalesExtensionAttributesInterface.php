@@ -13,10 +13,6 @@ interface SalesExtensionAttributesInterface
     /**#@+
      * Constants for order and quote item extension attributes
      */
-    const QUOTE_ITEM_EXTENSION_TABLE = 'tnw_subscriptions_quote_item_extension_entity';
-    const ORDER_ITEM_EXTENSION_TABLE = 'tnw_subscriptions_order_item_extension_entity';
-    const INVOICE_ITEM_EXTENSION_TABLE = 'tnw_subscriptions_invoice_item_extension_entity';
-    const CREDITMEMO_ITEM_EXTENSION_TABLE = 'tnw_subscriptions_creditmemo_item_extension_entity';
     const EXT_ATTRIBUTE_INITIAL_FEE = 'subs_initial_fee';
     const EXT_ATTRIBUTE_BASE_INITIAL_FEE = 'base_subs_initial_fee';
     const MAGENTO_ITEM_ID = 'item_id';
