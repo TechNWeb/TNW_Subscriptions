@@ -228,7 +228,7 @@ jobs:
       - run:
           name: Run Magento Coding Standard
           command: |
-            /var/www/html/magento/vendor/bin/phpcs --standard=Magento2 --extensions=php,phtml --severity=10 --ignore-annotations --config-set ignore_warnings_on_exit 1 $CIRCLE_WORKING_DIRECTORY
+            /var/www/html/magento/vendor/bin/phpcs --standard=Magento2 --extensions=php,phtml --severity=10 --ignore-annotations $CIRCLE_WORKING_DIRECTORY
 
   check-composer-installation:
     <<: *base-image
@@ -313,6 +313,7 @@ jobs:
               NEW_MODULE_VERSION=(`composer show -al $package |grep '^latest '|awk '{print $3}'|sed 's/,//'`);
               PAGE_TITLE='_'
               PAGE_TITLE+=`echo "$package" | sed 's/\//_/'`
+              PAGE_TITLE+='_m24'             
 
               PAGE_SEARCH_DATA=`curl -u $JIRA_LOGIN:$JIRA_TOKEN -X GET "https://technweb.atlassian.net/wiki/rest/api/content?title=$PAGE_TITLE&limit=1&expand=version.number,body.view,body.storage"`
 
@@ -429,17 +430,23 @@ workflows:
           context: powersync
           requires:
             - magento-coding-standard
-
+            - m240-commerce-php74
+            - m240-open_source-php74
+            - m241-commerce-php74
+            - m241-open_source-php74
+            - m242-commerce-php74
+            - m242-open_source-php74
+            
       - check-composer-installation:
           context: powersync
           requires:
             - deploy
 
-#      - update-wiki:
-#          context: powersync
-#          requires:
-#            - check-composer-installation
-#          filters:
-#            branches:
-#              only:
-#                - master-2.4.x
+      - update-wiki:
+          context: powersync
+          requires:
+            - check-composer-installation
+          filters:
+            branches:
+              only:
+                - master-2.4.x
