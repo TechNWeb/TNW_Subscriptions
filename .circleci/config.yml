@@ -1,6 +1,7 @@
 version: 2
 
 jobs:
+  
   deploy:
     machine:
       enabled: true
@@ -9,6 +10,7 @@ jobs:
           name: Deploy Over SSH
           command: |
             ssh $SSH_USER@$SSH_HOST "./release"
+  
   tag-release:
     machine:
       enabled: true
@@ -23,9 +25,9 @@ jobs:
             chmod +x git_release.sh
             ./git_release.sh
 
-  m233-commerce-php72: &base-image
+  m235-commerce-php73: &base-image
     docker:
-      - image: powersync/magento-builds:m233-commerce-php72
+      - image: powersync/magento-builds:m235-commerce-php73
         auth:
           username: $DOCKER_USER
           password: $DOCKER_PASS
@@ -58,7 +60,7 @@ jobs:
               moduleNameLower=(`echo $moduleName| tr '[:upper:]' '[:lower:]'`)
 
               set +e
-                branchExists=(`composer info -a tnw/$moduleNameLower|grep "versions : .*dev-$CIRCLE_BRANCH"`)
+                branchExists=(`composer info -a tnw/$moduleNameLower|grep "versions : .*dev-$CIRCLE_BRANCH[^0-9a-zA-Z-]"`)
               set -e
 
               COMPOSER_BRANCH="dev-"
@@ -91,20 +93,7 @@ jobs:
             cd /var/www/html/magento
             php bin/magento setup:di:compile
             php bin/magento deploy:mode:set developer
-  m233-open_source-php71:
-    <<: *base-image
-    docker:
-      - image: powersync/magento-builds:m233-open_source-php71
-        auth:
-          username: $DOCKER_USER
-          password: $DOCKER_PASS
-      - image: circleci/mysql:5.7
-        environment:
-          MYSQL_PASSWORD: mage
-          MYSQL_USER: mage
-          MYSQL_DATABASE: magento
-          MYSQL_ROOT_PASSWORD: docker
-
+  
   m234-commerce-php72:
     <<: *base-image
     docker:
@@ -133,9 +122,10 @@ jobs:
           MYSQL_DATABASE: magento
           MYSQL_ROOT_PASSWORD: docker
 
-  magento-coding-standard:
+  m235-open_source-php73:
+    <<: *base-image
     docker:
-      - image: powersync/magento-builds:m234-commerce-php72
+      - image: powersync/magento-builds:m235-open_source-php73
         auth:
           username: $DOCKER_USER
           password: $DOCKER_PASS
@@ -145,28 +135,29 @@ jobs:
           MYSQL_USER: mage
           MYSQL_DATABASE: magento
           MYSQL_ROOT_PASSWORD: docker
-    working_directory: ~/tnw_extension
-    steps:
-      - checkout
-      - run:
-          name: Run Magento Coding Standard
-          command: |
-            /var/www/html/magento-coding-standard/vendor/bin/phpcs $CIRCLE_WORKING_DIRECTORY --standard=MEQP2 --severity=10 --extensions=php,phtml
+
+  magento-coding-standard:
+    docker:
+      - image: powersync/magento-builds:m235-commerce-php73
+        auth:
+          username: $DOCKER_USER
+          password: $DOCKER_PASS
+      - image: circleci/mysql:5.7
+        environment:
+          MYSQL_PASSWORD: mage
+          MYSQL_USER: mage
+          MYSQL_DATABASE: magento
+          MYSQL_ROOT_PASSWORD: docker
+      working_directory: ~/tnw_extension
+      steps:
+        - checkout
+        - run:
+            name: Run Magento Coding Standard
+            command: |
+              /var/www/html/magento/vendor/bin/phpcs --standard=Magento2 --extensions=php,phtml --severity=10 --ignore-annotations $CIRCLE_WORKING_DIRECTORY
 
   check-composer-installation:
     <<: *base-image
-    docker:
-      - image: powersync/magento-builds:m233-open_source-php72
-        auth:
-          username: $DOCKER_USER
-          password: $DOCKER_PASS
-      - image: circleci/mysql:5.7
-        environment:
-          MYSQL_PASSWORD: mage
-          MYSQL_USER: mage
-          MYSQL_DATABASE: magento
-          MYSQL_ROOT_PASSWORD: docker
-
     steps:
       - run:
           name: Wait for DB
@@ -184,7 +175,6 @@ jobs:
             cd /var/www/html/magento/
             composer config -g http-basic.dist.powersync.biz $TECHWEB_REPO_LOGIN $TECHNWEB_REPO_PASSWORD
             composer config --global repositories.powersync composer https://dist.powersync.biz
-
       - run:
           name: Checkout related modules
           command: |
@@ -193,7 +183,6 @@ jobs:
               NEW_MODULE_VERSION=(`composer show -al $package |grep '^latest '|awk '{print $3}'|sed 's/,//'`);
               composer require $package=$NEW_MODULE_VERSION
             done
-
       - run:
           name: Install the Extension
           command: |
@@ -230,6 +219,7 @@ jobs:
               NEW_MODULE_VERSION=(`composer show -al $package |grep '^latest '|awk '{print $3}'|sed 's/,//'`);
               PAGE_TITLE='_'
               PAGE_TITLE+=`echo "$package" | sed 's/\//_/'`
+              PAGE_TITLE+='_m23' 
 
               PAGE_SEARCH_DATA=`curl -u $JIRA_LOGIN:$JIRA_TOKEN -X GET "https://technweb.atlassian.net/wiki/rest/api/content?title=$PAGE_TITLE&limit=1&expand=version.number,body.view,body.storage"`
 
@@ -263,83 +253,85 @@ jobs:
                 --header 'Accept: application/json' \
                 --header 'Content-Type: application/json' \
                 --data "$POST_DATA"
-
             done
-
 
 workflows:
   version: 2
 
   test-deploy-wiki:
     jobs:
+      
       - m234-commerce-php72:
           context: powersync
+          requires:
+            - magento-coding-standard
           filters:
             branches:
-              only: /.*/
+              only:
+                - master
 
-#      - m234-open_source-php72:
-#          context: powersync
-#          filters:
-#            branches:
-#              only: master
-#
-#      - m233-commerce-php72:
-#          context: powersync
-#          filters:
-#            branches:
-#              only: master
-#
-#      - m233-open_source-php71:
-#          context: powersync
-#          filters:
-#            branches:
-#              only: master
-#
-#      - m2210-commerce-php72:
-#          context: powersync
-#          filters:
-#            branches:
-#              only: master
-#
-#      - m2210-open_source-php71:
-#          context: powersync
-#          filters:
-#            branches:
-#              only: master
+      - m234-open_source-php72:
+          context: powersync
+          requires:
+            - magento-coding-standard
+          filters:
+            branches:
+              only:
+                - master              
+
+      - m235-commerce-php73:
+          context: powersync
+          requires:
+            - magento-coding-standard        
+          filters:
+            branches:
+              only:
+                - master
+
+      - m235-open_source-php73:
+          context: powersync
+          requires:
+            - magento-coding-standard          
+          filters:
+            branches:
+              only:
+                - master
 
       - magento-coding-standard:
           context: powersync
           filters:
             branches:
-              only: master
+              only:
+                - master
 
       - deploy:
           context: powersync
           requires:
-#            - m233-commerce-php72
-#            - m233-open_source-php71
-            - m234-commerce-php72
-#            - m234-open_source-php72
-            - magento-coding-standard
+            - tag-release
           filters:
             branches:
-              only: master
+              only:
+                - master
 
       - tag-release:
           context: powersync
           requires:
+            - magento-coding-standard
+            - m234-commerce-php72
+            - m234-open_source-php72
+            - m235-commerce-php73
+            - m235-open_source-php73
+
+      - check-composer-installation:
+          context: powersync
+          requires:
             - deploy
-#
-#      - check-composer-installation:
-#          context: powersync
-#          requires:
-#            - deploy
-#
-#      - update-wiki:
-#          context: powersync
-#          requires:
-#            - check-composer-installation
-#         filters:
-#            branches:
-#              only: master
+
+      - update-wiki:
+          context: powersync
+          requires:
+            - check-composer-installation
+          filters:
+            branches:
+              only: 
+                - master
