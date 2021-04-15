@@ -7,13 +7,13 @@
 namespace TNW\Subscriptions\Model\Sales\ExtensionAttributes;
 
 use Magento\Framework\Model\AbstractModel;
-use TNW\Subscriptions\Api\Data\SalesExtensionAttributesInterface;
+use TNW\Subscriptions\Api\Data\QuoteItemExtensionAttributesInterface;
 use TNW\Subscriptions\Model\ResourceModel\Sales\ExtensionAttributes\QuoteItem as Resource;
 
 /**
  * Class for quote item extension attribute.
  */
-class QuoteItem extends AbstractModel implements SalesExtensionAttributesInterface
+class QuoteItem extends AbstractModel implements QuoteItemExtensionAttributesInterface
 {
     /**
      * @return void
