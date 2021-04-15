@@ -15,6 +15,7 @@ use TNW\Subscriptions\Api\Data\SubscriptionProfilePaymentInterface;
 use TNW\Subscriptions\Model\SubscriptionProfile;
 use TNW\Subscriptions\Api\Data\ProductBillingFrequencyInterface;
 use TNW\Subscriptions\Model\ProductSubscriptionProfile;
+use TNW\Subscriptions\Model\SubscriptionProfile\Address;
 
 /**
  * Upgrade schema for TNW Subscriptions.
@@ -125,6 +126,24 @@ class UpgradeSchema implements UpgradeSchemaInterface
                         'default' => 0,
                         'comment' => 'Is Disabled'
                     ]
+                );
+        }
+
+        if (version_compare($context->getVersion(), '2.2.71', '<')) {
+            $setup->getConnection()
+                ->addForeignKey(
+                    $setup->getFkName(
+                        $setup->getTable(Address::SUBSCRIPTION_PROFILE_ADDRESS_TABLE),
+                        'customer_address_id',
+                        $setup->getTable('customer_address_entity'),
+                        'entity_id'
+                    ),
+                    $setup->getTable(Address::SUBSCRIPTION_PROFILE_ADDRESS_TABLE),
+                    'customer_address_id',
+                    $setup->getTable('customer_address_entity'),
+                    'entity_id',
+                    Table::ACTION_SET_NULL,
+                    true
                 );
         }
 
