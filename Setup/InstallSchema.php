@@ -12,7 +12,9 @@ use Magento\Framework\Setup\InstallSchemaInterface;
 use Magento\Framework\Setup\ModuleContextInterface;
 use Magento\Framework\Setup\SchemaSetupInterface;
 use TNW\Subscriptions\Api\Data\BillingFrequencyInterface;
+use TNW\Subscriptions\Api\Data\OrderItemExtensionAttributesInterface;
 use TNW\Subscriptions\Api\Data\ProductBillingFrequencyInterface;
+use TNW\Subscriptions\Api\Data\QuoteItemExtensionAttributesInterface;
 use TNW\Subscriptions\Api\Data\SalesExtensionAttributesInterface;
 use TNW\Subscriptions\Api\Data\SubscriptionProfileOrderInterface;
 use TNW\Subscriptions\Model\CustomerQuote;
@@ -537,7 +539,7 @@ class InstallSchema implements InstallSchemaInterface
      */
     private function addQuoteAndOrderItemExtentionAttributeTables(SchemaSetupInterface $setup)
     {
-        $tableName = $setup->getTable(SalesExtensionAttributesInterface::QUOTE_ITEM_EXTENSION_TABLE);
+        $tableName = $setup->getTable(QuoteItemExtensionAttributesInterface::QUOTE_ITEM_EXTENSION_TABLE);
         if (!$setup->tableExists($tableName)) {
             $table = $setup->getConnection()->newTable($tableName)
                 ->addColumn(
@@ -574,7 +576,7 @@ class InstallSchema implements InstallSchemaInterface
             $setup->getConnection()->createTable($table);
         }
 
-        $tableName = $setup->getTable(SalesExtensionAttributesInterface::ORDER_ITEM_EXTENSION_TABLE);
+        $tableName = $setup->getTable(OrderItemExtensionAttributesInterface::ORDER_ITEM_EXTENSION_TABLE);
 
         if (!$setup->tableExists($tableName)) {
             $table = $setup->getConnection()->newTable($tableName)->addColumn(

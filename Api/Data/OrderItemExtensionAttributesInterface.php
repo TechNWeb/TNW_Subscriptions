@@ -13,6 +13,7 @@ interface OrderItemExtensionAttributesInterface extends SalesExtensionAttributes
     /**#@+
      * Refunded and invoiced subscription initial fee column names
      */
+    const ORDER_ITEM_EXTENSION_TABLE = 'tnw_subscriptions_order_item_extension_entity';
     const EXT_ATTRIBUTE_INITIAL_FEE_INVOICED = 'subs_initial_fee_invoiced';
     const EXT_ATTRIBUTE_BASE_INITIAL_FEE_INVOICED = 'base_subs_initial_fee_invoiced';
     const EXT_ATTRIBUTE_INITIAL_FEE_REFUNDED = 'subs_initial_fee_refunded';

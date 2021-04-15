@@ -7,13 +7,13 @@
 namespace TNW\Subscriptions\Model\Sales\ExtensionAttributes;
 
 use Magento\Framework\Model\AbstractModel;
-use TNW\Subscriptions\Api\Data\SalesExtensionAttributesInterface;
+use TNW\Subscriptions\Api\Data\InvoiceItemExtensionAttributesInterface;
 use TNW\Subscriptions\Model\ResourceModel\Sales\ExtensionAttributes\InvoiceItem as Resource;
 
 /**
  * Class for invoice item extension attribute.
  */
-class InvoiceItem extends AbstractModel implements SalesExtensionAttributesInterface
+class InvoiceItem extends AbstractModel implements InvoiceItemExtensionAttributesInterface
 {
     /**
      * @return void

@@ -7,13 +7,13 @@
 namespace TNW\Subscriptions\Model\Sales\ExtensionAttributes;
 
 use Magento\Framework\Model\AbstractModel;
-use TNW\Subscriptions\Api\Data\SalesExtensionAttributesInterface;
+use TNW\Subscriptions\Api\Data\CreditmemoItemExtensionAttributesInterface;
 use TNW\Subscriptions\Model\ResourceModel\Sales\ExtensionAttributes\CreditmemoItem as Resource;
 
 /**
  * Class for credit memo item extension attribute.
  */
-class CreditmemoItem extends AbstractModel implements SalesExtensionAttributesInterface
+class CreditmemoItem extends AbstractModel implements CreditmemoItemExtensionAttributesInterface
 {
     /**
      * @return void
