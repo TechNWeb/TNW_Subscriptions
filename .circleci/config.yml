@@ -301,7 +301,8 @@ workflows:
           context: powersync
           filters:
             branches:
-              only: master
+              only: 
+                - master
 
       - deploy:
           context: powersync
@@ -317,7 +318,7 @@ workflows:
           requires:
             - magento-coding-standard
             - m234-commerce-php72
-            - m234-open_source-php72
+#            - m234-open_source-php72
             - m235-commerce-php73
             - m235-open_source-php73
 
