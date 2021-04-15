@@ -7,7 +7,7 @@
 namespace TNW\Subscriptions\Model\ResourceModel\Sales\ExtensionAttributes;
 
 use Magento\Framework\Model\ResourceModel\Db\AbstractDb;
-use TNW\Subscriptions\Api\Data\SalesExtensionAttributesInterface;
+use TNW\Subscriptions\Api\Data\OrderItemExtensionAttributesInterface;
 
 /**
  * Resource class for order item extension attribute.
@@ -22,8 +22,8 @@ class OrderItem extends AbstractDb
     protected function _construct()
     {
         $this->_init(
-            SalesExtensionAttributesInterface::ORDER_ITEM_EXTENSION_TABLE,
-            SalesExtensionAttributesInterface::MAGENTO_ITEM_ID
+            OrderItemExtensionAttributesInterface::ORDER_ITEM_EXTENSION_TABLE,
+            OrderItemExtensionAttributesInterface::MAGENTO_ITEM_ID
         );
     }
 }
