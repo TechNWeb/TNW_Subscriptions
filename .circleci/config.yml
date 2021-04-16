@@ -270,14 +270,14 @@ workflows:
               only:
                 - master
 
-      - m234-open_source-php72:
-          context: powersync
-          requires:
-            - magento-coding-standard
-          filters:
-            branches:
-              only:
-                - master              
+#      - m234-open_source-php72:
+#          context: powersync
+#          requires:
+#            - magento-coding-standard
+#          filters:
+#            branches:
+#              only:
+#                - master              
 
       - m235-commerce-php73:
           context: powersync
