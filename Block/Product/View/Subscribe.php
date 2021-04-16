@@ -15,6 +15,7 @@ use Magento\Catalog\Block\Product\View;
 use Magento\ConfigurableProduct\Model\Product\Type\Configurable;
 use Magento\Framework\DataObject;
 use Magento\Framework\Pricing\PriceCurrencyInterface;
+use Magento\GroupedProduct\Model\Product\Type\Grouped;
 use TNW\Subscriptions\Api\BillingFrequencyRepositoryInterface as FrequencyRepository;
 use TNW\Subscriptions\Api\Data\ProductBillingFrequencyInterface;
 use TNW\Subscriptions\Api\ProductBillingFrequencyRepositoryInterface as FrequencyOptionRepository;
@@ -194,7 +195,10 @@ class Subscribe extends View
      */
     public function isSubscribeAvailable()
     {
-        if ($this->getProduct()->getTypeId() === TypeBundle::TYPE_CODE) {
+        if ($this->getProduct()->getTypeId() === TypeBundle::TYPE_CODE
+            || $this->getProduct()->getTypeId() === Grouped::TYPE_CODE
+        ) {
+
             return false;
         }
         return ($this->getPurchaseType() ===  PurchaseType::RECURRING_PURCHASE_TYPE

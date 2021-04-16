@@ -180,7 +180,7 @@ jobs:
           command: |
             cd /var/www/html/magento/
             for package in $PACKAGES_NAME; do
-              NEW_MODULE_VERSION=(`composer show -al $package |grep '^latest '|awk '{print $3}'|sed 's/,//'`);
+              NEW_MODULE_VERSION=(`composer show -al $package~2.2|grep '^vesions'|awk '{print $3}'|sed 's/,//'`);
               composer require $package=$NEW_MODULE_VERSION
             done
       - run:
@@ -216,7 +216,7 @@ jobs:
 
             for package in $PACKAGES_NAME; do
 
-              NEW_MODULE_VERSION=(`composer show -al $package |grep '^latest '|awk '{print $3}'|sed 's/,//'`);
+              NEW_MODULE_VERSION=(`composer show -al $package~2.2|grep '^vesions'|awk '{print $3}'|sed 's/,//'`);
               PAGE_TITLE='_'
               PAGE_TITLE+=`echo "$package" | sed 's/\//_/'`
               PAGE_TITLE+='_m23' 
@@ -270,14 +270,14 @@ workflows:
               only:
                 - master
 
-      - m234-open_source-php72:
-          context: powersync
-          requires:
-            - magento-coding-standard
-          filters:
-            branches:
-              only:
-                - master              
+#      - m234-open_source-php72:
+#          context: powersync
+#          requires:
+#            - magento-coding-standard
+#          filters:
+#            branches:
+#              only:
+#                - master              
 
       - m235-commerce-php73:
           context: powersync
