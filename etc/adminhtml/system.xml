@@ -198,7 +198,12 @@
             <group id="notifications" translate="label" sortOrder="75" showInDefault="1" showInWebsite="0" showInStore="0">
                 <label>Notifications</label>
                 <field id="renewals" translate="label" type="text" sortOrder="1" showInDefault="1" showInWebsite="0">
-                    <label>Renewals</label>
+                    <label>Renewals #1</label>
+                    <frontend_class>validate-number</frontend_class>
+                    <comment>The number of days before sending the customer an email notification to tell them about an upcoming renewal.</comment>
+                </field>
+                <field id="renewals_two" translate="label" type="text" sortOrder="1" showInDefault="1" showInWebsite="0">
+                    <label>Renewals #2</label>
                     <frontend_class>validate-number</frontend_class>
                     <comment>The number of days before sending the customer an email notification to tell them about an upcoming renewal.</comment>
                 </field>

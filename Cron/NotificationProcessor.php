@@ -146,14 +146,15 @@ class NotificationProcessor
     public function sendRenewalNotifications()
     {
         $collectionToday = $this->queueManager->getCollectionForDate(
-            $this->scopeConfig->getValue(EmailNotifier::XML_PATH_RENEWAL_NOTIFICATION_PERIOD)
+            $this->scopeConfig->getValue(EmailNotifier::XML_PATH_RENEWAL_NOTIFICATION_PERIOD),
+            $this->scopeConfig->getValue(EmailNotifier::XML_PATH_RENEWAL_SECOND_NOTIFICATION_PERIOD)
         );
         foreach ($this->processor->groupedQueue($collectionToday->getItems()) as $groupQueue) {
             $profileIds = [];
             $scheduledAt = '';
             foreach ($groupQueue as $queue) {
                 $profileIds[] = $queue->getData('subscription_profile_id');
-                $scheduledAt =  $queue->getData('scheduled_at');
+                $scheduledAt = $queue->getData('scheduled_at');
             }
             $this->emailNotifierFactory->create()->renewal(
                 $profileIds,
@@ -200,7 +201,7 @@ class NotificationProcessor
             return $this->loadedCollections[] = $this->paymentFactory->create()
                 ->join(
                     'tnw_subscriptions_subscription_profile_order',
-                    'main_table.subscription_profile_id = 
+                    'main_table.subscription_profile_id =
                     tnw_subscriptions_subscription_profile_order.subscription_profile_id AND magento_order_id IS NULL',
                     'scheduled_at'
                 )

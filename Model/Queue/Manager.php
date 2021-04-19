@@ -238,9 +238,10 @@ class Manager
 
     /**
      * @param $daysBefore
+     * @param array $additionalDate
      * @return Collection
      */
-    public function getCollectionForDate($daysBefore)
+    public function getCollectionForDate($daysBefore, $additionalDate = [])
     {
         $collection = $this->getBaseCollection();
         $connection = $collection->getConnection();
@@ -252,6 +253,17 @@ class Manager
             ]),
             $connection->prepareSqlCondition('main_table.status', QueueStatus::QUEUE_STATUS_PENDING),
         ]);
+        if ($additionalDate) {
+            $additionalSearchableDate = strtotime(date('Y-m-d') . " +" . $additionalDate . " day");
+                $additionalPendingCondition = ' OR ' . implode(' AND ', [
+                $connection->prepareSqlCondition('relation.scheduled_at', [
+                    'from' => date('Y-m-d 00:00:00', $additionalSearchableDate),
+                    'to' => date('Y-m-d 23:59:59', $additionalSearchableDate)
+                ]),
+                $connection->prepareSqlCondition('main_table.status', QueueStatus::QUEUE_STATUS_PENDING),
+                ]);
+            $pendingCondition = $pendingCondition . $additionalPendingCondition;
+        }
         $collection->getSelect()
             ->where("$pendingCondition")
             ->order('relation.scheduled_at ASC')
