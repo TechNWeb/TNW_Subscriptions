@@ -49,6 +49,13 @@ class Processor
 
             // Set initial fee
             $this->productModifier->setInitialFeeToItem($item);
+
+            // In case of grouped product child items, we need to set custom price from their buyRequest
+            $customPrice = $buyRequest->getCustomPrice();
+            if (!empty($customPrice) && !$item->getCustomPrice()) {
+                $item->setCustomPrice($customPrice);
+                $item->setOriginalCustomPrice($customPrice);
+            }
         }
     }
 }

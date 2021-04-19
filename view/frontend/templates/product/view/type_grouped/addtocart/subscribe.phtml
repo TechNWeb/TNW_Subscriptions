@@ -1,0 +1,35 @@
+<?php
+/**
+ * Copyright © 2018 TechNWeb, Inc. All rights reserved.
+ * See TNW_LICENSE.txt for license details.
+ */
+
+/**
+ * @var $block \TNW\Subscriptions\Block\Product\View\Subscribe
+ * @var $escaper \Magento\Framework\Escaper
+ */
+?>
+<div class="subscribe-container">
+    <div id="subscribe-container" data-bind="scope: 'recurringAddToCart'">
+        <!-- ko template: getTemplate() --><!-- /ko -->
+    </div>
+    <script type="text/x-magento-init">
+    {
+        "*": {
+            "Magento_Ui/js/core/app": {
+                "components": {
+                    "recurringAddToCart": {
+                        "component": "TNW_Subscriptions/js/product/grouped-subscribe-component",
+                        "config": {
+                            "buttonLabel" : "<?= $escaper->escapeHtml(__('Add to Cart')) ?>",
+                            "dateFormat": "<?= /** @noEscape  */$block->getDateFormat() ?>",
+                            "minStartOn" : "<?= /** @noEscape  */ $block->getMinStartOn() ?>",
+                            "products" : <?= /** @noEscape  */ $block->getProductDataArray() ?>
+                        }
+                    }
+                }
+            }
+        }
+    }
+    </script>
+</div>

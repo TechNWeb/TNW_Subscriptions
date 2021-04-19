@@ -913,7 +913,19 @@
                 type="TNW\Subscriptions\Plugin\Quote\PrepareBuyRequest"
                 sortOrder="100"
                 disabled="false"/>
-        <plugin name="tnw_subs" type="TNW\Subscriptions\Plugin\Catalog\Model\Product\Type\AbstractType" />
+    </type>
+    <type name="Magento\Catalog\Model\Product\Type\Simple">
+        <plugin name="prepare_for_cart_advanced_type_simple" type="TNW\Subscriptions\Plugin\Catalog\Model\Product\Type\AbstractType" />
+    </type>
+    <type name="Magento\Catalog\Model\Product\Type\Virtual">
+        <plugin name="prepare_for_cart_advanced_type_virtual" type="TNW\Subscriptions\Plugin\Catalog\Model\Product\Type\AbstractType" />
+    </type>
+    <type name="Magento\ConfigurableProduct\Model\Product\Type\Configurable">
+        <plugin name="prepare_for_cart_advanced_type_configurable" type="TNW\Subscriptions\Plugin\Catalog\Model\Product\Type\AbstractType" />
+    </type>
+    <type name="Magento\GroupedProduct\Model\Product\Type\Grouped">
+        <plugin name="prepare_for_cart_advanced_type_grouped"
+                type="TNW\Subscriptions\Plugin\Catalog\Model\Product\Type\Grouped"/>
     </type>
     <type name="Magento\Quote\Model\Quote\Item\Processor">
         <plugin name="tnw_subscriptions" type="TNW\Subscriptions\Plugin\Quote\Model\Quote\Item\Processor" />

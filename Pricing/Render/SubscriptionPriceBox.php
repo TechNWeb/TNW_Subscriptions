@@ -139,7 +139,7 @@ class SubscriptionPriceBox extends BasePriceBox
 
         $result = parent::_toHtml();
 
-        return $this->wrapResult($result);
+        return $this->getConfigOnly() ? $result : $this->wrapResult($result);
     }
 
     /**

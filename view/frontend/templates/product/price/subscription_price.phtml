@@ -36,6 +36,9 @@ $schema = ($block->getZone() == 'item_view') ? true : false;
     );
     $data = $block->getEncodedData($data);
 ?>
+<?php if ($block->getConfigOnly()): ?>
+<?= $data ?>
+<?php else: ?>
 <script type="text/x-magento-init">
 {
     ".product-info-price": {
@@ -46,3 +49,4 @@ $schema = ($block->getZone() == 'item_view') ? true : false;
     }
 }
 </script>
+<?php endif; ?>

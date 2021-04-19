@@ -6,6 +6,7 @@
 namespace TNW\Subscriptions\Model\ProductSubscriptionProfile;
 
 use TNW\Subscriptions\Model\ProductSubscriptionProfile\TypeManager\ConfigurableFactory;
+use TNW\Subscriptions\Model\ProductSubscriptionProfile\TypeManager\GroupedFactory;
 use TNW\Subscriptions\Model\ProductSubscriptionProfile\TypeManager\SimpleFactory;
 use TNW\Subscriptions\Model\ProductSubscriptionProfile\TypeManager\TypeInterface;
 
@@ -29,15 +30,25 @@ class ProductTypeManagerResolver
     private $configurableFactory;
 
     /**
+     * Factory for creating product manager for grouped product types.
+     *
+     * @var GroupedFactory
+     */
+    private $groupedFactory;
+
+    /**
      * @param SimpleFactory $simpleFactory
      * @param ConfigurableFactory $configurableFactory
+     * @param GroupedFactory $groupedFactory
      */
     public function __construct(
         SimpleFactory $simpleFactory,
-        ConfigurableFactory $configurableFactory
+        ConfigurableFactory $configurableFactory,
+        GroupedFactory $groupedFactory
     ) {
         $this->simpleFactory = $simpleFactory;
         $this->configurableFactory = $configurableFactory;
+        $this->groupedFactory = $groupedFactory;
     }
 
     /**
@@ -57,6 +68,9 @@ class ProductTypeManagerResolver
                 break;
             case \Magento\ConfigurableProduct\Model\Product\Type\Configurable::TYPE_CODE:
                 $result = $this->configurableFactory->create();
+                break;
+            case \Magento\GroupedProduct\Model\Product\Type\Grouped::TYPE_CODE:
+                $result = $this->groupedFactory->create();
                 break;
             default:
                 throw new \InvalidArgumentException(__('Unsupported product type -' . $type));

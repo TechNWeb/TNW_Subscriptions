@@ -9,10 +9,12 @@ namespace TNW\Subscriptions\Model\Config\Product;
 use Magento\Catalog\Api\Data\ProductInterface;
 use Magento\Catalog\Model\ResourceModel\Product\CollectionFactory as ProductCollectionFactory;
 use Magento\Framework\App\RequestInterface;
+use Magento\GroupedProduct\Model\Product\Type\Grouped;
 use TNW\Subscriptions\Api\ProductBillingFrequencyRepositoryInterface as FrequencyOptionRepository;
 use TNW\Subscriptions\Model\Config;
 use TNW\Subscriptions\Model\Config\Source\PurchaseType;
 use TNW\Subscriptions\Model\Product\Attribute;
+use TNW\Subscriptions\Model\ProductSubscriptionProfile\ProductTypeManagerResolver;
 
 /**
  * Class subscription product view config is available subscription.
@@ -41,21 +43,29 @@ class SubscriptionProductView
     private $productCollectionFactory;
 
     /**
+     * @var ProductTypeManagerResolver
+     */
+    private $productTypeResolver;
+
+    /**
      * @param Config $config
      * @param FrequencyOptionRepository $frequencyOptionRepository
      * @param RequestInterface $request
      * @param ProductCollectionFactory $productCollectionFactory
+     * @param ProductTypeManagerResolver $productTypeResolver
      */
     public function __construct(
         Config $config,
         FrequencyOptionRepository $frequencyOptionRepository,
         RequestInterface $request,
-        ProductCollectionFactory $productCollectionFactory
+        ProductCollectionFactory $productCollectionFactory,
+        ProductTypeManagerResolver $productTypeResolver
     ) {
         $this->config = $config;
         $this->frequencyOptionRepository = $frequencyOptionRepository;
         $this->request = $request;
         $this->productCollectionFactory = $productCollectionFactory;
+        $this->productTypeResolver = $productTypeResolver;
     }
 
     /**
@@ -63,9 +73,22 @@ class SubscriptionProductView
      *
      * @param ProductInterface $product
      * @return bool
+     * @throws \Magento\Framework\Exception\LocalizedException
      */
     public function isSubscribeAvailable($product)
     {
+        if ($product->getTypeId() === Grouped::TYPE_CODE) {
+            $result = false;
+            $childrenData = $this->isSubscribeAvailableByIds(
+                $product->getTypeInstance()->getChildrenIds($product->getId())
+            );
+            foreach ($childrenData as $id => $isSubscription) {
+                if ($isSubscription && $this->getProductBillingFrequenciesById($id)) {
+                    $result = true;
+                }
+            }
+            return $this->config->isSubscriptionsActiveCurrent() && $result;
+        }
         return
             $this->config->isSubscriptionsActiveCurrent()
             && !empty($this->getProductBillingFrequencies($product));
@@ -82,6 +105,24 @@ class SubscriptionProductView
         return
             $this->config->isSubscriptionsActiveCurrent()
             && !empty($this->getProductBillingFrequenciesById($productId));
+    }
+
+    /**
+     * @param array $productIds
+     * @return array
+     */
+    public function isSubscribeAvailableByIds(array $productIds)
+    {
+        $result = [];
+        foreach ($this->getProductSubscriptionPurchaseTypeByIds($productIds) as $key => $element) {
+            $result[$key] = false;
+            if (($element[Attribute::SUBSCRIPTION_PURCHASE_TYPE] == PurchaseType::ONE_TIME_AND_RECURRING_PURCHASE_TYPE
+                || $element[Attribute::SUBSCRIPTION_PURCHASE_TYPE] == PurchaseType::RECURRING_PURCHASE_TYPE)
+                && $element['is_salable']) {
+                $result[$key] = true;
+            }
+        }
+        return $result;
     }
 
     /**
@@ -159,6 +200,10 @@ class SubscriptionProductView
      */
     private function getProductSubscriptionPurchaseType(ProductInterface $product)
     {
+        if ($product->getTypeId() === Grouped::TYPE_CODE) {
+            return $this->productTypeResolver->resolve($product->getTypeId())
+                ->getProductDataObject($product)->getData(Attribute::SUBSCRIPTION_PURCHASE_TYPE);
+        }
         return $product->getData(Attribute::SUBSCRIPTION_PURCHASE_TYPE);
     }
 

@@ -11,6 +11,7 @@ var config = {
             tnwSubscribeShipmentDetails: 'TNW_Subscriptions/js/subscription-profile/shipment-details',
             tnwSubscribeBilling: 'TNW_Subscriptions/js/subscription-profile/billing',
             tnwSubscribeListButtons: 'TNW_Subscriptions/js/product/list/subscribe-list-buttons',
+            calendar: 'mage/calendar'
         }
     },
     config: {

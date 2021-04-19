@@ -42,6 +42,7 @@ class Edit extends \TNW\Subscriptions\Block\Product\View\Subscribe
      * @param Context $context
      * @param \Magento\Framework\Url\EncoderInterface $urlEncoder
      * @param \Magento\Framework\Json\EncoderInterface $jsonEncoder
+     * @param \Magento\Framework\Serialize\SerializerInterface $serializer
      * @param \Magento\Framework\Stdlib\StringUtils $string
      * @param \Magento\Catalog\Helper\Product $productHelper
      * @param \Magento\Catalog\Model\ProductTypes\ConfigInterface $productTypeConfig
@@ -64,6 +65,7 @@ class Edit extends \TNW\Subscriptions\Block\Product\View\Subscribe
         Context $context,
         \Magento\Framework\Url\EncoderInterface $urlEncoder,
         \Magento\Framework\Json\EncoderInterface $jsonEncoder,
+        \Magento\Framework\Serialize\SerializerInterface $serializer,
         \Magento\Framework\Stdlib\StringUtils $string,
         \Magento\Catalog\Helper\Product $productHelper,
         \Magento\Catalog\Model\ProductTypes\ConfigInterface $productTypeConfig,
@@ -87,6 +89,7 @@ class Edit extends \TNW\Subscriptions\Block\Product\View\Subscribe
             $context,
             $urlEncoder,
             $jsonEncoder,
+            $serializer,
             $string,
             $productHelper,
             $productTypeConfig,
