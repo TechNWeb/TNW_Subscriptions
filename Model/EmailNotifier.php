@@ -14,6 +14,7 @@ class EmailNotifier
 {
     const XML_PATH_EMAIL_IDENTITY = 'tnw_subscriptions_profile_options/emails/email_identity';
     const XML_PATH_RENEWAL_NOTIFICATION_PERIOD = 'tnw_subscriptions_profile_options/notifications/renewals';
+    const XML_PATH_RENEWAL_SECOND_NOTIFICATION_PERIOD = 'tnw_subscriptions_profile_options/notifications/renewals_two';
     const XML_PATH_EXPIRED_CARD_NOTIFICATION_PERIOD = 'tnw_subscriptions_profile_options/notifications/expired_card';
 
     const XML_PATH_STATUS_CHANGE_TEMPLATE = 'tnw_subscriptions_profile_options/emails/profile_status_change';
