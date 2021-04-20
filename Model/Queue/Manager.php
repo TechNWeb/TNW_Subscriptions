@@ -238,9 +238,10 @@ class Manager
 
     /**
      * @param $daysBefore
+     * @param array $additionalDate
      * @return Collection
      */
-    public function getCollectionForDate($daysBefore)
+    public function getCollectionForDate($daysBefore, $additionalDate = [])
     {
         $collection = $this->getBaseCollection();
         $connection = $collection->getConnection();
@@ -252,6 +253,17 @@ class Manager
             ]),
             $connection->prepareSqlCondition('main_table.status', QueueStatus::QUEUE_STATUS_PENDING),
         ]);
+        if ($additionalDate) {
+            $additionalSearchableDate = strtotime(date('Y-m-d') . " +" . $additionalDate . " day");
+                $additionalPendingCondition = ' OR ' . implode(' AND ', [
+                $connection->prepareSqlCondition('relation.scheduled_at', [
+                    'from' => date('Y-m-d 00:00:00', $additionalSearchableDate),
+                    'to' => date('Y-m-d 23:59:59', $additionalSearchableDate)
+                ]),
+                $connection->prepareSqlCondition('main_table.status', QueueStatus::QUEUE_STATUS_PENDING),
+                ]);
+            $pendingCondition = $pendingCondition . $additionalPendingCondition;
+        }
         $collection->getSelect()
             ->where("$pendingCondition")
             ->order('relation.scheduled_at ASC')
@@ -307,12 +319,12 @@ class Manager
      *
      * @param array|int $ids
      * @param string $message
-     *
+     * @param bool $isPaymentError
      * @throws \Magento\Framework\Exception\LocalizedException
      */
-    public function makeError($ids, $message)
+    public function makeError($ids, $message, $isPaymentError = false)
     {
-        $this->resourceQueue->updateStatus($ids, QueueStatus::QUEUE_STATUS_ERROR, $message);
+        $this->resourceQueue->updateStatus($ids, QueueStatus::QUEUE_STATUS_ERROR, $message, $isPaymentError);
     }
 
     /**
@@ -362,7 +374,7 @@ class Manager
     private function getAttemptDate()
     {
         return $this->timezone->date()
-            ->modify(sprintf('-%d day', $this->config->getAttemptInterval()))
+            ->modify(sprintf('-%d day', $this->config->getAttemptInterval()))->setTime(23, 59, 59)
             ->format(\Magento\Framework\Stdlib\DateTime::DATETIME_PHP_FORMAT);
     }
 
