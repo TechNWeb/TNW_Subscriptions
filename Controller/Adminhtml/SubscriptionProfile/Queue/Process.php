@@ -78,6 +78,12 @@ class Process extends Action
                     } catch (\TNW\Subscriptions\Exception\ProfileProductsUnsaleableException $e) {
                         $this->messageManager->addErrorMessage($e->getMessage());
                         $this->queueManager->makeCompleted($item->getId(), $e->getMessage());
+                    } catch (\Magento\Payment\Gateway\Command\CommandException $e) {
+                        $this->queueManager->makeError($item->getId(), $e->getMessage(), true);
+                        $this->messageManager->addErrorMessage(
+                            $e->getMessage(),
+                            'backend'
+                        );
                     } catch (\Exception $e) {
                         $this->queueManager->makeError($item->getId(), $e->getMessage());
                         $this->messageManager->addErrorMessage(

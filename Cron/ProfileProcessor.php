@@ -117,6 +117,10 @@ class ProfileProcessor
                 $this->context->messageError($e->getMessage());
                 $this->queueManager->makeCompleted($queueIds, $e->getMessage());
                 $orderProcessHasError = false;
+            } catch (\Magento\Payment\Gateway\Command\CommandException $e) {
+                $this->context->messageError($e->getMessage());
+                $this->queueManager->makeError($queueIds, $e->getMessage(), true);
+                $orderProcessHasError = false;
             } catch (\Exception $e) {
                 $this->context->messageError('Error on processing profile: %s', $e);
                 $this->queueManager->makeError($queueIds, $e->getMessage());

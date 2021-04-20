@@ -319,12 +319,12 @@ class Manager
      *
      * @param array|int $ids
      * @param string $message
-     *
+     * @param bool $isPaymentError
      * @throws \Magento\Framework\Exception\LocalizedException
      */
-    public function makeError($ids, $message)
+    public function makeError($ids, $message, $isPaymentError = false)
     {
-        $this->resourceQueue->updateStatus($ids, QueueStatus::QUEUE_STATUS_ERROR, $message);
+        $this->resourceQueue->updateStatus($ids, QueueStatus::QUEUE_STATUS_ERROR, $message, $isPaymentError);
     }
 
     /**
@@ -374,7 +374,7 @@ class Manager
     private function getAttemptDate()
     {
         return $this->timezone->date()
-            ->modify(sprintf('-%d day', $this->config->getAttemptInterval()))
+            ->modify(sprintf('-%d day', $this->config->getAttemptInterval()))->setTime(23, 59, 59)
             ->format(\Magento\Framework\Stdlib\DateTime::DATETIME_PHP_FORMAT);
     }
 
