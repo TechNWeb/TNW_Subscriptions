@@ -66,7 +66,7 @@ class Process extends Action
                 $collection->addFieldToFilter(Queue::ID, $queueId);
                 /** @var Queue $item */
                 $item = $collection->getFirstItem();
-                if ($item && $item->getId()){
+                if ($item && $item->getId()) {
                     $this->queueManager->makeRunning($queueId);
                     try {
                         $this->queueManager->placeOrderByGroupQueue([$item]);
@@ -81,6 +81,12 @@ class Process extends Action
                     } catch (\TNW\Subscriptions\Exception\ProfileProductsUnsaleableException $e) {
                         $this->messageManager->addErrorMessage($e->getMessage());
                         $this->queueManager->makeCompleted($item->getId(), $e->getMessage());
+                    } catch (\Magento\Payment\Gateway\Command\CommandException $e) {
+                        $this->queueManager->makeError($item->getId(), $e->getMessage(), true);
+                        $this->messageManager->addErrorMessage(
+                            $e->getMessage(),
+                            'backend'
+                        );
                     } catch (\Exception $e) {
                         $this->queueManager->makeError($item->getId(), $e->getMessage());
                         $this->messageManager->addErrorMessage(
