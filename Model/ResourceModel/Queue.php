@@ -114,12 +114,12 @@ class Queue extends AbstractDb
 
     /**
      * @param int[]|int $ids
-     * @param int $status
+     * @param string $status
      * @param string $message
-     *
+     * @param bool $incrementAttempts
      * @throws \Magento\Framework\Exception\LocalizedException
      */
-    public function updateStatus($ids, $status, $message = '')
+    public function updateStatus($ids, $status, $message = '', $incrementAttempts = false)
     {
         if (empty($ids)) {
             return;
@@ -130,14 +130,17 @@ class Queue extends AbstractDb
         }
 
         $connection = $this->getConnection();
+        $updateData = [
+            'status' => $status,
+            'message' => $message,
+            'updated_at' => $this->dateTime->gmtDate(),
+        ];
+        if ($incrementAttempts || $status === QueueStatus::QUEUE_STATUS_COMPLETE) {
+            $updateData['attempt_count'] = new \Zend_Db_Expr('attempt_count + 1');
+        }
         $connection->update(
             $this->getMainTable(),
-            [
-                'status' => $status,
-                'attempt_count' => new \Zend_Db_Expr('attempt_count + 1'),
-                'message' => $message,
-                'updated_at' => $this->dateTime->gmtDate(),
-            ],
+            $updateData,
             $connection->prepareSqlCondition(QueueModel::ID, ['in'=>$ids])
         );
     }
