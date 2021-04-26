@@ -7,6 +7,7 @@
 namespace TNW\Subscriptions\Console\Command;
 
 use Magento\Framework\Event\ManagerInterface;
+use Magento\Framework\Exception\FileSystemException;
 use Magento\Framework\Stdlib\DateTime\TimezoneInterface;
 use Symfony\Component\Console\Command\Command;
 use Magento\Framework\App\Filesystem\DirectoryList;
@@ -80,6 +81,8 @@ abstract class Base extends Command
      * @param Config $config
      * @param ObjectManagerInterface $objectManager
      * @param StoreManagerInterface $storeManager
+     * @param ManagerInterface $eventManager
+     * @throws FileSystemException
      */
     public function __construct(
         Filesystem $filesystem,

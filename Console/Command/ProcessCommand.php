@@ -45,6 +45,8 @@ class ProcessCommand extends Base
      * @param ObjectManagerInterface $objectManager
      * @param StoreManagerInterface $storeManager
      * @param ProfileProcessor $profileProcessor
+     * @param ManagerInterface $eventManager
+     * @throws FileSystemException
      */
     public function __construct(
         Filesystem $filesystem,
