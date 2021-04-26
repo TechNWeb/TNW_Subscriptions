@@ -250,7 +250,7 @@ class Vault extends Base
                 ? $ccToken->getConfig()['details']['maskedCC']
                 : $ccToken->getConfig()['details']['cc_last_4'];
             $expDate = isset($ccToken->getConfig()['details']['expirationDate'])
-                ? $ccToken->getConfig()['details']['expirationDate']
+                ? str_replace("\\/", "/", $ccToken->getConfig()['details']['expirationDate'])
                 : $ccToken->getConfig()['details']['cc_exp_month']
                     . '/'
                     . $ccToken->getConfig()['details']['cc_exp_year'];
