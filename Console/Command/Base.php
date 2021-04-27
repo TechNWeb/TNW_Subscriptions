@@ -1,11 +1,13 @@
 <?php
 /**
- * Copyright © 2018 TechNWeb, Inc. All rights reserved.
+ * Copyright © 2021 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
 
 namespace TNW\Subscriptions\Console\Command;
 
+use Magento\Framework\Event\ManagerInterface;
+use Magento\Framework\Exception\FileSystemException;
 use Magento\Framework\Stdlib\DateTime\TimezoneInterface;
 use Symfony\Component\Console\Command\Command;
 use Magento\Framework\App\Filesystem\DirectoryList;
@@ -13,6 +15,8 @@ use Magento\Framework\App\State;
 use Magento\Framework\App\Area;
 use Magento\Framework\Filesystem;
 use Magento\Framework\Filesystem\Directory\WriteInterface;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Output\OutputInterface;
 use TNW\Subscriptions\Model\Config;
 use Magento\Framework\ObjectManagerInterface;
 use Magento\Framework\ObjectManager\ConfigLoaderInterface;
@@ -65,6 +69,11 @@ abstract class Base extends Command
     private $storeManager;
 
     /**
+     * @var ManagerInterface
+     */
+    private $eventManager;
+
+    /**
      * Base constructor.
      * @param Filesystem $filesystem
      * @param State $state
@@ -72,6 +81,8 @@ abstract class Base extends Command
      * @param Config $config
      * @param ObjectManagerInterface $objectManager
      * @param StoreManagerInterface $storeManager
+     * @param ManagerInterface $eventManager
+     * @throws FileSystemException
      */
     public function __construct(
         Filesystem $filesystem,
@@ -79,7 +90,8 @@ abstract class Base extends Command
         TimezoneInterface $timezone,
         Config $config,
         ObjectManagerInterface $objectManager,
-        StoreManagerInterface $storeManager
+        StoreManagerInterface $storeManager,
+        ManagerInterface $eventManager
     ) {
         $this->dir = $filesystem->getDirectoryWrite(DirectoryList::VAR_DIR);
         $this->state = $state;
@@ -88,6 +100,7 @@ abstract class Base extends Command
         $this->config = $config;
         $this->objectManager = $objectManager;
         $this->storeManager = $storeManager;
+        $this->eventManager = $eventManager;
 
         parent::__construct();
     }
@@ -161,5 +174,16 @@ abstract class Base extends Command
     protected function getDateTime()
     {
         return $this->timezone->date()->format('m/d/y H:i:s');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function run(InputInterface $input, OutputInterface $output)
+    {
+        $result = parent::run($input, $output);
+        $this->eventManager->dispatch('tnw_salesforce_entities_sync');
+
+        return $result;
     }
 }

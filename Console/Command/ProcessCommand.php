@@ -1,11 +1,12 @@
 <?php
 /**
- * Copyright © 2018 TechNWeb, Inc. All rights reserved.
+ * Copyright © 2021 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
 
 namespace TNW\Subscriptions\Console\Command;
 
+use Magento\Framework\Event\ManagerInterface;
 use Magento\Framework\App\State;
 use Magento\Framework\Console\Cli;
 use Magento\Framework\Exception\FileSystemException;
@@ -44,6 +45,8 @@ class ProcessCommand extends Base
      * @param ObjectManagerInterface $objectManager
      * @param StoreManagerInterface $storeManager
      * @param ProfileProcessor $profileProcessor
+     * @param ManagerInterface $eventManager
+     * @throws FileSystemException
      */
     public function __construct(
         Filesystem $filesystem,
@@ -52,10 +55,11 @@ class ProcessCommand extends Base
         Config $config,
         ObjectManagerInterface $objectManager,
         StoreManagerInterface $storeManager,
-        ProfileProcessor $profileProcessor
+        ProfileProcessor $profileProcessor,
+        ManagerInterface $eventManager
     ) {
         $this->profileProcessor = $profileProcessor;
-        parent::__construct($filesystem, $state, $timezone, $config, $objectManager, $storeManager);
+        parent::__construct($filesystem, $state, $timezone, $config, $objectManager, $storeManager, $eventManager);
     }
 
 
