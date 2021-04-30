@@ -4,7 +4,10 @@
  * See TNW_LICENSE.txt for license details.
  */
 
-/* @var $block \TNW\Subscriptions\Block\Product\View\Subscribe */
+/**
+ * @var $block \TNW\Subscriptions\Block\Product\View\Subscribe
+ * @var $escaper \Magento\Framework\Escaper
+ */
 ?>
 <?php $block->getProduct()->setPriceCalculation()?>
 <div class="subscribe-container">
@@ -19,14 +22,14 @@
                     "recurringAddToCart": {
                         "component": "TNW_Subscriptions/js/product/subscribe-component",
                         "config": {
-                            "buttonLabel" : "<?= $block->escapeHtml(__('Subscribe')) ?>",
-                            "dateFormat": "<?= $block->getDateFormat() ?>",
-                            "minStartOn" : "<?= $block->getMinStartOn() ?>",
-                            "defaultPeriod" : "<?= $block->getDefaultPeriod() ?>",
-                            "defaultUntilCancelled" : "<?= $block->getDefaultUntilCancelled() ?>",
-                            "defaultSubscribeQty" : "<?= $block->getDefaultSubscribeQty() ?>",
-                            "defaultStartOn" : "<?= $block->getDefaultStartOn() ?>",
-                            "products" : <?= $block->getProductDataArray() ?>
+                            "buttonLabel" : "<?= $escaper->escapeHtml(__('Add to Cart')) ?>",
+                            "dateFormat": "<?= /* @noEscape */ $block->getDateFormat() ?>",
+                            "minStartOn" : "<?= /* @noEscape */ $block->getMinStartOn() ?>",
+                            "defaultPeriod" : "<?= /* @noEscape */ $block->getDefaultPeriod() ?>",
+                            "defaultUntilCancelled" : "<?= /* @noEscape */ $block->getDefaultUntilCancelled() ?>",
+                            "defaultSubscribeQty" : "<?= /* @noEscape */ $block->getDefaultSubscribeQty() ?>",
+                            "defaultStartOn" : "<?= /* @noEscape */ $block->getDefaultStartOn() ?>",
+                            "products" : <?= /* @noEscape */ $block->getProductDataArray() ?>
                         }
                     }
                 }

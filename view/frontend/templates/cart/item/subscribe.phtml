@@ -4,7 +4,10 @@
  * See TNW_LICENSE.txt for license details.
  */
 
-/* @var $block \TNW\Subscriptions\Block\Product\View\Subscribe */
+/**
+ * @var $block \TNW\Subscriptions\Block\Product\View\Subscribe
+ * @var $escaper \Magento\Framework\Escaper
+ */
 ?>
 <?php
 $block->getProduct()->setPriceCalculation();
@@ -18,12 +21,12 @@ $customOptions = $block->getPreconfiguredCustomOptions();
     <?php if ($block->isOneTimeAndSubscribePurchase() || $block->isOnlySubscribePurchase()): ?>
     <div class="product-item-subscription-details">
         <div class="tnw-addtocart-container">
-            <input type="hidden" name="cart[<?= $_itemId; ?>][addtocart_type]" value="1"/>
+            <input type="hidden" name="cart[<?= /* @noEscape */ $_itemId; ?>][addtocart_type]" value="1"/>
             <?php if (is_array($configurableOptions)): ?>
                 <?php foreach ($configurableOptions as $attributeId => $attributeValue): ?>
                     <input type="hidden"
-                           name="cart[<?= $_itemId; ?>][super_attribute][<?= $attributeId; ?>]"
-                           value="<?= $attributeValue; ?>"
+                           name="cart[<?= /* @noEscape */ $_itemId; ?>][super_attribute][<?= /* @noEscape */ $attributeId; ?>]"
+                           value="<?= /* @noEscape */ $attributeValue; ?>"
                     >
                 <?php endforeach; ?>
             <?php endif; ?>
@@ -32,14 +35,14 @@ $customOptions = $block->getPreconfiguredCustomOptions();
                     <?php if (is_array($optionValue)): ?>
                         <?php foreach ($optionValue as $checkboxValue): ?>
                         <input type="hidden"
-                               name="cart[<?= $_itemId; ?>][options][<?= $optionId; ?>][]"
-                               value="<?= $checkboxValue; ?>"
+                               name="cart[<?= /* @noEscape */ $_itemId; ?>][options][<?= /* @noEscape */ $optionId; ?>][]"
+                               value="<?= /* @noEscape */ $checkboxValue; ?>"
                         >
                         <?php endforeach; ?>
                     <?php else: ?>
                         <input type="hidden"
-                                   name="cart[<?= $_itemId; ?>][options][<?= $optionId; ?>]"
-                                   value="<?= $optionValue; ?>"
+                               name="cart[<?= /* @noEscape */ $_itemId; ?>][options][<?= /* @noEscape */ $optionId; ?>]"
+                               value="<?= /* @noEscape */ $optionValue; ?>"
                             >
                     <?php endif; ?>
                 <?php endforeach; ?>
@@ -51,24 +54,28 @@ $customOptions = $block->getPreconfiguredCustomOptions();
                     <?php else: ?>
                        type="radio"
                     <?php endif; ?>
-                       id="cart-<?= $_itemId; ?>-subscribe"
-                       name="cart[<?= $_itemId; ?>][subscribe_active]"
+                       id="cart-<?= /* @noEscape */ $_itemId; ?>-subscribe"
+                       name="cart[<?= /* @noEscape */ $_itemId; ?>][subscribe_active]"
                        value="1"
                     <?php if ($groupsViewModel->isSubscriptionItem($_item)): ?>
                         checked="checked"
                     <?php endif; ?>
                 />
-                <label for="cart-<?= $_itemId; ?>-subscribe"><?= /* @escapeNotVerified */ __('Subscribe') ?></label>
+                <label for="cart-<?= /* @noEscape */ $_itemId; ?>-subscribe">
+                    <?= $escaper->escapeHtml(__('Auto-Ship')) ?>
+                </label>
                 <div class="addtocart-wrapper">
                     <div class="subscribe-container">
                         <div class="fieldset">
                             <div class="field">
-                                <label class="label"><span><?= __('Billing Frequency') ?>:</span></label>
-                                <select name="cart[<?= $_itemId; ?>][billing_frequency]"
-                                        id="cart[<?= $_itemId; ?>][billing_frequency]">
+                                <label class="label">
+                                    <span><?= $escaper->escapeHtml(__('Billing Frequency')) ?>:</span>
+                                </label>
+                                <select name="cart[<?= /* @noEscape */ $_itemId; ?>][billing_frequency]"
+                                        id="cart[<?= /* @noEscape */ $_itemId; ?>][billing_frequency]">
                                     <?php foreach ($block->getFrequencyOptions() as $option): ?>
-                                        <option id="billing_frequency_<?= $option['value'] ?>"
-                                                value="<?= $option['value'] ?>"
+                                        <option id="billing_frequency_<?= /* @noEscape */ $option['value'] ?>"
+                                                value="<?= /* @noEscape */ $option['value'] ?>"
                                             <?php if ($option['is_default']): ?>
                                                 selected
                                             <?php endif ?>
@@ -82,7 +89,7 @@ $customOptions = $block->getPreconfiguredCustomOptions();
                                                 data-frequency-unit-type="<?= $option['frequency_unit_type'] * 1 ?>"
                                             <?php endif ?>
                                         >
-                                            <?= $option['label'] ?>
+                                            <?= $escaper->escapeHtml($option['label']) ?>
                                         </option>
                                     <?php endforeach ?>
                                 </select>
@@ -90,60 +97,60 @@ $customOptions = $block->getPreconfiguredCustomOptions();
                         </div>
                         <div class="fieldset">
                             <div class="field term">
-                                <label class="label"><span><?= __('Term') ?>:</span></label>
+                                <label class="label"><span><?= $escaper->escapeHtml(__('Term')) ?>:</span></label>
                                 <div class="control">
                                     <?php if ($block->getIsInfiniteSubscriptions()): ?>
-                                        <span><?= __('Until canceled') ?></span>
+                                        <span><?= $escaper->escapeHtml(__('Until canceled')) ?></span>
                                         <input type="hidden"
-                                               name="cart[<?= $_itemId ?>][term]"
+                                               name="cart[<?= /* @noEscape */ $_itemId ?>][term]"
                                                class="input-text qty"
                                                data-validate='{"required-number":true}'
                                                value="1"
                                                checked="checked"
                                         />
                                         <input type="hidden"
-                                               name="cart[<?= $_itemId ?>][period]"
-                                               id="cart-<?= $_itemId ?>-period"
+                                               name="cart[<?= /* @noEscape */ $_itemId ?>][period]"
+                                               id="cart-<?= /* @noEscape */ $_itemId ?>-period"
                                                class="input-text qty"
                                                data-validate='{"required-number":true, "validate-number-range":"2-9999999999"}'
-                                               value="<?= $block->getDefaultPeriod() ?>"
+                                               value="<?= /* @noEscape */ $block->getDefaultPeriod() ?>"
                                         />
                                     <?php else: ?>
                                         <div>
                                             <input type="radio"
-                                                   id="cart-<?= $_itemId ?>-term1"
-                                                   name="cart[<?= $_itemId ?>][term]"
+                                                   id="cart-<?= /* @noEscape */ $_itemId ?>-term1"
+                                                   name="cart[<?= /* @noEscape */ $_itemId ?>][term]"
                                                    value="1"
                                                 <?php if ($block->getDefaultUntilCancelled()): ?>
                                                     checked="checked"
                                                 <?php endif ?>
                                             />
-                                            <label class="label" for="cart-<?= $_itemId ?>-term1">
-                                                <span><?= __('Until canceled') ?></span>
+                                            <label class="label" for="cart-<?= /* @noEscape */ $_itemId ?>-term1">
+                                                <span><?= $escaper->escapeHtml(__('Until canceled')) ?></span>
                                             </label>
                                         </div>
                                         <div>
                                             <input type="radio"
-                                                   id="cart-<?= $_itemId ?>-term0"
-                                                   name="cart[<?= $_itemId ?>][term]"
+                                                   id="cart-<?= /* @noEscape */ $_itemId ?>-term0"
+                                                   name="cart[<?= /* @noEscape */ $_itemId ?>][term]"
                                                    value="0"
                                                 <?php if (!$block->getDefaultUntilCancelled()): ?>
                                                     checked="checked"
                                                 <?php endif ?>
                                             />
-                                            <label class="label" for="cart-<?= $_itemId ?>-term0">
-                                                <span><?= __('Stop after') ?></span>
+                                            <label class="label" for="cart-<?= /* @noEscape */ $_itemId ?>-term0">
+                                                <span><?= $escaper->escapeHtml(__('Stop after')) ?></span>
                                                 <input type="number"
-                                                       name="cart[<?= $_itemId ?>][period]"
-                                                       id="cart-<?= $_itemId ?>-period"
+                                                       name="cart[<?= /* @noEscape */ $_itemId ?>][period]"
+                                                       id="cart-<?= /* @noEscape */ $_itemId ?>-period"
                                                        class="input-text period"
                                                        data-validate='{
                                                        "required-number":true,
                                                        "validate-number-range":"2-9999999999"
                                                        }'
-                                                       value="<?= $block->getDefaultPeriod() ?>"
+                                                       value="<?= /* @noEscape */ $block->getDefaultPeriod() ?>"
                                                 >
-                                                <span><?= __('payment(s)') ?></span>
+                                                <span><?= $escaper->escapeHtml(__('payment(s)')) ?></span>
                                             </label>
                                         </div>
                                     <?php endif;?>
@@ -153,23 +160,32 @@ $customOptions = $block->getPreconfiguredCustomOptions();
                         <?php if ($block->getIsVisibleStartOn()): ?>
                             <div class="fieldset">
                                 <div class="field date">
-                                    <label class="label"><span><?= __('Delivery Schedule') ?>:</span></label>
+                                    <label class="label">
+                                        <span><?= $escaper->escapeHtml(__('Delivery Schedule')) ?>:</span>
+                                    </label>
                                     <div class="control delivery-schedule">
-                                        <span><?= __('First delivery on'); ?></span>
-                                        <span class="cart-<?= $_itemId ?>-delivery-schedule-date"></span>
+                                        <span><?= $escaper->escapeHtml(__('First delivery on')); ?></span>
+                                        <span class="cart-<?= /* @noEscape */ $_itemId ?>-delivery-schedule-date">
+                                        </span>
                                         <input type="hidden"
-                                               name="cart[<?= $_itemId ?>][start_on_alt]"
-                                               id="cart-<?= $_itemId ?>-start_on_alt"
+                                               name="cart[<?= /* @noEscape */ $_itemId ?>][start_on_alt]"
+                                               id="cart-<?= /* @noEscape */ $_itemId ?>-start_on_alt"
                                         />
-                                        <a href="#" class="action change-delivery-date-<?= $_itemId ?>"><?= __('change') ?></a>
-                                        <span class="start-on-wrapper-<?= $_itemId ?>" style="display: none;">
+                                        <a href="#" class="action change-delivery-date-<?= /* @noEscape */ $_itemId ?>">
+                                            <?= $escaper->escapeHtml(__('change')) ?>
+                                        </a>
+                                        <span class="start-on-wrapper-<?= /* @noEscape */ $_itemId ?>"
+                                              style="display: none;">
                                             <input type="text"
-                                                   name="cart[<?= $_itemId ?>][start_on]"
+                                                   name="cart[<?= /* @noEscape */ $_itemId ?>][start_on]"
                                                    class="start-on"
-                                                   id="cart-<?= $_itemId ?>-start_at"
-                                                   value="<?= $block->getDefaultStartOn() ?>"
+                                                   id="cart-<?= /* @noEscape */ $_itemId ?>-start_at"
+                                                   value="<?= /* @noEscape */ $block->getDefaultStartOn() ?>"
                                             />
-                                            <a href="#" class="action update-delivery-date-<?= $_itemId ?>"><?= __('Update') ?></a>
+                                            <a href="#"
+                                               class="action update-delivery-date-<?= /* @noEscape */ $_itemId ?>">
+                                                <?= $escaper->escapeHtml(__('Update')) ?>
+                                            </a>
                                         </span>
                                     </div>
                                 </div>
@@ -182,22 +198,22 @@ $customOptions = $block->getPreconfiguredCustomOptions();
                                 "jquery",
                                 "mage/calendar"
                             ], function($) {
-                                var changeDeliveryDateLink = $('.action.change-delivery-date-<?= $_itemId ?>'),
-                                    updateDeliverDateButton = $('.action.update-delivery-date-<?= $_itemId ?>'),
-                                    startOnWrapper = $('.start-on-wrapper-<?= $_itemId ?>'),
-                                    startOnFormattedInput = $('#cart-<?= $_itemId ?>-start_on_alt'),
-                                    deliveryScheduleDate = $('.cart-<?= $_itemId ?>-delivery-schedule-date');
-                                $("#cart-<?= $_itemId ?>-start_at").calendar({
+                                var changeDeliveryDateLink = $('.action.change-delivery-date-<?= /* @noEscape */ $_itemId ?>'),
+                                    updateDeliverDateButton = $('.action.update-delivery-date-<?= /* @noEscape */ $_itemId ?>'),
+                                    startOnWrapper = $('.start-on-wrapper-<?= /* @noEscape */ $_itemId ?>'),
+                                    startOnFormattedInput = $('#cart-<?= /* @noEscape */ $_itemId ?>-start_on_alt'),
+                                    deliveryScheduleDate = $('.cart-<?= /* @noEscape */ $_itemId ?>-delivery-schedule-date');
+                                $("#cart-<?= /* @noEscape */ $_itemId ?>-start_at").calendar({
                                     showsTime: false,
-                                    dateFormat: "<?= $block->getDateFormat() ?>",
-                                    buttonImage: "<?= $block->getViewFileUrl('Magento_Theme::calendar.png') ?>",
-                                    buttonText: "<?= __('Select Date') ?>",
+                                    dateFormat: "<?= /* @noEscape */ $block->getDateFormat() ?>",
+                                    buttonImage: "<?= /* @noEscape */ $block->getViewFileUrl('Magento_Theme::calendar.png') ?>",
+                                    buttonText: "<?= $escaper->escapeHtml(__('Select Date')) ?>",
                                     showOn: 'both',
-                                    minDate: "<?= $block->getMinStartOn() ?>",
-                                    altField: "#cart-<?= $_itemId ?>-start_on_alt",
+                                    minDate: "<?= /* @noEscape */ $block->getMinStartOn() ?>",
+                                    altField: "#cart-<?= /* @noEscape */ $_itemId ?>-start_on_alt",
                                     altFormat: "MM dd"
-                                }).datepicker('setDate', '<?= $block->getDefaultStartOn() ?>');
-                                deliveryScheduleDate.html($('#cart-<?= $_itemId ?>-start_on_alt').val());
+                                }).datepicker('setDate', '<?= /* @noEscape */ $block->getDefaultStartOn() ?>');
+                                deliveryScheduleDate.html($('#cart-<?= /* @noEscape */ $_itemId ?>-start_on_alt').val());
                                 changeDeliveryDateLink.on('click', function (e) {
                                     e.stopImmediatePropagation();
                                     e.preventDefault();
@@ -220,14 +236,16 @@ $customOptions = $block->getPreconfiguredCustomOptions();
     <?php if ($block->isOneTimeAndSubscribePurchase()): ?>
             <div class="addtocart-onetime">
                 <input type="radio"
-                       id="cart-<?= $_itemId; ?>-onetime"
-                       name="cart[<?= $_itemId; ?>][subscribe_active]"
+                       id="cart-<?= /* @noEscape */ $_itemId; ?>-onetime"
+                       name="cart[<?= /* @noEscape */ $_itemId; ?>][subscribe_active]"
                        value="0"
                     <?php if (!$groupsViewModel->isSubscriptionItem($_item)): ?>
                         checked="checked"
                     <?php endif; ?>
                 />
-                <label for="cart-<?= $_itemId; ?>-onetime"><?= /* @escapeNotVerified */ __('One Time Purchase') ?></label>
+                <label for="cart-<?= /* @noEscape */ $_itemId; ?>-onetime">
+                    <?= $escaper->escapeHtml(__('Purchase')) ?>
+                </label>
             </div>
     <?php endif; ?>
         </div>

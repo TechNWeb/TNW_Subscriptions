@@ -4,25 +4,27 @@
  * See TNW_LICENSE.txt for license details.
  */
 
-// @codingStandardsIgnoreFile
-
-/* @var $block \Magento\Wishlist\Block\Customer\Sidebar */
+/**
+ * @var $block \Magento\Wishlist\Block\Customer\Sidebar
+ * @var $escaper \Magento\Framework\Escaper
+ */
 ?>
 <?php
 $wishlistHelper = $this->helper(\Magento\Wishlist\Helper\Data::class);
 ?>
-<?php if ($wishlistHelper->isAllow()) : ?>
+<?php if ($wishlistHelper->isAllow()): ?>
     <div class="block block-wishlist" data-bind="scope: 'wishlist'">
         <div class="block-title">
-            <strong><?= /* @escapeNotVerified */ $block->getTitle(); ?></strong>
+            <strong><?= $escaper->escapeHtml($block->getTitle()) ?></strong>
             <!-- ko if: wishlist().counter -->
             <span data-bind="text: wishlist().counter" class="counter"></span>
             <!-- /ko -->
         </div>
         <div class="block-content">
-            <strong class="subtitle"><?= /* @escapeNotVerified */ __('Last Added Items') ?></strong>
+            <strong class="subtitle"><?= $escaper->escapeHtml(__('Last Added Items')) ?></strong>
             <!-- ko if: wishlist().counter -->
-                <ol class="product-items no-display" id="wishlist-sidebar" data-bind="foreach: wishlist().items, css: {'no-display': null}">
+                <ol class="product-items no-display" id="wishlist-sidebar"
+                    data-bind="foreach: wishlist().items, css: {'no-display': null}">
                     <li class="product-item">
                         <div class="product-item-info">
                             <a class="product-item-photo" data-bind="attr: { href: product_url, title: product_name }">
@@ -42,26 +44,36 @@ $wishlistHelper = $this->helper(\Magento\Wishlist\Helper\Data::class);
                                             <div class="product-subscribe-addtocart-buttons-container">
                                                 <div class="product-subscribe-button">
                                                     <a data-bind="attr: { href: product_url }">
-                                                        <button type="button" title="Subscribe" class="action primary subscribe">
-                                                            <span data-role="button-text"><?= /* @escapeNotVerified */ __('Subscribe') ?></span>
+                                                        <button type="button" title="Subscribe"
+                                                                class="action primary subscribe">
+                                                            <span data-role="button-text">
+                                                                <?= $escaper->escapeHtml(__('Auto-Ship')) ?>
+                                                            </span>
                                                         </button>
                                                     </a>
                                                 </div>
                                                 <div class="product-subscribe-button-dropdown">
-                                                    <button title="<?= /* @escapeNotVerified */ __('Add to Cart') ?>"
+                                                    <button title="<?= $escaper->escapeHtml(__('Add to Cart')) ?>"
                                                             class="action-toggle primary add"
                                                             data-toggle="dropdown"
                                                             data-bind="attr: {'data-wishlist-item-counter': $index()}">
-                                                        <span><?= /* @escapeNotVerified */ __('Select') ?></span>
+                                                        <span><?= $escaper->escapeHtml(__('Select')) ?></span>
                                                     </button>
                                                 </div>
-                                                <div class="product-addtocart-button-hidden" data-bind="css: 'wishlist-subscription-dropdown-hidden-' + $index()">
+                                                <div class="product-addtocart-button-hidden"
+                                                     data-bind="css: 'wishlist-subscription-dropdown-hidden-' + $index()">
                                                     <div class="actions-primary">
                                                         <!-- ko if: product_has_required_options -->
-                                                        <a href="#" data-bind="attr: {'data-post': add_to_cart_params}" class="action tocart primary"><span><?= /* @escapeNotVerified */ __('Add to Cart') ?></span></a>
+                                                        <a href="#" data-bind="attr: {'data-post': add_to_cart_params}"
+                                                           class="action tocart primary">
+                                                            <span><?= $escaper->escapeHtml(__('Add to Cart')) ?></span>
+                                                        </a>
                                                         <!-- /ko -->
                                                         <!-- ko ifnot: product_has_required_options -->
-                                                        <button type="button" class="action tocart primary" data-bind="attr: {'data-post': add_to_cart_params}"><span><?= /* @escapeNotVerified */ __('Add to Cart') ?></span></button>
+                                                        <button type="button" class="action tocart primary"
+                                                                data-bind="attr: {'data-post': add_to_cart_params}">
+                                                            <span><?= $escaper->escapeHtml(__('Add to Cart')) ?></span>
+                                                        </button>
                                                         <!-- /ko -->
                                                     </div>
                                                 </div>
@@ -71,18 +83,27 @@ $wishlistHelper = $this->helper(\Magento\Wishlist\Helper\Data::class);
                                             <!-- ko if: is_subscribe -->
                                                 <div class="product-subscribe-button">
                                                     <a data-bind="attr: { href: product_url }">
-                                                        <button type="button" title="Subscribe" class="action primary subscribe">
-                                                            <span data-role="button-text"><?= /* @escapeNotVerified */ __('Subscribe') ?></span>
+                                                        <button type="button" title="Subscribe"
+                                                                class="action primary subscribe">
+                                                            <span data-role="button-text">
+                                                                <?= $escaper->escapeHtml(__('Auto-Ship')) ?>
+                                                            </span>
                                                         </button>
                                                     </a>
                                                 </div>
                                             <!-- /ko -->
                                             <!-- ko ifnot: is_subscribe -->
                                                 <!-- ko if: product_has_required_options -->
-                                                    <a href="#" data-bind="attr: {'data-post': add_to_cart_params}" class="action tocart primary"><span><?= /* @escapeNotVerified */ __('Add to Cart') ?></span></a>
+                                                    <a href="#" data-bind="attr: {'data-post': add_to_cart_params}"
+                                                       class="action tocart primary">
+                                                        <span><?= $escaper->escapeHtml(__('Add to Cart')) ?></span>
+                                                    </a>
                                                 <!-- /ko -->
                                                 <!-- ko ifnot: product_has_required_options -->
-                                                    <button type="button" class="action tocart primary" data-bind="attr: {'data-post': add_to_cart_params}"><span><?= /* @escapeNotVerified */ __('Add to Cart') ?></span></button>
+                                                    <button type="button" class="action tocart primary"
+                                                            data-bind="attr: {'data-post': add_to_cart_params}">
+                                                        <span><?= $escaper->escapeHtml(__('Add to Cart')) ?></span>
+                                                    </button>
                                                 <!-- /ko -->
                                             <!-- /ko -->
                                         <!-- /ko -->
@@ -90,9 +111,9 @@ $wishlistHelper = $this->helper(\Magento\Wishlist\Helper\Data::class);
                                     </div>
                                     <div class="actions-secondary">
                                         <a href="#"  data-bind="attr: {'data-post': delete_item_params}"
-                                           title="<?= /* @escapeNotVerified */ __('Remove This Item') ?>"
+                                           title="<?= $escaper->escapeHtml(__('Remove This Item')) ?>"
                                            class="btn-remove action delete">
-                                            <span><?= /* @escapeNotVerified */ __('Remove This Item') ?></span>
+                                            <span><?= $escaper->escapeHtml(__('Remove This Item')) ?></span>
                                         </a>
                                     </div>
                                 </div>
@@ -103,13 +124,15 @@ $wishlistHelper = $this->helper(\Magento\Wishlist\Helper\Data::class);
                 <div class="actions-toolbar no-display" data-bind="css: {'no-display': null}">
                     <div class="primary">
                         <a class="action details"
-                           href="<?= /* @escapeNotVerified */ $this->helper('Magento\Wishlist\Helper\Data')->getListUrl() ?>"
-                           title="<?= /* @escapeNotVerified */ __('Go to Wish List') ?>"><span><?= /* @escapeNotVerified */ __('Go to Wish List') ?></span></a>
+                           href="<?= $escaper->escapeHtml($wishlistHelper->getListUrl()) ?>"
+                           title="<?= $escaper->escapeHtml(__('Go to Wish List')) ?>">
+                            <span><?= $escaper->escapeHtml(__('Go to Wish List')) ?></span>
+                        </a>
                     </div>
                 </div>
             <!-- /ko -->
             <!-- ko ifnot: wishlist().counter -->
-                <div class="empty"><?= /* @escapeNotVerified */ __('You have no items in your wish list.') ?></div>
+                <div class="empty"><?= $escaper->escapeHtml(__('You have no items in your wish list.')) ?></div>
             <!-- /ko -->
         </div>
     </div>
@@ -126,7 +149,7 @@ $wishlistHelper = $this->helper(\Magento\Wishlist\Helper\Data::class);
         }
     }
 </script>
-    <?php if (!$block->isRedirectToCartEnabled()) : ?>
+    <?php if (!$block->isRedirectToCartEnabled()): ?>
         <script type="text/x-magento-init">
         {
             "[data-role=tocart-form], .form.map.checkout": {
