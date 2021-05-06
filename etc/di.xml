@@ -1502,4 +1502,9 @@
             <argument name="labelsVisible" xsi:type="boolean">false</argument>
         </arguments>
     </virtualType>
+    <type name="ClassyLlama\AvaTax\Helper\ExtensionAttributeMerger">
+        <plugin name="prevent_avatax_extension_attributes_copy"
+                type="TNW\Subscriptions\Plugin\Avatax\PreventExtensionCopy"
+                sortOrder="10"/>
+    </type>
 </config>
