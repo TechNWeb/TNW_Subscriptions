@@ -118,6 +118,25 @@ class Adapter
             $this->privateKey(
                 $this->config->getValue($this->config::KEY_PRIVATE_KEY, $storeId)
             );
+
+            if ($environmentIdentifier === Environment::ENVIRONMENT_SANDBOX) {
+                $configClass = get_class($this->config);
+                if (defined($configClass . '::KEY_SANDBOX_MERCHANT_ID')) {
+                    $this->merchantId(
+                        $this->config->getValue($this->config::KEY_SANDBOX_MERCHANT_ID, $storeId)
+                    );
+                }
+                if (defined($configClass . '::KEY_SANDBOX_PUBLIC_KEY')) {
+                    $this->publicKey(
+                        $this->config->getValue($this->config::KEY_SANDBOX_PUBLIC_KEY, $storeId)
+                    );
+                }
+                if (defined($configClass . '::KEY_SANDBOX_PRIVATE_KEY')) {
+                    $this->privateKey(
+                        $this->config->getValue($this->config::KEY_SANDBOX_PRIVATE_KEY, $storeId)
+                    );
+                }
+            }
         }
     }
 
