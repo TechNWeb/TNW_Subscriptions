@@ -23,6 +23,10 @@ class Cart
     ) {
         if (isset($requestInfo['subscribe_button'])) {
             $subscribeOptions = json_decode($requestInfo['subscribe_options'], true);
+            if (!isset($subscribeOptions['value'])) {
+                /** In case of grouped product */
+                return [$productInfo, $requestInfo];
+            }
             $billingFrequency['billing_frequency'] = $subscribeOptions['value'];
             if (is_object($requestInfo)) {
                 $requestInfo = array_merge($requestInfo->getData(), $billingFrequency, $subscribeOptions);

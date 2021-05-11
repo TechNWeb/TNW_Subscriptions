@@ -35,6 +35,12 @@ class Grouped
         $processMode = null
     ) {
         if (isset($buyRequest['subscribe_active']) && $buyRequest['subscribe_active']) {
+
+            if (isset($buyRequest['subscribe_button'])) {
+                /** In case of subscribing to grouped product from category page */
+                return __('Please specify the quantity and auto-ship options of product(s).')->render();
+            }
+
             $cartCandidates = [];
 
             foreach ($this->grouped->getChildProducts($product) as $subProduct) {
