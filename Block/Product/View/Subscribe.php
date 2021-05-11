@@ -661,10 +661,7 @@ class Subscribe extends View
                     $subscriptionPrice = trim($this->getProductPriceHtml(
                         $childProduct,
                         'subscription_price',
-                        'item_view',
-                        [
-                            'config_only' => true
-                        ]
+                        'grouped_view'
                     ));
                     if ($subscriptionPrice !== '') {
                         $childArray[$childProduct->getId()]['subscription_price'] = $this->serializer
