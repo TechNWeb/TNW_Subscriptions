@@ -63,6 +63,8 @@ class Sales extends AbstractDataProvider
      */
     protected $request;
 
+    private $loadedData = [];
+
     /**
      * Sales constructor.
      *
@@ -140,7 +142,7 @@ class Sales extends AbstractDataProvider
      */
     public function getMeta()
     {
-        return $this->meta;
+         return $this->meta;
     }
 
     /**
@@ -262,6 +264,12 @@ class Sales extends AbstractDataProvider
         $period = $this->request->getParam('period');
         $unProcessedItems = $this->getCollection()->toArray();
         $data = [];
+        $params =  $this->request->getParams();
+        unset($params['sorting']);
+        $dataKey = implode(',', $params);
+        if (array_key_exists($dataKey, $this->loadedData)) {
+            return $this->loadedData[$dataKey];
+        }
         if ($unProcessedItems && $date && $period) {
             $processedItemsGroupedByPeriods = [];
             $periodStartTime = '';
@@ -304,17 +312,29 @@ class Sales extends AbstractDataProvider
                     $processedItemsGroupedByPeriods[$periodGroupValue][$itemData['sku']] = $resultedRow;
                 }
             }
+            $total = 0;
             foreach ($processedItemsGroupedByPeriods as $periodValue => $skuBasedData) {
                 foreach ($skuBasedData as $sku => $rowData) {
                     $data[] = $rowData;
+                    $total += $rowData['total'];
                 }
             }
+            if ($total) {
+                $data[] = [
+                    'total' => $total,
+                    'sku' => '',
+                    'name' => 'Period Total',
+                    'qty' => NULL,
+                    'interval' => NULL
+                ];
+            }
         }
-        //TODO: implement sort order based on grid selected order
-        return [
+        $this->loadedData[$dataKey] = [
             'totalRecords' => count($data),
             'items' => $data
         ];
+        //TODO: implement sort order based on grid selected order
+        return $this->loadedData[$dataKey];
     }
 
     /**
