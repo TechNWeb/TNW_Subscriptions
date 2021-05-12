@@ -63,6 +63,9 @@ class Sales extends AbstractDataProvider
      */
     protected $request;
 
+    /**
+     * @var array
+     */
     private $loadedData = [];
 
     /**
@@ -142,7 +145,7 @@ class Sales extends AbstractDataProvider
      */
     public function getMeta()
     {
-         return $this->meta;
+        return $this->meta;
     }
 
     /**
