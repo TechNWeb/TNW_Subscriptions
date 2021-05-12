@@ -41,7 +41,8 @@ define([
             this._super();
             this.getFrequencyLabel = this.getFrequencyLabel.bind(this);
 
-            function initializePreselected() {
+            function initializePreselected()
+            {
                 if (self.getSelectedProductId()) {
                     self.setCurrentProduct(self.getSelectedProductId());
                 }
@@ -57,7 +58,7 @@ define([
                 this.currentProduct = this.products.product;
                 this.setDefaultFrequency();
                 initializePreselected();
-            } else if (this.products.type === 'configurable'){
+            } else if (this.products.type === 'configurable') {
                 if (!$(this.swatchWidgetSelector).length) {
                     initializePreselected();
                     return;
@@ -108,7 +109,7 @@ define([
                 $(this.onetimeFields).removeAttr('disabled');
             } else {
                 $(this.priceBox).hide();
-                $(this.altPriceBox).html($t('There is no one time purchase available for this option'));
+                $(this.altPriceBox).html($t('There is no one-time purchase available for this option'));
                 $(this.onetimeFields).attr('disabled', 'disabled');
             }
         },
@@ -133,7 +134,7 @@ define([
                 selectedOptions[attrId] = attrValue;
             });
             _.each(this.products.super_attributes, function (mappedOptions, id) {
-                if(_.difference(_.toArray(mappedOptions), _.toArray(selectedOptions)).length) {
+                if (_.difference(_.toArray(mappedOptions), _.toArray(selectedOptions)).length) {
                     return false;
                 }
                 productId = id;
@@ -182,7 +183,9 @@ define([
         getFrequencyOptions: function () {
             var options = [];
 
-            if (!this.currentProduct || !this.currentProduct.frequency_data) return false;
+            if (!this.currentProduct || !this.currentProduct.frequency_data) {
+                return false
+            }
             _.each(this.currentProduct.frequency_data, function (option) {
                 if (_.indexBy(this.products.product.frequency_data, 'value')[option.value]) {
                     options.push(option);

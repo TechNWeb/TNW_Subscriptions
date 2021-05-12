@@ -10,6 +10,7 @@
  *
  * @var $block \TNW\Subscriptions\Block\Product\ListProduct
  * @var $imageBlockBuilder \Magento\Catalog\Block\Product\ImageBlockBuilder
+ * @var $escaper \Magento\Framework\Escaper
  */
 ?>
 <?php
@@ -17,7 +18,9 @@ $_productCollection = $block->getLoadedProductCollection();
 $_helper = $this->helper('Magento\Catalog\Helper\Output');
 ?>
 <?php if (!$_productCollection->count()): ?>
-    <div class="message info empty"><div><?= /* @escapeNotVerified */ __('We can\'t find products matching the selection.') ?></div></div>
+    <div class="message info empty">
+        <div><?= $escaper->escapeHtml(__('We can\'t find products matching the selection.')) ?></div>
+    </div>
 <?php else: ?>
     <?= $block->getToolbarHtml() ?>
     <?= $block->getAdditionalHtml() ?>
@@ -38,12 +41,13 @@ $_helper = $this->helper('Magento\Catalog\Helper\Output');
      */
     $pos = $block->getPositioned();
     ?>
-    <div class="products wrapper <?= /* @escapeNotVerified */ $viewMode; ?> products-<?= /* @escapeNotVerified */ $viewMode; ?>">
+    <div class="products wrapper <?= /* @noEscape */ $viewMode; ?> products-<?= /* @noEscape */ $viewMode; ?>">
         <?php $iterator = 1; ?>
         <ol class="products list items product-items">
             <?php /** @var $_product \Magento\Catalog\Model\Product */ ?>
             <?php foreach ($_productCollection as $_product): ?>
-                <?= /* @escapeNotVerified */($iterator++ == 1) ? '<li class="item product product-item">' : '</li><li class="item product product-item">' ?>
+                <?= /* @noEscape */($iterator++ == 1) ? '<li class="item product product-item">'
+                    : '</li><li class="item product product-item">' ?>
                 <div class="product-item-info" data-container="product-grid">
                     <?php
                     $productImage = $block->getImage($_product, $imageDisplayArea);
@@ -54,7 +58,8 @@ $_helper = $this->helper('Magento\Catalog\Helper\Output');
                     }
                     ?>
                     <?php // Product Image ?>
-                    <a href="<?= /* @escapeNotVerified */ $_product->getProductUrl() ?>" class="product photo product-item-photo" tabindex="-1">
+                    <a href="<?= /* @noEscape */ $_product->getProductUrl() ?>"
+                       class="product photo product-item-photo" tabindex="-1">
                         <?= $productImage->toHtml(); ?>
                     </a>
                     <div class="product details product-item-details">
@@ -63,27 +68,38 @@ $_helper = $this->helper('Magento\Catalog\Helper\Output');
                         ?>
                         <strong class="product name product-item-name">
                             <a class="product-item-link"
-                               href="<?= /* @escapeNotVerified */ $_product->getProductUrl() ?>">
-                                <?= /* @escapeNotVerified */ $_helper->productAttribute($_product, $_product->getName(), 'name'); ?>
+                               href="<?= /* @noEscape */ $_product->getProductUrl() ?>">
+                                <?= $escaper->escapeHtml(
+                                    $_helper->productAttribute($_product, $_product->getName(), 'name')
+                                ); ?>
                             </a>
                         </strong>
                         <?= $block->getReviewsSummaryHtml($_product, $templateType); ?>
                         <strong class="product name product-item-name">
-                            <?= /* @escapeNotVerified */ $block->getChildBlock('helper.category.products.list')->getTopMessage($_product) ?>
+                            <?= $escaper->escapeHtml(
+                                $block->getChildBlock('helper.category.products.list')->getTopMessage($_product)
+                            ) ?>
                         </strong>
-                        <?php if ($_product->getTypeId() == 'simple' || $_product->getTypeId() == 'virtual' || $_product->getTypeId() == 'downloadable'): ?>
+                        <?php if ($_product->getTypeId() == 'simple'
+                            || $_product->getTypeId() == 'virtual'
+                            || $_product->getTypeId() == 'downloadable'): ?>
                             <div class="price-box price-final_price">
                             <span class="price-wrapper" data-role="priceBox">
-                                <span class="price"><?= /* @escapeNotVerified */ $block->getChildBlock('helper.category.products.list')->getTrialPriceForCategory($_product) ?></span>
+                                <span class="price">
+                                    <?= $escaper->escapeHtml($block->getChildBlock(
+                                        'helper.category.products.list'
+                                    )->getTrialPriceForCategory($_product)) ?>
+                                </span>
                             </span>
                             </div>
                         <?php else: ?>
-                            <?= /* @escapeNotVerified */ $block->getProductPrice($_product) ?>
+                            <?= /* @noEscape */ $block->getProductPrice($_product) ?>
                         <?php endif; ?>
                         <?= $block->getProductDetailsHtml($_product); ?>
 
                         <div class="product-item-inner">
-                            <div class="product actions product-item-actions"<?= strpos($pos, $viewMode . '-actions') ? $position : ''; ?>>
+                            <div class="product actions product-item-actions"<?= /* @noEscape */
+                                    strpos($pos, $viewMode . '-actions') ? $position : ''; ?>>
                                 <?php
                                 $block->getChildBlock('helper.category.products.list')->prepareParamsToButtonsBlock(
                                     $_product,
@@ -94,7 +110,8 @@ $_helper = $this->helper('Magento\Catalog\Helper\Output');
                                 );
                                 echo $block->getChildBlock('helper.category.products.list')->getButtonsHtml();
                                 ?>
-                                <div data-role="add-to-links" class="actions-secondary"<?= strpos($pos, $viewMode . '-secondary') ? $position : ''; ?>>
+                                <div data-role="add-to-links" class="actions-secondary"<?= /* @noEscape */
+                                        strpos($pos, $viewMode . '-secondary') ? $position : ''; ?>>
                                     <?php if ($addToBlock = $block->getChildBlock('addto')): ?>
                                         <?= $addToBlock->setProduct($_product)->getChildHtml(); ?>
                                     <?php endif; ?>
@@ -102,9 +119,14 @@ $_helper = $this->helper('Magento\Catalog\Helper\Output');
                             </div>
                             <?php if ($showDescription):?>
                                 <div class="product description product-item-description">
-                                    <?= /* @escapeNotVerified */ $_helper->productAttribute($_product, $_product->getShortDescription(), 'short_description') ?>
-                                    <a href="<?= /* @escapeNotVerified */ $_product->getProductUrl() ?>" title="<?= /* @escapeNotVerified */ $_productNameStripped ?>"
-                                       class="action more"><?= /* @escapeNotVerified */ __('Learn More') ?></a>
+                                    <?= $escaper->escapeHtml($_helper->productAttribute(
+                                        $_product,
+                                        $_product->getShortDescription(),
+                                        'short_description'
+                                    )) ?>
+                                    <a href="<?= /* @noEscape */ $_product->getProductUrl() ?>"
+                                       title="<?= $escaper->escapeHtml($_productNameStripped) ?>"
+                                       class="action more"><?= $escaper->escapeHtml(__('Learn More')) ?></a>
                                 </div>
                             <?php endif; ?>
                         </div>
@@ -120,7 +142,7 @@ $_helper = $this->helper('Magento\Catalog\Helper\Output');
         {
             "[data-role=tocart-subscriptions-form]": {
                 "catalogAddToCart": {
-                    "addToCartButtonTextDefault" : "<?= __('Subscribe') ?>"
+                    "addToCartButtonTextDefault" : "<?= $escaper->escapeHtml(__('Auto-Ship')) ?>"
                     }
             },
             "[data-role=tocart-form], .form.map.checkout": {

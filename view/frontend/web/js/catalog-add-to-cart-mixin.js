@@ -11,7 +11,7 @@ define([
         $.widget('mage.catalogAddToCart', originalAddToCart, {
 
             options: {
-                subscribeButtonText : $t('Subscribe')
+                subscribeButtonText : $t('Auto-Ship')
             },
 
             enableAddToCartButton: function (form) {

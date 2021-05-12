@@ -62,6 +62,7 @@ class Collection extends SearchResult
         $this->_initialFieldsToSelect = array_merge(
             $this->_initialFieldsToSelect,
             [
+                'billing_frequency_id',
                 'website_id',
                 'status',
                 'trial_start_date',
@@ -136,8 +137,7 @@ class Collection extends SearchResult
                     'parent_id' => 'profile_product.parent_id',
                     'product_options' => 'profile_product.custom_options'
                 ]
-            )
-            ->where('parent_id IS NULL');
+            )->where('parent_id IS NULL');
 
         return $this;
     }
