@@ -10,8 +10,8 @@ use Magento\Catalog\Model\Locator\LocatorInterface;
 use Magento\ConfigurableProduct\Model\Product\Type\Configurable;
 use Magento\Framework\Api\SearchCriteria;
 use Magento\Framework\Api\SearchCriteriaBuilder;
-use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\Stdlib\ArrayManager;
+use Magento\Framework\UrlInterface;
 use Magento\Store\Model\StoreManagerInterface;
 use Magento\Ui\Component\Container;
 use Magento\Ui\Component\DynamicRows;
@@ -26,7 +26,6 @@ use Magento\Ui\Component\Form\Fieldset;
 use TNW\Subscriptions\Api\BillingFrequencyRepositoryInterface as BillingFrequencyRepository;
 use TNW\Subscriptions\Api\Data\BillingFrequencyInterface;
 use TNW\Subscriptions\Api\Data\ProductBillingFrequencyInterface;
-use TNW\Subscriptions\Model\Backend\UrlBuilder;
 use TNW\Subscriptions\Model\Config;
 use TNW\Subscriptions\Model\Context;
 use TNW\Subscriptions\Model\Product\Attribute;
@@ -135,11 +134,6 @@ class RecurringOptions extends BaseModifier
     private $supportTypes;
 
     /**
-     * @var UrlBuilder
-     */
-    private $urlBuilder;
-
-    /**
      * @var SubscriptionProfileRepository
      */
     private $profileRepository;
@@ -150,6 +144,11 @@ class RecurringOptions extends BaseModifier
     private $productSubscriptionProfileRepository;
 
     /**
+     * @var UrlInterface
+     */
+    private $urlBuilder;
+
+    /**
      * @param LocatorInterface $locator
      * @param StoreManagerInterface $storeManager
      * @param ArrayManager $arrayManager
@@ -158,7 +157,7 @@ class RecurringOptions extends BaseModifier
      * @param Context $context
      * @param Config $config
      * @param array $supportTypes
-     * @param UrlBuilder $urlBuilder
+     * @param UrlInterface $urlBuilder
      * @param SubscriptionProfileRepository $profileRepository
      * @param ProductSubscriptionProfileRepository $productSubscriptionProfileRepository
      */
@@ -171,7 +170,7 @@ class RecurringOptions extends BaseModifier
         Context $context,
         Config $config,
         array $supportTypes,
-        UrlBuilder $urlBuilder,
+        UrlInterface $urlBuilder,
         SubscriptionProfileRepository $profileRepository,
         ProductSubscriptionProfileRepository $productSubscriptionProfileRepository
     ) {
@@ -198,50 +197,69 @@ class RecurringOptions extends BaseModifier
 
             $productId = $this->locator->getProduct()->getId();
 
+            $searchStatuses = [
+                ProfileStatus::STATUS_ACTIVE,
+                ProfileStatus::STATUS_TRIAL,
+                ProfileStatus::STATUS_HOLDED,
+                ProfileStatus::STATUS_PAST_DUE
+            ];
+
+            $searchCriteria = $this->searchCriteriaBuilder->addFilter(
+                'magento_product_id',
+                $productId
+            )->create();
+
+            $subscriptionProfileIds = [];
+            $parentProductId = false;
+
+            $productSubscriptions = $this->productSubscriptionProfileRepository->getList($searchCriteria);
+            foreach ($productSubscriptions->getItems() as $productSubscription) {
+                $subscriptionProfileIds[] = $productSubscription->getSubscriptionProfileId();
+                if ($productSubscription->getParentId() && !$parentProductId) {
+                    $parentProductId = $this->productSubscriptionProfileRepository->getById(
+                        $productSubscription->getParentId()
+                    )->getMagentoProductId();
+                }
+            }
+
             /** @var ProductBillingFrequencyInterface $option */
             foreach ($productOptions as $option) {
                 $optionArray = $option->getData();
                 $optionArray = $this->formatPriceByPath(static::FIELD_PRICE_NAME, $optionArray);
                 $optionArray = $this->formatPriceByPath(static::FIELD_INITIAL_FEE_NAME, $optionArray);
-                $searchStatuses = [
-                    ProfileStatus::STATUS_ACTIVE,
-                    ProfileStatus::STATUS_TRIAL,
-                    ProfileStatus::STATUS_HOLDED,
-                    ProfileStatus::STATUS_PAST_DUE
-                ];
-                $searchCriteria = $this->searchCriteriaBuilder->addFilter(
-                    'billing_frequency_id',
-                    $optionArray['billing_frequency_id'],
-                    'eq'
-                )->addFilter(
-                    'status',
-                    $searchStatuses,
-                    'in'
-                )->setPageSize(1)->setCurrentPage(1)->create();
 
-                $subscriptionProfiles = $this->profileRepository->getList($searchCriteria);
-                if (!empty($subscriptionProfiles->getItems())) {
-                    try {
-                        $subscriptionArray = [];
-                        foreach ($subscriptionProfiles->getItems() as $subscriptionProfile) {
-                            $productSubscription = $this->productSubscriptionProfileRepository
-                                ->getById($subscriptionProfile['entity_id']);
-                            if (
-                                $productSubscription->getData()['magento_product_id']
-                                == $this->locator->getProduct()->getId()
-                            ) {
-                                $subscriptionArray['subscriptions'][] = $this->urlBuilder->getEditHtmlLink(
-                                    $subscriptionProfile['entity_id'], true
-                                );
-                            }
-                        }
-                        $options[] = array_merge($optionArray, $subscriptionArray);
-                    } catch (NoSuchEntityException $e) {
-                        $options[] = $optionArray;
+                if (!empty($subscriptionProfileIds)) {
+                    $profilesSearchCriteria = $this->searchCriteriaBuilder->addFilter(
+                        'status',
+                        $searchStatuses,
+                        'in'
+                    )->addFilter(
+                        'billing_frequency_id',
+                        $optionArray['billing_frequency_id']
+                    )->addFilter(
+                        'entity_id',
+                        $subscriptionProfileIds,
+                        'in'
+                    )->create();
+
+                    $subscriptionProfiles = $this->profileRepository->getList($profilesSearchCriteria);
+
+                    if ($subscriptionProfiles->getTotalCount()) {
+                        $gridUrl = $this->urlBuilder->getUrl(
+                            'tnw_subscriptions/subscriptionprofile/index',
+                            [
+                                'status' => implode(',', $searchStatuses),
+                                'product_id' => $parentProductId ?: $productId,
+                                'child_sku' => $parentProductId ? $this->locator->getProduct()->getSku(): null,
+                                'billing_frequency_id' => $optionArray['billing_frequency_id']
+                            ]
+                        );
+
+                        $optionArray['grid_url'] = $gridUrl;
                     }
-                } else {
-                    $options[] = $optionArray;
                 }
+
+                $options[] = $optionArray;
             }
 
             $data =  array_replace_recursive(

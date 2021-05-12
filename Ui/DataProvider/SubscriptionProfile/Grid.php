@@ -22,6 +22,10 @@ class Grid extends DataProvider
             $filter->setField('frequency.label');
         }
 
+        if ($field === 'billing_frequency_id') {
+            $filter->setField('main_table.billing_frequency_id');
+        }
+
         if ($field === 'next_billing_cycle_date') {
             $filter->setField(new \Zend_Db_Expr('relation.scheduled_at'));
         }
@@ -57,14 +61,45 @@ class Grid extends DataProvider
             $filter->setField('profile_product.name');
         }
 
+        if ($field === 'product_id') {
+            $filter->setField('profile_product.magento_product_id');
+        }
+
+        if ($field === 'child_sku') {
+            $filter->setField(new \Zend_Db_Expr("json_extract(profile_product.custom_options, '$.simple_sku')"));
+        }
+
         parent::addFilter($filter);
     }
 
     /**
-     * @inheritdoc
+     * {@inheritDoc}
      */
-    public function addOrder($field, $direction)
+    protected function prepareUpdateUrl()
     {
-        parent::addOrder($field, $direction);
+        if (!isset($this->data['config']['filter_url_params'])) {
+            return;
+        }
+        foreach ($this->data['config']['filter_url_params'] as $paramName => $paramValue) {
+            if ('*' == $paramValue) {
+                $paramValue = $this->request->getParam($paramName);
+            }
+            if ($paramValue) {
+                $this->data['config']['update_url'] = sprintf(
+                    '%s%s/%s/',
+                    $this->data['config']['update_url'],
+                    $paramName,
+                    $paramValue
+                );
+                if ($paramName === 'status') {
+                    $filter = $this->filterBuilder->setField($paramName)
+                        ->setValue(explode(',', $paramValue))->setConditionType('in')->create();
+                } else {
+                    $filter = $this->filterBuilder->setField($paramName)
+                        ->setValue($paramValue)->setConditionType('eq')->create();
+                }
+                $this->addFilter($filter);
+            }
+        }
     }
 }

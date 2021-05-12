@@ -83,7 +83,7 @@ class DataProvider extends AbstractDataProvider
     {
         $profileId = $this->request->getParam('subscription_profile_id', 0);
         $arrItems = [
-            'totalRecords' => $this->getCollection()->getSize(),
+            'totalRecords' => 0,
             'items' => [],
         ];
         if ($profileId) {
