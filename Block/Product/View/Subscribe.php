@@ -212,9 +212,7 @@ class Subscribe extends View
      */
     public function isSubscribeAvailable()
     {
-        if ($this->getProduct()->getTypeId() === TypeBundle::TYPE_CODE
-            || $this->getProduct()->getTypeId() === Grouped::TYPE_CODE
-        ) {
+        if ($this->getProduct()->getTypeId() === TypeBundle::TYPE_CODE) {
             return false;
         }
         return (
