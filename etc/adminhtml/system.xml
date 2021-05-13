@@ -402,6 +402,24 @@
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                 </field>
             </group>
+            <group id="profile_subscribe_limitations" translate="label" type="text" sortOrder="20" showInDefault="1"
+                   showInWebsite="1"
+                   showInStore="0">
+                <label>Subscriber Limitation</label>
+                <comment>Limit which customer group can use subscriptions.</comment>
+                <field id="sallowspecific" translate="label" type="select" sortOrder="50" showInDefault="1" showInWebsite="1" canRestore="1">
+                    <label>Allow to all customer groups</label>
+                    <frontend_class>shipping-applicable-country</frontend_class>
+                    <source_model>TNW\Subscriptions\Model\Backend\System\Config\Source\AllCustomerGroups</source_model>
+                </field>
+                <field id="specificcountry" translate="label" type="multiselect" sortOrder="60" showInDefault="1"
+                       showInWebsite="1">
+                    <label>Customer Group Limit</label>
+                    <comment>Allow customers from the selected customer groups to be able to place recurring orders.</comment>
+                    <source_model>TNW\Subscriptions\Model\Backend\System\Config\Source\Customer</source_model>
+                    <can_be_empty>1</can_be_empty>
+                </field>
+            </group>
         </section>
     </system>
 </config>

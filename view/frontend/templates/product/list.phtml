@@ -16,6 +16,7 @@
 <?php
 $_productCollection = $block->getLoadedProductCollection();
 $_helper = $this->helper('Magento\Catalog\Helper\Output');
+$_subscriptionBlock = $block->getChildBlock('helper.category.products.list');
 ?>
 <?php if (!$_productCollection->count()): ?>
     <div class="message info empty">
@@ -76,21 +77,18 @@ $_helper = $this->helper('Magento\Catalog\Helper\Output');
                         </strong>
                         <?= $block->getReviewsSummaryHtml($_product, $templateType); ?>
                         <strong class="product name product-item-name">
-                            <?= $escaper->escapeHtml(
-                                $block->getChildBlock('helper.category.products.list')->getTopMessage($_product)
-                            ) ?>
+                            <?= $escaper->escapeHtml($_subscriptionBlock->getTopMessage($_product)) ?>
                         </strong>
-                        <?php if ($_product->getTypeId() == 'simple'
-                            || $_product->getTypeId() == 'virtual'
-                            || $_product->getTypeId() == 'downloadable'): ?>
+                            <?php if ($_subscriptionBlock->isAllowedProductType($_product)
+                                && $_subscriptionBlock->isSubscriptionPrice($_product)): ?>
                             <div class="price-box price-final_price">
-                            <span class="price-wrapper" data-role="priceBox">
-                                <span class="price">
-                                    <?= $escaper->escapeHtml($block->getChildBlock(
-                                        'helper.category.products.list'
-                                    )->getTrialPriceForCategory($_product)) ?>
+                                <span class="price-wrapper" data-role="priceBox">
+                                    <span class="price">
+                                        <?= $escaper->escapeHtml(
+                                            $_subscriptionBlock->getTrialPriceForCategory($_product)
+                                        ) ?>
+                                    </span>
                                 </span>
-                            </span>
                             </div>
                         <?php else: ?>
                             <?= /* @noEscape */ $block->getProductPrice($_product) ?>
@@ -101,14 +99,14 @@ $_helper = $this->helper('Magento\Catalog\Helper\Output');
                             <div class="product actions product-item-actions"<?= /* @noEscape */
                                     strpos($pos, $viewMode . '-actions') ? $position : ''; ?>>
                                 <?php
-                                $block->getChildBlock('helper.category.products.list')->prepareParamsToButtonsBlock(
+                                $_subscriptionBlock->prepareParamsToButtonsBlock(
                                     $_product,
                                     $pos,
                                     $viewMode,
                                     $position,
                                     $block->getAddToCartPostParams($_product)
                                 );
-                                echo $block->getChildBlock('helper.category.products.list')->getButtonsHtml();
+                                echo $_subscriptionBlock->getButtonsHtml();
                                 ?>
                                 <div data-role="add-to-links" class="actions-secondary"<?= /* @noEscape */
                                         strpos($pos, $viewMode . '-secondary') ? $position : ''; ?>>

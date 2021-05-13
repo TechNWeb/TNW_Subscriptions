@@ -10,11 +10,16 @@ use Magento\Catalog\Api\Data\ProductInterface;
 use Magento\Catalog\Model\ResourceModel\Product\CollectionFactory as ProductCollectionFactory;
 use Magento\Framework\App\RequestInterface;
 use Magento\GroupedProduct\Model\Product\Type\Grouped;
+use Magento\Framework\Exception\LocalizedException;
+use Magento\Framework\Exception\NoSuchEntityException;
 use TNW\Subscriptions\Api\ProductBillingFrequencyRepositoryInterface as FrequencyOptionRepository;
 use TNW\Subscriptions\Model\Config;
 use TNW\Subscriptions\Model\Config\Source\PurchaseType;
 use TNW\Subscriptions\Model\Product\Attribute;
 use TNW\Subscriptions\Model\ProductSubscriptionProfile\ProductTypeManagerResolver;
+use Magento\Customer\Model\Session;
+use Magento\Catalog\Api\ProductRepositoryInterface;
+use Psr\Log\LoggerInterface;
 
 /**
  * Class subscription product view config is available subscription.
@@ -48,24 +53,53 @@ class SubscriptionProductView
     private $productTypeResolver;
 
     /**
+     * @var RequestInterface
+     */
+    private $request;
+
+    /**
+     * @var Session
+     */
+    private $customerSession;
+
+    /**
+     * @var ProductRepositoryInterface
+     */
+    private $productRepository;
+
+    /**
+     * @var LoggerInterface
+     */
+    private $logger;
+
+    /**
      * @param Config $config
      * @param FrequencyOptionRepository $frequencyOptionRepository
      * @param RequestInterface $request
      * @param ProductCollectionFactory $productCollectionFactory
      * @param ProductTypeManagerResolver $productTypeResolver
+     * @param Session $customerSession
+     * @param ProductRepositoryInterface $productRepository
+     * @param LoggerInterface $logger
      */
     public function __construct(
         Config $config,
         FrequencyOptionRepository $frequencyOptionRepository,
         RequestInterface $request,
         ProductCollectionFactory $productCollectionFactory,
-        ProductTypeManagerResolver $productTypeResolver
+        ProductTypeManagerResolver $productTypeResolver,
+        Session $customerSession,
+        ProductRepositoryInterface $productRepository,
+        LoggerInterface $logger
     ) {
         $this->config = $config;
         $this->frequencyOptionRepository = $frequencyOptionRepository;
         $this->request = $request;
         $this->productCollectionFactory = $productCollectionFactory;
         $this->productTypeResolver = $productTypeResolver;
+        $this->customerSession = $customerSession;
+        $this->productRepository = $productRepository;
+        $this->logger = $logger;
     }
 
     /**
@@ -73,7 +107,7 @@ class SubscriptionProductView
      *
      * @param ProductInterface $product
      * @return bool
-     * @throws \Magento\Framework\Exception\LocalizedException
+     * @throws LocalizedException
      */
     public function isSubscribeAvailable($product)
     {
@@ -91,7 +125,8 @@ class SubscriptionProductView
         }
         return
             $this->config->isSubscriptionsActiveCurrent()
-            && !empty($this->getProductBillingFrequencies($product));
+            && !empty($this->getProductBillingFrequencies($product))
+            && $this->getCustomerGroupLimitation($product);
     }
 
     /**
@@ -99,12 +134,15 @@ class SubscriptionProductView
      *
      * @param int $productId
      * @return bool
+     * @throws LocalizedException
      */
     public function isSubscribeAvailableById($productId)
     {
+
         return
             $this->config->isSubscriptionsActiveCurrent()
-            && !empty($this->getProductBillingFrequenciesById($productId));
+            && !empty($this->getProductBillingFrequenciesById($productId))
+            && $this->getCustomerGroupLimitation(null, $productId);
     }
 
     /**
@@ -267,5 +305,35 @@ class SubscriptionProductView
     private function getRequest()
     {
         return $this->request;
+    }
+
+    /**
+     * @param null $product
+     * @param null $productId
+     * @return bool
+     */
+    public function getCustomerGroupLimitation($product = null, $productId = null)
+    {
+        if ($productId) {
+            try {
+                $product = $this->productRepository->getById($productId);
+            } catch (NoSuchEntityException $e) {
+                $this->logger->log($e, \Psr\Log\LogLevel::DEBUG);
+                return false;
+            }
+        }
+        $websiteId = $product->getStore()->getWebsiteId() ? $product->getStore()->getWebsiteId() : null;
+        if ($this->config->getAllowAllCustomerGroups($websiteId)) {
+            $customerGroups = $this->config->getCustomerGroupLimit($websiteId);
+            if ($customerGroups != null) {
+                if (array_search(
+                        $this->customerSession->getCustomer()->getGroupId(),
+                        explode(',', $customerGroups)
+                    ) !== false) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 }

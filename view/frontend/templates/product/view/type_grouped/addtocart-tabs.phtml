@@ -57,10 +57,12 @@
     <?php else: ?>
         <input type="hidden" name="subscribe_active" value="0" />
         <?= $block->getChildHtml('grouped_orig') ?>
+        <?= $block->getChildHtml('grouped_recurring_only') ?>
         <?= $block->getChildHtml('addtocart_orig') ?>
     <?php endif ?>
 <?php else: ?>
     <input type="hidden" name="subscribe_active" value="0" />
     <?= $block->getChildHtml('grouped_orig') ?>
+    <?= $block->getChildHtml('grouped_recurring_only') ?>
     <?= $block->getChildHtml('addtocart_orig') ?>
 <?php endif ?>

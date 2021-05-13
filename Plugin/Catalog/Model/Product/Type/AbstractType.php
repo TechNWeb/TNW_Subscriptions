@@ -5,52 +5,82 @@
  */
 namespace TNW\Subscriptions\Plugin\Catalog\Model\Product\Type;
 
+use Magento\Catalog\Model\Product;
+use Magento\Framework\Controller\ResultFactory;
+use Magento\Framework\DataObject;
+use Magento\Framework\Exception\LocalizedException;
+use Magento\Framework\Locale\ResolverInterface;
+use TNW\Subscriptions\Model\Config\Product\SubscriptionProductView;
+use TNW\Subscriptions\Model\SubscriptionProfile\Admin\Create\Product as SubscriptionProduct;
+
 /**
  * Class AbstractType - plugin to modify data for all products on adding to cart
  */
 class AbstractType
 {
     /**
-     * @var \TNW\Subscriptions\Model\SubscriptionProfile\Admin\Create\Product
+     * @var SubscriptionProduct
      */
     private $productModifier;
 
     /**
-     * @var \Magento\Framework\Locale\ResolverInterface
+     * @var ResolverInterface
      */
     private $localeResolver;
 
     /**
+     * @var SubscriptionProductView
+     */
+    private $subscriptionProductView;
+
+    /**
+     * @var ResultFactory
+     */
+    private $resultFactory;
+
+    /**
      * AbstractType constructor.
-     * @param \TNW\Subscriptions\Model\SubscriptionProfile\Admin\Create\Product $productModifier
-     * @param \Magento\Framework\Locale\ResolverInterface $localeResolver
+     * @param SubscriptionProduct $productModifier
+     * @param ResolverInterface $localeResolver
+     * @param SubscriptionProductView $subscriptionProductView
+     * @param ResultFactory $resultFactory
      */
     public function __construct(
-        \TNW\Subscriptions\Model\SubscriptionProfile\Admin\Create\Product $productModifier,
-        \Magento\Framework\Locale\ResolverInterface $localeResolver
+        SubscriptionProduct $productModifier,
+        ResolverInterface $localeResolver,
+        SubscriptionProductView $subscriptionProductView,
+        ResultFactory $resultFactory
     ) {
         $this->productModifier = $productModifier;
         $this->localeResolver = $localeResolver;
+        $this->subscriptionProductView = $subscriptionProductView;
+        $this->resultFactory = $resultFactory;
     }
 
     /**
-     * @param \Magento\Catalog\Model\Product\Type\AbstractType $subject
+     * @param Product\Type\AbstractType $subject
      * @param callable $callback
-     * @param \Magento\Framework\DataObject $buyRequest
-     * @param \Magento\Catalog\Model\Product $product
+     * @param DataObject $buyRequest
+     * @param Product $product
      * @param null $processMode
      *
      * @return mixed
-     * @throws \Magento\Framework\Exception\LocalizedException
+     * @throws LocalizedException
      * @throws \Zend_Filter_Exception
      */
     public function aroundPrepareForCartAdvanced(
-        \Magento\Catalog\Model\Product\Type\AbstractType $subject,
+        Product\Type\AbstractType $subject,
         callable $callback,
-        \Magento\Framework\DataObject $buyRequest,
+        DataObject $buyRequest,
         $product,
         $processMode = null
     ) {
+        /** Checking is customer group allowed */
+        if (!$this->subscriptionProductView->getCustomerGroupLimitation($product)
+            && $this->subscriptionProductView->isOnlySubscribePurchase($product)
+        ) {
+            return __('Product is not available for purchase at this time')->render();
+        }
         if (isset($buyRequest['subscribe_active']) && $buyRequest['subscribe_active']) {
             if (isset($buyRequest['subscribe_qty'])) {
                 $buyRequest['qty'] = \Zend_Filter::filterStatic(
