@@ -25,33 +25,6 @@ use TNW\Subscriptions\Service\Serializer;
 class Configurable extends Base
 {
     /**
-     * Configurable constructor.
-     * @param Config $config
-     * @param PriceCalculator $priceCalculator
-     * @param ProductFrequencyRepository $productFrequencyRepository
-     * @param SearchCriteriaBuilder $searchCriteriaBuilder
-     * @param ProductRepositoryInterface $productRepository
-     * @param Serializer $serializer
-     */
-    public function __construct(
-        Config $config,
-        PriceCalculator $priceCalculator,
-        ProductFrequencyRepository $productFrequencyRepository,
-        SearchCriteriaBuilder $searchCriteriaBuilder,
-        ProductRepositoryInterface $productRepository,
-        Serializer $serializer
-    ) {
-        parent::__construct(
-            $config,
-            $priceCalculator,
-            $productFrequencyRepository,
-            $searchCriteriaBuilder,
-            $productRepository,
-            $serializer
-        );
-    }
-
-    /**
      * @inheritdoc
      */
     public function modifyBuyRequests(array $products)

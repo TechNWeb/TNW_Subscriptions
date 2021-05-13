@@ -1,0 +1,66 @@
+<?php
+/**
+ * Copyright © 2018 TechNWeb, Inc. All rights reserved.
+ * See TNW_LICENSE.txt for license details.
+ */
+
+/**
+ * @var $block \TNW\Subscriptions\Block\Product\View\Subscribe
+ * @var $escaper \Magento\Framework\Escaper
+ */
+?>
+
+<?php if ($block->isSubscribeAvailable()): ?>
+    <?php if ($block->isOnlySubscribePurchase()): ?>
+        <input type="hidden" name="subscribe_active" value="1" />
+        <div class="tnw-addtocart-container">
+            <div class="addtocart-subscribe">
+                <div class="box-tocart">
+                    <?= $block->getChildHtml('addtocart_subscribe') ?>
+                </div>
+            </div>
+        </div>
+        <script type="text/x-magento-init">
+            {
+                "#product_addtocart_form": {
+                    "Magento_Catalog/js/validate-product": {}
+                }
+            }
+        </script>
+    <?php elseif ($block->isOneTimeAndSubscribePurchase()): ?>
+        <input type="hidden" name="subscribe_active" value="<?= $block->isSubscriptionDefault() ? 1 : 0 ?>" />
+        <div class="tnw-addtocart-container" data-mage-init='{"tabs":{"openedState":"active"}}'>
+            <div class="addtocart-subscribe-title item title" data-role="collapsible">
+                <a class="switch" data-toggle="trigger" href="#addtocart-subscribe-content">
+                    <?= $escaper->escapeHtml(__('Auto-Ship')) ?>
+                </a>
+            </div>
+            <div id="addtocart-subscribe-content" class="addtocart-subscribe item content" data-role="content">
+                <div class="box-tocart">
+                    <div class="addtocart-wrapper">
+                        <?= $block->getChildHtml('addtocart_subscribe') ?>
+                    </div>
+                </div>
+            </div>
+            <div class="addtocart-onetime-title item title" data-role="collapsible">
+                <a class="switch" data-toggle="trigger" href="#addtocart-onetime-content">
+                    <?= $escaper->escapeHtml(__('Purchase')) ?>
+                </a>
+            </div>
+            <div id="addtocart-onetime-content" class="addtocart-onetime item content" data-role="content">
+                <div class="addtocart-wrapper">
+                    <?= $block->getChildHtml('grouped_orig') ?>
+                    <?= $block->getChildHtml('addtocart_orig') ?>
+                </div>
+            </div>
+        </div>
+    <?php else: ?>
+        <input type="hidden" name="subscribe_active" value="0" />
+        <?= $block->getChildHtml('grouped_orig') ?>
+        <?= $block->getChildHtml('addtocart_orig') ?>
+    <?php endif ?>
+<?php else: ?>
+    <input type="hidden" name="subscribe_active" value="0" />
+    <?= $block->getChildHtml('grouped_orig') ?>
+    <?= $block->getChildHtml('addtocart_orig') ?>
+<?php endif ?>

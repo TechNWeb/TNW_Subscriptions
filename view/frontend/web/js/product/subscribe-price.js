@@ -45,7 +45,7 @@ define([
                 }
             }
 
-            $(this.options.subscriptionPriceContainerSelector).html(priceHtml);
+            this.element.find(this.options.subscriptionPriceContainerSelector).html(priceHtml);
             $(this.options.alternativeContainerSelector).html(priceHtml);
         }
     });

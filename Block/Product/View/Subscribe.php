@@ -87,9 +87,15 @@ class Subscribe extends View
     private $trialLengthUnitType;
 
     /**
+     * @var \Magento\Framework\Serialize\SerializerInterface
+     */
+    private $serializer;
+
+    /**
      * @param Context $context
      * @param \Magento\Framework\Url\EncoderInterface $urlEncoder
      * @param \Magento\Framework\Json\EncoderInterface $jsonEncoder
+     * @param \Magento\Framework\Serialize\SerializerInterface $serializer
      * @param \Magento\Framework\Stdlib\StringUtils $string
      * @param \Magento\Catalog\Helper\Product $productHelper
      * @param \Magento\Catalog\Model\ProductTypes\ConfigInterface $productTypeConfig
@@ -111,6 +117,7 @@ class Subscribe extends View
         Context $context,
         \Magento\Framework\Url\EncoderInterface $urlEncoder,
         \Magento\Framework\Json\EncoderInterface $jsonEncoder,
+        \Magento\Framework\Serialize\SerializerInterface $serializer,
         \Magento\Framework\Stdlib\StringUtils $string,
         \Magento\Catalog\Helper\Product $productHelper,
         \Magento\Catalog\Model\ProductTypes\ConfigInterface $productTypeConfig,
@@ -149,6 +156,7 @@ class Subscribe extends View
             $priceCurrency,
             $data
         );
+        $this->serializer = $serializer;
     }
 
     /**
@@ -642,6 +650,47 @@ class Subscribe extends View
             case \Magento\Catalog\Model\Product\Type::TYPE_VIRTUAL:
             case \Magento\Downloadable\Model\Product\Type::TYPE_DOWNLOADABLE:
                 break;
+            case \Magento\GroupedProduct\Model\Product\Type\Grouped::TYPE_CODE:
+                $childProducts = $this->subscriptionTypeResolver
+                    ->resolve($type)->getChildProducts($this->getProduct());
+                $childArray = [];
+
+                foreach ($childProducts as $childProduct) {
+                    $productDataObject = $this->subscriptionTypeResolver
+                        ->resolve($childProduct->getTypeId())->getProductDataObject($childProduct);
+                    $childArray[$childProduct->getId()]['name'] = $childProduct->getName();
+                    $childArray[$childProduct->getId()]['id'] = $childProduct->getId();
+                    $childArray[$childProduct->getId()]['product_price'] = $childProduct->getFinalPrice();
+                    $subscriptionPrice = trim($this->getProductPriceHtml(
+                        $childProduct,
+                        'subscription_price',
+                        'grouped_view'
+                    ));
+                    if ($subscriptionPrice !== '') {
+                        $childArray[$childProduct->getId()]['subscription_price'] = $this->serializer
+                            ->unserialize($subscriptionPrice);
+                    }
+                    $childArray[$childProduct->getId()]['frequency_data'] = $this->getProductBillingFrequenciesData(
+                        $productDataObject
+                    );
+                    $childArray[$childProduct->getId()]['trial_data'] = $this->getTrialDataByProduct(
+                        $productDataObject
+                    );
+                    $childArray[$childProduct->getId()]['recurring_settings'] = $this->getRecurringSettingsByProduct(
+                        $productDataObject
+                    );
+                    $childArray[$childProduct->getId()]['qtyValidators'] = $this->getQtyValidators($childProduct);
+                }
+
+                $associatedProducts = $this->getProduct()->getTypeInstance()
+                    ->getAssociatedProducts($this->getProduct());
+                foreach ($associatedProducts as $associatedProduct) {
+                    $childArray[$associatedProduct->getId()]['qty'] = $associatedProduct->getQty();
+                    $childArray[$associatedProduct->getId()]['is_salable'] = $associatedProduct->isSalable();
+                }
+
+                $result['children'] = $childArray;
+                break;
             case Configurable::TYPE_CODE:
                 $result['super_attributes'] = $this->getOptions();
                 $childProducts = $this->getProduct()
@@ -762,5 +811,15 @@ class Subscribe extends View
         return $this->getProduct()->hasPreconfiguredValues()
             ? $this->getProduct()->getPreconfiguredValues()->getData($field)
             : null;
+    }
+
+    /**
+     * @return array
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     */
+    public function getAssociatedProducts()
+    {
+        $product = $this->getProduct();
+        return $product->getTypeInstance()->getAssociatedProducts($product);
     }
 }

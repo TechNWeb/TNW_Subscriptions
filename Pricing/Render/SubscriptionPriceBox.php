@@ -139,7 +139,7 @@ class SubscriptionPriceBox extends BasePriceBox
 
         $result = parent::_toHtml();
 
-        return $this->wrapResult($result);
+        return ($this->getZone() == 'grouped_view') ? $result : $this->wrapResult($result);
     }
 
     /**
@@ -164,6 +164,18 @@ class SubscriptionPriceBox extends BasePriceBox
     public function getCacheKey()
     {
         return parent::getCacheKey() . ($this->getData('list_category_page') ? '-list-category-page' : '');
+    }
+
+    /**
+     * Get cache key informative items
+     *
+     * @return array
+     */
+    public function getCacheKeyInfo()
+    {
+        $cacheKeys = parent::getCacheKeyInfo();
+        $cacheKeys['zone_type'] = $this->getZone();
+        return $cacheKeys;
     }
 
     /**

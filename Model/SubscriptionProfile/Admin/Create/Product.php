@@ -408,15 +408,13 @@ class Product extends Create
         $requestData = $this->getData();
         $origInitialFee = $this->getInitialFee($requestData, false);
         $initialFee = $this->getInitialFee($requestData, true);
-        if ($origInitialFee > 0 && $initialFee > 0) {
-            $quoteItemAttribute = $this->extensionManager->getEmptyQuoteItemAttribute()
-                ->setBaseSubsInitialFee($origInitialFee)
-                ->setSubsInitialFee($initialFee);
-            $extensionAttributes = $item->getExtensionAttributes()
-                ?: $this->extensionManager->getEmptyCartItemExtension();
-            $extensionAttributes->setSubsInitialFees($quoteItemAttribute);
-            $item->setExtensionAttributes($extensionAttributes);
-        }
+        $quoteItemAttribute = $this->extensionManager->getEmptyQuoteItemAttribute()
+            ->setBaseSubsInitialFee($origInitialFee)
+            ->setSubsInitialFee($initialFee);
+        $extensionAttributes = $item->getExtensionAttributes()
+            ?: $this->extensionManager->getEmptyCartItemExtension();
+        $extensionAttributes->setSubsInitialFees($quoteItemAttribute);
+        $item->setExtensionAttributes($extensionAttributes);
     }
 
     /**

@@ -210,8 +210,65 @@
     }
 
     .catalog-product-view {
+        &.page-product-grouped {
+            .tnw-addtocart-container {
+                .lib-data-tabs(
+                    @_tab-content-border-top-status: true,
+                    @_tab-content-padding-left: 0,
+                    @_tab-content-padding-right: 0
+                );
+
+                .addtocart-onetime {
+                    .addtocart-wrapper {
+                        padding-left: 0;
+                    }
+                }
+
+                .addtocart-subscribe {
+                    .addtocart-wrapper {
+                        padding-left: 0;
+                    }
+
+                    .col.no-subscription {
+                        text-align: center;
+                        vertical-align: middle;
+                    }
+
+                    .second-row {
+                        td {
+                            border-top-width: 0;
+                        }
+                    }
+
+                    .subscription-price {
+                        div {
+                            display: inline;
+                        }
+                    }
+
+                    .period-picker-wrapper {
+                        .lib-dropdown(
+                            @_options-selector: ~'.period-picker',
+                            @_dropdown-list-min-width: 27rem
+                        );
+                        display: block;
+
+                        .period-picker {
+                            padding: 1.5rem 1rem 1rem;
+                        }
+                    }
+
+                    .start-on-picker {
+                        .lib-dropdown(
+                            @_options-selector: ~'.ui-datepicker-inline'
+                        );
+                        display: block;
+                    }
+                }
+            }
+        }
         .tnw-addtocart-container {
-            input[name="addtocart_type"] {
+            input[name="addtocart_type"][type=radio] {
                 &:not(:checked) {
                     & ~ .addtocart-wrapper {
                         display: none;
