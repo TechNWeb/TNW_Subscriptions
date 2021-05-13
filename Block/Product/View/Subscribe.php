@@ -110,8 +110,8 @@ class Subscribe extends View
     /**
      * @param Context $context
      * @param UrlEncoderInterface $urlEncoder
-     * @param SerializerInterface $serializer
      * @param EncoderInterface $jsonEncoder
+     * @param SerializerInterface $serializer
      * @param StringUtils $string
      * @param Product $productHelper
      * @param ConfigInterface $productTypeConfig
@@ -132,8 +132,8 @@ class Subscribe extends View
     public function __construct(
         Context $context,
         UrlEncoderInterface $urlEncoder,
-        SerializerInterface $serializer,
         EncoderInterface $jsonEncoder,
+        SerializerInterface $serializer,
         StringUtils $string,
         Product $productHelper,
         ConfigInterface $productTypeConfig,

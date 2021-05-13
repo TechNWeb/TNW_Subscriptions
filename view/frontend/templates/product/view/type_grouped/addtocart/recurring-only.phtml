@@ -1,0 +1,22 @@
+<?php
+/**
+ * Copyright © 2018 TechNWeb, Inc. All rights reserved.
+ * See TNW_LICENSE.txt for license details.
+ */
+
+/**
+ * @var $block \TNW\Subscriptions\Block\Product\View\Subscribe
+ * @var $escaper \Magento\Framework\Escaper
+ */
+?>
+
+<script type="text/x-magento-init">
+    {
+        "*": {
+            "TNW_Subscriptions/js/product/grouped-recurring-only": {
+                "products" : <?= /** @noEscape  */ $block->getProductDataArray() ?>,
+                "message" : "<?= $escaper->escapeHtml(__('Product is not available for purchase at this time')) ?>"
+            }
+        }
+    }
+</script>

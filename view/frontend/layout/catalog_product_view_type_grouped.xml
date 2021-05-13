@@ -8,6 +8,9 @@
                 <block class="TNW\Subscriptions\Block\Product\View\Subscribe"
                        name="product.info.addtocart.subscription" as="addtocart_subscribe"
                        template="TNW_Subscriptions::product/view/type_grouped/addtocart/subscribe.phtml"/>
+                <block class="TNW\Subscriptions\Block\Product\View\Subscribe"
+                       name="product.info.recurring-only" as="grouped_recurring_only"
+                       template="TNW_Subscriptions::product/view/type_grouped/addtocart/recurring-only.phtml"/>
                 <block class="Magento\Catalog\Block\Product\View"
                        name="product.info.addtocart.orig" as="addtocart_orig"
                        template="product/view/addtocart.phtml"/>
