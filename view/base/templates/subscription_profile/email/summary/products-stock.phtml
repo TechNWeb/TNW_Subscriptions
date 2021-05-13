@@ -1,0 +1,90 @@
+<?php
+/**
+ * @var \TNW\Subscriptions\Block\Subscription\Summary\Products $block
+ * @var \Magento\Framework\Escaper $escaper
+ */
+?>
+
+<?php if ($block->getSubscriptionProfiles()): ?>
+    <?php foreach ($block->getSubscriptionsWithStock() as $key => $profiles): ?>
+        <?php if ($key === 'in_stock'): ?>
+            <h3><?= $escaper->escapeHtml(__('Products')) ?></h3>
+        <?php else: ?>
+            <h3><?= $escaper->escapeHtml(__('Out of stock')) ?></h3>
+            <p>
+                <?= $escaper->escapeHtml(
+                    __('The following products are currently out of stock and will be excluded'
+                    . ' from the upcoming order, if they remain out of stock. We apologize for any inconvenience.')
+                ) ?>
+            </p>
+        <?php endif; ?>
+        <table class="email-items">
+            <thead>
+                <tr>
+                    <th class="item-info">
+                        <?= $escaper->escapeHtml(__('Item')) ?>
+                    </th>
+                    <th class="item-info">
+                        <?= $escaper->escapeHtml(__('Details')) ?>
+                    </th>
+                    <th class="item-subscription">
+                        <?= $escaper->escapeHtml(__('Subscription Details')) ?>
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+            <?php foreach ($profiles as $subscriptionProfile): ?>
+                <?php $block->setSubscriptionProfile($subscriptionProfile) ?>
+                <?php foreach ($block->getItems() as $item): ?>
+                    <tr>
+                        <td class="item-info">
+                            <p class="product-name"><?= $escaper->escapeHtml($block->getName($item)) ?></p>
+                            <img class="product-image" src="<?= $escaper->escapeUrl($block->getImageUrl($item)) ?>"
+                                 alt="<?= $escaper->escapeHtml($block->getName($item)) ?>"/>
+                        </td>
+                        <td class="item-additional">
+                            <dl class="item-options custom-attributes">
+                                <dt class="qty"><?= $escaper->escapeHtml(__('Qty')) ?></dt>
+                                <dd><?= (int)$item->getQty() ?></dd>
+                                <?php foreach ($block->getItemOptions($item) as $option): ?>
+                                    <dt><?= $escaper->escapeHtml($option['label']) ?></dt>
+                                    <?php $formattedOptionValue = $block->getFormatedOptionValue($option) ?>
+                                    <dd>
+                                        <?php if (isset($formattedOptionValue['full_view'])): ?>
+                                            <?= /* @noEscape  */ $formattedOptionValue['full_view'] ?>
+                                        <?php else: ?>
+                                            <?= /* @noEscape  */ $formattedOptionValue['value'] ?>
+                                        <?php endif; ?>
+                                    </dd>
+                                <?php endforeach; ?>
+                                <?php foreach ($block->customAttributes($item) as $attribute): ?>
+                                    <dt><?= $escaper->escapeHtml($attribute->getDefaultFrontendLabel()) ?></dt>
+                                    <dd><?= $escaper->escapeHtml($attribute->getFrontend()->getValue($item)) ?></dd>
+                                <?php endforeach; ?>
+                            </dl>
+                        </td>
+                        <td class="item-subscription-info">
+                            <dt><?= $escaper->escapeHtml(__('Billing Frequency')) ?></dt>
+                            <dd><?= $escaper->escapeHtml($block->getBillingFrequencyLabel()) ?></dd>
+                            <dt><?= $escaper->escapeHtml(__('Term')) ?></dt>
+                            <dd><?= $escaper->escapeHtml($block->getTerm()) ?></dd>
+                            <dt><?= $escaper->escapeHtml(__('Start on')) ?></dt>
+                            <dd><?= /* @noEscape  */ $block->getStartOnFormatted() ?></dd>
+                            <dt><?= $escaper->escapeHtml(__('Price')) ?></dt>
+                            <?php $taxAmount = (float) $item->getTaxAmount($subscriptionProfile) ?>
+                            <dd>
+                                <?= /* @noEscape */ $block->formatPrice($item->getPrice() + $taxAmount) ?>
+                                <?php if ($taxAmount): ?>
+                                    <?= $escaper->escapeHtml('(' .  __('Incl. Tax') . ')') ?>
+                                <?php endif; ?>
+                            </dd>
+                            <dt><?= $escaper->escapeHtml(__('Subtotal')) ?></dt>
+                            <dd><?= $escaper->escapeHtml($block->getProfileFrequencyDescription()) ?></dd>
+                        </td>
+                    </tr>
+                <?php endforeach; ?>
+            <?php endforeach; ?>
+            </tbody>
+        </table>
+    <?php endforeach; ?>
+<?php endif; ?>

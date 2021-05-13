@@ -223,10 +223,11 @@ define([
                     return elem.index === index;
                 });
 
-                if (recordInstance.data().subscriptions !== undefined) {
+                if (recordInstance.data().grid_url !== undefined) {
                     alert({
-                        content: $t('Cannot delete Billing frequency. The following subscription profiles use it: %1')
-                            .replace('%1',recordInstance.data().subscriptions)
+                        content: $t('Cannot delete Billing frequency. '
+                            +'Some <a href="%1" target="_blank">subscription profiles</a> use it.')
+                            .replace('%1',recordInstance.data().grid_url)
                     });
                     return false;
                 } else {

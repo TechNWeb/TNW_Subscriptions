@@ -51,7 +51,7 @@ class DataProvider extends AbstractDataProvider
     public function getData()
     {
         $arrItems = [
-            'totalRecords' => $this->getCollection()->getSize(),
+            'totalRecords' => 0,
             'items' => [],
         ];
         $profileId = $this->request->getParam('subscription_profile_id', 0);

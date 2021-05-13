@@ -4,7 +4,10 @@
  * See TNW_LICENSE.txt for license details.
  */
 
-/* @var $block \TNW\Subscriptions\Block\Product\View\Subscribe */
+/**
+ * @var $block \TNW\Subscriptions\Block\Product\View\Subscribe
+ * @var $escaper \Magento\Framework\Escaper
+ */
 ?>
 
 <?php if ($block->isSubscribeAvailable()): ?>
@@ -32,7 +35,7 @@
                        name="addtocart_type" value="0"
                     <?= $block->isSubscriptionDefault() ?: 'checked' ?>
                 />
-                <label for="addtocart_onetime"><?= /* @escapeNotVerified */ __('One Time Purchase') ?></label>
+                <label for="addtocart_onetime"><?= $escaper->escapeHtml(__('Purchase')) ?></label>
                 <div class="onetime-final-price"></div>
                 <div class="addtocart-wrapper">
                     <?= $block->getChildHtml('addtocart_orig') ?>
@@ -44,7 +47,7 @@
                        name="addtocart_type" value="1"
                     <?= $block->isSubscriptionDefault() ? 'checked' : '' ?>
                 />
-                <label for="addtocart_subscribe"><?= /* @escapeNotVerified */ __('Subscribe') ?></label>
+                <label for="addtocart_subscribe"><?= $escaper->escapeHtml(__('Auto-Ship')) ?></label>
                 <div class="subscription-price-with-savings"></div>
                 <div class="addtocart-wrapper">
                     <?= $block->getChildHtml('addtocart_subscribe') ?>

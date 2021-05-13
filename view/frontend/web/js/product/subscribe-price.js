@@ -38,7 +38,7 @@ define([
                 if (selectedProduct && !!optionIndex) {
                     priceHtml = this.options.subscriptionPricesData[selectedProduct][optionIndex];
                 } else if (selectedProduct && !optionIndex) {
-                    priceHtml = $t('There is no subscription available for this option');
+                    priceHtml = $t('There is no auto-ship available for this option');
                 } else {
                     productId = _.toArray(this.options.subscriptionPricesData['default']).slice(0, 1);
                     priceHtml = _.toArray(this.options.subscriptionPricesData[productId]).slice(0, 1);

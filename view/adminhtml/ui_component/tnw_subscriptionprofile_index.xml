@@ -30,6 +30,12 @@
                     <item name="component" xsi:type="string">Magento_Ui/js/grid/provider</item>
                     <item name="direction" xsi:type="string">DESC</item>
                     <item name="update_url" path="mui/index/render" xsi:type="url"/>
+                    <item name="filter_url_params" xsi:type="array">
+                        <item name="billing_frequency_id" xsi:type="string">*</item>
+                        <item name="status" xsi:type="string">*</item>
+                        <item name="product_id" xsi:type="string">*</item>
+                        <item name="child_sku" xsi:type="string">*</item>
+                    </item>
                     <item name="storageConfig" xsi:type="array">
                         <item name="indexField" xsi:type="string">entity_id</item>
                     </item>

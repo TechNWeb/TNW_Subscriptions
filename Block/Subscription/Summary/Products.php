@@ -5,11 +5,23 @@
  */
 namespace TNW\Subscriptions\Block\Subscription\Summary;
 
+use Magento\CatalogInventory\Model\Stock\StockItemRepository;
 use Magento\Framework\Api\AttributeInterface;
+use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Exception\NoSuchEntityException;
+use Magento\Framework\Locale\CurrencyInterface;
 use Magento\Framework\View\Element\Template;
+use Magento\InventorySalesApi\Api\AreProductsSalableForRequestedQtyInterface;
+use Magento\InventorySalesApi\Api\Data\IsProductSalableForRequestedQtyRequestInterfaceFactory;
+use Magento\InventorySalesApi\Api\Data\SalesChannelInterface;
+use Magento\InventorySalesApi\Api\StockResolverInterface;
+use Magento\Sales\Model\OrderRepository;
 use TNW\Subscriptions\Api\Data\ProductSubscriptionProfileAttributeInterface;
 use TNW\Subscriptions\Api\Data\ProductSubscriptionProfileInterface;
+use TNW\Subscriptions\Model\BillingFrequencyRepository;
+use TNW\Subscriptions\Model\ProductBillingFrequency\DescriptionCreator;
+use TNW\Subscriptions\Model\ProductSubscriptionProfile\AttributeRepository;
+use TNW\Subscriptions\Model\ProductSubscriptionProfile\ManagerConfigurable;
 use TNW\Subscriptions\Model\SubscriptionProfile;
 use TNW\Subscriptions\Model\SubscriptionProfile\CreateProfile;
 use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Modal\Context as FormContext;
@@ -20,22 +32,22 @@ use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Modal\Conte
 class Products extends BaseSummary
 {
     /**
-     * @var \TNW\Subscriptions\Model\BillingFrequencyRepository
+     * @var BillingFrequencyRepository
      */
     private $frequencyRepository;
 
     /**
-     * @var \Magento\Framework\Locale\CurrencyInterface
+     * @var CurrencyInterface
      */
     private $currency;
 
     /**
-     * @var \Magento\Sales\Model\OrderRepository
+     * @var OrderRepository
      */
     private $orderRepository;
 
     /**
-     * @var \TNW\Subscriptions\Model\ProductBillingFrequency\DescriptionCreator
+     * @var DescriptionCreator
      */
     private $descriptionCreator;
 
@@ -45,34 +57,56 @@ class Products extends BaseSummary
     private $formContext;
 
     /**
-     * @var \TNW\Subscriptions\Model\ProductSubscriptionProfile\AttributeRepository
+     * @var AttributeRepository
      */
     private $productAttributeRepository;
 
     /**
-     * @var \TNW\Subscriptions\Model\ProductSubscriptionProfile\ManagerConfigurable
+     * @var ManagerConfigurable
      */
     private $managerConfigurable;
 
     /**
+     * @var StockResolverInterface
+     */
+    private $stockResolver;
+
+    /**
+     * @var AreProductsSalableForRequestedQtyInterface
+     */
+    private $productsSalableForRequestedQty;
+
+    /**
+     * @var IsProductSalableForRequestedQtyRequestInterfaceFactory
+     */
+    private $salableQtyRequestFactory;
+
+    /**
      * @param Template\Context $context
-     * @param \TNW\Subscriptions\Model\BillingFrequencyRepository $frequencyRepository
-     * @param \Magento\Framework\Locale\CurrencyInterface $currency
-     * @param \Magento\Sales\Model\OrderRepository $orderRepository
-     * @param \TNW\Subscriptions\Model\ProductBillingFrequency\DescriptionCreator $descriptionCreator
+     * @param BillingFrequencyRepository $frequencyRepository
+     * @param CurrencyInterface $currency
+     * @param OrderRepository $orderRepository
+     * @param DescriptionCreator $descriptionCreator
      * @param FormContext $formContext
-     * @param \TNW\Subscriptions\Model\ProductSubscriptionProfile\AttributeRepository $productAttributeRepository
-     * @param \TNW\Subscriptions\Model\ProductSubscriptionProfile\ManagerConfigurable $managerConfigurable
+     * @param AttributeRepository $productAttributeRepository
+     * @param ManagerConfigurable $managerConfigurable
+     * @param StockResolverInterface $stockResolver
+     * @param AreProductsSalableForRequestedQtyInterface $productsSalableForRequestedQty
+     * @param IsProductSalableForRequestedQtyRequestInterfaceFactory $salableQtyRequestFactory
+     * @param array $data
      */
     public function __construct(
         Template\Context $context,
-        \TNW\Subscriptions\Model\BillingFrequencyRepository $frequencyRepository,
-        \Magento\Framework\Locale\CurrencyInterface $currency,
-        \Magento\Sales\Model\OrderRepository $orderRepository,
-        \TNW\Subscriptions\Model\ProductBillingFrequency\DescriptionCreator $descriptionCreator,
+        BillingFrequencyRepository $frequencyRepository,
+        CurrencyInterface $currency,
+        OrderRepository $orderRepository,
+        DescriptionCreator $descriptionCreator,
         FormContext $formContext,
-        \TNW\Subscriptions\Model\ProductSubscriptionProfile\AttributeRepository $productAttributeRepository,
-        \TNW\Subscriptions\Model\ProductSubscriptionProfile\ManagerConfigurable $managerConfigurable,
+        AttributeRepository $productAttributeRepository,
+        ManagerConfigurable $managerConfigurable,
+        StockResolverInterface $stockResolver,
+        AreProductsSalableForRequestedQtyInterface $productsSalableForRequestedQty,
+        IsProductSalableForRequestedQtyRequestInterfaceFactory $salableQtyRequestFactory,
         array $data = []
     ) {
         parent::__construct($context, $data);
@@ -83,6 +117,9 @@ class Products extends BaseSummary
         $this->formContext = $formContext;
         $this->productAttributeRepository = $productAttributeRepository;
         $this->managerConfigurable = $managerConfigurable;
+        $this->stockResolver = $stockResolver;
+        $this->productsSalableForRequestedQty = $productsSalableForRequestedQty;
+        $this->salableQtyRequestFactory = $salableQtyRequestFactory;
     }
 
     /**
@@ -151,6 +188,94 @@ class Products extends BaseSummary
         return null === $product
             ? __('Product deleted')
             : $product->getData('short_description');
+    }
+
+    /**
+     * @return array
+     */
+    public function getSubscriptionsWithStock()
+    {
+        if ($this->hasData('in_stock_profiles') && $this->hasData('out_of_stock_profiles')) {
+            return [
+                'in_stock' => $this->getData('in_stock_profiles'),
+                'out_of_stock' => $this->getData('out_of_stock_profiles')
+            ];
+        }
+        $stockSkuRequests = [];
+        foreach ($this->getSubscriptionProfiles() as $profile) {
+            $profileProducts = $profile->getVisibleProducts();
+            $profileProduct = reset($profileProducts);
+            $qty = $profileProduct->getQty();
+            $sku = $profileProduct->getSku();
+            /** In case of configurable product, get SKU from child */
+            foreach ($profileProduct->getChildren() as $child) {
+                $sku = $child->getSku();
+            }
+            $stockSkuRequests[] = $this->salableQtyRequestFactory->create(
+                [
+                    'sku' => $sku,
+                    'qty' => $qty
+                ]
+            );
+        }
+        try {
+            $stockSkuResults = $this->productsSalableForRequestedQty->execute(
+                $stockSkuRequests,
+                $this->getWebsiteStockId()
+            );
+        } catch (LocalizedException $e) {
+            $stockSkuResults = null;
+        }
+        $inStockProfiles = [];
+        $outOfStockProfiles = [];
+        foreach ($this->getSubscriptionProfiles() as $profile) {
+            if (!$stockSkuResults) {
+                $outOfStockProfiles[] = $profile;
+                continue;
+            }
+            $profileProducts = $profile->getVisibleProducts();
+            $profileProduct = reset($profileProducts);
+            $sku = $profileProduct->getSku();
+            foreach ($profileProduct->getChildren() as $child) {
+                $sku = $child->getSku();
+            }
+            foreach ($stockSkuResults as $stockSkuResult) {
+                if ($stockSkuResult->getSku() === $sku) {
+                    if ($stockSkuResult->isSalable()) {
+                        $inStockProfiles[] = $profile;
+                        continue;
+                    }
+                    $outOfStockProfiles[] = $profile;
+                }
+            }
+        }
+        $this->setData('in_stock_profiles', $inStockProfiles);
+        $this->setData('out_of_stock_profiles', $outOfStockProfiles);
+        return [
+            'in_stock' => $this->getData('in_stock_profiles'),
+            'out_of_stock' => $this->getData('out_of_stock_profiles')
+        ];
+    }
+
+    /**
+     * @return int|null
+     */
+    public function getWebsiteStockId()
+    {
+        if (!$this->getSubscriptionProfiles()) {
+            return null;
+        }
+        $profiles = $this->getSubscriptionProfiles();
+        $firstProfile = reset($profiles);
+        try {
+            $stockId = $this->stockResolver->execute(
+                SalesChannelInterface::TYPE_WEBSITE,
+                $firstProfile->getWebsite()->getCode()
+            )->getStockId();
+        } catch (NoSuchEntityException $e) {
+            return null;
+        }
+        return $stockId;
     }
 
     /**
@@ -227,7 +352,7 @@ class Products extends BaseSummary
      * @return string
      * @throws NoSuchEntityException
      * @throws \Magento\Framework\Exception\InputException
-     * @throws \Magento\Framework\Exception\LocalizedException
+     * @throws LocalizedException
      */
     public function getFrequencyDescription()
     {
@@ -267,7 +392,7 @@ class Products extends BaseSummary
 
     /**
      * @return string
-     * @throws \Magento\Framework\Exception\LocalizedException
+     * @throws LocalizedException
      */
     public function getProfileFrequencyDescription()
     {
