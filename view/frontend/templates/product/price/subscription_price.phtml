@@ -22,6 +22,7 @@ $priceModel = $block->getPriceType('regular_price');
 $finalPriceModel = $block->getPriceType('final_price');
 $idSuffix = $block->getIdSuffix() ? $block->getIdSuffix() : '';
 $schema = ($block->getZone() == 'item_view') ? true : false;
+$jsonOnly = ($block->getZone() == 'grouped_view') ? true : false;
 ?>
 <?php
     $data = $block->renderSubscriptionAmounts(
@@ -36,6 +37,9 @@ $schema = ($block->getZone() == 'item_view') ? true : false;
     );
     $data = $block->getEncodedData($data);
 ?>
+<?php if ($jsonOnly): ?>
+<?= $data ?>
+<?php else: ?>
 <script type="text/x-magento-init">
 {
     ".product-info-price": {
@@ -46,3 +50,4 @@ $schema = ($block->getZone() == 'item_view') ? true : false;
     }
 }
 </script>
+<?php endif; ?>

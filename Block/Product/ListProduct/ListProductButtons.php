@@ -7,6 +7,7 @@ namespace TNW\Subscriptions\Block\Product\ListProduct;
 
 use Magento\Catalog\Api\Data\ProductInterface;
 use Magento\Framework\View\Element\Template;
+use Magento\Store\Model\ScopeInterface;
 use TNW\Subscriptions\Api\BillingFrequencyRepositoryInterface as FrequencyRepository;
 use TNW\Subscriptions\Model\Config\Product\SubscriptionProductView;
 use TNW\Subscriptions\Model\Config\Source\PurchaseType;
@@ -15,6 +16,7 @@ use TNW\Subscriptions\Api\ProductBillingFrequencyRepositoryInterface as Frequenc
 use TNW\Subscriptions\Model\Config;
 use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Modal\Form as ModalForm;
 use Magento\Framework\Json\Encoder;
+use Magento\Customer\Model\Session;
 
 /**
  *  Subscription product list action buttons.
@@ -49,12 +51,18 @@ class ListProductButtons extends Template
     private $encoder;
 
     /**
+     * @var Session
+     */
+    private $customerSession;
+
+    /**
      * @param Template\Context $context
      * @param SubscriptionProductView $subscriptionProductViewConfig
      * @param FrequencyOptionRepository $frequencyOptionRepository
      * @param FrequencyRepository $frequencyRepository
      * @param Config $config
      * @param Encoder $encoder
+     * @param Session $customerSession
      * @param array $data
      */
     public function __construct(
@@ -64,6 +72,7 @@ class ListProductButtons extends Template
         FrequencyRepository $frequencyRepository,
         Config $config,
         Encoder $encoder,
+        Session $customerSession,
         array $data = []
     ) {
         $this->subscriptionProductViewConfig = $subscriptionProductViewConfig;
@@ -71,6 +80,7 @@ class ListProductButtons extends Template
         $this->frequencyRepository = $frequencyRepository;
         $this->config = $config;
         $this->encoder = $encoder;
+        $this->customerSession = $customerSession;
         parent::__construct($context, $data);
     }
 
@@ -125,13 +135,28 @@ class ListProductButtons extends Template
     }
 
     /**
-     * Get "Enable Subscriptions" config value for current website.
+     * Get "Enable Subscriptions" config value for current website
+     * and allowed customer groups to use subscription.
      *
      * @param ProductInterface $product
      * @return bool
      */
     public function isSubscribeAvailable(ProductInterface $product)
     {
+        $websiteId = $product->getStore()->getWebsiteId() ? $product->getStore()->getWebsiteId() : null;
+        if ($this->config->getAllowAllCustomerGroups($websiteId)) {
+            $customerGroups = $this->config->getCustomerGroupLimit($websiteId);
+            if ($customerGroups != null) {
+                if (array_search(
+                    $this->customerSession->getCustomer()->getGroupId(),
+                    explode(',', $customerGroups)
+                ) !== false) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
         return $this->subscriptionProductViewConfig->isSubscribeAvailable($product);
     }
 

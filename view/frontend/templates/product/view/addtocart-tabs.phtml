@@ -9,23 +9,23 @@
  * @var $escaper \Magento\Framework\Escaper
  */
 ?>
-
-<?php if ($block->isSubscribeAvailable()): ?>
-    <?php if ($block->isOnlySubscribePurchase()): ?>
-        <input type="hidden" name="subscribe_active" value="1" />
-        <div class="tnw-addtocart-container">
-            <div class="addtocart-subscribe">
-                <div class="box-tocart">
-                    <?= $block->getChildHtml('addtocart_subscribe') ?>
+<?php if ($block->isAllowedAddToCart()): ?>
+    <?php if ($block->isSubscribeAvailable()): ?>
+        <?php if ($block->isOnlySubscribePurchase()): ?>
+            <input type="hidden" name="subscribe_active" value="1" />
+            <div class="tnw-addtocart-container">
+                <div class="addtocart-subscribe">
+                    <div class="box-tocart">
+                        <?= $block->getChildHtml('addtocart_subscribe') ?>
+                    </div>
                 </div>
             </div>
-        </div>
-        <script type="text/x-magento-init">
-            {
-                "#product_addtocart_form": {
-                    "Magento_Catalog/js/validate-product": {}
+            <script type="text/x-magento-init">
+                {
+                    "#product_addtocart_form": {
+                        "Magento_Catalog/js/validate-product": {}
+                    }
                 }
-            }
         </script>
     <?php elseif ($block->isOneTimeAndSubscribePurchase()): ?>
         <input type="hidden" name="subscribe_active" value="<?= $block->isSubscriptionDefault() ? 1 : 0 ?>" />
@@ -43,23 +43,32 @@
             </div>
             <div class="addtocart-subscribe">
                 <div class="box-tocart">
-                <input type="radio" id="addtocart_subscribe"
-                       name="addtocart_type" value="1"
-                    <?= $block->isSubscriptionDefault() ? 'checked' : '' ?>
-                />
-                <label for="addtocart_subscribe"><?= $escaper->escapeHtml(__('Auto-Ship')) ?></label>
-                <div class="subscription-price-with-savings"></div>
-                <div class="addtocart-wrapper">
-                    <?= $block->getChildHtml('addtocart_subscribe') ?>
-                </div>
+                    <input type="radio" id="addtocart_subscribe"
+                           name="addtocart_type" value="1"
+                        <?= $block->isSubscriptionDefault() ? 'checked' : '' ?>
+                    />
+                    <label for="addtocart_subscribe"><?= $escaper->escapeHtml(__('Auto-Ship')) ?></label>
+                    <div class="subscription-price-with-savings"></div>
+                    <div class="addtocart-wrapper">
+                        <?= $block->getChildHtml('addtocart_subscribe') ?>
+                    </div>
                 </div>
             </div>
         </div>
+        <?php else: ?>
+            <input type="hidden" name="subscribe_active" value="0" />
+            <?= $block->getChildHtml('addtocart_orig') ?>
+        <?php endif ?>
     <?php else: ?>
         <input type="hidden" name="subscribe_active" value="0" />
         <?= $block->getChildHtml('addtocart_orig') ?>
     <?php endif ?>
-<?php else: ?>
+<?php elseif (!$block->isOnlySubscribePurchase()): ?>
     <input type="hidden" name="subscribe_active" value="0" />
     <?= $block->getChildHtml('addtocart_orig') ?>
+<?php else: ?>
+    <input type="hidden" name="subscribe_active" value="0" />
+    <div class="product-unavailable">
+        <?= $escaper->escapeHtml(__('Product is not available for purchase at this time'))?>
+    </div>
 <?php endif ?>

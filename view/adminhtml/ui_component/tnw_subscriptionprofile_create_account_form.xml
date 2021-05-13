@@ -55,11 +55,12 @@
             </argument>
             <field name="group">
                 <argument name="data" xsi:type="array">
-                    <item name="options" xsi:type="object">Magento\Customer\Model\Customer\Attribute\Source\Group</item>
+                    <item name="options" xsi:type="object">TNW\Subscriptions\Model\Customer\Attribute\Source\CustomerGroup</item>
                     <item name="config" xsi:type="array">
                         <item name="dataType" xsi:type="string">number</item>
                         <item name="label" translate="true" xsi:type="string">Group</item>
                         <item name="formElement" xsi:type="string">select</item>
+                        <item name="elementTmpl" xsi:type="string">TNW_Subscriptions/form/element/select</item>
                         <item name="source" xsi:type="string">SubscriptionProfile</item>
                         <item name="dataScope" xsi:type="string">group</item>
                         <item name="additionalClasses" xsi:type="string">admin__field-small</item>

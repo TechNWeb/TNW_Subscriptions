@@ -6,15 +6,30 @@
  */
 namespace TNW\Subscriptions\Block\Product\View;
 
+use IntlDateFormatter;
+use InvalidArgumentException;
 use Magento\Bundle\Model\Product\Type as TypeBundle;
 use Magento\Catalog\Api\Data\ProductInterface;
 use Magento\Catalog\Api\ProductRepositoryInterface;
 use Magento\Catalog\Block\Product\Context;
 use Magento\Catalog\Block\Product\View;
+use Magento\Catalog\Helper\Product;
+use Magento\Catalog\Model\ProductTypes\ConfigInterface;
+use Magento\CatalogInventory\Api\Data\StockItemInterface;
+use Magento\Checkout\Block\Cart\Item\Renderer;
 use Magento\ConfigurableProduct\Model\Product\Type\Configurable;
+use Magento\Customer\Model\Session;
+use Magento\Downloadable\Model\Product\Type;
 use Magento\Framework\DataObject;
+use Magento\Framework\Exception\LocalizedException;
+use Magento\Framework\Exception\NoSuchEntityException;
+use Magento\Framework\Json\EncoderInterface;
+use Magento\Framework\Locale\FormatInterface;
 use Magento\Framework\Pricing\PriceCurrencyInterface;
+use Magento\Framework\Serialize\SerializerInterface;
+use Magento\Framework\Url\EncoderInterface as UrlEncoderInterface;
 use Magento\GroupedProduct\Model\Product\Type\Grouped;
+use Magento\Framework\Stdlib\StringUtils;
 use TNW\Subscriptions\Api\BillingFrequencyRepositoryInterface as FrequencyRepository;
 use TNW\Subscriptions\Api\Data\ProductBillingFrequencyInterface;
 use TNW\Subscriptions\Api\ProductBillingFrequencyRepositoryInterface as FrequencyOptionRepository;
@@ -26,6 +41,7 @@ use TNW\Subscriptions\Model\Product\Attribute;
 use TNW\Subscriptions\Model\ProductBillingFrequency\PriceCalculator;
 use TNW\Subscriptions\Model\ProductBillingFrequency\SavingsCalculation;
 use TNW\Subscriptions\Model\ProductSubscriptionProfile\ProductTypeManagerResolver;
+use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Modal\Form;
 
 /**
  * Subscribe product block instance
@@ -87,14 +103,20 @@ class Subscribe extends View
     private $trialLengthUnitType;
 
     /**
+     * @var SerializerInterface
+     */
+    private $serializer;
+
+    /**
      * @param Context $context
-     * @param \Magento\Framework\Url\EncoderInterface $urlEncoder
-     * @param \Magento\Framework\Json\EncoderInterface $jsonEncoder
-     * @param \Magento\Framework\Stdlib\StringUtils $string
-     * @param \Magento\Catalog\Helper\Product $productHelper
-     * @param \Magento\Catalog\Model\ProductTypes\ConfigInterface $productTypeConfig
-     * @param \Magento\Framework\Locale\FormatInterface $localeFormat
-     * @param \Magento\Customer\Model\Session $customerSession
+     * @param UrlEncoderInterface $urlEncoder
+     * @param EncoderInterface $jsonEncoder
+     * @param SerializerInterface $serializer
+     * @param StringUtils $string
+     * @param Product $productHelper
+     * @param ConfigInterface $productTypeConfig
+     * @param FormatInterface $localeFormat
+     * @param Session $customerSession
      * @param ProductRepositoryInterface $productRepository
      * @param PriceCurrencyInterface $priceCurrency
      * @param SubscriptionProductView $subscriptionProductViewConfig
@@ -109,15 +131,16 @@ class Subscribe extends View
      */
     public function __construct(
         Context $context,
-        \Magento\Framework\Url\EncoderInterface $urlEncoder,
-        \Magento\Framework\Json\EncoderInterface $jsonEncoder,
-        \Magento\Framework\Stdlib\StringUtils $string,
-        \Magento\Catalog\Helper\Product $productHelper,
-        \Magento\Catalog\Model\ProductTypes\ConfigInterface $productTypeConfig,
-        \Magento\Framework\Locale\FormatInterface $localeFormat,
-        \Magento\Customer\Model\Session $customerSession,
+        UrlEncoderInterface $urlEncoder,
+        EncoderInterface $jsonEncoder,
+        SerializerInterface $serializer,
+        StringUtils $string,
+        Product $productHelper,
+        ConfigInterface $productTypeConfig,
+        FormatInterface $localeFormat,
+        Session $customerSession,
         ProductRepositoryInterface $productRepository,
-        \Magento\Framework\Pricing\PriceCurrencyInterface $priceCurrency,
+        PriceCurrencyInterface $priceCurrency,
         SubscriptionProductView $subscriptionProductViewConfig,
         Config $config,
         FrequencyOptionRepository $frequencyOptionRepository,
@@ -149,17 +172,18 @@ class Subscribe extends View
             $priceCurrency,
             $data
         );
+        $this->serializer = $serializer;
     }
 
     /**
      * Retrieve current product model.
      *
      * @return ProductInterface
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     * @throws NoSuchEntityException
      */
     public function getProduct()
     {
-        if ($this->getParentBlock() instanceof \Magento\Checkout\Block\Cart\Item\Renderer) {
+        if ($this->getParentBlock() instanceof Renderer) {
             $productId = $this->getItem()->getProduct()->getId();
             $product = $this->productRepository->getById($productId);
             if (!$product->hasPreconfiguredValues() || $product->getQuoteItemId() !== $this->getItem()->getId()) {
@@ -181,11 +205,11 @@ class Subscribe extends View
     /**
      * Get product data object. Respect inheritance config for configurable.
      * @return DataObject
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     * @throws NoSuchEntityException
      */
     public function getProductDataObject()
     {
-        if ($this->getParentBlock() instanceof \Magento\Checkout\Block\Cart\Item\Renderer) {
+        if ($this->getParentBlock() instanceof Renderer) {
             $children = $this->getItem()->getChildren();
             $child = is_array($children) ? reset($children) : null;
             $arguments = !empty($child) ? ['child_product' => $child->getProduct()] : [];
@@ -197,18 +221,34 @@ class Subscribe extends View
     }
 
     /**
-     * Get "Enable Subscriptions" config value for current website.
+     * Get "Enable Subscriptions" config value for current website
+     * and allowed customer groups to use subscription.
      *
      * @return bool
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     * @throws NoSuchEntityException
      */
     public function isSubscribeAvailable()
     {
-        if ($this->getProduct()->getTypeId() === TypeBundle::TYPE_CODE
-            || $this->getProduct()->getTypeId() === Grouped::TYPE_CODE
-        ) {
+        if ($this->getProduct()->getTypeId() === TypeBundle::TYPE_CODE) {
             return false;
         }
+        $websiteId = $this->getProduct()->getStore()->getWebsiteId()
+            ? $this->getProduct()->getStore()->getWebsiteId()
+            : null;
+        if ($this->config->getAllowAllCustomerGroups($websiteId)) {
+            $customerGroups = $this->config->getCustomerGroupLimit($websiteId);
+
+            if ($customerGroups != null) {
+                if (array_search(
+                    $this->customerSession->getCustomer()->getGroupId(),
+                    explode(',', $customerGroups)
+                ) !== false) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
         return (
             $this->getPurchaseType() ===  PurchaseType::RECURRING_PURCHASE_TYPE
                 || $this->getPurchaseType() === PurchaseType::ONE_TIME_AND_RECURRING_PURCHASE_TYPE
@@ -220,7 +260,7 @@ class Subscribe extends View
      * Check if subscription purchase type is "Recurring purchase" only.
      *
      * @return bool
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     * @throws NoSuchEntityException
      */
     public function isOnlySubscribePurchase()
     {
@@ -236,7 +276,7 @@ class Subscribe extends View
      * Check if subscription purchase type is "Recurring purchase" and "One time purchase".
      *
      * @return bool
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     * @throws NoSuchEntityException
      */
     public function isOneTimeAndSubscribePurchase()
     {
@@ -247,7 +287,7 @@ class Subscribe extends View
     /**
      * Get purchase type from product data object. Respect configurable inheritance.
      * @return int
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     * @throws NoSuchEntityException
      */
     public function getPurchaseType()
     {
@@ -256,7 +296,7 @@ class Subscribe extends View
 
     /**
      * @return array
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     * @throws NoSuchEntityException
      */
     public function getOptions()
     {
@@ -291,8 +331,8 @@ class Subscribe extends View
      * Returns product billing frequencies as array.
      *
      * @return array
-     * @throws \Magento\Framework\Exception\LocalizedException
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     * @throws LocalizedException
+     * @throws NoSuchEntityException
      */
     public function getFrequencyOptions()
     {
@@ -327,8 +367,8 @@ class Subscribe extends View
     /**
      * @param DataObject $productDataObject
      * @return array|null
-     * @throws \Magento\Framework\Exception\LocalizedException
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     * @throws LocalizedException
+     * @throws NoSuchEntityException
      */
     private function getProductBillingFrequenciesData(DataObject $productDataObject)
     {
@@ -365,8 +405,8 @@ class Subscribe extends View
      * Returns list of product billing frequencies.
      *
      * @return array|ProductBillingFrequencyInterface[]
-     * @throws \Magento\Framework\Exception\LocalizedException
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     * @throws LocalizedException
+     * @throws NoSuchEntityException
      */
     private function getProductBillingFrequencies()
     {
@@ -402,7 +442,7 @@ class Subscribe extends View
      * Can allow edit Subscribe Qty
      *
      * @return bool
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     * @throws NoSuchEntityException
      */
     public function getAllowEditSubscribeQty()
     {
@@ -413,7 +453,7 @@ class Subscribe extends View
      * Can allow display Subscribe Qty
      *
      * @return bool
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     * @throws NoSuchEntityException
      */
     public function getAllowDisplaySubscribeQty()
     {
@@ -425,7 +465,7 @@ class Subscribe extends View
      * Returns product savings calculation type.
      *
      * @return int
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     * @throws NoSuchEntityException
      */
     public function getSavingCalculationType()
     {
@@ -434,7 +474,7 @@ class Subscribe extends View
 
     /**
      * @return array|null
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     * @throws NoSuchEntityException
      */
     public function getDefaultFrequency()
     {
@@ -445,8 +485,8 @@ class Subscribe extends View
      * Get default value for Subscribe Qty
      *
      * @return float|int
-     * @throws \Magento\Framework\Exception\LocalizedException
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     * @throws LocalizedException
+     * @throws NoSuchEntityException
      */
     public function getDefaultSubscribeQty()
     {
@@ -465,7 +505,7 @@ class Subscribe extends View
      * Get is need check until canceled by default
      *
      * @return bool|mixed
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     * @throws NoSuchEntityException
      */
     public function getDefaultUntilCancelled()
     {
@@ -477,7 +517,7 @@ class Subscribe extends View
      *  Get is only infinite subscriptions available.
      *
      * @return mixed
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     * @throws NoSuchEntityException
      */
     public function getIsInfiniteSubscriptions()
     {
@@ -488,7 +528,7 @@ class Subscribe extends View
      * Get default period value
      *
      * @return int|string
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     * @throws NoSuchEntityException
      */
     public function getDefaultPeriod()
     {
@@ -496,12 +536,12 @@ class Subscribe extends View
 
         return $period
             ? (string)$period
-            : \TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Modal\Form::DEFAULT_PERIOD_VALUE;
+            : Form::DEFAULT_PERIOD_VALUE;
     }
 
     /**
      * @return bool
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     * @throws NoSuchEntityException
      */
     public function getIsVisibleStartOn()
     {
@@ -519,7 +559,7 @@ class Subscribe extends View
      * Get default value for Start on
      *
      * @return string
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     * @throws NoSuchEntityException
      */
     public function getDefaultStartOn()
     {
@@ -527,11 +567,12 @@ class Subscribe extends View
 
         return null !== $startOn
             ? (string)$startOn :
-            $this->_localeDate->formatDate(null, \IntlDateFormatter::SHORT);
+            $this->_localeDate->formatDate(null, IntlDateFormatter::SHORT);
     }
 
     /**
      * @return bool
+     * @throws NoSuchEntityException
      */
     public function isSubscriptionDefault()
     {
@@ -543,7 +584,7 @@ class Subscribe extends View
      * Get preconfigured options for configurable product
      *
      * @return array|null
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     * @throws NoSuchEntityException
      */
     public function getPreconfiguredOptions()
     {
@@ -555,7 +596,7 @@ class Subscribe extends View
      * Get preconfigured custom options for configurable product
      *
      * @return array|null
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     * @throws NoSuchEntityException
      */
     public function getPreconfiguredCustomOptions()
     {
@@ -570,7 +611,7 @@ class Subscribe extends View
      */
     public function getMinStartOn()
     {
-        return $this->_localeDate->formatDate(null, \IntlDateFormatter::SHORT);
+        return $this->_localeDate->formatDate(null, IntlDateFormatter::SHORT);
     }
 
     /**
@@ -580,7 +621,7 @@ class Subscribe extends View
      */
     public function getDateFormat()
     {
-        return $this->_localeDate->getDateFormat(\IntlDateFormatter::SHORT);
+        return $this->_localeDate->getDateFormat(IntlDateFormatter::SHORT);
     }
 
     /**
@@ -594,7 +635,7 @@ class Subscribe extends View
         $params = [];
         $validators = [];
         $validators['required-number'] = true;
-        /** @var \Magento\CatalogInventory\Api\Data\StockItemInterface $stockItem */
+        /** @var StockItemInterface $stockItem */
         $stockItem = $this->stockRegistry->getStockItem(
             $product->getId(),
             $product->getStore()->getWebsiteId()
@@ -616,8 +657,8 @@ class Subscribe extends View
      * Returns product data array to display subscription form
      *
      * @return string
-     * @throws \Magento\Framework\Exception\LocalizedException
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     * @throws LocalizedException
+     * @throws NoSuchEntityException
      */
     public function getProductDataArray()
     {
@@ -640,7 +681,48 @@ class Subscribe extends View
         switch ($type) {
             case \Magento\Catalog\Model\Product\Type::TYPE_SIMPLE:
             case \Magento\Catalog\Model\Product\Type::TYPE_VIRTUAL:
-            case \Magento\Downloadable\Model\Product\Type::TYPE_DOWNLOADABLE:
+            case Type::TYPE_DOWNLOADABLE:
+                break;
+            case \Magento\GroupedProduct\Model\Product\Type\Grouped::TYPE_CODE:
+                $childProducts = $this->subscriptionTypeResolver
+                    ->resolve($type)->getChildProducts($this->getProduct());
+                $childArray = [];
+
+                foreach ($childProducts as $childProduct) {
+                    $productDataObject = $this->subscriptionTypeResolver
+                        ->resolve($childProduct->getTypeId())->getProductDataObject($childProduct);
+                    $childArray[$childProduct->getId()]['name'] = $childProduct->getName();
+                    $childArray[$childProduct->getId()]['id'] = $childProduct->getId();
+                    $childArray[$childProduct->getId()]['product_price'] = $childProduct->getFinalPrice();
+                    $subscriptionPrice = trim($this->getProductPriceHtml(
+                        $childProduct,
+                        'subscription_price',
+                        'grouped_view'
+                    ));
+                    if ($subscriptionPrice !== '') {
+                        $childArray[$childProduct->getId()]['subscription_price'] = $this->serializer
+                            ->unserialize($subscriptionPrice);
+                    }
+                    $childArray[$childProduct->getId()]['frequency_data'] = $this->getProductBillingFrequenciesData(
+                        $productDataObject
+                    );
+                    $childArray[$childProduct->getId()]['trial_data'] = $this->getTrialDataByProduct(
+                        $productDataObject
+                    );
+                    $childArray[$childProduct->getId()]['recurring_settings'] = $this->getRecurringSettingsByProduct(
+                        $productDataObject
+                    );
+                    $childArray[$childProduct->getId()]['qtyValidators'] = $this->getQtyValidators($childProduct);
+                }
+
+                $associatedProducts = $this->getProduct()->getTypeInstance()
+                    ->getAssociatedProducts($this->getProduct());
+                foreach ($associatedProducts as $associatedProduct) {
+                    $childArray[$associatedProduct->getId()]['qty'] = $associatedProduct->getQty();
+                    $childArray[$associatedProduct->getId()]['is_salable'] = $associatedProduct->isSalable();
+                }
+
+                $result['children'] = $childArray;
                 break;
             case Configurable::TYPE_CODE:
                 $result['super_attributes'] = $this->getOptions();
@@ -670,7 +752,7 @@ class Subscribe extends View
                 $result['children'] = $childArray;
                 break;
             default:
-                throw new \InvalidArgumentException(__('Unsupported product type -' . $type));
+                throw new InvalidArgumentException(__('Unsupported product type -' . $type));
         }
 
         return $this->_jsonEncoder->encode($result);
@@ -678,6 +760,7 @@ class Subscribe extends View
 
     /**
      * Returns array of recurring settings used on product page for child products
+     *
      * @param $productData
      * @return array
      */
@@ -710,8 +793,8 @@ class Subscribe extends View
      *
      * @param DataObject $productDataObject
      * @return array
-     * @throws \Magento\Framework\Exception\LocalizedException
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     * @throws LocalizedException
+     * @throws NoSuchEntityException
      */
     protected function getFrequencyPricesByProduct(DataObject $productDataObject)
     {
@@ -732,6 +815,7 @@ class Subscribe extends View
 
     /**
      * Return trial data array if product has trial
+     *
      * @param DataObject $productDataObject
      * @return array|null
      */
@@ -753,14 +837,37 @@ class Subscribe extends View
     }
 
     /**
+     * Check if any preconfigured data
+     *
      * @param $field
      * @return array|null
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     * @throws NoSuchEntityException
      */
     private function preconfiguredValue($field)
     {
         return $this->getProduct()->hasPreconfiguredValues()
             ? $this->getProduct()->getPreconfiguredValues()->getData($field)
             : null;
+    }
+
+    /**
+     * @return array
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     */
+    public function getAssociatedProducts()
+    {
+        $product = $this->getProduct();
+        return $product->getTypeInstance()->getAssociatedProducts($product);
+    }
+
+    /**
+     * Check is allowed add to cart
+     *
+     * @return bool
+     * @throws NoSuchEntityException
+     */
+    public function isAllowedAddToCart()
+    {
+        return $this->subscriptionProductViewConfig->getCustomerGroupLimitation($this->getProduct());
     }
 }
