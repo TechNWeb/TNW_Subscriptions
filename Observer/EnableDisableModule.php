@@ -21,12 +21,20 @@ class EnableDisableModule implements ObserverInterface
     private $resourceConfigFactory;
 
     /**
+     * @var ScopeConfigInterface
+     */
+    private $config;
+
+    /**
      * EnableDisableModule constructor.
      * @param ConfigFactory $resourceConfigFactory
+     * @param ScopeConfigInterface $config
      */
     public function __construct(
-        ConfigFactory $resourceConfigFactory
+        ConfigFactory $resourceConfigFactory,
+        ScopeConfigInterface $config
     ) {
+        $this->config = $config;
         $this->resourceConfigFactory = $resourceConfigFactory;
     }
 
@@ -40,6 +48,7 @@ class EnableDisableModule implements ObserverInterface
             && array_key_exists('section', $configData)
             && $configData['section'] == 'tnw_subscriptions_general'
         ) {
+            $configPath = 'advanced/modules_disable_output/TNW_Subscriptions';
             if ($configData['website']) {
                 $scope = 'websites';
                 $scopeId = $configData['website'];
@@ -50,7 +59,7 @@ class EnableDisableModule implements ObserverInterface
             if (isset($configData['groups']['general']['fields']['active']['value'])) {
                 $state = $configData['groups']['general']['fields']['active']['value'] ? 0 : 1;
                 $this->resourceConfigFactory->create()->saveConfig(
-                    'advanced/modules_disable_output/TNW_Subscriptions',
+                    $configPath,
                     $state,
                     $scope,
                     $scopeId
@@ -59,8 +68,10 @@ class EnableDisableModule implements ObserverInterface
                 && $configData['groups']['general']['fields']['active']['inherit']
                 && $configData['website']
             ) {
-                $this->resourceConfigFactory->create()->deleteConfig(
-                    'advanced/modules_disable_output/TNW_Subscriptions',
+                $state = $this->config->getValue($configPath, ScopeConfigInterface::SCOPE_TYPE_DEFAULT, 0 );
+                $this->resourceConfigFactory->create()->saveConfig(
+                    $configPath,
+                    $state,
                     $scope,
                     $scopeId
                 );
