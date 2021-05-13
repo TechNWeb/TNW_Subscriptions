@@ -66,4 +66,9 @@
 <?php elseif (!$block->isOnlySubscribePurchase()): ?>
     <input type="hidden" name="subscribe_active" value="0" />
     <?= $block->getChildHtml('addtocart_orig') ?>
+<?php else: ?>
+    <input type="hidden" name="subscribe_active" value="0" />
+    <div class="product-unavailable">
+        <?= $escaper->escapeHtml(__('Product is not available for purchase at this time'))?>
+    </div>
 <?php endif ?>
