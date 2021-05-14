@@ -28,6 +28,7 @@ use TNW\Subscriptions\Model\SubscriptionProfile\Engine\EngineInterface;
 use TNW\Subscriptions\Model\SubscriptionProfile\Manager as ProfileManager;
 use TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Form\Modifier\SummaryInsertForm;
 use TNW\Subscriptions\Model\QuoteSessionInterface;
+use Magento\Framework\Session\Generic;
 
 /**
  * Controller to processing response from PayPal gateway.
@@ -88,6 +89,11 @@ class Response extends \Magento\Framework\App\Action\Action implements CsrfAware
     private $quoteSession;
 
     /**
+     * @var Generic
+     */
+    private $sessionTransparent;
+
+    /**
      * Response constructor.
      * @param Context $context
      * @param Registry $coreRegistry
@@ -98,6 +104,7 @@ class Response extends \Magento\Framework\App\Action\Action implements CsrfAware
      * @param QuoteSessionInterface $quoteSession
      * @param Manager $moduleManager
      * @param ObjectManagerInterface $objectManager
+     * @param Generic $sessionTransparent
      */
     public function __construct(
         Context $context,
@@ -108,9 +115,11 @@ class Response extends \Magento\Framework\App\Action\Action implements CsrfAware
         EncryptorInterface $encryptor,
         QuoteSessionInterface $quoteSession,
         Manager $moduleManager,
-        ObjectManagerInterface $objectManager
+        ObjectManagerInterface $objectManager,
+        Generic $sessionTransparent
     ) {
         parent::__construct($context);
+        $this->sessionTransparent = $sessionTransparent;
         $this->quoteSession = $quoteSession;
         $this->coreRegistry = $coreRegistry;
         $this->resultLayoutFactory = $resultLayoutFactory;
@@ -137,6 +146,9 @@ class Response extends \Magento\Framework\App\Action\Action implements CsrfAware
         if ($this->getRequest()->getParam(SummaryInsertForm::FORM_DATA_KEY, 0)) {
             /** @var SubscriptionProfileInterface $profile */
             $profile = $this->profileManager->loadProfileFromRequest(SummaryInsertForm::FORM_DATA_KEY);
+        } elseif ($profileId = $this->sessionTransparent->getSubscriptionProfileId()) {
+            $profile = $this->profileManager->loadProfile($profileId);
+            $this->sessionTransparent->setSubscriptionProfileId(null);
         }
         try {
             /** @var DataObject $response */

@@ -9,6 +9,7 @@ use Magento\Backend\App\Action;
 use Magento\Backend\App\Action\Context;
 use Magento\Framework\Controller\ResultInterface;
 use Magento\Framework\Exception\LocalizedException;
+use Magento\Framework\Message\ManagerInterface;
 use Magento\Framework\Registry;
 use Magento\Framework\View\Element\AbstractBlock;
 use Magento\Framework\View\Result\LayoutFactory;
@@ -40,56 +41,68 @@ class ReceiveToken extends Action
     private $profileManager;
 
     /**
+     * @var ManagerInterface
+     */
+    protected $messageManager;
+
+    /**
      * ReceiveToken constructor.
      * @param Context $context
      * @param Registry $coreRegistry
      * @param LayoutFactory $resultLayoutFactory
      * @param ProfileManager $profileManager
+     * @param ManagerInterface $messageManager
      */
     public function __construct(
         Context $context,
         Registry $coreRegistry,
         LayoutFactory $resultLayoutFactory,
-        ProfileManager $profileManager
+        ProfileManager $profileManager,
+        ManagerInterface $messageManager
     ) {
         parent::__construct($context);
         $this->coreRegistry = $coreRegistry;
         $this->resultLayoutFactory = $resultLayoutFactory;
         $this->profileManager = $profileManager;
+        $this->messageManager = $messageManager;
     }
 
     /**
      * @return ResultInterface
-     * @throws LocalizedException
      */
     public function execute()
     {
-        $parameters = [];
         $profile = null;
         if ($this->getRequest()->getParam(SummaryInsertForm::FORM_DATA_KEY, 0)) {
             /** @var SubscriptionProfileInterface $profile */
             $profile = $this->profileManager->loadProfileFromRequest(SummaryInsertForm::FORM_DATA_KEY);
+        } elseif ($profileId = $this->_session->getData('subscription_profile_id')) {
+            $profile = $this->profileManager->loadProfile($profileId);
+            $this->_session->setData('subscription_profile_id', null);
         }
         if ($this->getRequest()->getParam('isAjax', false)) {
-            $parameters['payment_token'] = $this->_session->getData('chcybersource_payment_token');
+            $paymentToken = $this->_session->getData('chcybersource_payment_token');
             $this->_session->setData('chcybersource_payment_token', null);
         } else {
             $this->_session->setData(
                 'chcybersource_payment_token',
                 $this->getRequest()->getParam('payment_token')
             );
-            $parameters['payment_token'] = $this->getRequest()->getParam('payment_token');
+            $paymentToken = $this->getRequest()->getParam('payment_token');
         }
-
-        $this->coreRegistry->register(Iframe::REGISTRY_KEY, $parameters);
 
         $resultLayout = $this->resultLayoutFactory->create();
         $resultLayout->addDefaultHandle();
-        $resultLayout->getLayout()->getUpdate()->load(['tnw_cybersource_payment_response']);
+        try {
+            $resultLayout->getLayout()->getUpdate()->load(['tnw_cybersource_payment_response']);
+        } catch (LocalizedException $localizedException) {
+            $this->messageManager->addErrorMessage($localizedException->getMessage());
+        }
         /** @var AbstractBlock $iframeBlock */
         $iframeBlock = $resultLayout->getLayout()->getBlock('transparent_iframe');
         $index = $this->getFormIndex($profile);
         $iframeBlock->setData('index', $index);
+        $iframeBlock->setData('payment_token', $paymentToken);
 
         return $resultLayout;
     }

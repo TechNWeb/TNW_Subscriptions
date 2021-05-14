@@ -42,6 +42,8 @@ define([
             _.each(elems, function (field, code) {
                 if ($.inArray(field.componentType, fieldSet.complexComponents) != -1) {
                     fieldSet.clearElemsData(field.elems());
+                } else if (field.inputName.match(/publicHash/g) !== null) {
+                    return false;
                 } else {
                     field.restoreToDefault();
                     field.error('');

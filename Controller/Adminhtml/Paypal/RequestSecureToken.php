@@ -122,6 +122,7 @@ class RequestSecureToken extends \Magento\Framework\App\Action\Action
                 throw new \LogicException();
             }
             $this->sessionTransparent->setSecureToken($token->getData('securetoken'));
+            $this->sessionTransparent->setSubscriptionProfileId($object->getId());
 
             return $this->resultJsonFactory->create()->setData(
                 [

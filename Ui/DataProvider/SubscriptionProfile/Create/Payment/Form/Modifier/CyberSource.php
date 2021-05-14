@@ -320,7 +320,6 @@ class CyberSource extends Base
 
         return [
             'component' => 'TNW_Subscriptions/js/form/subscription-profile/payment/cybersource_sop',
-            'template' => 'TNW_Subscriptions/form/subscription-profile/payment/cybersource',
             'listens' => $this->getListens(),
             'dataContainer' => $this->getPaymentCode() . '-transparent-iframe',
             'code' => $this->getPaymentCode(),
@@ -358,7 +357,7 @@ class CyberSource extends Base
                         'componentType' => \Magento\Ui\Component\Form\Fieldset::NAME,
                         'component' => 'TNW_Subscriptions/js/form/subscription-profile/payment/'
                             . 'additional-fields-fieldset',
-                        'template' => 'TNW_Subscriptions/form/subscription-profile/payment/braintree',
+                        'template' => 'TNW_Subscriptions/form/subscription-profile/payment/cybersource',
                         'label' => false,
                         'visible' => false,
                         'dataScope' => 'additional',

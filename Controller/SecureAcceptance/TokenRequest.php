@@ -88,6 +88,7 @@ class TokenRequest extends \Magento\Framework\App\Action\Action
         if ($profileId = $this->getRequest()->getParam('profile_id')) {
             $quote = $this->manager->getTempQuote($this->profileRepository->getById($profileId));
             $billingAddress = $quote->getBillingAddress();
+            $this->customerSession->setData('subscription_profile_id', $profileId);
             try {
                 $commandResult = $this->resultFactory->create(['array' => $this->tokenRequestDataBuilder->build(
                     [

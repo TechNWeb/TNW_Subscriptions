@@ -325,6 +325,7 @@ class PaymentsPro extends Base implements PaymentModifierInterface
             'listens'=> $this->getListens(),
             'dataContainer' => $this->getPaymentCode() . '-transparent-iframe',
             'iframeSrc' => $this->context->getEscaper()->escapeUrl($this->getViewFileUrl('blank.html')),
+            'availableCardTypes' => explode(',', $this->getMethodConfigData('cctypes')),
             'options' => [
                 'gateway' => $this->getPaymentCode(),
                 'dateDelim' => $this->context->getEscaper()->escapeHtml($this->getDateDelim()),
