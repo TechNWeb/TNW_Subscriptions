@@ -8,7 +8,6 @@ namespace TNW\Subscriptions\Observer;
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
 use Magento\Config\Model\ResourceModel\ConfigFactory;
-use Magento\Framework\App\Config\ScopeConfigInterface;
 
 /**
  * Class EnableDisableModule - used to additional config processing on enabling and disabling Subscriptions in config
@@ -21,20 +20,12 @@ class EnableDisableModule implements ObserverInterface
     private $resourceConfigFactory;
 
     /**
-     * @var ScopeConfigInterface
-     */
-    private $config;
-
-    /**
      * EnableDisableModule constructor.
      * @param ConfigFactory $resourceConfigFactory
-     * @param ScopeConfigInterface $config
      */
     public function __construct(
-        ConfigFactory $resourceConfigFactory,
-        ScopeConfigInterface $config
+        ConfigFactory $resourceConfigFactory
     ) {
-        $this->config = $config;
         $this->resourceConfigFactory = $resourceConfigFactory;
     }
 
@@ -68,10 +59,8 @@ class EnableDisableModule implements ObserverInterface
                 && $configData['groups']['general']['fields']['active']['inherit']
                 && $configData['website']
             ) {
-                $state = $this->config->getValue($configPath, ScopeConfigInterface::SCOPE_TYPE_DEFAULT, 0 );
-                $this->resourceConfigFactory->create()->saveConfig(
+                $this->resourceConfigFactory->create()->deleteConfig(
                     $configPath,
-                    $state,
                     $scope,
                     $scopeId
                 );
