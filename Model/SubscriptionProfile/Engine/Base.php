@@ -187,7 +187,7 @@ class Base implements EngineInterface
      */
     public function getProfilePaymentInfo(Payment $payment)
     {
-        return [];
+        return ['engine_code' => $this->getVaultPaymentCode()];
     }
 
     /**
@@ -301,11 +301,13 @@ class Base implements EngineInterface
         $paymentData['method'] = $this->getVaultPaymentCode();
         $paymentData['additional_data'] = array_merge($paymentData, $additionalData);
 
-        $this->vaultPaymentAuthorization->processPreAuthForTrial(
-            $paymentData,
-            $this->manager->getTempQuote($this->getProfile())
-        );
-        $this->populateProfilePayment($paymentToken);
+        if ($paymentToken->getGatewayToken() !== $this->getProfile()->getPayment()->getPaymentToken()) {
+            $this->vaultPaymentAuthorization->processPreAuthForTrial(
+                $paymentData,
+                $this->manager->getTempQuote($this->getProfile())
+            );
+            $this->populateProfilePayment($paymentToken);
+        }
         return $this;
     }
 
@@ -326,7 +328,7 @@ class Base implements EngineInterface
         $tokenDetails = json_decode($paymentToken->getTokenDetails(), true);
         $expiration = explode('/', $tokenDetails['expirationDate']);
         $this->getProfile()->getPayment()
-            ->setEngineCode($this->getPaymentMethodCode())
+            ->setEngineCode($this->getVaultPaymentCode())
             ->setPaymentToken($paymentToken->getGatewayToken())
             ->setEncodedPaymentAdditionalInfo([
                 OrderPaymentInterface::CC_TYPE => $tokenDetails['type'],

@@ -49,29 +49,34 @@
                 <filter>dateRange</filter>
                 <dataType>date</dataType>
                 <label translate="true">Interval</label>
+                <sortable>false</sortable>
             </settings>
         </column>
         <column name="name" sortOrder="20">
             <settings>
                 <filter>text</filter>
                 <label translate="true">Product Name</label>
+                <sortable>false</sortable>
             </settings>
         </column>
         <column name="sku" sortOrder="30">
             <settings>
                 <filter>text</filter>
                 <label translate="true">SKU</label>
+                <sortable>false</sortable>
             </settings>
         </column>
         <column name="qty" sortOrder="40">
             <settings>
                 <label translate="true">Total Qty</label>
+                <sortable>false</sortable>
             </settings>
         </column>
         <column name="total" class="Magento\Sales\Ui\Component\Listing\Column\Price" sortOrder="50">
             <settings>
                 <filter>textRange</filter>
                 <label translate="true">Total Price</label>
+                <sortable>false</sortable>
             </settings>
         </column>
     </columns>

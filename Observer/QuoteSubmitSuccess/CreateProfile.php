@@ -158,6 +158,18 @@ class CreateProfile implements ObserverInterface
                 $customer = $this->orderCustomerService->create($order->getEntityId());
                 //ISSUE: https://github.com/magento/magento2/issues/7597
                 $this->customerFactory->create()->setId($customer->getId())->reindex();
+                if (!$this->trialPaymentData) {
+                    $payment = $order->getPayment();
+                    if ($payment->getExtensionAttributes()
+                        && $payment->getExtensionAttributes()->getVaultPaymentToken()
+                        && $payment->getExtensionAttributes()->getVaultPaymentToken()->getEntityId()
+                        && !$payment->getExtensionAttributes()->getVaultPaymentToken()->getCustomerId()
+                    ) {
+                        $vaultPaymentToken = $payment->getExtensionAttributes()->getVaultPaymentToken();
+                        $vaultPaymentToken->setCustomerId($customer->getId());
+                        $this->paymentTokenManagement->saveTokenWithPaymentLink($vaultPaymentToken, $payment);
+                    }
+                }
             } catch (\Exception $e) {
                 $customer = $this->customerRepository->get($order->getCustomerEmail());
             }

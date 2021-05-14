@@ -89,6 +89,7 @@ class TokenRequest extends \Magento\Backend\App\Action
         if ($profileId = $this->getRequest()->getParam('profile_id')) {
             $quote = $this->manager->getTempQuote($this->profileRepository->getById($profileId));
             $billingAddress = $quote->getBillingAddress();
+            $this->_session->setData('subscription_profile_id', $profileId);
         } else {
             foreach ($this->quoteSession->getSubQuotes() as $subQuotequote) {
                 $billingAddress = $subQuotequote->getBillingAddress();
@@ -96,7 +97,7 @@ class TokenRequest extends \Magento\Backend\App\Action
                 break;
             }
         }
-        if (!$billingAddress->getEmail() && !$billingAddress->getFirstname()) {
+        if (!$billingAddress->getEmail() || !$billingAddress->getFirstname() || !$billingAddress->getLastname()) {
             $billingAddress = $quote->getShippingAddress();
         }
         try {

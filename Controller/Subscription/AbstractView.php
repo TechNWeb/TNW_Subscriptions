@@ -9,7 +9,6 @@ use Magento\Customer\Controller\AbstractAccount;
 use Magento\Framework\Api\FilterBuilder;
 use Magento\Framework\Api\SearchCriteriaBuilder;
 use Magento\Framework\App\Action\Context;
-use Magento\Framework\Controller\Result\Forward;
 use Magento\Framework\Controller\Result\ForwardFactory;
 use Magento\Framework\Controller\Result\RedirectFactory;
 use Magento\Framework\Exception\NoSuchEntityException;
@@ -83,11 +82,19 @@ abstract class AbstractView extends AbstractAccount
     private $filterBuilder;
 
     /**
+     * AbstractView constructor.
      * @param Context $context
      * @param PageFactory $resultPageFactory
      * @param ForwardFactory $resultForwardFactory
      * @param Registry $registry
      * @param SubscriptionProfileRepository $subscriptionProfileRepository
+     * @param OrderViewAuthorizationInterface $orderAuthorization
+     * @param OrderFactory $orderFactory
+     * @param SubscriptionProfileOrderRepository $subscriptionProfileOrder
+     * @param RedirectFactory $redirectFactory
+     * @param UrlInterface $url
+     * @param SearchCriteriaBuilder $criteriaBuilder
+     * @param FilterBuilder $filterBuilder
      */
     public function __construct(
         Context $context,
@@ -165,19 +172,6 @@ abstract class AbstractView extends AbstractAccount
     }
 
     /**
-     * Get redirect for not valid subscriptionId in params.
-     *
-     * @return Forward
-     */
-    private function noRoutRedirect()
-    {
-        /** @var \Magento\Framework\Controller\Result\Forward $resultForward */
-        $resultForward = $this->resultForwardFactory->create();
-
-        return $resultForward->forward('noroute');
-    }
-
-    /**
      * Verifying user access to the profile
      *
      * @param $subscriptionProfileId
@@ -190,13 +184,14 @@ abstract class AbstractView extends AbstractAccount
         $subscriptionData = $this->subscriptionProfileOrder->getList(
             $this->getFilterByProfileId($subscriptionProfileId)
         )->getItems();
-        $subscriptionProfile = array_shift($subscriptionData);
+        $subscriptionProfile = end($subscriptionData);
         if ($subscriptionProfile === null) {
             throw new NoSuchEntityException();
         }
         $magentoOrder = $this->orderFactory->create()->load($subscriptionProfile->getMagentoOrderId());
         return $this->orderAuthorization->canView($magentoOrder);
     }
+
     /**
      * Get criteria filter for Subscription Profile Order Repository
      *

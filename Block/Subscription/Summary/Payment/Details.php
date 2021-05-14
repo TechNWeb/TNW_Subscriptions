@@ -99,7 +99,9 @@ class Details extends BaseSummary
         $additionalInfo = $this->getPaymentAdditionalInfo();
         $creditCardExpDate = '';
         if (isset($additionalInfo['cc_exp_month']) && isset($additionalInfo['cc_exp_year'])) {
-            $creditCardExpDate = "{$additionalInfo['cc_exp_month']}/{$additionalInfo['cc_exp_year']}";
+            $ccExpMonth = (int) $additionalInfo['cc_exp_month'];
+            $ccExpYear = (int) $additionalInfo['cc_exp_year'];
+            $creditCardExpDate = "{$ccExpMonth}/{$ccExpYear}";
         }
 
         return $creditCardExpDate;

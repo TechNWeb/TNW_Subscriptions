@@ -71,7 +71,7 @@ class ProfileCcUtils
                 sprintf(
                     "%s-%s-%s",
                     $paymentInfo[OrderPaymentInterface::CC_EXP_YEAR],
-                    $paymentInfo[OrderPaymentInterface::CC_EXP_MONTH],
+                    (int) $paymentInfo[OrderPaymentInterface::CC_EXP_MONTH],
                     $lastDayOfMonth
                 )
             );
