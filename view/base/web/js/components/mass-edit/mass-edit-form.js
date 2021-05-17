@@ -3,8 +3,9 @@ define([
     'TNW_Subscriptions/js/components/payment-form',
     'jquery',
     'uiRegistry',
-    'underscore'
-], function (uiForm, $, uiRegistry, _) {
+    'underscore',
+    'mage/translate'
+], function (uiForm, $, uiRegistry, _, $t) {
     return uiForm.extend({
 
         initialize: function () {
