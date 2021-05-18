@@ -8,6 +8,7 @@ namespace TNW\Subscriptions\Observer;
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
 use Magento\Config\Model\ResourceModel\ConfigFactory;
+use Magento\Framework\App\Config\ScopeConfigInterface;
 
 /**
  * Class EnableDisableModule - used to additional config processing on enabling and disabling Subscriptions in config
