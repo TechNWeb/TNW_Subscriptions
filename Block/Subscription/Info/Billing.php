@@ -223,4 +223,14 @@ class Billing extends ContentAbstract implements ExpireWarningSupportInterface
     {
         return (int)$this->_request->getParam('payment_details');
     }
+
+    /**
+     * Return payment methods view form
+     *
+     * @return string
+     */
+    public function getCouponDetailsViewHtml()
+    {
+        return $this->getChildHtml('coupon-details');
+    }
 }

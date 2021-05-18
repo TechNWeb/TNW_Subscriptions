@@ -755,7 +755,8 @@ class Manager
             ->setTrialStartDate(null)
             ->setTrialLength($request['trial_period'])
             ->setTrialLengthUnit($request['trial_unit_id'])
-            ->setGenerateQuotesState(SubscriptionProfile::GENERATE_QUOTES_STATE_NEED_GENERATE);
+            ->setGenerateQuotesState(SubscriptionProfile::GENERATE_QUOTES_STATE_NEED_GENERATE)
+            ->setCouponCode($quote->getCouponCode());
 
         $this->getProfile()->getPayment()
             ->setEngineCode($quote->getPayment()->getMethod());
@@ -985,6 +986,7 @@ class Manager
                     }
                 }
 
+                $quote->setCouponCode($profile->getCouponCode());
                 $quote->setTotalsCollectedFlag(false);
                 $quote->collectTotals();
             }

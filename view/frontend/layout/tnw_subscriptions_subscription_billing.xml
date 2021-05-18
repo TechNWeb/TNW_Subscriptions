@@ -39,6 +39,11 @@
                     </arguments>
                 </block>
                 <uiComponent name="tnw_subscriptionprofile_account_payment_method_form"/>
+                <block class="TNW\Subscriptions\Block\Subscription\Billing\CouponInformation"
+                       name="subscription.info.view.coupon"
+                       template="TNW_Subscriptions::subscription_profile/summary/overview/coupon-code.phtml"
+                       as="coupon-details"
+                />
             </block>
         </referenceContainer>
     </body>

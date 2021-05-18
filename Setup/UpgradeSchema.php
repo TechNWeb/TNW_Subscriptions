@@ -130,6 +130,10 @@ class UpgradeSchema implements UpgradeSchemaInterface
                 );
         }
 
+        if (version_compare($context->getVersion(), '2.3.26', '<')) {
+            $this->addCouponCodeToSubscriptionProfile($setup);
+        }
+
         $setup->endSetup();
     }
 
@@ -804,6 +808,24 @@ class UpgradeSchema implements UpgradeSchemaInterface
                 'type' => Table::TYPE_SMALLINT,
                 'comment' => 'Billing Cycles To Skip',
                 'default' => 0,
+            ]
+        );
+    }
+
+    /**
+     * @param SchemaSetupInterface $setup
+     */
+    private function addCouponCodeToSubscriptionProfile(SchemaSetupInterface $setup)
+    {
+        $table = $setup->getTable(SubscriptionProfile::SUBSCRIPTION_PROFILE_ENTITY);
+        $setup->getConnection()->addColumn(
+            $table,
+            SubscriptionProfile::COUPON_CODE,
+            [
+                'type' => Table::TYPE_TEXT,
+                'length' => 255,
+                'comment' => 'Coupon Code',
+                'default' => null,
             ]
         );
     }

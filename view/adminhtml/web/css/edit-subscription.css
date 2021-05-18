@@ -184,6 +184,11 @@ button.profile__cancel-edit_button:before {
   display: inline-block;
   float: right;
 }
+.subscription-profile-coupon {
+    width: 49%;
+    float: left;
+    margin-top: 20px;
+}
 .subscription-profile-products-container .admin__field-complex-elements {
   max-width: 100%;
 }
