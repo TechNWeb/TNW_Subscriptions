@@ -130,6 +130,20 @@ class UpgradeSchema implements UpgradeSchemaInterface
                 );
         }
 
+        if (version_compare($context->getVersion(), '2.3.26', '<')) {
+            $setup->getConnection()->addColumn(
+                $setup->getTable('sales_order_grid'),
+                'subscription_profile_id',
+                [
+                    'type' => Table::TYPE_TEXT,
+                    'length' => 255,
+                    'nullable' => true,
+                    'default' => null,
+                    'comment' => 'subscription_profile_id'
+                ]
+            );
+        }
+
         $setup->endSetup();
     }
 

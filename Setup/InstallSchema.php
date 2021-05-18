@@ -49,6 +49,7 @@ class InstallSchema implements InstallSchemaInterface
         $this->addSubscriptionsQueueTable($setup);
         $this->createProductSubscriptionProfileEav($setup);
         $this->createSubscriptionProfileEav($setup);
+        $this->addSubscriptionProfileIdColumnToSalesOrderGrid($setup);
 
         $setup->endSetup();
     }
@@ -2029,5 +2030,29 @@ class InstallSchema implements InstallSchemaInterface
             'Customer Address Entity Varchar'
         );
         $setup->getConnection()->createTable($table);
+    }
+
+    /**
+     * Add subscription_profile_id column to sales_order_grid table.
+     *
+     * @param SchemaSetupInterface $setup
+     * @return void
+     * @throws \Zend_Db_Exception
+     *
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     */
+    private function addSubscriptionProfileIdColumnToSalesOrderGrid(SchemaSetupInterface $setup)
+    {
+        $setup->getConnection()->addColumn(
+            $setup->getTable('sales_order_grid'),
+            'subscription_profile_id',
+            [
+                'type' => Table::TYPE_TEXT,
+                'length' => 255,
+                'nullable' => true,
+                'default' => null,
+                'comment' => 'subscription_profile_id'
+            ]
+        );
     }
 }
