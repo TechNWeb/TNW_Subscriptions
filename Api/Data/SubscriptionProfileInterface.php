@@ -46,6 +46,7 @@ interface SubscriptionProfileInterface extends CustomAttributesDataInterface
     const CANCEL_BEFORE_NEXT_CYCLE = 'cancel_before_next_cycle';
     const ORIGINAL_START_DATE = 'original_start_date';
     const BILLING_CYCLES_TO_SKIP = 'billing_cycles_to_skip';
+    const COUPON_CODE = 'coupon_code';
     /**#@-*/
 
     /**#@+
@@ -507,4 +508,17 @@ interface SubscriptionProfileInterface extends CustomAttributesDataInterface
      * @return $this
      */
     public function setSkipBillingCycles($billingCyclesToSkip);
+
+    /**
+     * Get Coupon code
+     *
+     * @return string|null
+     */
+    public function getCouponCode();
+
+    /**
+     * @param string $couponCode
+     * @return $this
+     */
+    public function setCouponCode($couponCode);
 }

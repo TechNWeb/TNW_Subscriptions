@@ -223,6 +223,9 @@ class CreateProfile extends BaseCreate
         $this->productModifier->setData($productData);
         $product = $this->productModifier->getProduct();
         $quote = $this->getSubQuote();
+        if (isset($productData['coupon_code'])) {
+            $quote->setCouponCode($productData['coupon_code']);
+        }
         if ($this->canUpdateItemQty($quote, $product)) {
             $item = $quote->addProduct(
                 $product,

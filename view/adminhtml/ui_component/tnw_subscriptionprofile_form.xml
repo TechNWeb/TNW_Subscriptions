@@ -181,7 +181,14 @@
                 </item>
             </argument>
             <htmlContent name="html_content">
-                <argument name="block" xsi:type="object">TNW\Subscriptions\Block\Adminhtml\SubscriptionProfile\Edit\Summary\AccountInformation</argument>
+                <block name="wrapper" class="Magento\Framework\View\Element\Template" template="TNW_Subscriptions::subscription_profile/summary/account_details.phtml">
+                    <block name="coupon_code" class="TNW\Subscriptions\Block\Subscription\Billing\CouponInformation">
+                        <arguments>
+                            <argument name="template" xsi:type="string">TNW_Subscriptions::subscription_profile/summary/coupon-code.phtml</argument>
+                        </arguments>
+                    </block>
+                    <block name="account_info" class="TNW\Subscriptions\Block\Adminhtml\SubscriptionProfile\Edit\Summary\AccountInformation"/>
+                </block>
             </htmlContent>
         </container>
     </fieldset>

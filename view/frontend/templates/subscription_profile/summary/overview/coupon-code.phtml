@@ -1,0 +1,28 @@
+<?php
+/* @var $block \TNW\Subscriptions\Block\Subscription\Billing\CouponInformation */
+?>
+<div class="block">
+    <div class="block-title">
+        <strong>Used Coupon</strong>
+    </div>
+    <div class="block-content subscription-profile-coupon">
+        <?php if ($block->getCouponCode()): ?>
+        <table class="table-secondary data-table">
+            <tbody>
+            <tr class="col-0">
+                <td class="label"><?= __('Code') ?>:</td>
+                <td class="right"><span class="text"><?= $block->getCouponCode() ?></span></td>
+            </tr>
+            <tr class="col-1">
+                <td class="label"><?= __('Status') ?>:</td>
+                <td class="right"><span class="text"><?= $block->isCouponValid() ? __('Valid') : __('Not valid') ?></span></td>
+            </tr>
+            </tbody>
+        </table>
+        <?php else: ?>
+        <div>
+            <?= __('Coupon not used') ?>
+        </div>
+        <?php endif; ?>
+    </div>
+</div>
