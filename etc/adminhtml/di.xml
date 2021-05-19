@@ -111,6 +111,12 @@
         </arguments>
     </virtualType>
 
+    <virtualType name="TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Form\Modifier\CouponInformationInsertForm"
+                 type="TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Form\Modifier\SummaryInsertForm">
+        <arguments>
+            <argument name="formType" xsi:type="const">TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Form\Modifier\SummaryInsertForm::COUPON_INFORMATION_INSERT_FORM</argument>
+        </arguments>
+    </virtualType>
     <virtualType name="TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Form\Modifier\ShippingInformationInsertForm"
                  type="TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Form\Modifier\SummaryInsertForm">
         <arguments>
@@ -156,6 +162,10 @@
                 <item name="dashboard" xsi:type="array">
                     <item name="class" xsi:type="string">TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Form\Modifier\Dashboard</item>
                     <item name="sortOrder" xsi:type="number">40</item>
+                </item>
+                <item name="coupon_info" xsi:type="array">
+                    <item name="class" xsi:type="string">TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Form\Modifier\CouponInformationInsertForm</item>
+                    <item name="sortOrder" xsi:type="number">45</item>
                 </item>
                 <item name="shipping_info" xsi:type="array">
                     <item name="class" xsi:type="string">TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Form\Modifier\ShippingInformationInsertForm</item>

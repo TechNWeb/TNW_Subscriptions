@@ -7,6 +7,7 @@ namespace TNW\Subscriptions\Block\Subscription\Billing;
 
 use Magento\Framework\Registry;
 use Magento\Framework\View\Element\Template\Context;
+use TNW\Subscriptions\Api\Data\SubscriptionProfileInterface;
 use TNW\Subscriptions\Block\Subscription\Info\ContentAbstract;
 use TNW\Subscriptions\Model\MessagePool;
 use Magento\SalesRule\Model\Utility;
@@ -15,6 +16,8 @@ use TNW\Subscriptions\Api\SubscriptionProfileOrderRepositoryInterface;
 use Magento\Quote\Model\QuoteRepository;
 use Magento\SalesRule\Model\Coupon;
 use Magento\SalesRule\Model\ResourceModel\Rule as RuleResource;
+use TNW\Subscriptions\Model\SubscriptionProfile\Manager as ProfileManager;
+use TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Form\Modifier\SummaryInsertForm;
 
 /**
  * Block for view used coupon code information
@@ -52,12 +55,18 @@ class CouponInformation extends ContentAbstract
     private $ruleResource;
 
     /**
+     * @var ProfileManager
+     */
+    private $profileManager;
+
+    /**
      * CouponInformation constructor.
      * @param Context $context
      * @param Registry $registry
      * @param MessagePool $messagePool
      * @param Utility $utility
      * @param Rule $salesRule
+     * @param ProfileManager $profileManager
      * @param SubscriptionProfileOrderRepositoryInterface $subscriptionProfileOrderRepository
      * @param QuoteRepository $quoteRepository
      * @param Coupon $coupon
@@ -70,6 +79,7 @@ class CouponInformation extends ContentAbstract
         MessagePool $messagePool,
         Utility $utility,
         Rule $salesRule,
+        ProfileManager $profileManager,
         SubscriptionProfileOrderRepositoryInterface $subscriptionProfileOrderRepository,
         QuoteRepository $quoteRepository,
         Coupon $coupon,
@@ -78,6 +88,7 @@ class CouponInformation extends ContentAbstract
     ) {
         $this->couponUtility = $utility;
         $this->salesRule = $salesRule;
+        $this->profileManager = $profileManager;
         $this->subscriptionProfileOrderRepository = $subscriptionProfileOrderRepository;
         $this->quoteRepository = $quoteRepository;
         $this->coupon = $coupon;
@@ -127,5 +138,14 @@ class CouponInformation extends ContentAbstract
             }
         }
         return false;
+    }
+
+    /**
+     * @return SubscriptionProfileInterface
+     */
+    public function getSubscriptionProfile()
+    {
+        return $this->profileManager->loadProfileFromRequest(SummaryInsertForm::FORM_DATA_KEY)
+            ?? parent::getSubscriptionProfile();
     }
 }

@@ -678,6 +678,43 @@ class Manager
     }
 
     /**
+     * Processes coupon code
+     * @param $requestData
+     * @return $this
+     */
+    public function processCoupon($requestData)
+    {
+        $oldCouponCode = $this->getProfile()->getCouponCode();
+        $newCouponCode = $requestData[SubscriptionProfileInterface::COUPON_CODE];
+
+        $this->getProfile()->setCouponCode($newCouponCode !== '' ? $newCouponCode : null);
+
+        if ($newCouponCode !== '' && $oldCouponCode === null) {
+            $message = __(
+                'Coupon code set to <b>%1</b>',
+                $newCouponCode
+            );
+        }
+        if ($newCouponCode !== $oldCouponCode && $newCouponCode !== '' && $oldCouponCode !== null) {
+            $message = __(
+                'Coupon code changed from <b>%1</b> to <b>%2</b>',
+                $oldCouponCode,
+                $newCouponCode
+            );
+        }
+        if ($oldCouponCode !== null && $newCouponCode === '') {
+            $message = __(
+                'Removed coupon code <b>%1</b>',
+                $oldCouponCode
+            );
+        }
+        if (isset($message)) {
+            $this->historyLogger->log($message, $this->getProfile()->getId());
+        }
+        return $this;
+    }
+
+    /**
      * Assigns order to profile.
      *
      * @param SubscriptionProfileOrderInterface $relation
