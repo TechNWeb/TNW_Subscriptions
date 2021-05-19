@@ -163,7 +163,7 @@ class ProcessShipping extends Action
                     foreach ($shippingRates as $rate) {
                         $rates[] = [
                             'value' => $rate->getCode(),
-                            'label' => $rate->getCarrierTitle(),
+                            'label' => $rate->getCarrierTitle() . ' (' . $rate->getMethodTitle() . ')',
                         ];
                     }
                 } else {

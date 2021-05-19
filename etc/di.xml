@@ -1507,4 +1507,8 @@
                 type="TNW\Subscriptions\Plugin\Avatax\PreventExtensionCopy"
                 sortOrder="10"/>
     </type>
+    <type name="Magento\Shipping\Model\Shipping">
+        <plugin name="tnw_shipping_rates"
+                type="TNW\Subscriptions\Plugin\Shipping\Model\ShippingRates"/>
+    </type>
 </config>
