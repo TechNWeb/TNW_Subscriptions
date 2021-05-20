@@ -7,6 +7,7 @@ namespace TNW\Subscriptions\Block\Subscription\Billing;
 
 use Magento\Framework\Registry;
 use Magento\Framework\View\Element\Template\Context;
+use Magento\Quote\Model\Quote;
 use TNW\Subscriptions\Api\Data\SubscriptionProfileInterface;
 use TNW\Subscriptions\Block\Subscription\Info\ContentAbstract;
 use TNW\Subscriptions\Model\MessagePool;
@@ -16,6 +17,7 @@ use TNW\Subscriptions\Api\SubscriptionProfileOrderRepositoryInterface;
 use Magento\Quote\Model\QuoteRepository;
 use Magento\SalesRule\Model\Coupon;
 use Magento\SalesRule\Model\ResourceModel\Rule as RuleResource;
+use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Modal\Context as FormContext;
 use TNW\Subscriptions\Model\SubscriptionProfile\Manager as ProfileManager;
 use TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Form\Modifier\SummaryInsertForm;
 
@@ -60,6 +62,11 @@ class CouponInformation extends ContentAbstract
     private $profileManager;
 
     /**
+     * @var FormContext
+     */
+    private $formContext;
+
+    /**
      * CouponInformation constructor.
      * @param Context $context
      * @param Registry $registry
@@ -71,6 +78,7 @@ class CouponInformation extends ContentAbstract
      * @param QuoteRepository $quoteRepository
      * @param Coupon $coupon
      * @param RuleResource $ruleResource
+     * @param FormContext $formContext
      * @param array $data
      */
     public function __construct(
@@ -84,6 +92,7 @@ class CouponInformation extends ContentAbstract
         QuoteRepository $quoteRepository,
         Coupon $coupon,
         RuleResource $ruleResource,
+        FormContext $formContext,
         array $data = []
     ) {
         $this->couponUtility = $utility;
@@ -93,15 +102,21 @@ class CouponInformation extends ContentAbstract
         $this->quoteRepository = $quoteRepository;
         $this->coupon = $coupon;
         $this->ruleResource = $ruleResource;
+        $this->formContext = $formContext;
         parent::__construct($context, $registry, $messagePool, $data);
     }
 
     /**
-     * @return mixed|string|null
+     * Gets coupon code from profile or quote (during subscription creation)
+     * @return string|null
      */
     public function getCouponCode()
     {
-        return $this->getSubscriptionProfile()->getCouponCode();
+        $subscriptionProfile = $this->getSubscriptionProfile();
+        if ($subscriptionProfile) {
+            return $subscriptionProfile->getCouponCode();
+        }
+        return $this->getSubQuote()->getCouponCode();
     }
 
     /**
@@ -119,11 +134,19 @@ class CouponInformation extends ContentAbstract
                 if (!$this->salesRule->getIsActive()) {
                     return false;
                 }
-                $subscriptionProfileOrder = $this->subscriptionProfileOrderRepository->getById(
-                    $this->getSubscriptionProfile()->getId()
-                );
-                $quote = $this->quoteRepository->get($subscriptionProfileOrder->getMagentoQuoteId());
-                $quote->setCouponCode($this->getCouponCode());
+
+                if ($this->getSubscriptionProfile()) {
+                    $subscriptionProfileOrder = $this->subscriptionProfileOrderRepository->getById(
+                        $this->getSubscriptionProfile()->getId()
+                    );
+                    $quote = $this->quoteRepository->get($subscriptionProfileOrder->getMagentoQuoteId());
+                    $quote->setCouponCode($this->getCouponCode());
+                } elseif ($this->getSubQuote()) {
+                    $quote = $this->getSubQuote();
+                } else {
+                    return false;
+                }
+
                 $validForShippingAddress = $this->couponUtility->canProcessRule(
                     $this->salesRule,
                     $quote->getShippingAddress()
@@ -147,5 +170,14 @@ class CouponInformation extends ContentAbstract
     {
         return $this->profileManager->loadProfileFromRequest(SummaryInsertForm::FORM_DATA_KEY)
             ?? parent::getSubscriptionProfile();
+    }
+
+    /**
+     * @return false|Quote
+     */
+    public function getSubQuote()
+    {
+        $subQuotes = $this->formContext->getSession()->getSubQuotes();
+        return reset($subQuotes);
     }
 }

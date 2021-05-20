@@ -139,6 +139,23 @@
             </field>
         </container>
     </fieldset>
+    <fieldset name="coupon_information">
+        <settings>
+            <label translate="true">Coupon information</label>
+            <additionalClasses>
+                <class name="admin__coupon-information-preview">true</class>
+            </additionalClasses>
+        </settings>
+        <container name="coupon">
+            <htmlContent name="html_content">
+                <block name="coupon_code" class="TNW\Subscriptions\Block\Subscription\Billing\CouponInformation">
+                    <arguments>
+                        <argument name="template" xsi:type="string">TNW_Subscriptions::subscription_profile/summary/coupon-code.phtml</argument>
+                    </arguments>
+                </block>
+            </htmlContent>
+        </container>
+    </fieldset>
     <fieldset name="shipping_information">
         <argument name="data" xsi:type="array">
             <item name="config" xsi:type="array">

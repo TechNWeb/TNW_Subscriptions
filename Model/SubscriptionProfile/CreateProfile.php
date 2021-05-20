@@ -6,12 +6,17 @@
 namespace TNW\Subscriptions\Model\SubscriptionProfile;
 
 use Magento\Catalog\Model\Product as MagentoProduct;
+use Magento\Customer\Api\AddressRepositoryInterface;
 use Magento\Framework\Event\ManagerInterface;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Quote\Model\Quote as ModelQuote;
 use Magento\Quote\Model\Quote\Address as QuoteAddress;
 use Magento\Quote\Model\Quote\Payment;
 use Magento\Quote\Model\Quote\Item;
+use Magento\SalesRule\Model\Coupon as CouponModel;
+use Magento\SalesRule\Model\ResourceModel\Rule as RuleResource;
+use Magento\SalesRule\Model\Rule;
+use Magento\SalesRule\Model\Utility as CouponUtility;
 use TNW\Subscriptions\Api\Data\SubscriptionProfileInterface;
 use TNW\Subscriptions\Cron\Quote\Creator as QuoteGenerator;
 use TNW\Subscriptions\Model\Backend\Session\Quote as Session;
@@ -19,6 +24,7 @@ use TNW\Subscriptions\Model\Context;
 use TNW\Subscriptions\Model\Product\Attribute as SubscriptionAttributes;
 use TNW\Subscriptions\Model\Queue\Manager as QueueManager;
 use TNW\Subscriptions\Model\QuoteSessionInterface;
+use TNW\Subscriptions\Model\ResourceModel\SalesItemRelation;
 use TNW\Subscriptions\Model\SubscriptionProfile\Admin\Create\Address;
 use TNW\Subscriptions\Model\SubscriptionProfile\Admin\Create\Customer;
 use TNW\Subscriptions\Model\SubscriptionProfile\Admin\Create\Product;
@@ -113,12 +119,56 @@ class CreateProfile extends BaseCreate
     private $profileStatus;
 
     /**
-     * @var \TNW\Subscriptions\Model\ResourceModel\SalesItemRelation
+     * @var SalesItemRelation
      */
     private $relationResource;
 
+    /**
+     * @var AddressRepositoryInterface
+     */
     private $addressRepository;
 
+    /**
+     * @var CouponModel
+     */
+    private $coupon;
+
+    /**
+     * @var RuleResource
+     */
+    private $ruleResource;
+
+    /**
+     * @var Rule
+     */
+    private $salesRule;
+
+    /**
+     * @var CouponUtility
+     */
+    private $couponUtility;
+
+    /**
+     * CreateProfile constructor.
+     * @param Context $context
+     * @param QuoteSessionInterface $session
+     * @param Address $addressCreator
+     * @param QuoteCreateInterface $quoteCreator
+     * @param Product $productModifier
+     * @param Customer $customerCreator
+     * @param Manager $profileManager
+     * @param ManagerInterface $eventManager
+     * @param MessageHistoryLogger $messageHistoryLogger
+     * @param QueueManager $queueManager
+     * @param QuoteGenerator $quoteGenerator
+     * @param ProfileStatus $profileStatus
+     * @param SalesItemRelation $relationResource
+     * @param AddressRepositoryInterface $addressRepository
+     * @param CouponModel $coupon
+     * @param RuleResource $ruleResource
+     * @param Rule $salesRule
+     * @param CouponUtility $couponUtility
+     */
     public function __construct(
         Context $context,
         QuoteSessionInterface $session,
@@ -132,8 +182,12 @@ class CreateProfile extends BaseCreate
         QueueManager $queueManager,
         QuoteGenerator $quoteGenerator,
         ProfileStatus $profileStatus,
-        \TNW\Subscriptions\Model\ResourceModel\SalesItemRelation $relationResource,
-        \Magento\Customer\Api\AddressRepositoryInterface $addressRepository
+        SalesItemRelation $relationResource,
+        AddressRepositoryInterface $addressRepository,
+        CouponModel $coupon,
+        RuleResource $ruleResource,
+        Rule $salesRule,
+        CouponUtility $couponUtility
     ) {
         $this->addressRepository = $addressRepository;
         $this->addressCreator = $addressCreator;
@@ -147,6 +201,10 @@ class CreateProfile extends BaseCreate
         $this->quoteGenerator = $quoteGenerator;
         $this->profileStatus = $profileStatus;
         $this->relationResource = $relationResource;
+        $this->coupon = $coupon;
+        $this->ruleResource = $ruleResource;
+        $this->couponUtility = $couponUtility;
+        $this->salesRule = $salesRule;
 
         parent::__construct($context, $session);
     }
@@ -780,5 +838,39 @@ class CreateProfile extends BaseCreate
     public function getCustomerCreator()
     {
         return $this->customerCreator;
+    }
+
+    /**
+     * Sets coupon code to quote
+     * @param $couponCode
+     * @return array
+     */
+    public function setCouponCode($couponCode)
+    {
+        $result = [];
+        $subQuotes = $this->getSubQuotes();
+        $subQuote = reset($subQuotes);
+        if ($couponCode && $ruleId = $this->coupon->loadByCode($couponCode)->getRuleId()) {
+            $this->ruleResource->load($this->salesRule, $ruleId);
+            if (!$this->salesRule->getIsActive()) {
+                $result[] = __('Coupon code is not active');
+            }
+            $validForShippingAddress = $this->couponUtility->canProcessRule(
+                $this->salesRule,
+                $subQuote->getShippingAddress()
+            );
+            $validForBillingAddress = $this->couponUtility->canProcessRule(
+                $this->salesRule,
+                $subQuote->getBillingAddress()
+            );
+            if (!($validForShippingAddress || $validForBillingAddress)) {
+                $result[] = __("The coupon code cannot be applied. Verify the code and try again.");
+            }
+        } elseif ($couponCode) {
+            $result[] = __("The coupon code isn't valid. Verify the code and try again.");
+        }
+        $subQuote->setCouponCode($couponCode);
+
+        return $result;
     }
 }
