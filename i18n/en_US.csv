@@ -401,3 +401,5 @@ The number of future quotes to generate at a time for the new subscription profi
 "Auto-Ship", "Auto-Ship"
 "Add to Cart", "Add to Cart"
 "No available customers are found, please check the included customer groups in the configuration.","No available customers are found, please check the included customer groups in the configuration."
+"The coupon code cannot be applied. Verify the code and try again.","The coupon code cannot be applied. Verify the code and try again."
+"Coupon code is not active","Coupon code is not active"

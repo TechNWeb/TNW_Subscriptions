@@ -516,6 +516,10 @@
                     <item name="class" xsi:type="string">TNW\Subscriptions\Model\SubscriptionProfile\Create\Request\Save\Profile\Billing</item>
                     <item name="sortOrder" xsi:type="number">60</item>
                 </item>
+                <item name="coupon" xsi:type="array">
+                    <item name="class" xsi:type="string">TNW\Subscriptions\Model\SubscriptionProfile\Create\Request\Save\Profile\Coupon</item>
+                    <item name="sortOrder" xsi:type="number">65</item>
+                </item>
                 <item name="payment" xsi:type="array">
                     <item name="class" xsi:type="string">TNW\Subscriptions\Model\SubscriptionProfile\Create\Request\Save\Profile\PaymentMethod</item>
                     <item name="sortOrder" xsi:type="number">70</item>
