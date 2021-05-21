@@ -10,10 +10,12 @@ use Magento\Catalog\Api\ProductRepositoryInterface;
 use Magento\Catalog\Helper\Image as ImageHelper;
 use Magento\Catalog\Model\Product\Attribute\Source\Status;
 use Magento\Catalog\Ui\DataProvider\Product\Form\Modifier\AbstractModifier;
+use Magento\Framework\Locale\CurrencyInterface;
 use Magento\Framework\Phrase;
 use Magento\Framework\Registry;
 use Magento\Framework\Stdlib\ArrayManager;
 use Magento\Framework\UrlInterface;
+use Magento\Store\Model\StoreManagerInterface;
 use Magento\Ui\Component\DynamicRows;
 use Magento\Ui\Component\Form\Fieldset;
 use Magento\Ui\Component\Modal;
@@ -22,7 +24,10 @@ use TNW\Subscriptions\Api\ProductBillingFrequencyRepositoryInterface;
 use TNW\Subscriptions\Block\Adminhtml\BillingFrequency\Edit\SaveButton;
 use TNW\Subscriptions\Model\Config;
 use TNW\Subscriptions\Model\Product\Attribute;
+use TNW\Subscriptions\Model\Source\ProfileStatus;
 use TNW\Subscriptions\Ui\DataProvider\BillingFrequency\Form\Modifier\LinkedProducts\GridMetadata;
+use Magento\Framework\Api\SearchCriteriaBuilder;
+use TNW\Subscriptions\Model\SubscriptionProfileRepository;
 
 /**
  * Class LinkedProducts - dataprovider
@@ -102,14 +107,24 @@ class LinkedProducts extends AbstractModifier
     private $arrayManager;
 
     /**
-     * @var \Magento\Framework\Locale\CurrencyInterface
+     * @var CurrencyInterface
      */
     private $localeCurrency;
 
     /**
-     * @var \Magento\Store\Model\StoreManagerInterface
+     * @var StoreManagerInterface
      */
     private $storeManager;
+
+    /**
+     * @var SearchCriteriaBuilder
+     */
+    private $searchCriteriaBuilder;
+
+    /**
+     * @var SubscriptionProfileRepository
+     */
+    private $profileRepository;
 
     /**
      * @param UrlInterface $urlBuilder
@@ -121,8 +136,10 @@ class LinkedProducts extends AbstractModifier
      * @param GridMetadata $gridMetadata
      * @param Config $config
      * @param ArrayManager $arrayManager
-     * @param \Magento\Framework\Locale\CurrencyInterface $localeCurrency
-     * @param \Magento\Store\Model\StoreManagerInterface $storeManager
+     * @param CurrencyInterface $localeCurrency
+     * @param StoreManagerInterface $storeManager
+     * @param SearchCriteriaBuilder $searchCriteriaBuilder
+     * @param SubscriptionProfileRepository $profileRepository
      * @param string $scopeName
      */
     public function __construct(
@@ -135,8 +152,10 @@ class LinkedProducts extends AbstractModifier
         GridMetadata $gridMetadata,
         Config $config,
         ArrayManager $arrayManager,
-        \Magento\Framework\Locale\CurrencyInterface $localeCurrency,
-        \Magento\Store\Model\StoreManagerInterface $storeManager,
+        CurrencyInterface $localeCurrency,
+        StoreManagerInterface $storeManager,
+        SearchCriteriaBuilder $searchCriteriaBuilder,
+        SubscriptionProfileRepository $profileRepository,
         $scopeName = ''
     ) {
         $this->urlBuilder = $urlBuilder;
@@ -151,6 +170,8 @@ class LinkedProducts extends AbstractModifier
         $this->arrayManager = $arrayManager;
         $this->localeCurrency = $localeCurrency;
         $this->storeManager = $storeManager;
+        $this->searchCriteriaBuilder = $searchCriteriaBuilder;
+        $this->profileRepository = $profileRepository;
     }
 
     /**
@@ -166,8 +187,8 @@ class LinkedProducts extends AbstractModifier
             );
 
             $data[$frequency->getId()]['links'][self::DATA_SCOPE_LINKED_PRODUCTS] = [];
+            $options = [];
 
-            /** @var  ProductBillingFrequencyInterface $productFrequency */
             foreach ($productFrequencies->getItems() as $productFrequency) {
                 $product = $this->productRepository->getById($productFrequency->getMagentoProductId());
 
@@ -175,9 +196,67 @@ class LinkedProducts extends AbstractModifier
                     $data[$frequency->getId()]['links'][self::DATA_SCOPE_LINKED_PRODUCTS][]
                         = $this->fillData($product, $productFrequency);
                 }
+
+                if ($this->config->isSubscriptionsActive()) {
+                    $searchStatuses = [
+                        ProfileStatus::STATUS_ACTIVE,
+                        ProfileStatus::STATUS_TRIAL,
+                        ProfileStatus::STATUS_HOLDED,
+                        ProfileStatus::STATUS_PAST_DUE
+                    ];
+
+                    $parentProductId = false;
+                    $optionArray = [];
+
+                    $profilesSearchCriteria = $this->searchCriteriaBuilder->addFilter(
+                        'status',
+                        implode(',', $searchStatuses),
+                        'in'
+                    )->addFilter(
+                        'billing_frequency_id',
+                        $frequency->getId()
+                    )->create();
+
+                    $subscriptionProfiles = $this->profileRepository->getList($profilesSearchCriteria);
+
+                    if ($subscriptionProfiles->getTotalCount()) {
+                        $gridUrl = $this->urlBuilder->getUrl(
+                            'tnw_subscriptions/subscriptionprofile/index',
+                            [
+                                'status' => implode(',', $searchStatuses),
+                                'product_id' => $product->getId(),
+                                'child_sku' => $parentProductId ? $product->getSku() : null,
+                                'billing_frequency_id' => $frequency->getId()
+                            ]
+                        );
+
+                        $optionArray['grid_url'] = $gridUrl;
+                    }
+                    $options[] = $optionArray;
+                }
+            }
+
+            if (is_array($options) && !empty($options)) {
+                for ($i = 0; $i < count($options); $i++) {
+                    $data = array_replace_recursive(
+                        $data,
+                        [
+                            array_keys($data)[0] => [
+                                'links' => [
+                                    'linked' => [
+                                        $i => [
+                                            'grid_url' => array_key_exists('grid_url', $options[$i])
+                                                ? $options[$i]['grid_url']
+                                                : ''
+                                        ]
+                                    ]
+                                ]
+                            ]
+                        ]
+                    );
+                }
             }
         }
-
         return $data;
     }
 
@@ -474,5 +553,23 @@ class LinkedProducts extends AbstractModifier
         }
 
         return $price;
+    }
+
+    /**
+     * Format float number to have two digits after delimiter
+     *
+     * @param string $path
+     * @param array $data
+     * @return array
+     */
+    private function formatPriceByPath($path, array $data)
+    {
+        $value = $this->arrayManager->get($path, $data);
+
+        if (is_numeric($value)) {
+            $data = $this->arrayManager->replace($path, $data, $this->formatPrice($value));
+        }
+
+        return $data;
     }
 }
