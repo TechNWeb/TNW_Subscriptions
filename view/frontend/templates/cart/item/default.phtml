@@ -94,7 +94,7 @@ $canApplyMsrp = $helper->isShowBeforeOrderConfirm($product) && $helper->isMinima
             <?php endif; ?>
         <?php endif; ?>
         <td class="col qty" data-th="<?= $block->escapeHtmlAttr(__('Qty')) ?>">
-            <div class="field qty <?php echo $groupsViewModel->allowDisplaySubscribeQty($_item) ? : 'hidden' ?>">
+            <div class="field qty <?= ($groupsViewModel->allowDisplaySubscribeQty($_item) || !$groupsViewModel->isSubscriptionItem($_item)) ? : 'hidden' ?>">
                 <div class="control qty">
                     <label for="cart-<?= $block->escapeHtmlAttr($_item->getId()) ?>-qty">
                         <span class="label"><?= $block->escapeHtml(__('Qty')) ?></span>
@@ -141,3 +141,25 @@ $canApplyMsrp = $helper->isShowBeforeOrderConfirm($product) && $helper->isMinima
         </td>
     </tr>
 </tbody>
+<script type="text/javascript">
+    require([
+        "jquery"
+    ], function($) {
+        var cartRadioSubscribe = $('#cart-<?= /* @noEscape */ $_item->getId(); ?>-subscribe'),
+            cartRadioOnetime = $('#cart-<?= /* @noEscape */ $_item->getId(); ?>-onetime'),
+            cartQty = $('#cart-<?= /* @noEscape */ $_item->getId() ?>-qty'),
+            isSubscription = $("input[id=cart-<?= /* @noEscape */ $_item->getId(); ?>-subscribe]").val(),
+            isOnetime = $("input[id=cart-<?= /* @noEscape */ $_item->getId(); ?>-onetime]").val(),
+            qty = $('.qty');
+        cartRadioSubscribe.on('change', function (e) {
+            if (isSubscription && <?= !(int)$groupsViewModel->allowDisplaySubscribeQty($_item)?>) {
+                cartQty.addClass('hidden');
+            }
+        });
+        cartRadioOnetime.on('change', function (e) {
+            if (isOnetime && <?= !(int)$groupsViewModel->allowDisplaySubscribeQty($_item)?>) {
+                qty.removeClass('hidden');
+            }
+        })
+    })
+</script>
