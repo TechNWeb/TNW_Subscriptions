@@ -554,22 +554,4 @@ class LinkedProducts extends AbstractModifier
 
         return $price;
     }
-
-    /**
-     * Format float number to have two digits after delimiter
-     *
-     * @param string $path
-     * @param array $data
-     * @return array
-     */
-    private function formatPriceByPath($path, array $data)
-    {
-        $value = $this->arrayManager->get($path, $data);
-
-        if (is_numeric($value)) {
-            $data = $this->arrayManager->replace($path, $data, $this->formatPrice($value));
-        }
-
-        return $data;
-    }
 }
