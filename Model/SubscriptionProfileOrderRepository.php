@@ -8,11 +8,13 @@ namespace TNW\Subscriptions\Model;
 
 use Magento\Framework\Api\DataObjectHelper;
 use Magento\Framework\Api\SortOrder;
+use Magento\Framework\App\ObjectManager;
 use Magento\Framework\Exception\CouldNotDeleteException;
 use Magento\Framework\Exception\CouldNotSaveException;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\Reflection\DataObjectProcessor;
 use Magento\Store\Model\StoreManagerInterface;
+use Psr\Log\LoggerInterface;
 use TNW\Subscriptions\Api\Data\SubscriptionProfileOrderInterfaceFactory;
 use TNW\Subscriptions\Api\Data\SubscriptionProfileOrderSearchResultsInterfaceFactory;
 use TNW\Subscriptions\Api\SubscriptionProfileOrderRepositoryInterface;
@@ -64,6 +66,10 @@ class SubscriptionProfileOrderRepository implements SubscriptionProfileOrderRepo
      */
     private $subscriptionProfileOrderCollectionFactory;
 
+    /**
+     * @var LoggerInterface
+     */
+    private $logger;
 
     /**
      * @param ResourceSubscriptionProfileOrder $resource
@@ -83,7 +89,8 @@ class SubscriptionProfileOrderRepository implements SubscriptionProfileOrderRepo
         SubscriptionProfileOrderSearchResultsInterfaceFactory $searchResultsFactory,
         DataObjectHelper $dataObjectHelper,
         DataObjectProcessor $dataObjectProcessor,
-        StoreManagerInterface $storeManager
+        StoreManagerInterface $storeManager,
+        LoggerInterface $logger = null
     ) {
         $this->resource = $resource;
         $this->subscriptionProfileOrderFactory = $subscriptionProfileOrderFactory;
@@ -93,6 +100,8 @@ class SubscriptionProfileOrderRepository implements SubscriptionProfileOrderRepo
         $this->dataSubscriptionProfileOrderFactory = $dataSubscriptionProfileOrderFactory;
         $this->dataObjectProcessor = $dataObjectProcessor;
         $this->storeManager = $storeManager;
+        $objectManager = ObjectManager::getInstance();
+        $this->logger = $logger ?: $objectManager->get(LoggerInterface::class);
     }
 
     /**
@@ -112,6 +121,17 @@ class SubscriptionProfileOrderRepository implements SubscriptionProfileOrderRepo
                 'Could not save the subscriptionProfileOrder: %1',
                 $exception->getMessage()
             ));
+        }
+        $magentoOrderId = $subscriptionProfileOrder->getMagentoOrderId();
+        if ($magentoOrderId) {
+            try {
+                $profileIds = $this->resource->getProfileIdsByMagentoOrderId((int)$magentoOrderId);
+                if ($profileIds) {
+                    $this->resource->populateSalesOrderGridWithProfileIds((int)$magentoOrderId, $profileIds);
+                }
+            } catch (\Exception $e) {
+                $this->logger->warning($e->getMessage());
+            }
         }
         return $subscriptionProfileOrder;
     }
