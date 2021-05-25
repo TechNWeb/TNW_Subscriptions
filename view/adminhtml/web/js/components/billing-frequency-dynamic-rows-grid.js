@@ -13,10 +13,12 @@ define([
         deleteRecord: function (index, recordId) {
             var recordInstance = _.find(this.elems(), function (elem) {
                 return elem.index === index;
-             });
+            });
 
             if (recordInstance.data().grid_url !== undefined
-                && recordInstance.data().grid_url !== "") {
+                && recordInstance.data().grid_url !== ""
+                && recordInstance.data().grid_url !== null
+            ) {
                 alert({
                     content: $t('Cannot unlink product from Billing frequency. '
                         + 'Some <a href="%1" target="_blank">subscription profiles</a> use it.')

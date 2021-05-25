@@ -10,6 +10,7 @@ use Magento\Catalog\Api\ProductRepositoryInterface;
 use Magento\Catalog\Helper\Image as ImageHelper;
 use Magento\Catalog\Model\Product\Attribute\Source\Status;
 use Magento\Catalog\Ui\DataProvider\Product\Form\Modifier\AbstractModifier;
+use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Locale\CurrencyInterface;
 use Magento\Framework\Phrase;
 use Magento\Framework\Registry;
@@ -20,10 +21,12 @@ use Magento\Ui\Component\DynamicRows;
 use Magento\Ui\Component\Form\Fieldset;
 use Magento\Ui\Component\Modal;
 use TNW\Subscriptions\Api\Data\ProductBillingFrequencyInterface;
+use TNW\Subscriptions\Api\Data\SubscriptionProfileInterface;
 use TNW\Subscriptions\Api\ProductBillingFrequencyRepositoryInterface;
 use TNW\Subscriptions\Block\Adminhtml\BillingFrequency\Edit\SaveButton;
 use TNW\Subscriptions\Model\Config;
 use TNW\Subscriptions\Model\Product\Attribute;
+use TNW\Subscriptions\Model\ProductSubscriptionProfileRepository;
 use TNW\Subscriptions\Model\Source\ProfileStatus;
 use TNW\Subscriptions\Ui\DataProvider\BillingFrequency\Form\Modifier\LinkedProducts\GridMetadata;
 use Magento\Framework\Api\SearchCriteriaBuilder;
@@ -127,6 +130,26 @@ class LinkedProducts extends AbstractModifier
     private $profileRepository;
 
     /**
+     * @var ProductSubscriptionProfileRepository
+     */
+    private $productProfileRepository;
+
+    /**
+     * @var SubscriptionProfileInterface[]
+     */
+    private $subscriptionProfiles = [];
+
+    /**
+     * @var array
+     */
+    private $searchStatuses = [
+        ProfileStatus::STATUS_ACTIVE,
+        ProfileStatus::STATUS_TRIAL,
+        ProfileStatus::STATUS_HOLDED,
+        ProfileStatus::STATUS_PAST_DUE
+    ];
+
+    /**
      * @param UrlInterface $urlBuilder
      * @param Registry $coreRegistry
      * @param ProductRepositoryInterface $productRepository
@@ -140,6 +163,7 @@ class LinkedProducts extends AbstractModifier
      * @param StoreManagerInterface $storeManager
      * @param SearchCriteriaBuilder $searchCriteriaBuilder
      * @param SubscriptionProfileRepository $profileRepository
+     * @param ProductSubscriptionProfileRepository $productProfileRepository
      * @param string $scopeName
      */
     public function __construct(
@@ -156,6 +180,7 @@ class LinkedProducts extends AbstractModifier
         StoreManagerInterface $storeManager,
         SearchCriteriaBuilder $searchCriteriaBuilder,
         SubscriptionProfileRepository $profileRepository,
+        ProductSubscriptionProfileRepository $productProfileRepository,
         $scopeName = ''
     ) {
         $this->urlBuilder = $urlBuilder;
@@ -172,6 +197,7 @@ class LinkedProducts extends AbstractModifier
         $this->storeManager = $storeManager;
         $this->searchCriteriaBuilder = $searchCriteriaBuilder;
         $this->profileRepository = $profileRepository;
+        $this->productProfileRepository = $productProfileRepository;
     }
 
     /**
@@ -185,9 +211,9 @@ class LinkedProducts extends AbstractModifier
             $productFrequencies = $this->productBillingFrequencyRepository->getListByFrequencyId(
                 $frequency->getId()
             );
+            $this->initSubscriptionProfiles($productFrequencies->getItems());
 
             $data[$frequency->getId()]['links'][self::DATA_SCOPE_LINKED_PRODUCTS] = [];
-            $options = [];
 
             foreach ($productFrequencies->getItems() as $productFrequency) {
                 $product = $this->productRepository->getById($productFrequency->getMagentoProductId());
@@ -195,65 +221,6 @@ class LinkedProducts extends AbstractModifier
                 if ($product && $product->getId()) {
                     $data[$frequency->getId()]['links'][self::DATA_SCOPE_LINKED_PRODUCTS][]
                         = $this->fillData($product, $productFrequency);
-                }
-
-                if ($this->config->isSubscriptionsActive()) {
-                    $searchStatuses = [
-                        ProfileStatus::STATUS_ACTIVE,
-                        ProfileStatus::STATUS_TRIAL,
-                        ProfileStatus::STATUS_HOLDED,
-                        ProfileStatus::STATUS_PAST_DUE
-                    ];
-
-                    $parentProductId = false;
-                    $optionArray = [];
-
-                    $profilesSearchCriteria = $this->searchCriteriaBuilder->addFilter(
-                        'status',
-                        implode(',', $searchStatuses),
-                        'in'
-                    )->addFilter(
-                        'billing_frequency_id',
-                        $frequency->getId()
-                    )->create();
-
-                    $subscriptionProfiles = $this->profileRepository->getList($profilesSearchCriteria);
-
-                    if ($subscriptionProfiles->getTotalCount()) {
-                        $gridUrl = $this->urlBuilder->getUrl(
-                            'tnw_subscriptions/subscriptionprofile/index',
-                            [
-                                'status' => implode(',', $searchStatuses),
-                                'product_id' => $product->getId(),
-                                'child_sku' => $parentProductId ? $product->getSku() : null,
-                                'billing_frequency_id' => $frequency->getId()
-                            ]
-                        );
-
-                        $optionArray['grid_url'] = $gridUrl;
-                    }
-                    $options[] = $optionArray;
-                }
-            }
-
-            if (is_array($options) && !empty($options)) {
-                for ($i = 0; $i < count($options); $i++) {
-                    $data = array_replace_recursive(
-                        $data,
-                        [
-                            array_keys($data)[0] => [
-                                'links' => [
-                                    'linked' => [
-                                        $i => [
-                                            'grid_url' => array_key_exists('grid_url', $options[$i])
-                                                ? $options[$i]['grid_url']
-                                                : ''
-                                        ]
-                                    ]
-                                ]
-                            ]
-                        ]
-                    );
                 }
             }
         }
@@ -301,6 +268,58 @@ class LinkedProducts extends AbstractModifier
         );
 
         return $meta;
+    }
+
+    /**
+     * @param ProductBillingFrequencyInterface[] $productFrequencies
+     * @return SubscriptionProfileInterface[]
+     * @throws LocalizedException
+     */
+    public function initSubscriptionProfiles($productFrequencies)
+    {
+        if (!$this->subscriptionProfiles && !empty($productFrequencies)) {
+            $productIds = array_map(
+                function ($productFrequency) {
+                    return $productFrequency->getMagentoProductId();
+                },
+                $productFrequencies
+            );
+            $profileProductsSearchCriteria = $this->searchCriteriaBuilder->addFilter(
+                'magento_product_id',
+                implode(',', $productIds),
+                'in'
+            )->create();
+            $productProfiles = $this->productProfileRepository->getList($profileProductsSearchCriteria);
+
+            $profileIds = array_map(
+                function ($productProfile) {
+                    return (int)$productProfile->getSubscriptionProfileId();
+                },
+                $productProfiles->getItems()
+            );
+
+            if (!empty($profileIds)) {
+                $frequencyId = reset($productFrequencies)->getBillingFrequencyId();
+                $profilesSearchCriteria = $this->searchCriteriaBuilder->addFilter(
+                    'status',
+                    implode(',', $this->searchStatuses),
+                    'in'
+                )->addFilter(
+                    'billing_frequency_id',
+                    $frequencyId
+                )->addFilter(
+                    'entity_id',
+                    implode(',', $profileIds),
+                    'in'
+                )->create();
+                foreach ($this->profileRepository->getList($profilesSearchCriteria)->getItems() as $profile) {
+                    foreach ($profile->getProducts() as $product) {
+                        $this->subscriptionProfiles[$product->getMagentoProductId()] = $profile;
+                    }
+                }
+            }
+        }
+        return $this->subscriptionProfiles;
     }
 
     /**
@@ -507,8 +526,30 @@ class LinkedProducts extends AbstractModifier
             $presetQty = null;
         }
 
+        if (array_key_exists($linkedProduct->getId(), $this->subscriptionProfiles)) {
+            $visibleProducts = $this->subscriptionProfiles[$linkedProduct->getId()]->getVisibleProducts();
+            foreach ($visibleProducts as $visibleProduct) {
+                if (!empty($visibleProduct->getChildren())) {
+                    foreach ($visibleProduct->getChildren() as $child) {
+                        $childSku = $child->getSku();
+                        $parentId = $visibleProduct->getMagentoProductId();
+                    }
+                }
+            }
+            $gridUrl = $this->urlBuilder->getUrl(
+                'tnw_subscriptions/subscriptionprofile/index',
+                [
+                    'status' => implode(',', $this->searchStatuses),
+                    'product_id' => $parentId ?? $linkedProduct->getId(),
+                    'child_sku' => $childSku ?? null,
+                    'billing_frequency_id' => $linkItem->getBillingFrequencyId()
+                ]
+            );
+        }
+
         return [
             'id' => $linkedProduct->getId(),
+            'grid_url' => $gridUrl ?? null,
             'thumbnail' => $this->imageHelper->init($linkedProduct, 'product_listing_thumbnail')->getUrl(),
             'name' => $linkedProduct->getName(),
             'status' => $this->status->getOptionText($linkedProduct->getStatus()),
