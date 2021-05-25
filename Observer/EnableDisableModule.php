@@ -40,6 +40,7 @@ class EnableDisableModule implements ObserverInterface
             && array_key_exists('section', $configData)
             && $configData['section'] == 'tnw_subscriptions_general'
         ) {
+            $configPath = 'advanced/modules_disable_output/TNW_Subscriptions';
             if ($configData['website']) {
                 $scope = 'websites';
                 $scopeId = $configData['website'];
@@ -50,7 +51,7 @@ class EnableDisableModule implements ObserverInterface
             if (isset($configData['groups']['general']['fields']['active']['value'])) {
                 $state = $configData['groups']['general']['fields']['active']['value'] ? 0 : 1;
                 $this->resourceConfigFactory->create()->saveConfig(
-                    'advanced/modules_disable_output/TNW_Subscriptions',
+                    $configPath,
                     $state,
                     $scope,
                     $scopeId
@@ -60,7 +61,7 @@ class EnableDisableModule implements ObserverInterface
                 && $configData['website']
             ) {
                 $this->resourceConfigFactory->create()->deleteConfig(
-                    'advanced/modules_disable_output/TNW_Subscriptions',
+                    $configPath,
                     $scope,
                     $scopeId
                 );

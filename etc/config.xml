@@ -78,5 +78,10 @@
                 <sallowspecific>0</sallowspecific>
             </profile_subscribe_limitations>
         </tnw_subscriptions_customer>
+        <advanced>
+            <modules_disable_output>
+                <TNW_Subscriptions>1</TNW_Subscriptions>
+            </modules_disable_output>
+        </advanced>
     </default>
 </config>

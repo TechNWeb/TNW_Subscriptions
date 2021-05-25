@@ -140,7 +140,7 @@ class ProcessShipping extends Action
                         $addressData['street'] = [
                             $addressData['street0'],
                             $addressData['street1'],
-                            $addressData['street2']
+                            isset($addressData['street2']) ? $addressData['street2'] : ''
                         ];
                         $addressData['region'] = $params['region'];
                         $addressData['address_type'] = 'shipping';
