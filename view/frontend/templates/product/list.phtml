@@ -84,9 +84,7 @@ $_subscriptionBlock = $block->getChildBlock('helper.category.products.list');
                             <div class="price-box price-final_price">
                                 <span class="price-wrapper" data-role="priceBox">
                                     <span class="price">
-                                        <?= $escaper->escapeHtml(
-                                            $_subscriptionBlock->getTrialPriceForCategory($_product)
-                                        ) ?>
+                                        <?= /* @noEscape */ $_subscriptionBlock->getTrialPriceForCategory($_product) ?>
                                     </span>
                                 </span>
                             </div>
