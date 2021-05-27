@@ -217,8 +217,7 @@ class Config
     public function isSubscriptionsActiveCurrent()
     {
         $currentWebsiteId = $this->storeManager->getWebsite()->getId();
-        return $this->getStoreConfig($this->xmlIsActive, $currentWebsiteId)
-            && !empty($this->getAvailablePaymentsList($currentWebsiteId));
+        return $this->getStoreConfig($this->xmlIsActive, $currentWebsiteId);
     }
 
     /**

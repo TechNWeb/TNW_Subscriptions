@@ -19,6 +19,7 @@
             <module name="Magento_Tax"/>
             <module name="Magento_Quote"/>
             <module name="Magento_SalesRule"/>
+            <module name="Magento_InstantPurchase"/>
         </sequence>
     </module>
 </config>

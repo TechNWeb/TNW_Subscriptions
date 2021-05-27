@@ -130,4 +130,7 @@
     <type name="Magento\Multishipping\Block\Checkout\Link">
         <plugin name="tnw_subscriptions_remove_multishipping_link" type="TNW\Subscriptions\Plugin\Multishipping\Block\Checkout\Link" />
     </type>
+    <type name="Magento\InstantPurchase\Controller\Button\PlaceOrder">
+        <plugin name="tnw_subscriptions_add_profile_label_into_message_output" type="TNW\Subscriptions\Plugin\InstantPurchase\Controller\Button\PlaceOrder"/>
+    </type>
 </config>
