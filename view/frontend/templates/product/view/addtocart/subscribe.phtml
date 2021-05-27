@@ -14,6 +14,7 @@
     <div id="subscribe-container" data-bind="scope: 'recurringAddToCart'">
         <!-- ko template: getTemplate() --><!-- /ko -->
     </div>
+    <?= $block->getChildHtml('', true) ?>
     <script type="text/x-magento-init">
     {
         "*": {
