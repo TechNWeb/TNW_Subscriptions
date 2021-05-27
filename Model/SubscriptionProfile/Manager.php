@@ -1024,6 +1024,7 @@ class Manager
                 }
 
                 $quote->setCouponCode($profile->getCouponCode());
+                $quote->getShippingAddress()->setShippingAmountForDiscount(null);
                 $quote->setTotalsCollectedFlag(false);
                 $quote->collectTotals();
             }
