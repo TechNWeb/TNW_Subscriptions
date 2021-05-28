@@ -204,11 +204,14 @@ class Overview extends ContentAbstract implements ExpireWarningSupportInterface
     protected function _prepareLayout()
     {
         foreach ($this->getChildNames() as $names) {
+            if ($this->getLayout()->isUiComponent($names)) {
+                continue;
+            }
             $this->initChildBlock($this->getLayout()->getBlock($names));
         }
         $this->prepareTabMessages();
 
-        return parent::_prepareLayout();
+        return $this;
     }
 
     /**
@@ -454,6 +457,15 @@ class Overview extends ContentAbstract implements ExpireWarningSupportInterface
     public function getProductsHtml()
     {
         return $this->getChildHtml('products');
+    }
+
+    /**
+     * Returns Next payment date ui form html
+     * @return string
+     */
+    public function getNextPaymentDateFormHtml()
+    {
+        return $this->getChildHtml('next_payment_date_form');
     }
 
     /**

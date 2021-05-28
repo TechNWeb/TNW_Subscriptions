@@ -1742,6 +1742,40 @@
 }
 
 .subscription-data-wrapper {
+    .summary.subscription-next-payment-date {
+        .admin__fieldset {
+            border: none;
+            padding: 0;
+
+        }
+        .next-payment-date-fieldset {
+            padding: 1.5rem 0;
+            .label,
+            .control {
+                display: inline-block;
+            }
+        }
+        .subscr-container-title {
+            display: none;
+        }
+        .profile__edit_button {
+            .lib-button(
+                @_button-icon-font-size: 1.4rem,
+                @_button-icon-use: true,
+                @_button-font-content: @icon-settings,
+                @_button-icon-font-position: before
+            );
+        }
+        .profile__cancel-edit_button {
+            .lib-button(
+                @_button-icon-use: true,
+                @_button-icon-font-size: 1.4rem,
+                @_button-font-content: @icon-remove,
+                @_button-icon-font-position: before
+            );
+        }
+    }
+
     .items-details-view{
         .block {
             margin: 0;

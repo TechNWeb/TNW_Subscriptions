@@ -135,6 +135,12 @@
             <argument name="formType" xsi:type="const">TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Form\Modifier\SummaryInsertForm::SHIPPING_METHODS_INSERT_FORM</argument>
         </arguments>
     </virtualType>
+    <virtualType name="TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Form\Modifier\NextPaymentDateInsertForm"
+                 type="TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Form\Modifier\SummaryInsertForm">
+        <arguments>
+            <argument name="formType" xsi:type="const">TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Form\Modifier\SummaryInsertForm::NEXT_PAYMENT_DATE_INSERT_FORM</argument>
+        </arguments>
+    </virtualType>
     <virtualType name="TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Form\Modifier\PaymentMethodInsertForm"
                  type="TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Form\Modifier\SummaryInsertForm">
         <arguments>
@@ -166,6 +172,10 @@
                 <item name="coupon_info" xsi:type="array">
                     <item name="class" xsi:type="string">TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Form\Modifier\CouponInformationInsertForm</item>
                     <item name="sortOrder" xsi:type="number">45</item>
+                </item>
+                <item name="next_payment_date" xsi:type="array">
+                    <item name="class" xsi:type="string">TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Form\Modifier\NextPaymentDateInsertForm</item>
+                    <item name="sortOrder" xsi:type="number">42</item>
                 </item>
                 <item name="shipping_info" xsi:type="array">
                     <item name="class" xsi:type="string">TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Form\Modifier\ShippingInformationInsertForm</item>

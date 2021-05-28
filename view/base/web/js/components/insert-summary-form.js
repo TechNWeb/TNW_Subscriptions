@@ -27,11 +27,13 @@ define(
              */
             processResponseStatus: function () {
                 var insertFrom;
-                if (this.responseStatus()) {
+                if (this.responseStatus() && this.insertFormName) {
                     insertFrom = registry.get('index=' + this.insertFormName);
                     insertFrom.destroyInserted();
                     insertFrom.render();
                     this.setMessageFromResponse();
+                } else {
+                    window.location.reload();
                 }
             },
 

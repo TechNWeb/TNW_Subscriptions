@@ -9,6 +9,7 @@ use Magento\Framework\Api\SearchCriteriaBuilder;
 use Magento\Framework\Api\SearchCriteriaInterface;
 use Magento\Framework\Api\SortOrder;
 use Magento\Framework\Api\SortOrderBuilder;
+use Magento\Framework\Exception\LocalizedException;
 use TNW\Subscriptions\Api\Data\SubscriptionProfileInterface;
 use TNW\Subscriptions\Api\Data\SubscriptionProfileOrderInterface;
 use TNW\Subscriptions\Api\SubscriptionProfileOrderRepositoryInterface as RelationRepository;
@@ -132,7 +133,7 @@ class Manager
      *
      * @param null|SubscriptionProfileOrderInterface $relation
      * @return SubscriptionProfileOrderInterface
-     * @throws \Magento\Framework\Exception\LocalizedException
+     * @throws LocalizedException
      */
     public function saveRelation($relation = null)
     {
@@ -161,6 +162,32 @@ class Manager
         $searchCriteria = $this->criteriaBuilder->create();
 
         return $this->profileOrderRepository->getList($searchCriteria)->getItems();
+    }
+
+    /**
+     * @param $profileId
+     * @return false|mixed|SubscriptionProfileOrderInterface|null
+     * @throws LocalizedException
+     */
+    public function getLastSuccessfulProfileRelation($profileId)
+    {
+        $sortOrder = $this->sortOrderBuilder
+            ->setField(SubscriptionProfileOrderInterface::SCHEDULED_AT)
+            ->setDescendingDirection()
+            ->create();
+
+        /** @var SearchCriteriaInterface $searchCriteria */
+        $searchCriteria = $this->criteriaBuilder->addFilter(
+            SubscriptionProfileOrderInterface::SUBSCRIPTION_PROFILE_ID,
+            $profileId
+        )->addFilter(
+            SubscriptionProfileOrderInterface::MAGENTO_ORDER_ID,
+            null,
+            'notnull'
+        )->addSortOrder($sortOrder)->setPageSize(1)->create();
+
+        $relations = $this->profileOrderRepository->getList($searchCriteria)->getItems();
+        return is_array($relations) && count($relations) ? reset($relations) : null;
     }
 
     /**
@@ -215,7 +242,7 @@ class Manager
      * @param int $orderId
      *
      * @return int[]
-     * @throws \Magento\Framework\Exception\LocalizedException
+     * @throws LocalizedException
      */
     public function getProfileIdsByOrder($orderId)
     {
