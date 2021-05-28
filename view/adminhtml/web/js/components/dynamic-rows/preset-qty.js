@@ -46,8 +46,10 @@ define([
         },
 
         setDisabled: function (value) {
-            if (registry.get('dataScope = ' + this.parentScope + ',index = container_option').disabled) {
-                return this.disabled(true)
+            if (registry.get('dataScope = ' + this.parentScope + ',index = container_option') !== undefined) {
+                if (registry.get('dataScope = ' + this.parentScope + ',index = container_option').disabled) {
+                    return this.disabled(true)
+                }
             }
             this.disabled(value)
         }
