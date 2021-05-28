@@ -136,11 +136,7 @@ class CouponInformation extends ContentAbstract
                 }
 
                 if ($this->getSubscriptionProfile()) {
-                    $subscriptionProfileOrder = $this->subscriptionProfileOrderRepository->getById(
-                        $this->getSubscriptionProfile()->getId()
-                    );
-                    $quote = $this->quoteRepository->get($subscriptionProfileOrder->getMagentoQuoteId());
-                    $quote->setCouponCode($this->getCouponCode());
+                    $quote = $this->profileManager->getTempQuote($this->getSubscriptionProfile());
                 } elseif ($this->getSubQuote()) {
                     $quote = $this->getSubQuote();
                 } else {
