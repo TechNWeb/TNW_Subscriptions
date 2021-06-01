@@ -219,6 +219,11 @@ class Manager
     private $orderCollectionFactory;
 
     /**
+     * @var array
+     */
+    private $usedCoupons = [];
+
+    /**
      * Manager constructor.
      * @param EnginePool $enginePool
      * @param SubscriptionProfileRepository $subscriptionProfileRepository
@@ -684,32 +689,34 @@ class Manager
      */
     public function processCoupon($requestData)
     {
-        $oldCouponCode = $this->getProfile()->getCouponCode();
-        $newCouponCode = $requestData[SubscriptionProfileInterface::COUPON_CODE];
+        if (array_key_exists(SubscriptionProfileInterface::COUPON_CODE, $requestData)) {
+            $oldCouponCode = $this->getProfile()->getCouponCode();
+            $newCouponCode = $requestData[SubscriptionProfileInterface::COUPON_CODE];
 
-        $this->getProfile()->setCouponCode($newCouponCode !== '' ? $newCouponCode : null);
+            $this->getProfile()->setCouponCode($newCouponCode !== '' ? $newCouponCode : null);
 
-        if ($newCouponCode !== '' && $oldCouponCode === null) {
-            $message = __(
-                'Coupon code set to <b>%1</b>',
-                $newCouponCode
-            );
-        }
-        if ($newCouponCode !== $oldCouponCode && $newCouponCode !== '' && $oldCouponCode !== null) {
-            $message = __(
-                'Coupon code changed from <b>%1</b> to <b>%2</b>',
-                $oldCouponCode,
-                $newCouponCode
-            );
-        }
-        if ($oldCouponCode !== null && $newCouponCode === '') {
-            $message = __(
-                'Removed coupon code <b>%1</b>',
-                $oldCouponCode
-            );
-        }
-        if (isset($message)) {
-            $this->historyLogger->log($message, $this->getProfile()->getId());
+            if ($newCouponCode !== '' && $oldCouponCode === null) {
+                $message = __(
+                    'Coupon code set to <b>%1</b>',
+                    $newCouponCode
+                );
+            }
+            if ($newCouponCode !== $oldCouponCode && $newCouponCode !== '' && $oldCouponCode !== null) {
+                $message = __(
+                    'Coupon code changed from <b>%1</b> to <b>%2</b>',
+                    $oldCouponCode,
+                    $newCouponCode
+                );
+            }
+            if ($oldCouponCode !== null && $newCouponCode === '') {
+                $message = __(
+                    'Removed coupon code <b>%1</b>',
+                    $oldCouponCode
+                );
+            }
+            if (isset($message)) {
+                $this->historyLogger->log($message, $this->getProfile()->getId());
+            }
         }
         return $this;
     }
@@ -967,6 +974,9 @@ class Manager
             }
         }
         if (count($quote->getAllVisibleItems())) {
+            if ($profile->getCouponCode()) {
+                $this->usedCoupons[] = $profile->getCouponCode();
+            }
             if ($collectQuoteTotals) {
                 $profileBillingAddressData = $profile->getBillingAddress()->getData();
                 unset($profileBillingAddressData['id']);
@@ -1023,9 +1033,30 @@ class Manager
                     }
                 }
 
-                $quote->setCouponCode($profile->getCouponCode());
-                $quote->setTotalsCollectedFlag(false);
-                $quote->collectTotals();
+                $resultCouponCodeTotals = [];
+                $resultCouponCode = '';
+                $totalsCollected = false;
+                foreach ($this->usedCoupons as $couponCode) {
+                    $quote->setCouponCode($couponCode);
+                    $quote->getShippingAddress()->setShippingAmountForDiscount(null);
+                    $quote->setTotalsCollectedFlag(false);
+                    $currentTotal = $quote->collectTotals()->getGrandTotal();
+                    $resultCouponCodeTotals[$couponCode] = $currentTotal;
+                    $totalsCollected = true;
+                    foreach ($resultCouponCodeTotals as $couponCode => $total) {
+                        if ($currentTotal > $total) {
+                            $currentTotal = $total;
+                            $resultCouponCode = $couponCode;
+                            $totalsCollected = false;
+                        }
+                    }
+                }
+                if (!$totalsCollected) {
+                    $quote->setCouponCode($resultCouponCode);
+                    $quote->getShippingAddress()->setShippingAmountForDiscount(null);
+                    $quote->setTotalsCollectedFlag(false);
+                    $quote->collectTotals();
+                }
             }
         }
         return $outOfStockProducts;

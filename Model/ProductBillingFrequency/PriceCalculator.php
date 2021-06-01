@@ -17,6 +17,7 @@ use TNW\Subscriptions\Model\Product\Attribute;
 use TNW\Subscriptions\Model\QuoteSessionInterface;
 use TNW\Subscriptions\Model\ResourceModel\ProductBillingFrequency\Collection;
 use TNW\Subscriptions\Model\ResourceModel\ProductBillingFrequency\CollectionFactory;
+use Magento\Customer\Model\Session;
 
 /**
  * Calculate unit price for billing frequency.
@@ -57,19 +58,28 @@ class PriceCalculator
     private $localeFormat;
 
     /**
+     * @var Session
+     */
+    protected $customerSession;
+
+    /**
+     * PriceCalculator constructor.
      * @param ProductRepository $productRepository
      * @param CollectionFactory $productBillingFrequencyCollectionFactory
      * @param Context $context
      * @param QuoteSessionInterface $session
      * @param FormatInterface $localeFormat
+     * @param Session $customerSession
      */
     public function __construct(
         ProductRepository $productRepository,
         CollectionFactory $productBillingFrequencyCollectionFactory,
         Context $context,
         QuoteSessionInterface $session,
-        FormatInterface $localeFormat
+        FormatInterface $localeFormat,
+        Session $customerSession
     ) {
+        $this->customerSession = $customerSession;
         $this->productRepository = $productRepository;
         $this->collectionFactory = $productBillingFrequencyCollectionFactory;
         $this->context = $context;
@@ -127,6 +137,14 @@ class PriceCalculator
                 $trialPrice = $this->getTrialPrice($product);
                 $price = $trialPrice ?: 0;
             } elseif ($lockProductPrice) {
+                if ($tierPrice = $this->getProductTierPrice($product['child_product_id'])) {
+                    $product['child_product_price'] = $tierPrice;
+                }
+                if ($product['child_product_id'] == $product['id']
+                    && $product['child_product_price']
+                ) {
+                    $product['price'] = $product['child_product_price'];
+                }
                 $discountAmount = $this->getDiscountAmount($product, $productPrice);
                 $origPrice = $this->convertToCurrency($product->getData('child_product_price'));
                 $discountedPrice = ($origPrice - $discountAmount) >= 0 ? $origPrice - $discountAmount : 0;
@@ -141,6 +159,35 @@ class PriceCalculator
         }
 
         return (string)$price;
+    }
+
+    /**
+     * @param $productId
+     * @return mixed|null
+     * @throws NoSuchEntityException
+     */
+    private function getProductTierPrice($productId)
+    {
+        $productTierPrice = null;
+        $product = $this->productRepository
+            ->getById($productId);
+        if ($product && $product->getId() && $product->getTierPrice()) {
+            $customerGroupId = $this->customerSession->getCustomer()->getGroupId();
+            foreach ($product->getTierPrice() as $tierPrice) {
+                if ($tierPrice['price_qty'] == 1
+                    && ($tierPrice['cust_group'] == $customerGroupId
+                        || $tierPrice['all_groups'])
+                ) {
+                    if (!$productTierPrice) {
+                        //TODO: resolve against website
+                        $productTierPrice = $tierPrice['price'];
+                    } else {
+                        $productTierPrice = min($productTierPrice, $tierPrice['price']);
+                    }
+                }
+            }
+        }
+        return $productTierPrice;
     }
 
     /**
@@ -223,7 +270,15 @@ class PriceCalculator
     private function getDiscountAmount(DataObject $product, $processPrice = null)
     {
         if ($processPrice === null) {
-            $processPrice = $product->getData('price') ?? $product->getData('child_product_price');
+            $processPrice = $product->getData('price');
+            if ($processPrice
+                && $product->getData('id') == $product->getData('child_product_id')
+                && $product->getData('child_product_price')
+            ) {
+                $processPrice = $product->getData('child_product_price');
+            } elseif (!$processPrice) {
+                $processPrice = $product->getData('child_product_price');
+            }
         }
         $discountAmount = 0;
         if ($this->getOfferFlatDiscount($product)) {

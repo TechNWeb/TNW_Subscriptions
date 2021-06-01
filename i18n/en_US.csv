@@ -248,7 +248,7 @@ Product,Product
 "Purchase Type","Purchase Type"
 "Start Date","Start Date"
 "Lock Product Price","Lock Product Price"
-"Unlock Preset Quiantity","Unlock Preset Quiantity"
+"Unlock Preset Quantity","Unlock Preset Quantity"
 Discount,Discount
 "Offer Flat Discount","Offer Flat Discount"
 "Discount Amount","Discount Amount"
@@ -401,5 +401,6 @@ The number of future quotes to generate at a time for the new subscription profi
 "Auto-Ship", "Auto-Ship"
 "Add to Cart", "Add to Cart"
 "No available customers are found, please check the included customer groups in the configuration.","No available customers are found, please check the included customer groups in the configuration."
+"Cannot unlink product from Billing frequency. Some <a href=""%1"" target=""_blank"">subscription profiles</a> use it.", "Cannot unlink product from Billing frequency. Some <a href=""%1"" target=""_blank"">subscription profiles</a> use it."
 "The coupon code cannot be applied. Verify the code and try again.","The coupon code cannot be applied. Verify the code and try again."
 "Coupon code is not active","Coupon code is not active"
