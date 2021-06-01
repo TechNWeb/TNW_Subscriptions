@@ -240,6 +240,18 @@
             </argument>
         </field>
     </fieldset>
+    <fieldset>
+        <settings>
+            <label translate="true">Coupon</label>
+        </settings>
+        <field name="coupon_code" formElement="input">
+            <settings>
+                <label translate="true">Coupon code</label>
+                <dataType>text</dataType>
+                <dataScope>coupon_code</dataScope>
+            </settings>
+        </field>
+    </fieldset>
     <fieldset name="buttons">
         <argument name="data" xsi:type="array">
             <item name="config" xsi:type="array">

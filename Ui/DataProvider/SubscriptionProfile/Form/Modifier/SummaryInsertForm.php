@@ -11,6 +11,7 @@ use Magento\Ui\Component\Container;
 use TNW\Subscriptions\Model\ProfileCcUtils;
 use TNW\Subscriptions\Model\SubscriptionProfile;
 use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Modal\SummaryAddressForm;
+use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Modal\SummaryCouponForm;
 use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Modal\SummaryPaymentMethodForm;
 use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Modal\SummaryShippingMethodForm;
 use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Modal\SummaryProductsForm;
@@ -43,6 +44,7 @@ class SummaryInsertForm extends BaseFormModifier
     /**
      * Insert form names
      */
+    const COUPON_INFORMATION_INSERT_FORM = 'coupon_information_insert_form';
     const SHIPPING_INFORMATION_INSERT_FORM = 'shipping_information_insert_form';
     const BILLING_INFORMATION_INSERT_FORM = 'billing_information_insert_form';
     const SHIPPING_METHODS_INSERT_FORM = 'shipping_method_insert_form';
@@ -55,6 +57,11 @@ class SummaryInsertForm extends BaseFormModifier
      * @var array
      */
     private static $insertFormData = [
+        self::COUPON_INFORMATION_INSERT_FORM => [
+            self::INSERT_FORM_HANDLE => 'tnw_subscriptions_subscriptionprofile_summary_coupon',
+            self::INSERT_FORM_NAMESPACE => SummaryCouponForm::FORM_NAME,
+            self::INSERT_FORM_SORT_ORDER => 5,
+        ],
         self::SHIPPING_INFORMATION_INSERT_FORM => [
             self::INSERT_FORM_HANDLE => 'tnw_subscriptions_subscriptionprofile_summary_shipping_address',
             self::INSERT_FORM_NAMESPACE => SummaryAddressForm::DATA_SCOPE_SUMMARY_SHIPPING_ADDRESS_FORM,
