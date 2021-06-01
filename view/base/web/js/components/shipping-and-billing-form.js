@@ -17,8 +17,12 @@ define([
                 } else {
                     var firstFieldSet = registry.get('index = shipping_methods');
                     if (firstFieldSet !== undefined) {
-                        firstFieldSet.resetErrors();
-                        firstFieldSet.set('shipping_errors', [$.mage.__('Please select shipping.')]);
+                        if (!firstFieldSet.visible()) {
+                            this.save();
+                        } else {
+                            firstFieldSet.resetErrors();
+                            firstFieldSet.set('shipping_errors', [$.mage.__('Please select shipping.')]);
+                        }
                     }
                 }
             }
