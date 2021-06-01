@@ -62,6 +62,12 @@ button.profile__cancel-edit_button:before {
 .admin__fieldset > .subscription-store-fieldset > .admin__field-control > .admin__field-option:nth-child(1):nth-last-child(2).admin__fieldset > .subscription-store-fieldset > .admin__field-control > .admin__field-option:nth-child(1) + .admin__field-option:before {
   display: none;
 }
+.admin__profile-summary-account-information .fieldset {
+  overflow: hidden;
+}
+.tnw_subscriptionprofile_form_areas_summary_summary_coupon_information_insert_form {
+  width: 49.5%;
+}
 .tnw_subscriptionprofile_form_areas_summary_summary_shipping_method_insert_form {
   width: 49.5%;
   vertical-align: top;

@@ -17,5 +17,11 @@
         <referenceBlock name="additional.product.info">
             <block class="TNW\Subscriptions\Block\Order\Email\SubscriptionItems" name="subscription_items" template="TNW_Subscriptions::order/email/items.phtml"/>
         </referenceBlock>
+        <referenceBlock name="items" template="TNW_Subscriptions::order/email/sales-items.phtml">
+            <block class="TNW\Subscriptions\Block\Subscription\Billing\EmailCouponInformation"
+                   name="coupon_expire" as="coupon_expire"
+                   template="TNW_Subscriptions::order/email/coupon-expire.phtml"
+                   after="order_totals"/>
+        </referenceBlock>
     </body>
 </page>

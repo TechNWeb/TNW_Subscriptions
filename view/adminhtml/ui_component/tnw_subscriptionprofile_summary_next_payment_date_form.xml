@@ -1,0 +1,162 @@
+<?xml version="1.0" ?>
+<!--
+/**
+ * Copyright © 2018 TechNWeb, Inc. All rights reserved.
+ * See TNW_LICENSE.txt for license details.
+ */
+-->
+<form xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd"
+      component="TNW_Subscriptions/js/components/insert-summary-form">
+    <argument name="data" xsi:type="array">
+        <item name="js_config" xsi:type="array">
+            <item name="provider" xsi:type="string">tnw_subscriptionprofile_summary_next_payment_date_form.tnw_subscriptionprofile_summary_next_payment_date_form_data_source</item>
+        </item>
+        <item name="config" xsi:type="array">
+            <item name="insertFormName" xsi:type="string">next_payment_date_insert_form</item>
+        </item>
+        <item name="template" xsi:type="string">templates/form/subs_collapsible</item>
+    </argument>
+    <settings>
+        <deps>
+            <dep>tnw_subscriptionprofile_summary_next_payment_date_form.tnw_subscriptionprofile_summary_next_payment_date_form_data_source</dep>
+        </deps>
+        <dataScope>data</dataScope>
+        <ajaxSaveType>simple</ajaxSaveType>
+        <namespace>tnw_subscriptionprofile_summary_next_payment_date_form</namespace>
+    </settings>
+    <dataSource name="tnw_subscriptionprofile_summary_next_payment_date_form_data_source"
+                component="Magento_Ui/js/form/provider">
+        <settings>
+            <submitUrl path="tnw_subscriptions/subscriptionprofile_edit/save"/>
+        </settings>
+        <dataProvider name="tnw_subscriptionprofile_summary_next_payment_date_form_data_source"
+                      class="\TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Modal\SummaryNextPaymentDateForm">
+            <settings>
+                <primaryFieldName>subscription_profile_id</primaryFieldName>
+                <requestFieldName>subscription_profile_id</requestFieldName>
+            </settings>
+        </dataProvider>
+    </dataSource>
+    <fieldset name="next_payment_date" component="TNW_Subscriptions/js/form/editable-fieldset">
+        <settings>
+            <collapsible>false</collapsible>
+            <label></label>
+            <additionalClasses>
+                <class name="profile__edit_block">true</class>
+            </additionalClasses>
+        </settings>
+        <field name="subscription_profile_id" formElement="input">
+            <settings>
+                <dataType>text</dataType>
+                <visible>false</visible>
+            </settings>
+        </field>
+        <container name="next_payment_date_header"
+                   template="TNW_Subscriptions/form/subscription-profile/edit/buttons"
+                   sortOrder="0">
+            <field name="edit_next_payment_date" formElement="button"
+                   component="Magento_Ui/js/form/components/button" sortOrder="0">
+                <argument name="data" xsi:type="array">
+                    <item name="config" xsi:type="array">
+                        <item name="title" xsi:type="boolean">false</item>
+                        <item name="elementTmpl" xsi:type="string">TNW_Subscriptions/form/element/button-additional-classes</item>
+                        <item name="displayAsLink" xsi:type="boolean">false</item>
+                        <item name="actions" xsi:type="array">
+                            <item name="0" xsi:type="array">
+                                <item name="targetName" xsi:type="string">ns = ${ $.ns }, index = next_payment_date</item>
+                                <item name="actionName" xsi:type="string">disablePreview</item>
+                            </item>
+                        </item>
+                    </item>
+                </argument>
+                <settings>
+                    <componentType>button</componentType>
+                    <additionalClasses>
+                        <class name="profile__edit_button">true</class>
+                    </additionalClasses>
+                </settings>
+            </field>
+            <field name="cancel_edit_next_payment_date" formElement="button"
+                   component="Magento_Ui/js/form/components/button" sortOrder="1">
+                <argument name="data" xsi:type="array">
+                    <item name="config" xsi:type="array">
+                        <item name="title" xsi:type="boolean">false</item>
+                        <item name="elementTmpl" xsi:type="string">TNW_Subscriptions/form/element/button-additional-classes</item>
+                        <item name="displayAsLink" xsi:type="boolean">false</item>
+                        <item name="actions" xsi:type="array">
+                            <item name="0" xsi:type="array">
+                                <item name="targetName" xsi:type="string">ns = ${ $.ns }, index = next_payment_date</item>
+                                <item name="actionName" xsi:type="string">enablePreview</item>
+                            </item>
+                        </item>
+                    </item>
+                </argument>
+                <settings>
+                    <componentType>button</componentType>
+                    <additionalClasses>
+                        <class name="profile__cancel-edit_button">true</class>
+                    </additionalClasses>
+                    <imports>
+                        <link name="visible">!ns = ${ $.ns }, index = next_payment_date:preview</link>
+                    </imports>
+                </settings>
+            </field>
+        </container>
+        <htmlContent name="next_payment_date_view" sortOrder="10">
+            <settings>
+                <imports>
+                    <link name="content">${ $.provider }:data.next_payment_date_view</link>
+                    <link name="visible">ns = ${ $.ns }, index = next_payment_date:preview</link>
+                </imports>
+            </settings>
+            <block name="html" class="Magento\Framework\View\Element\Template"/>
+        </htmlContent>
+        <fieldset name="next_payment_date_edit" sortOrder="30">
+            <settings>
+                <label></label>
+                <imports>
+                    <link name="visible">!ns = ${ $.ns }, index = next_payment_date:preview</link>
+                </imports>
+            </settings>
+            <field name="next_payment_date_value" formElement="date">
+                <argument name="data" xsi:type="array">
+                    <item name="config" xsi:type="array">
+                        <item name="source" xsi:type="string">SubscriptionProfile</item>
+                    </item>
+                </argument>
+                <settings>
+                    <label translate="true">Date</label>
+                    <additionalClasses>
+                        <class name="next-payment-date-fieldset">true</class>
+                    </additionalClasses>
+                    <dataType>text</dataType>
+                    <dataScope>next_payment_date_value</dataScope>
+                    <validation>
+                        <rule name="validate-date" xsi:type="boolean">true</rule>
+                    </validation>
+                </settings>
+            </field>
+            <field name="save" component="TNW_Subscriptions/js/components/primary-button"
+                   template="TNW_Subscriptions/form/element/primary-button" formElement="button" sortOrder="201">
+                <argument name="data" xsi:type="array">
+                    <item name="config" xsi:type="array">
+                        <item name="dataType" xsi:type="string">text</item>
+                        <item name="title" translate="true" xsi:type="string">Save</item>
+                        <item name="subButtonLeft" xsi:type="string">true</item>
+                        <item name="displayPrimary" xsi:type="boolean">true</item>
+                        <item name="actions" xsi:type="array">
+                            <item name="0" xsi:type="array">
+                                <item name="targetName" xsi:type="string">index = tnw_subscriptionprofile_summary_next_payment_date_form</item>
+                                <item name="actionName" xsi:type="string">save</item>
+                            </item>
+                        </item>
+                    </item>
+                </argument>
+                <settings>
+                    <dataType>text</dataType>
+                </settings>
+            </field>
+        </fieldset>
+    </fieldset>
+</form>

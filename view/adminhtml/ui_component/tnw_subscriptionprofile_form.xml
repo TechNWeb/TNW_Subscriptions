@@ -181,7 +181,7 @@
                 </item>
             </argument>
             <htmlContent name="html_content">
-                <argument name="block" xsi:type="object">TNW\Subscriptions\Block\Adminhtml\SubscriptionProfile\Edit\Summary\AccountInformation</argument>
+                <block name="account_info" class="TNW\Subscriptions\Block\Adminhtml\SubscriptionProfile\Edit\Summary\AccountInformation"/>
             </htmlContent>
         </container>
     </fieldset>

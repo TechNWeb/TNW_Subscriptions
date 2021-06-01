@@ -1,0 +1,32 @@
+<?php
+/**
+ * @var $block \TNW\Subscriptions\Block\Subscription\Billing\CouponInformation
+ * @var $escaper \Magento\Framework\Escaper
+ */
+?>
+<div class="subscription-profile-coupon tnw_subscriptions inner-block">
+    <?php if ($block->getCouponCode()): ?>
+    <table class="table-secondary data-table">
+        <tbody>
+        <tr class="col-0">
+            <td class="label"><?= $escaper->escapeHtml(__('Code')) ?></td>
+            <td class="right"><span class="text"><?= $escaper->escapeHtml($block->getCouponCode()) ?></span></td>
+        </tr>
+        <tr class="col-1">
+            <td class="label"><?= $escaper->escapeHtml(__('Status')) ?></td>
+            <td class="right">
+                <span class="text">
+                    <?= $block->isCouponValid()
+                        ? $escaper->escapeHtml(__('Valid'))
+                        : $escaper->escapeHtml(__('Not valid')) ?>
+                </span>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+    <?php else: ?>
+    <div>
+        <?= $escaper->escapeHtml(__('Coupon not used')) ?>
+    </div>
+    <?php endif; ?>
+</div>

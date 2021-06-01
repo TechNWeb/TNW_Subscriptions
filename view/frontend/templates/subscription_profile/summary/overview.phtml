@@ -15,6 +15,7 @@
         </div>
     </div>
     <div class="clear"></div>
+    <div class="summary subscription-next-payment-date"><?= $block->getNextPaymentDateFormHtml() ?></div>
     <div class="summary-item subscription-products"><?= $block->getProductsHtml() ?></div>
     <?php if ($block->canShowDangerZone()): ?>
         <div class="summary-item subscription-danger-zone"><?= $block->getDangerZoneHtml() ?></div>

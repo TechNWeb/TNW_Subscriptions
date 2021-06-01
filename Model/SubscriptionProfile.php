@@ -816,4 +816,20 @@ class SubscriptionProfile extends AbstractExtensibleModel implements Subscriptio
     {
         return $this->setData(self::ORIGINAL_START_DATE, $originalStartDate);
     }
+
+    /**
+     * @inheritdoc
+     */
+    public function getCouponCode()
+    {
+        return $this->getData(self::COUPON_CODE);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function setCouponCode($couponCode)
+    {
+        return $this->setData(self::COUPON_CODE, $couponCode);
+    }
 }
