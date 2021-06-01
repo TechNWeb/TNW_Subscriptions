@@ -29,6 +29,10 @@
             <block name="subscription.email.products" as="products"
                    class="TNW\Subscriptions\Block\Subscription\Summary\Products"
                    template="TNW_Subscriptions::subscription_profile/email/summary/products.phtml" />
+            <block class="TNW\Subscriptions\Block\Subscription\Billing\EmailCouponInformation"
+                   name="subscription.info.view.coupon"
+                   template="TNW_Subscriptions::subscription_profile/summary/overview/coupon-code.phtml"
+                   as="coupon-details"/>
         </block>
     </body>
 </page>

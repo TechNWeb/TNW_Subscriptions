@@ -91,4 +91,13 @@ class EmailOverview extends \Magento\Framework\View\Element\Template
     {
         return $this->getChildHtml('products');
     }
+
+    /**
+     * Return coupon block html
+     */
+    public function getCouponDetails()
+    {
+        return $this->getChildHtml('coupon-details');
+
+    }
 }
