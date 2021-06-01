@@ -186,7 +186,7 @@ define([
         hasTrial: function () {
             var values = _.values(this.products.children);
             _.each(values, function (product) {
-                if (product.trial_data !== null) {
+                if (product.trial_data !== null && product.isTrialAvailableForUser) {
                     this.hasTrialStatus = true;
                 }
             }, this);
@@ -201,7 +201,7 @@ define([
             var trialData = product.trial_data,
                 trialLabelString = $t('(Try %p %u %p)'),
                 trialPrice = $t('FREE');
-            if (trialData) {
+            if (trialData && trialData.trial_can_skip === '1' && product.isTrialAvailableForUser) {
                 trialPrice = parseFloat(trialData.trial_price)
                     ? $t(' for ') + priceUtils.formatPrice(trialData.trial_price, this.priceFormat, false)
                     : trialPrice;

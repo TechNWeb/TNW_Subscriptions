@@ -5,6 +5,8 @@
  */
 
 /* @var $block \TNW\Subscriptions\Block\Product\View\Subscribe */
+/* @var $customerProductsHistoryListViewModel \TNW\Subscriptions\Block\Product\CustomerProductsHistoryList */
+$customerProductsHistoryListViewModel = $block->getData('customerProductsHistoryList');
 ?>
 <?php $block->getProduct()->setPriceCalculation()?>
 <div class="subscribe-container">
@@ -29,7 +31,7 @@
                             "defaultStartOn" : "<?= $block->getDefaultStartOn() ?>",
                             "products" : <?= $block->getProductDataArray() ?>,
                             "defaultIsTrial" : <?= $block->getIsTrial() ?>,
-                            "isTrialAvailableForUser" : true
+                            "isTrialAvailableForUser" : "<?= /* @noEscape */ $customerProductsHistoryListViewModel->isProductTrialAvailableForCurrentCustomer($block->getProduct()->getId()) ?>"
                         }
                     }
                 }

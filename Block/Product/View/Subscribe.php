@@ -32,6 +32,7 @@ use Magento\Framework\Url\EncoderInterface as UrlEncoderInterface;
 use Magento\GroupedProduct\Model\Product\Type\Grouped;
 use Magento\Framework\Stdlib\StringUtils;
 use TNW\Subscriptions\Api\BillingFrequencyRepositoryInterface as FrequencyRepository;
+use TNW\Subscriptions\Api\CustomerProductHistoryManagementInterface;
 use TNW\Subscriptions\Api\Data\ProductBillingFrequencyInterface;
 use TNW\Subscriptions\Api\ProductBillingFrequencyRepositoryInterface as FrequencyOptionRepository;
 use TNW\Subscriptions\Model\Config;
@@ -125,6 +126,12 @@ class Subscribe extends View
     private $context;
 
     /**
+     * @var CustomerProductHistoryManagementInterface
+     */
+    private $customerProductHistoryManagement;
+
+    /**
+     * Subscribe constructor.
      * @param Context $context
      * @param UrlEncoderInterface $urlEncoder
      * @param EncoderInterface $jsonEncoder
@@ -144,6 +151,8 @@ class Subscribe extends View
      * @param ProductTypeManagerResolver $subscriptionTypeResolver
      * @param PriceCalculator $priceCalculator
      * @param Config\Source\TrialLengthUnitType $trialLengthUnitType
+     * @param SubscriptionContext $subscriptionContext
+     * @param CustomerProductHistoryManagementInterface $customerProductHistoryManagement
      * @param array $data
      */
     public function __construct(
@@ -167,6 +176,7 @@ class Subscribe extends View
         PriceCalculator $priceCalculator,
         Config\Source\TrialLengthUnitType $trialLengthUnitType,
         SubscriptionContext $subscriptionContext,
+        CustomerProductHistoryManagementInterface $customerProductHistoryManagement,
         array $data = []
     ) {
         $this->subscriptionProductViewConfig = $subscriptionProductViewConfig;
@@ -179,6 +189,7 @@ class Subscribe extends View
         $this->trialLengthUnitType = $trialLengthUnitType;
         $this->subscriptionContext = $subscriptionContext;
         $this->context = $context;
+        $this->customerProductHistoryManagement = $customerProductHistoryManagement;
         parent::__construct(
             $context,
             $urlEncoder,
@@ -694,7 +705,10 @@ class Subscribe extends View
                 'trial_data' => $this->getTrialDataByProduct($productData),
                 'recurring_settings' => $this->getRecurringSettingsByProduct($this->getProduct()),
                 'qtyValidators' => $this->getQtyValidators($this->getProduct()),
-                'preconfigured' => $preconfiguredValues
+                'preconfigured' => $preconfiguredValues,
+                'isTrialAvailableForUser' => $this->isProductTrialAvailableForCurrentCustomer(
+                    $this->getProduct()->getId()
+                ),
             ]
         ];
 
@@ -733,6 +747,9 @@ class Subscribe extends View
                         $productDataObject
                     );
                     $childArray[$childProduct->getId()]['qtyValidators'] = $this->getQtyValidators($childProduct);
+                    $childArray[$childProduct->getId()]['isTrialAvailableForUser'] =
+                        $this->isProductTrialAvailableForCurrentCustomer($childProduct->getId());
+
                 }
 
                 $associatedProducts = $this->getProduct()->getTypeInstance()
@@ -767,6 +784,8 @@ class Subscribe extends View
                         $productDataObject
                     );
                     $childArray[$childProduct->getId()]['qtyValidators'] = $this->getQtyValidators($childProduct);
+                    $childArray[$childProduct->getId()]['isTrialAvailableForUser'] =
+                        $this->isProductTrialAvailableForCurrentCustomer($childProduct->getId());
                 }
 
                 $result['children'] = $childArray;
@@ -944,5 +963,16 @@ class Subscribe extends View
         }
 
         return $this->currentCurrency;
+    }
+
+    /**
+     * @param $productId
+     * @return bool
+     */
+    public function isProductTrialAvailableForCurrentCustomer($productId)
+    {
+        $customerProductHistoryList = $this->customerProductHistoryManagement
+            ->getUniqueProductsInSubscriptionsForCurrentCustomer();
+        return !in_array((int)$productId, $customerProductHistoryList, true);
     }
 }

@@ -7,7 +7,9 @@
 /**
  * @var $block \TNW\Subscriptions\Block\Product\View\Subscribe
  * @var $escaper \Magento\Framework\Escaper
+ * @var $customerProductsHistoryListViewModel \TNW\Subscriptions\Block\Product\CustomerProductsHistoryList
  */
+$customerProductsHistoryListViewModel = $block->getData('customerProductsHistoryList');
 ?>
 <?php $block->getProduct()->setPriceCalculation()?>
 <div class="subscribe-container">
@@ -31,7 +33,7 @@
                             "defaultSubscribeQty" : "<?= /* @noEscape */ $block->getDefaultSubscribeQty() ?>",
                             "defaultStartOn" : "<?= /* @noEscape */ $block->getDefaultStartOn() ?>",
                             "products" : <?= /* @noEscape */ $block->getProductDataArray() ?>,
-                            "isTrialAvailableForUser" : true
+                            "isTrialAvailableForUser" : "<?= /* @noEscape */ $customerProductsHistoryListViewModel->isProductTrialAvailableForCurrentCustomer($block->getProduct()->getId()) ?>"
                         }
                     }
                 }

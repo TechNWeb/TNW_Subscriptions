@@ -10,6 +10,7 @@ use Magento\ConfigurableProduct\Model\Product\Type\Configurable as Configurable;
 use Magento\Directory\Model\Currency;
 use Magento\Framework\Api\Filter;
 use Magento\Framework\DataObject;
+use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\Pricing\PriceCurrencyInterface;
 use Magento\Ui\DataProvider\AbstractDataProvider;
@@ -307,7 +308,7 @@ class Form extends AbstractDataProvider
                         'arguments' => [
                             'data' => [
                                 'config' => [
-                                    'visible' => $this->getCanSkipTrial(),
+                                    'visible' => $this->getCanSkipTrial() && $this->isTrialAllowed(),
                                 ]
                             ]
                         ]
@@ -316,7 +317,7 @@ class Form extends AbstractDataProvider
                         'arguments' => [
                             'data' => [
                                 'config' => [
-                                    'visible' => $this->getTrialPeriod() ? true : false,
+                                    'visible' => $this->getTrialPeriod() && $this->isTrialAllowed(),
                                 ]
                             ]
                         ]
@@ -342,8 +343,10 @@ class Form extends AbstractDataProvider
                                     'imports' => [
                                         'changeValue' => 'index = billing_frequency:value',
                                     ],
-                                    'disabled' => (bool) $this->getTrialPeriod(),
-                                    'label' => $this->getTrialPeriod() ? __('Post trial price:') : __('Price') . ':',
+                                    'disabled' => (bool) $this->getTrialPeriod() && $this->isTrialAllowed(),
+                                    'label' => $this->getTrialPeriod() && $this->isTrialAllowed()
+                                        ? __('Post trial price:')
+                                        : __('Price') . ':',
                                     'priceFormat' => $this->getPriceFormatData(),
                                 ],
                             ],
@@ -477,6 +480,36 @@ class Form extends AbstractDataProvider
         $return = isset($this->trialPeriod[$productId]) ? $this->trialPeriod[$productId] : null;
 
         return $return;
+    }
+
+    /**
+     * Check is customer allowed to use trial option for subscription purchase
+     *
+     * @param null $productId
+     * @return bool
+     */
+    protected function isTrialAllowed($productId = null)
+    {
+        $productId = $productId ?: $this->getRequestProductId();
+        if (!$productId) {
+            return false;
+        }
+
+        $quote = $this->formContext->getSession();
+        $customerId = $quote->getCustomerId() ?? null;
+        if (!$customerId) {
+            return false;
+        }
+
+        $customerProductHistoryManagement = $this->formContext->getCustomerProductHistoryManagement();
+        try {
+            if (!$customerProductHistoryManagement->isProductTrialAvailableForCustomer($customerId, $productId)) {
+                return false;
+            }
+        } catch (LocalizedException $e) {
+            return false;
+        }
+        return true;
     }
 
     /**

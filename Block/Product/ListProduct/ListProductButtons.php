@@ -145,6 +145,16 @@ class ListProductButtons extends Template
     }
 
     /**
+     * Return products history list for logged in customer.
+     *
+     * @return array
+     */
+    public function getCurrentCustomerProductsHistoryList()
+    {
+        return $this->getCustomerProductsHistoryList() ?: [];
+    }
+
+    /**
      * Get "Enable Subscriptions" config value for current website
      * and allowed customer groups to use subscription.
      *

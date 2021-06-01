@@ -19,6 +19,11 @@
             </action>
         </referenceBlock>
         <referenceBlock name="product.info.addtocart.subscription">
+            <arguments>
+                <argument name="customerProductsHistoryList" xsi:type="object">
+                    TNW\Subscriptions\Block\Product\CustomerProductsHistoryList
+                </argument>
+            </arguments>
             <action method="setTemplate">
                 <argument name="template" xsi:type="string">TNW_Subscriptions::product/view/updatecart/subscribe.phtml</argument>
             </action>
@@ -29,6 +34,11 @@
             </action>
         </referenceBlock>
         <referenceBlock name="product.info.addtocart.additional.subscription">
+            <arguments>
+                <argument name="customerProductsHistoryList" xsi:type="object">
+                    TNW\Subscriptions\Block\Product\CustomerProductsHistoryList
+                </argument>
+            </arguments>
             <action method="setTemplate">
                 <argument name="template" xsi:type="string">TNW_Subscriptions::product/view/updatecart/subscribe.phtml</argument>
             </action>

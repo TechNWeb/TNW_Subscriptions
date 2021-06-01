@@ -95,7 +95,7 @@ $customOptions = $block->getPreconfiguredCustomOptions();
                                 </select>
                             </div>
                         </div>
-                        <?php if ($block->getIsCanSkipTrial()): ?>
+                        <?php if ($block->getIsCanSkipTrial() && $block->isProductTrialAvailableForCurrentCustomer($_item->getProduct()->getId())): ?>
                             <div class="fieldset">
                                 <div class="field trial">
                                     <label class="label"><span><?= $escaper->escapeHtml(__('Use Trial')); ?>:</span></label>

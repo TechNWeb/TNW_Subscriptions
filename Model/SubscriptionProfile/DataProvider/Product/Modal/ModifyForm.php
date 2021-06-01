@@ -465,7 +465,6 @@ class ModifyForm extends Form
                         'term' => $this->getTermDefinition(),
                         'period' => $this->getPeriodDefenition(),
                         'start_on' => $this->getStartOnDefinition(),
-                        'trial_period' => $this->getTrialPeriodDefenition(),
                         'initial_fee' => $this->getInitialFeeDefinition(),
                     ]
                 ],
@@ -477,7 +476,7 @@ class ModifyForm extends Form
             $result['children']['left']['children']['qty_container'] = $this->getQtyDefinition();
         }
         $canSkipTrial = $this->getSubAttributeFromItem(Attribute::SUBSCRIPTION_TRIAL_CAN_SKIP);
-        if ($canSkipTrial) {
+        if ($canSkipTrial && $this->isTrialAllowed($this->currentProduct->getId())) {
             $result['children']['left']['children']['use_trial'] = $this->getUseTrialDefenition();
         }
         return $result;

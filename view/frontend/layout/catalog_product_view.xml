@@ -49,6 +49,11 @@
             </block>
         </referenceBlock>
         <referenceBlock name="product.info.addtocart.subscription">
+            <arguments>
+                <argument name="customerProductsHistoryList" xsi:type="object">
+                    TNW\Subscriptions\Block\Product\CustomerProductsHistoryList
+                </argument>
+            </arguments>
             <block name="product.info.addtocart.instantPurchase.subscription" class="Magento\InstantPurchase\Block\Button" template="Magento_InstantPurchase::button.phtml" before="-">
                 <arguments>
                     <argument name="jsLayout" xsi:type="array">
@@ -81,6 +86,11 @@
             </block>
         </referenceBlock>
         <referenceBlock name="product.info.addtocart.additional.subscription">
+            <arguments>
+                <argument name="customerProductsHistoryList" xsi:type="object">
+                    TNW\Subscriptions\Block\Product\CustomerProductsHistoryList
+                </argument>
+            </arguments>
             <block name="product.info.addtocart.instantPurchase.additional.subscription" class="Magento\InstantPurchase\Block\Button" template="Magento_InstantPurchase::button.phtml" before="-">
                 <arguments>
                     <argument name="jsLayout" xsi:type="array">
