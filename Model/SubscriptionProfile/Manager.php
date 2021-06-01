@@ -219,6 +219,11 @@ class Manager
     private $orderCollectionFactory;
 
     /**
+     * @var array
+     */
+    private $usedCoupons = [];
+
+    /**
      * Manager constructor.
      * @param EnginePool $enginePool
      * @param SubscriptionProfileRepository $subscriptionProfileRepository
@@ -969,6 +974,9 @@ class Manager
             }
         }
         if (count($quote->getAllVisibleItems())) {
+            if ($profile->getCouponCode()) {
+                $this->usedCoupons[] = $profile->getCouponCode();
+            }
             if ($collectQuoteTotals) {
                 $profileBillingAddressData = $profile->getBillingAddress()->getData();
                 unset($profileBillingAddressData['id']);
@@ -1025,10 +1033,30 @@ class Manager
                     }
                 }
 
-                $quote->setCouponCode($profile->getCouponCode());
-                $quote->getShippingAddress()->setShippingAmountForDiscount(null);
-                $quote->setTotalsCollectedFlag(false);
-                $quote->collectTotals();
+                $resultCouponCodeTotals = [];
+                $resultCouponCode = '';
+                $totalsCollected = false;
+                foreach ($this->usedCoupons as $couponCode) {
+                    $quote->setCouponCode($couponCode);
+                    $quote->getShippingAddress()->setShippingAmountForDiscount(null);
+                    $quote->setTotalsCollectedFlag(false);
+                    $currentTotal = $quote->collectTotals()->getGrandTotal();
+                    $resultCouponCodeTotals[$couponCode] = $currentTotal;
+                    $totalsCollected = true;
+                    foreach ($resultCouponCodeTotals as $couponCode => $total) {
+                        if ($currentTotal > $total) {
+                            $currentTotal = $total;
+                            $resultCouponCode = $couponCode;
+                            $totalsCollected = false;
+                        }
+                    }
+                }
+                if (!$totalsCollected) {
+                    $quote->setCouponCode($resultCouponCode);
+                    $quote->getShippingAddress()->setShippingAmountForDiscount(null);
+                    $quote->setTotalsCollectedFlag(false);
+                    $quote->collectTotals();
+                }
             }
         }
         return $outOfStockProducts;
