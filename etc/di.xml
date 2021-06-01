@@ -741,6 +741,10 @@
                     <item name="class" xsi:type="string">TNW\Subscriptions\Model\SubscriptionProfile\Edit\Request\Save\Profile\ModifiedProducts</item>
                     <item name="sortOrder" xsi:type="number">50</item>
                 </item>
+                <item name="next_payment_date" xsi:type="array">
+                    <item name="class" xsi:type="string">TNW\Subscriptions\Model\SubscriptionProfile\Edit\Request\Save\Profile\NextPaymentDate</item>
+                    <item name="sortOrder" xsi:type="number">60</item>
+                </item>
             </argument>
         </arguments>
     </virtualType>

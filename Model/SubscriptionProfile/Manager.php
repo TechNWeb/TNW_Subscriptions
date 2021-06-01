@@ -12,6 +12,8 @@ use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\App\RequestInterface;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Serialize\SerializerInterface;
+use Magento\Framework\Stdlib\DateTime;
+use Magento\Framework\Stdlib\DateTime\TimezoneInterface;
 use Magento\Payment\Model\Config as PaymentConfig;
 use Magento\Quote\Api\CartRepositoryInterface;
 use Magento\Quote\Model\Quote;
@@ -224,6 +226,16 @@ class Manager
     private $usedCoupons = [];
 
     /**
+     * @var TimezoneInterface
+     */
+    private $localeDate;
+
+    /**
+     * @var DateTime\DateTime
+     */
+    private $dateConversion;
+
+    /**
      * Manager constructor.
      * @param EnginePool $enginePool
      * @param SubscriptionProfileRepository $subscriptionProfileRepository
@@ -250,6 +262,8 @@ class Manager
      * @param Quote\TotalsCollector $totalsCollector
      * @param SerializerInterface $serializer
      * @param CollectionFactory $orderCollectionFactory
+     * @param TimezoneInterface $localeDate
+     * @param DateTime\DateTime $dateConversion
      */
     public function __construct(
         EnginePool $enginePool,
@@ -276,7 +290,9 @@ class Manager
         QuoteFactory $quoteFactory,
         \Magento\Quote\Model\Quote\TotalsCollector $totalsCollector,
         SerializerInterface $serializer,
-        CollectionFactory $orderCollectionFactory
+        CollectionFactory $orderCollectionFactory,
+        TimezoneInterface $localeDate,
+        DateTime\DateTime $dateConversion
     ) {
         $this->orderCollectionFactory = $orderCollectionFactory;
         $this->totalsCollector = $totalsCollector;
@@ -303,6 +319,8 @@ class Manager
         $this->profileStatus = $profileStatus;
         $this->dataObjectFactory = $dataObjectFactory;
         $this->serializer = $serializer;
+        $this->localeDate = $localeDate;
+        $this->dateConversion = $dateConversion;
     }
 
     /**
@@ -752,7 +770,7 @@ class Manager
         $date = null
     ) {
         if (!$date) {
-            $date = date_create()->format(\Magento\Framework\Stdlib\DateTime::DATETIME_PHP_FORMAT);
+            $date = date_create()->format(DateTime::DATETIME_PHP_FORMAT);
         }
 
         $relation = $this->orderRelationManager
@@ -1212,6 +1230,15 @@ class Manager
     }
 
     /**
+     * @return null|SubscriptionProfileOrderInterface
+     * @throws LocalizedException
+     */
+    public function getLastSuccessfulProfileRelation()
+    {
+        return $this->orderRelationManager->getLastSuccessfulProfileRelation($this->getProfile()->getId());
+    }
+
+    /**
      * Returns next profile relation
      *
      * @return null|Quote
@@ -1369,7 +1396,7 @@ class Manager
 
             $expression = 'P' . $this->getProfile()->getTrialLength() . $intervalUnit;
             $result = $startDate->add(new \DateInterval($expression))
-                ->format(\Magento\Framework\Stdlib\DateTime::DATETIME_PHP_FORMAT);
+                ->format(DateTime::DATETIME_PHP_FORMAT);
         }
 
         return $result;
@@ -1395,7 +1422,7 @@ class Manager
             . $date->format('s') . 'S';
         $startDate->add(new \DateInterval($expression));
 
-        return $startDate->format(\Magento\Framework\Stdlib\DateTime::DATETIME_PHP_FORMAT);
+        return $startDate->format(DateTime::DATETIME_PHP_FORMAT);
     }
 
     /**
@@ -1602,5 +1629,32 @@ class Manager
             }
         }
         return $cardTypeToProcess;
+    }
+
+    /**
+     * @param array $data
+     * @throws \Exception
+     */
+    public function processNextPaymentDate(array $data)
+    {
+        if (!empty($data['next_payment_date_value'])) {
+            $nextDate = $this->localeDate->date($data['next_payment_date_value']);
+
+            $gmtOffset = $this->dateConversion->getGmtOffset('hours');
+            if ($gmtOffset < 0) {
+                $nextDate->add(new \DateInterval('PT' . -1*$gmtOffset . 'H'));
+            } elseif ($gmtOffset > 0) {
+                $nextDate->sub(new \DateInterval('PT' . $gmtOffset . 'H'));
+            }
+            $this->orderRelationManager->updateNextPaymentDate(
+                $this->getProfile(),
+                $nextDate->format(DateTime::DATETIME_PHP_FORMAT)
+            );
+            $message = __(
+                'Profile next payment date changed to <b>%1</b>',
+                $nextDate
+            );
+            $this->historyLogger->log($message, $this->getProfile()->getId());
+        }
     }
 }

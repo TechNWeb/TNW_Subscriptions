@@ -12,6 +12,8 @@
         <referenceContainer name="content">
             <block class="TNW\Subscriptions\Block\Subscription\Summary\Overview"
                    name="subscription.info.view" after="subscription.info.links" cacheable="false">
+                <uiComponent name="tnw_subscriptionprofile_account_next_payment_date_form"
+                             as="next_payment_date_form"/>
                 <block class="TNW\Subscriptions\Block\Subscription\Info\Items"
                        name="subscription.info.items"
                        as="products"

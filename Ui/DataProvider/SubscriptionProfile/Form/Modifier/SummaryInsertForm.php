@@ -12,6 +12,7 @@ use TNW\Subscriptions\Model\ProfileCcUtils;
 use TNW\Subscriptions\Model\SubscriptionProfile;
 use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Modal\SummaryAddressForm;
 use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Modal\SummaryCouponForm;
+use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Modal\SummaryNextPaymentDateForm;
 use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Modal\SummaryPaymentMethodForm;
 use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Modal\SummaryShippingMethodForm;
 use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Modal\SummaryProductsForm;
@@ -49,6 +50,7 @@ class SummaryInsertForm extends BaseFormModifier
     const BILLING_INFORMATION_INSERT_FORM = 'billing_information_insert_form';
     const SHIPPING_METHODS_INSERT_FORM = 'shipping_method_insert_form';
     const PAYMENT_METHODS_INSERT_FORM = 'payment_method_insert_form';
+    const NEXT_PAYMENT_DATE_INSERT_FORM = 'next_payment_date_insert_form';
     const PRODUCTS_INSERT_FORM = 'products_insert_form';
 
     /**
@@ -81,6 +83,11 @@ class SummaryInsertForm extends BaseFormModifier
             self::INSERT_FORM_HANDLE => 'tnw_subscriptions_subscriptionprofile_summary_payment_method',
             self::INSERT_FORM_NAMESPACE => SummaryPaymentMethodForm::FORM_NAME,
             self::INSERT_FORM_SORT_ORDER => 40,
+        ],
+        self::NEXT_PAYMENT_DATE_INSERT_FORM => [
+            self::INSERT_FORM_HANDLE => 'tnw_subscriptions_subscriptionprofile_summary_next_payment_date',
+            self::INSERT_FORM_NAMESPACE => SummaryNextPaymentDateForm::FORM_NAME,
+            self::INSERT_FORM_SORT_ORDER => 45,
         ],
         self::PRODUCTS_INSERT_FORM => [
             self::INSERT_FORM_HANDLE => 'tnw_subscriptions_subscriptionprofile_summary_products',
@@ -302,6 +309,8 @@ class SummaryInsertForm extends BaseFormModifier
      */
     private function getInsertLocation($formType)
     {
-        return $formType === self::PRODUCTS_INSERT_FORM ? self::DASHBOARD_FIELDSET : self::SUMMARY_FIELDSET;
+        return $formType === self::PRODUCTS_INSERT_FORM || $formType === self::NEXT_PAYMENT_DATE_INSERT_FORM
+            ? self::DASHBOARD_FIELDSET
+            : self::SUMMARY_FIELDSET;
     }
 }
