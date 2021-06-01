@@ -133,4 +133,8 @@
     <type name="Magento\InstantPurchase\Controller\Button\PlaceOrder">
         <plugin name="tnw_subscriptions_add_profile_label_into_message_output" type="TNW\Subscriptions\Plugin\InstantPurchase\Controller\Button\PlaceOrder"/>
     </type>
+    <type name="Magento\CatalogWidget\Block\Product\ProductsList">
+        <plugin name="tnw_products_list_widget_subs"
+                type="TNW\Subscriptions\Plugin\Block\Product\ProductsListWidget"/>
+    </type>
 </config>

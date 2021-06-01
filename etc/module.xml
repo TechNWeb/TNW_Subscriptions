@@ -20,6 +20,7 @@
             <module name="Magento_Quote"/>
             <module name="Magento_SalesRule"/>
             <module name="Magento_InstantPurchase"/>
+            <module name="Magento_CatalogWidget"/>
         </sequence>
     </module>
 </config>

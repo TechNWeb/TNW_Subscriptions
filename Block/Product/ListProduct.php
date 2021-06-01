@@ -129,7 +129,7 @@ class ListProduct extends OrigListProduct
     {
         $buyButtonsBlock = $this->getLayout()->createBlock(
             \TNW\Subscriptions\Block\Product\ListProduct\ListProductButtons::class,
-            'category.products.list_' . $this->postParamsToButtonsBlock['data']['product']->getId(),
+            $this->getNameInLayout() . '_' . $this->postParamsToButtonsBlock['data']['product']->getId(),
             $this->postParamsToButtonsBlock
         )->setTemplate('TNW_Subscriptions::product/list/buttons.phtml');
         return $buyButtonsBlock->toHtml();
