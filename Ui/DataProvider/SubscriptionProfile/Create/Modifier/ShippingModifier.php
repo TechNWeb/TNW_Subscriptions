@@ -124,7 +124,10 @@ class ShippingModifier implements \Magento\Ui\DataProvider\Modifier\ModifierInte
             $this->shippingMethods->setQuote($subQuote);
             $rates = $this->shippingMethods->getShippingRates();
             foreach ($rates as $rate) {
-                if (!empty($options[$rate->getCode()]) || $rate->getCarrier() == 'tnwautoship') {
+                if (!empty($options[$rate->getCode()])
+                    || $rate->getCarrier() == 'tnwautoship'
+                    || $rate->getErrorMessage()
+                ) {
                     continue;
                 }
                 if (in_array($rate->getMethod(), $this->shippingMethods->getDontCostDependedMethodsCodes())) {
