@@ -1,0 +1,141 @@
+<?php
+/**
+ * Copyright © 2018 TechNWeb, Inc. All rights reserved.
+ * See TNW_LICENSE.txt for license details.
+ */
+?>
+<?php
+
+// phpcs:disable Magento2.Templates.ThisInTemplate.FoundThis
+// phpcs:disable Magento2.Files.LineLength.MaxExceeded
+
+/**
+ * Template for displaying new products widget
+ *
+ * @var $block \Magento\Catalog\Block\Product\Widget\NewWidget
+ * @var $escaper \Magento\Framework\Escaper
+ */
+if ($exist = ($block->getProductCollection() && $block->getProductCollection()->getSize())) {
+    $_subscriptionBlock = $block->getChildBlock($block->getNameInLayout() . '.tnw.list');
+    $type = 'widget-new-list';
+
+    $mode = 'list';
+
+    $image = 'new_products_content_widget_list';
+    $title = __('New Products');
+    $items = $block->getProductCollection()->getItems();
+    /** @var Magento\Catalog\Helper\Output $_helper */
+    $_helper = $this->helper(Magento\Catalog\Helper\Output::class);
+
+    $showWishlist = true;
+    $showCompare = true;
+    $showCart = true;
+    $templateType = \Magento\Catalog\Block\Product\ReviewRendererInterface::DEFAULT_VIEW;
+    $description = true;
+}
+?>
+
+<?php if ($exist):?>
+    <div class="block widget block-new-products <?= /* @noEscape */ $mode ?>">
+        <div class="block-title">
+            <strong role="heading" aria-level="2"><?= $escaper->escapeHtml($title) ?></strong>
+        </div>
+        <div class="block-content">
+            <?= /* @noEscape */ '<!-- ' . $image . '-->' ?>
+            <div class="products-<?= /* @noEscape */ $mode ?> <?= /* @noEscape */ $mode ?>">
+                <ol class="product-items <?= /* @noEscape */ $type ?>">
+                    <?php foreach ($items as $_item):?>
+                        <li class="product-item">
+                            <div class="product-item-info">
+                                <a href="<?= $escaper->escapeUrl($block->getProductUrl($_item)) ?>"
+                                   class="product-item-photo">
+                                    <?= $block->getImage($_item, $image)->toHtml() ?>
+                                </a>
+                                <div class="product-item-details">
+                                    <strong class="product-item-name">
+                                        <a title="<?= $escaper->escapeHtmlAttr($_item->getName()) ?>"
+                                           href="<?= $escaper->escapeUrl($block->getProductUrl($_item)) ?>"
+                                           class="product-item-link">
+                                            <?= $escaper->escapeHtml($_item->getName()) ?>
+                                        </a>
+                                    </strong>
+                                    <strong class="product name product-item-name">
+                                        <?= $escaper->escapeHtml($_subscriptionBlock->getTopMessage($_item)) ?>
+                                    </strong>
+                                    <?php if ($_subscriptionBlock->isAllowedProductType($_item)
+                                        && $_subscriptionBlock->isSubscriptionPrice($_item)): ?>
+                                        <div class="price-box price-final_price">
+                                        <span class="price-wrapper" data-role="priceBox">
+                                            <span class="price">
+                                                <?= /* @noEscape */ $_subscriptionBlock
+                                                    ->getTrialPriceForCategory($_item) ?>
+                                            </span>
+                                        </span>
+                                        </div>
+                                    <?php else: ?>
+                                        <?= /* @noEscape */ $block->getProductPriceHtml($_item, $type) ?>
+                                    <?php endif; ?>
+
+                                    <?php if ($templateType):?>
+                                        <?= $block->getReviewsSummaryHtml($_item, $templateType) ?>
+                                    <?php endif; ?>
+
+                                    <?php if ($showWishlist || $showCompare || $showCart):?>
+                                        <div class="product-item-actions">
+                                            <?php if ($showCart):?>
+                                                <?php
+                                                $_subscriptionBlock->prepareParamsToButtonsBlock(
+                                                    $_item,
+                                                    null,
+                                                    'list',
+                                                    '',
+                                                    []
+                                                );
+                                                echo $_subscriptionBlock->getButtonsHtml();
+                                                ?>
+                                            <?php endif; ?>
+                                            <?php if ($showWishlist || $showCompare):?>
+                                                <div class="actions-secondary" data-role="add-to-links">
+                                                    <?php if ($this->helper(Magento\Wishlist\Helper\Data::class)->isAllow() && $showWishlist):?>
+                                                        <a href="#"
+                                                           data-post='<?= /* @noEscape */ $block->getAddToWishlistParams($_item) ?>'
+                                                           class="action towishlist" data-action="add-to-wishlist"
+                                                           title="<?= $escaper->escapeHtmlAttr(__('Add to Wish List')) ?>">
+                                                            <span><?= $escaper->escapeHtml(__('Add to Wish List')) ?></span>
+                                                        </a>
+                                                    <?php endif; ?>
+                                                    <?php if ($block->getAddToCompareUrl() && $showCompare):?>
+                                                        <?php $compareHelper = $this->helper(Magento\Catalog\Helper\Product\Compare::class); ?>
+                                                        <a href="#" class="action tocompare"
+                                                           title="<?= $escaper->escapeHtmlAttr(__('Add to Compare')) ?>"
+                                                           data-post='<?= /* @noEscape */ $compareHelper->getPostDataParams($_item) ?>'
+                                                        >
+                                                            <span><?= $escaper->escapeHtml(__('Add to Compare')) ?></span>
+                                                        </a>
+                                                    <?php endif; ?>
+                                                </div>
+                                            <?php endif; ?>
+                                        </div>
+                                    <?php endif; ?>
+                                    <?php if ($description):?>
+                                        <div class="product-item-description">
+                                            <?= /* @noEscape */ $_helper->productAttribute(
+                                                $_item,
+                                                $_item->getShortDescription(),
+                                                'short_description'
+                                            ) ?>
+                                            <a title="<?= $escaper->escapeHtmlAttr($_item->getName()) ?>"
+                                               href="<?= $escaper->escapeUrl($block->getProductUrl($_item))?>"
+                                               class="action more"><?= $escaper->escapeHtml(__('Learn More')) ?></a>
+                                        </div>
+                                    <?php endif; ?>
+                                </div>
+                            </div>
+                        </li>
+                    <?php endforeach ?>
+                </ol>
+            </div>
+            <?= $block->getPagerHtml() ?>
+        </div>
+    </div>
+<?php endif;?>

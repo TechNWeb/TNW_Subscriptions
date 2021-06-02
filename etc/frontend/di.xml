@@ -137,4 +137,8 @@
         <plugin name="tnw_products_list_widget_subs"
                 type="TNW\Subscriptions\Plugin\Block\Product\ProductsListWidget"/>
     </type>
+    <type name="Magento\Catalog\Block\Product\Widget\NewWidget">
+        <plugin name="tnw_new_products_widget_subs"
+                type="TNW\Subscriptions\Plugin\Block\Product\NewProductsWidget"/>
+    </type>
 </config>

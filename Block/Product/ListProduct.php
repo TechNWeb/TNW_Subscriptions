@@ -9,9 +9,12 @@ use Magento\Catalog\Api\CategoryRepositoryInterface;
 use Magento\Catalog\Block\Product\Context;
 use Magento\Catalog\Block\Product\ListProduct as OrigListProduct;
 use Magento\Catalog\Model\Layer\Resolver;
+use Magento\Catalog\Model\Product;
+use Magento\Framework\App\ActionInterface;
 use Magento\Framework\Data\Helper\PostHelper;
 use Magento\Framework\DataObject;
 use Magento\Framework\Pricing\PriceCurrencyInterface;
+use Magento\Framework\Url\EncoderInterface;
 use Magento\Framework\Url\Helper\Data;
 use TNW\Subscriptions\Api\Data\ProductBillingFrequencyInterface;
 use TNW\Subscriptions\Api\ProductBillingFrequencyRepositoryInterface as FrequencyOptionRepository;
@@ -62,6 +65,11 @@ class ListProduct extends OrigListProduct
     private $productView;
 
     /**
+     * @var EncoderInterface
+     */
+    private $urlEncoder;
+
+    /**
      * ListProduct constructor.
      * @param Context $context
      * @param PostHelper $postDataHelper
@@ -73,6 +81,7 @@ class ListProduct extends OrigListProduct
      * @param PriceCalculator $priceCalculator
      * @param FrequencyOptionRepository $frequencyOptionRepository
      * @param SubscriptionProductView $productView
+     * @param EncoderInterface $urlEncoder
      * @param array $data
      */
     public function __construct(
@@ -86,6 +95,7 @@ class ListProduct extends OrigListProduct
         PriceCalculator $priceCalculator,
         FrequencyOptionRepository $frequencyOptionRepository,
         SubscriptionProductView $productView,
+        EncoderInterface $urlEncoder,
         array $data = []
     ) {
         parent::__construct($context, $postDataHelper, $layerResolver, $categoryRepository, $urlHelper, $data);
@@ -94,6 +104,7 @@ class ListProduct extends OrigListProduct
         $this->priceCalculator = $priceCalculator;
         $this->frequencyOptionRepository = $frequencyOptionRepository;
         $this->productView = $productView;
+        $this->urlEncoder = $urlEncoder;
     }
 
     /**
@@ -108,6 +119,9 @@ class ListProduct extends OrigListProduct
      */
     public function prepareParamsToButtonsBlock($product, $pos, $viewMode, $position, $postParams)
     {
+        if (empty($postParams)) {
+            $postParams = $this->getAddToCartPostParams($product);
+        }
         $this->postParamsToButtonsBlock = [
             'data' => [
                 'product' => $product,
@@ -115,6 +129,24 @@ class ListProduct extends OrigListProduct
                 'view_mode' => $viewMode,
                 'position' => $position,
                 'post_params' => $postParams
+            ]
+        ];
+    }
+
+    /**
+     * Get post parameters.
+     *
+     * @param Product $product
+     * @return array
+     */
+    public function getAddToCartPostParams(Product $product)
+    {
+        $url = $this->getAddToCartUrl($product);
+        return [
+            'action' => $url,
+            'data' => [
+                'product' => $product->getEntityId(),
+                ActionInterface::PARAM_NAME_URL_ENCODED => $this->urlEncoder->encode($url),
             ]
         ];
     }
