@@ -576,6 +576,19 @@ class Manager
                         true
                     );
 
+                    if ($quote->getCouponCode() === "") {
+                        $this->messageHistoryLogger->message(
+                            SubscriptionProfile\MessageHistoryLogger::COUPON_INVALID,
+                            [
+                                $profile->getCouponCode()
+                            ],
+                            $profile->getId(),
+                            false,
+                            false,
+                            true
+                        );
+                    }
+
                     $relation = $this->relationManager
                         ->getRelationById($queue->getProfileOrderId())
                         ->setMagentoQuoteId($quote->getId())
