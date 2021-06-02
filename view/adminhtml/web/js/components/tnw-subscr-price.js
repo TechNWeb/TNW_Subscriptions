@@ -67,7 +67,7 @@ define([
                 if (commentPrice != 0) {
                     commentPrice = formatPrice.formatPrice(commentPrice, priceFormat);
                     this.notice = $.mage.__('Estimated');
-                    this.notice += ' ' + this.addbefore + commentPrice + ' ';
+                    this.notice += ' ' + commentPrice + ' ';
                     this.notice += $.mage.__('savings to the customer during the trial period.');
                 } else {
                     this.notice = ' ';
