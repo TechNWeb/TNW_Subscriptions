@@ -1652,7 +1652,7 @@ class Manager
             );
             $message = __(
                 'Profile next payment date changed to <b>%1</b>',
-                $nextDate
+                $nextDate->format('m/d/Y')
             );
             $this->historyLogger->log($message, $this->getProfile()->getId());
         }

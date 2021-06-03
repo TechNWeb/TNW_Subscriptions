@@ -158,5 +158,14 @@
                 </settings>
             </field>
         </fieldset>
+        <htmlContent name="overview_html">
+            <settings>
+                <visible>false</visible>
+                <exports>
+                    <link name="content">tnw_subscriptionprofile_form.areas.dashboard.dashboard.overview.html_content:content</link>
+                </exports>
+            </settings>
+            <block name="html" class="TNW\Subscriptions\Block\Subscription\Summary\Overview"/>
+        </htmlContent>
     </fieldset>
 </form>
