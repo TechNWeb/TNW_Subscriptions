@@ -1075,6 +1075,7 @@ class Manager
                     $quote->setTotalsCollectedFlag(false);
                     $quote->collectTotals();
                 }
+                $this->usedCoupons = [];
             }
         }
         return $outOfStockProducts;
