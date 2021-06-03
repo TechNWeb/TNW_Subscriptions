@@ -192,21 +192,17 @@ class SummaryAddressForm extends AbstractDataProvider
         $data =  [];
         $addressId = $this->getAddressId();
 
-        if (!empty($addressId)) {
-            $dataArray = $this->addressMapper->toFlatArray($this->getProfileAddress()->exportCustomerAddress());
-            if (count($dataArray)) {
-                $data = array_replace_recursive($data, $this->getAddressData($dataArray, true));
-            }
-
-            $data = array_replace_recursive($data, $this->modifyAddressIdData($addressId));
-
-            if (empty($data[$this->getAddressDataFieldSetdataScope()]['country_id'])) {
-                $data = array_replace_recursive($data, $this->modifyCountryIdData());
-            }
-
-            $data[SummaryInsertForm::FORM_DATA_KEY] = $this->getProfileId();
+        $dataArray = $this->addressMapper->toFlatArray($this->getProfileAddress()->exportCustomerAddress());
+        if (count($dataArray)) {
+            $data = array_replace_recursive($data, $this->getAddressData($dataArray, true));
         }
-
+        if (!empty($addressId)) {
+            $data = array_replace_recursive($data, $this->modifyAddressIdData($addressId));
+        }
+        if (empty($data[$this->getAddressDataFieldSetdataScope()]['country_id'])) {
+            $data = array_replace_recursive($data, $this->modifyCountryIdData());
+        }
+        $data[SummaryInsertForm::FORM_DATA_KEY] = $this->getProfileId();
         return [
             $this->getProfileId() => $data
         ];
