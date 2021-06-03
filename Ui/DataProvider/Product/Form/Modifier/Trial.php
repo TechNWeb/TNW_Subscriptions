@@ -133,6 +133,9 @@ class Trial extends BaseModifier
                         'disabled' => false
                     ]
                 ],
+                'validation' => [
+                    'validate-number' => true,
+                ],
                 'addbefore' => $this->locator->getStore()->getBaseCurrency()->getCurrencySymbol(),
                 'component' => 'TNW_Subscriptions/js/components/tnw-subscr-price',
                 'componentType' => 'field',
