@@ -88,7 +88,6 @@ class SummaryNextPaymentDateForm extends AbstractDataProvider
 
     /**
      * @inheritdoc
-     * @throws \Exception
      */
     public function getData()
     {
@@ -139,8 +138,8 @@ class SummaryNextPaymentDateForm extends AbstractDataProvider
                                     'arguments' => [
                                         'data' => $this->getEditFieldConfig(),
                                     ],
-                                ]
-                            ]
+                                ],
+                            ],
                         ],
                         self::NEXT_PAYMENT_DATE_EDIT_FIELDSET => [
                             'children' => [
@@ -152,9 +151,9 @@ class SummaryNextPaymentDateForm extends AbstractDataProvider
                                             ],
                                         ],
                                     ],
-                                ]
+                                ],
                             ],
-                        ]
+                        ],
                     ],
                 ],
             ]
@@ -192,8 +191,8 @@ class SummaryNextPaymentDateForm extends AbstractDataProvider
                     'visible' => $isEditVisible ? 'ns = ${ $.ns }, index = next_payment_date:preview' : '',
                     '__disableTmpl' => [
                         'visible' => false
-                    ]
-                ]
+                    ],
+                ],
             ],
         ];
 
