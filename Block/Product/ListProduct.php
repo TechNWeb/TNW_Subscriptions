@@ -14,6 +14,7 @@ use Magento\Framework\App\ActionInterface;
 use Magento\Framework\Data\Helper\PostHelper;
 use Magento\Framework\DataObject;
 use Magento\Framework\Pricing\PriceCurrencyInterface;
+use Magento\Framework\Serialize\SerializerInterface;
 use Magento\Framework\Url\EncoderInterface;
 use Magento\Framework\Url\Helper\Data;
 use TNW\Subscriptions\Api\Data\ProductBillingFrequencyInterface;
@@ -70,6 +71,11 @@ class ListProduct extends OrigListProduct
     private $urlEncoder;
 
     /**
+     * @var SerializerInterface
+     */
+    private $serializer;
+
+    /**
      * ListProduct constructor.
      * @param Context $context
      * @param PostHelper $postDataHelper
@@ -82,6 +88,7 @@ class ListProduct extends OrigListProduct
      * @param FrequencyOptionRepository $frequencyOptionRepository
      * @param SubscriptionProductView $productView
      * @param EncoderInterface $urlEncoder
+     * @param SerializerInterface $serializer
      * @param array $data
      */
     public function __construct(
@@ -96,6 +103,7 @@ class ListProduct extends OrigListProduct
         FrequencyOptionRepository $frequencyOptionRepository,
         SubscriptionProductView $productView,
         EncoderInterface $urlEncoder,
+        SerializerInterface $serializer,
         array $data = []
     ) {
         parent::__construct($context, $postDataHelper, $layerResolver, $categoryRepository, $urlHelper, $data);
@@ -105,6 +113,7 @@ class ListProduct extends OrigListProduct
         $this->frequencyOptionRepository = $frequencyOptionRepository;
         $this->productView = $productView;
         $this->urlEncoder = $urlEncoder;
+        $this->serializer = $serializer;
     }
 
     /**
@@ -121,6 +130,9 @@ class ListProduct extends OrigListProduct
     {
         if (empty($postParams)) {
             $postParams = $this->getAddToCartPostParams($product);
+        }
+        if (is_string($postParams)) {
+            $postParams = $this->serializer->unserialize($postParams);
         }
         $this->postParamsToButtonsBlock = [
             'data' => [
@@ -157,14 +169,16 @@ class ListProduct extends OrigListProduct
      * @return mixed
      * @throws \Magento\Framework\Exception\LocalizedException
      */
-    public function getButtonsHtml()
+    public function getButtonsHtml($dataPostButton = false)
     {
         $buyButtonsBlock = $this->getLayout()->createBlock(
             \TNW\Subscriptions\Block\Product\ListProduct\ListProductButtons::class,
             $this->getNameInLayout() . '_' . $this->postParamsToButtonsBlock['data']['product']->getId(),
             $this->postParamsToButtonsBlock
-        )->setTemplate('TNW_Subscriptions::product/list/buttons.phtml');
-        return $buyButtonsBlock->toHtml();
+        );
+        return $dataPostButton
+            ? $buyButtonsBlock->setTemplate('TNW_Subscriptions::product/list/post-buttons.phtml')->toHtml()
+            : $buyButtonsBlock->setTemplate('TNW_Subscriptions::product/list/buttons.phtml')->toHtml();
     }
 
     /**

@@ -29,11 +29,12 @@ define([
          */
         _bind: function () {
             var widget = this;
-            $j(this.options.subscriptionDropdownButtonSelector).on('click', function() {
+            $j(this.options.subscriptionDropdownButtonSelector).on('click', function (e) {
+                e.preventDefault();
                 widget._showDropdownContainer(this);
             });
 
-            $j(".block-wishlist").on("click",this.options.subscriptionDropdownButtonSelector, function() {
+            $j(".block-wishlist").on("click",this.options.subscriptionDropdownButtonSelector, function () {
                 widget._showDropdownContainerWishlist(this);
             });
         },

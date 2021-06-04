@@ -16,7 +16,7 @@ $viewMode = $block->getCurrentViewMode();
 $position = $block->getCurrentPosition();
 ?>
 
-<div class="actions-primary"<?= /* @noEscape */ strpos($pos, $viewMode . '-primary') ? $position : ''; ?>>
+<div class="actions-primary<?= /* @noEscape */ strpos($pos, $viewMode . '-primary') ? $position : ''; ?>">
     <?php if ($_product->isSaleable()): ?>
         <?php if ($block->isSubscribeAvailable($_product) && !$block->isOneTimePurchase($_product)): ?>
             <?php if ($_product->getTypeId() == "configurable"): ?>
@@ -27,16 +27,16 @@ $position = $block->getCurrentPosition();
                               action="<?= /* @noEscape */ $postParams['action']; ?>" method="post">
                             <input type="hidden" name="subscribe_active" value="1" />
                             <input type="hidden" name="subscribe_button"
-                                   value="<?= /* @noEscape */ $postParams['subscribe_button'] = 1; ?>">
+                                   value="<?= /* @noEscape */ $postParams['subscribe_button'] = 1; ?>" />
                             <input type="hidden" name="subscribe_options"
                                    value='<?= /* @noEscape */
-                                        $block->getSubscribeOptionsJson($block->getSubscribeOptions()); ?>'>
+                                        $block->getSubscribeOptionsJson($block->getSubscribeOptions()); ?>' />
                             <input type="hidden" name="<?= /* @noEscape */ Action::PARAM_NAME_URL_ENCODED; ?>"
-                                   value="<?= /* @noEscape */ $postParams['data'][Action::PARAM_NAME_URL_ENCODED]; ?>">
+                                   value="<?= /* @noEscape */ $postParams['data'][Action::PARAM_NAME_URL_ENCODED]; ?>"/>
                             <?= $block->getBlockHtml('formkey')?>
                             <button type="submit"
                                     title="<?= $escaper->escapeHtml(__('Auto-Ship')); ?>"
-                                    class="action tocart primary ">
+                                    class="action tocart primary">
                                 <span><?= $escaper->escapeHtml(__('Auto-Ship')) ?></span>
                             </button>
                         </form>
@@ -55,9 +55,9 @@ $position = $block->getCurrentPosition();
                         <form data-role="tocart-form"
                               action="<?= /* @noEscape */ $postParams['action']; ?>" method="post">
                             <input type="hidden" name="product"
-                                   value="<?= /* @noEscape */ $postParams['data']['product']; ?>">
+                                   value="<?= /* @noEscape */ $postParams['data']['product']; ?>"/>
                             <input type="hidden" name="<?= /* @noEscape */ Action::PARAM_NAME_URL_ENCODED; ?>"
-                                   value="<?= /* @noEscape */ $postParams['data'][Action::PARAM_NAME_URL_ENCODED]; ?>">
+                                   value="<?= /* @noEscape */ $postParams['data'][Action::PARAM_NAME_URL_ENCODED]; ?>"/>
                             <?= $block->getBlockHtml('formkey'); ?>
                             <button type="submit"
                                     title="<?= $escaper->escapeHtml(__('Add to Cart')); ?>"
@@ -75,12 +75,12 @@ $position = $block->getCurrentPosition();
                               action="<?= /* @noEscape */ $postParams['action']; ?>" method="post">
                             <input type="hidden" name="subscribe_active" value="1" />
                             <input type="hidden" name="subscribe_button"
-                                   value="<?= /* @noEscape */ $postParams['subscribe_button'] = 1; ?>">
+                                   value="<?= /* @noEscape */ $postParams['subscribe_button'] = 1; ?>"/>
                             <input type="hidden" name="subscribe_options"
                                    value='<?= /* @noEscape */
-                                    $block->getSubscribeOptionsJson($block->getSubscribeOptions()); ?>'>
+                                    $block->getSubscribeOptionsJson($block->getSubscribeOptions()); ?>'/>
                             <input type="hidden" name="<?= /* @noEscape */ Action::PARAM_NAME_URL_ENCODED; ?>"
-                                   value="<?= /* @noEscape */ $postParams['data'][Action::PARAM_NAME_URL_ENCODED]; ?>">
+                                   value="<?= /* @noEscape */ $postParams['data'][Action::PARAM_NAME_URL_ENCODED]; ?>"/>
                             <?= $block->getBlockHtml('formkey')?>
                             <button type="submit"
                                     title="<?= $escaper->escapeHtml(__('Auto-Ship')); ?>"
@@ -97,13 +97,13 @@ $position = $block->getCurrentPosition();
                                   action="<?= /* @noEscape */ $postParams['action']; ?>" method="post">
                                 <input type="hidden" name="subscribe_active" value="1" />
                                 <input type="hidden" name="subscribe_button"
-                                       value="<?= /* @noEscape */ $postParams['subscribe_button'] = 1; ?>">
+                                       value="<?= /* @noEscape */ $postParams['subscribe_button'] = 1; ?>"/>
                                 <input type="hidden" name="subscribe_options"
                                        value='<?= /* @noEscape */
-                                        $block->getSubscribeOptionsJson($block->getSubscribeOptions()); ?>'>
+                                        $block->getSubscribeOptionsJson($block->getSubscribeOptions()); ?>'/>
                                 <input type="hidden" name="<?= /* @noEscape */ Action::PARAM_NAME_URL_ENCODED; ?>"
                                        value="<?= /* @noEscape */
-                                        $postParams['data'][Action::PARAM_NAME_URL_ENCODED]; ?>">
+                                        $postParams['data'][Action::PARAM_NAME_URL_ENCODED]; ?>"/>
                                 <?= $block->getBlockHtml('formkey')?>
                                 <button type="submit"
                                         title="<?= $escaper->escapeHtml(__('Auto-Ship')); ?>"
@@ -126,10 +126,10 @@ $position = $block->getCurrentPosition();
                             <form data-role="tocart-form"
                                   action="<?= /* @noEscape */ $postParams['action']; ?>" method="post">
                                 <input type="hidden" name="product"
-                                       value="<?= /* @noEscape */ $postParams['data']['product']; ?>">
+                                       value="<?= /* @noEscape */ $postParams['data']['product']; ?>"/>
                                 <input type="hidden" name="<?= /* @noEscape */ Action::PARAM_NAME_URL_ENCODED; ?>"
                                        value="<?= /* @noEscape */
-                                        $postParams['data'][Action::PARAM_NAME_URL_ENCODED]; ?>">
+                                        $postParams['data'][Action::PARAM_NAME_URL_ENCODED]; ?>"/>
                                 <?= $block->getBlockHtml('formkey')?>
                                 <button type="submit"
                                         title="<?= $escaper->escapeHtml(__('Add to Cart')); ?>"
@@ -144,9 +144,9 @@ $position = $block->getCurrentPosition();
         <?php else: ?>
                 <?php $postParams = $block->getCurrentPostParams(); ?>
                 <form data-role="tocart-form" action="<?= /* @noEscape */ $postParams['action']; ?>" method="post">
-                    <input type="hidden" name="product" value="<?= /* @noEscape */ $postParams['data']['product']; ?>">
+                    <input type="hidden" name="product" value="<?= /* @noEscape */ $postParams['data']['product']; ?>"/>
                     <input type="hidden" name="<?= /* @noEscape */ Action::PARAM_NAME_URL_ENCODED; ?>"
-                           value="<?= /* @noEscape */ $postParams['data'][Action::PARAM_NAME_URL_ENCODED]; ?>">
+                           value="<?= /* @noEscape */ $postParams['data'][Action::PARAM_NAME_URL_ENCODED]; ?>"/>
                     <?= $block->getBlockHtml('formkey')?>
                     <button type="submit"
                             title="<?= $escaper->escapeHtml(__('Add to Cart')); ?>"

@@ -1,0 +1,33 @@
+<?php
+/**
+ * Copyright © 2018 TechNWeb, Inc. All rights reserved.
+ * See TNW_LICENSE.txt for license details.
+ */
+
+/**
+ * @var \Magento\Wishlist\Block\Customer\Wishlist\Item\Column\Cart $block
+ * @var \Magento\Framework\Escaper $escaper
+ */
+?>
+<?php
+$_subscriptionBlock = $block->getChildBlock('helper.customer.wishlist.item.price');
+$product = $block->getProductItem();
+?>
+<strong class="product name product-item-name">
+    <?= $escaper->escapeHtml($_subscriptionBlock->getTopMessage($product)) ?>
+</strong>
+<?php if ($_subscriptionBlock->isAllowedProductType($product)
+    && $_subscriptionBlock->isSubscriptionPrice($product)): ?>
+    <div class="price-box price-final_price">
+        <span class="price-wrapper" data-role="priceBox">
+            <span class="price">
+                <?= /* @noEscape */ $_subscriptionBlock->getTrialPriceForCategory($product) ?>
+            </span>
+        </span>
+    </div>
+    <?= $block->getChildHtml('customer.wishlist.item.options') ?>
+<?php else: ?>
+    <?php foreach ($block->getChildNames() as $childName): ?>
+        <?= /* @noEscape */ $block->getLayout()->renderElement($childName, false) ?>
+    <?php endforeach;?>
+<?php endif; ?>
