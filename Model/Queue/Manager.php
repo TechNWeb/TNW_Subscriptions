@@ -541,8 +541,6 @@ class Manager
                     if ($profile->getTrialStartDate() && time() < strtotime($profile->getStartDate())) {
                         $profile->setStatus(ProfileStatus::STATUS_TRIAL);
                     }
-                    $profile->setShippingMethod($order->getShippingMethod());
-                    $profile->setShippingDescription($order->getShippingDescription());
 
                     $this->profileManager->setProfile($profile);
                     $this->profileManager->saveProfile();

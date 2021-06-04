@@ -83,5 +83,15 @@
                 <TNW_Subscriptions>1</TNW_Subscriptions>
             </modules_disable_output>
         </advanced>
+        <carriers>
+            <tnwautoship>
+                <active>1</active>
+                <title>Automatically choose carrier</title>
+                <cheapest_name>Cheapest available</cheapest_name>
+                <fastest_name>Fastest available</fastest_name>
+                <sort_order>15</sort_order>
+                <model>TNW\Subscriptions\Model\Carrier\Autoshipping</model>
+            </tnwautoship>
+        </carriers>
     </default>
 </config>
