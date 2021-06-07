@@ -143,6 +143,10 @@ class CouponInformation extends ContentAbstract
                     return false;
                 }
 
+                if (!in_array($quote->getCustomerGroupId(), $this->salesRule->getCustomerGroupIds())) {
+                    return false;
+                }
+
                 $validForShippingAddress = $this->couponUtility->canProcessRule(
                     $this->salesRule,
                     $quote->getShippingAddress()
