@@ -5,72 +5,105 @@
  */
 namespace TNW\Subscriptions\Plugin\CustomerData;
 
+use Magento\Framework\Exception\LocalizedException;
+use Magento\Framework\Serialize\SerializerInterface;
+use Magento\Wishlist\CustomerData\Wishlist as OrigWishlist;
 use Magento\Wishlist\Helper\Data as WishlistHelper;
-use TNW\Subscriptions\Model\Config\Product\SubscriptionProductView;
+use TNW\Subscriptions\Block\Product\ListProduct;
+use TNW\Subscriptions\Block\Product\ListProduct\ListProductButtons;
 
 /**
- * Class Wishlist plugin
+ * Plugin is used to add subscription data to wishlist items, stored in customer data
  */
 class Wishlist
 {
-    /**
-     * Subscription Product View Config model.
-     *
-     * @var SubscriptionProductView
-     */
-    private $subscriptionProductViewConfig;
-
     /**
      * @var WishlistHelper
      */
     protected $wishlistHelper;
 
     /**
-     * LastOrderedItems constructor.
-     *
-     * @param SubscriptionProductView $subscriptionProductView
+     * @var ListProduct
+     */
+    private $listProduct;
+
+    /**
+     * @var ListProductButtons
+     */
+    private $listProductButtons;
+
+    /**
+     * @var SerializerInterface
+     */
+    private $serializer;
+
+    /**
+     * Wishlist constructor.
      * @param WishlistHelper $wishlistHelper
+     * @param ListProduct $listProduct
+     * @param ListProductButtons $listProductButtons
+     * @param SerializerInterface $serializer
      */
     public function __construct(
-        SubscriptionProductView $subscriptionProductView,
-        WishlistHelper $wishlistHelper
+        WishlistHelper $wishlistHelper,
+        ListProduct $listProduct,
+        ListProductButtons $listProductButtons,
+        SerializerInterface $serializer
     ) {
-        $this->subscriptionProductViewConfig = $subscriptionProductView;
         $this->wishlistHelper = $wishlistHelper;
+        $this->listProduct = $listProduct;
+        $this->listProductButtons = $listProductButtons;
+        $this->serializer = $serializer;
     }
 
     /**
-     * Add "is_subscribe" and "is_subscribe_and_addtocart" parameters to wishlist item object.
-     *
-     * @param \Magento\Wishlist\CustomerData\Wishlist $subject
-     * @param \Closure $proceed
-     * @return array
+     * Add subscription parameters to wishlist item object.
+     * @param OrigWishlist $subject
+     * @param callable $proceed
+     * @return mixed
+     * @throws LocalizedException
      */
-    public function aroundGetSectionData(\Magento\Wishlist\CustomerData\Wishlist $subject, \Closure $proceed)
+    public function aroundGetSectionData(OrigWishlist $subject, callable $proceed)
     {
         $result = $proceed();
-        $collection = $this->wishlistHelper->getWishlistItemCollection();
-        $productsPreset = [];
-        foreach ($collection->getItems() as $item) {
-            $productId = $item->getProductId();
-            if ($productId && $this->subscriptionProductViewConfig->isSubscribeAvailableById($productId)) {
-                $productsPreset[$productId] = $item->getProductName();
-            }
+        if (!$result['counter']) {
+            return $result;
         }
-        $onlySubscribeData = $this->subscriptionProductViewConfig->isOnlySubscribePurchaseByIds($productsPreset);
-        $subscribeAndAddtocartData = $this
-            ->subscriptionProductViewConfig
-            ->isOneTimeAndSubscribePurchaseByIds($productsPreset);
-        foreach ($result['items'] as $key => &$element) {
-            $rt = array_filter($productsPreset, function ($value) use ($element) {
-                return $value == $element['product_name'];
-            });
-            $element['is_subscribe'] = false;
-            $element['is_subscribe_and_addtocart'] = false;
-            if (count($rt)) {
-                $element['is_subscribe'] = $onlySubscribeData[key($rt)];
-                $element['is_subscribe_and_addtocart'] = $subscribeAndAddtocartData[key($rt)];
+        $subsData = [];
+        foreach ($this->wishlistHelper->getWishlistItemCollection() as $item) {
+            $product = $item->getProduct();
+            $productId = $item->getProductId();
+            $subsData[$productId]['subs_top_message'] = $this->listProduct->getTopMessage($product);
+            if ($this->listProduct->isAllowedProductType($product)
+                && $this->listProduct->isSubscriptionPrice($product)) {
+                $subsData[$productId]['subs_trial_price']
+                    = $this->listProduct->getTrialPriceForCategory($product);
+            } else {
+                $subsData[$productId]['subs_trial_price'] = false;
             }
+            $postParams = $this->serializer->unserialize($this->wishlistHelper->getAddToCartParams($item));
+            $this->listProductButtons->addData([
+                'product' => $product,
+                'pos' => null,
+                'view_mode' => 'grid',
+                'position' => '',
+                'post_params' => $postParams
+            ]);
+            $subsData[$productId]['subs_addtocart_params']
+                = $this->listProductButtons->getCurrentSubsDataPostParams();
+            $subsData[$productId]['is_subscribe']
+                = $this->listProductButtons->isSubscribeAvailable($product);
+            $subsData[$productId]['is_subscribe_only']
+                = $this->listProductButtons->isOnlySubscribePurchase($product);
+            $subsData[$productId]['is_one_time_purchase']
+                = $this->listProductButtons->isOneTimePurchase($product);
+
+        }
+        foreach ($result['items'] as &$element) {
+            $subsItem = array_filter($subsData, function ($value, $key) use ($element) {
+                return $key == $element['product_id'];
+            }, ARRAY_FILTER_USE_BOTH);
+            $element += reset($subsItem);
         }
         return $result;
     }

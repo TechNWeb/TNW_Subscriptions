@@ -1,9 +1,6 @@
 <page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
     <body>
-        <referenceBlock name="content">
-            <block name="subs.buttons.init" template="TNW_Subscriptions::product/subs-buttons-widget.phtml" />
-        </referenceBlock>
         <referenceBlock name="customer.wishlist.item.cart" template="TNW_Subscriptions::wishlist/item/column/cart.phtml">
             <block class="TNW\Subscriptions\Block\Product\ListProduct"
                    name="helper.customer.wishlist.item.cart"

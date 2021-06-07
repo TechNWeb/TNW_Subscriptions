@@ -17,6 +17,7 @@ use Magento\Framework\Pricing\PriceCurrencyInterface;
 use Magento\Framework\Serialize\SerializerInterface;
 use Magento\Framework\Url\EncoderInterface;
 use Magento\Framework\Url\Helper\Data;
+use Magento\GroupedProduct\Model\Product\Type\Grouped;
 use TNW\Subscriptions\Api\Data\ProductBillingFrequencyInterface;
 use TNW\Subscriptions\Api\ProductBillingFrequencyRepositoryInterface as FrequencyOptionRepository;
 use TNW\Subscriptions\Model\Config\Source\TrialLengthUnitType;
@@ -123,7 +124,7 @@ class ListProduct extends OrigListProduct
      * @param String $pos
      * @param String $viewMode
      * @param String $position
-     * @param array $postParams
+     * @param array|string $postParams
      * @return void
      */
     public function prepareParamsToButtonsBlock($product, $pos, $viewMode, $position, $postParams)
@@ -299,6 +300,7 @@ class ListProduct extends OrigListProduct
     {
         return $product->getTypeId() == Type::TYPE_SIMPLE
             || $product->getTypeId() == Type::TYPE_VIRTUAL
+            || $product->getTypeId() == Grouped::TYPE_CODE
             || $product->getTypeId() == DownloadableType::TYPE_DOWNLOADABLE;
     }
 

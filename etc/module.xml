@@ -21,6 +21,8 @@
             <module name="Magento_SalesRule"/>
             <module name="Magento_InstantPurchase"/>
             <module name="Magento_CatalogWidget"/>
+            <module name="Magento_Wishlist"/>
+            <module name="Magento_MultipleWishlist"/>
         </sequence>
     </module>
 </config>
