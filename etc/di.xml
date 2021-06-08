@@ -1523,4 +1523,11 @@
         <plugin name="tnw_shipping_rates"
                 type="TNW\Subscriptions\Plugin\Shipping\Model\ShippingRates"/>
     </type>
+    <type name="Magento\Catalog\Ui\DataProvider\Product\ProductRenderCollectorComposite">
+        <arguments>
+            <argument name="productProviders" xsi:type="array">
+                <item name="subscription_info" xsi:type="object">\TNW\Subscriptions\Ui\DataProvider\Product\Listing\Collector\SubscriptionInfo</item>
+            </argument>
+        </arguments>
+    </type>
 </config>

@@ -3,6 +3,7 @@
  *  Copyright © 2018 TechNWeb, Inc. All rights reserved.
  *  See TNW_LICENSE.txt for license details.
  */
+
 namespace TNW\Subscriptions\Plugin\CustomerData;
 
 use Magento\Framework\Exception\LocalizedException;
@@ -97,7 +98,6 @@ class Wishlist
                 = $this->listProductButtons->isOnlySubscribePurchase($product);
             $subsData[$productId]['is_one_time_purchase']
                 = $this->listProductButtons->isOneTimePurchase($product);
-
         }
         foreach ($result['items'] as &$element) {
             $subsItem = array_filter($subsData, function ($value, $key) use ($element) {

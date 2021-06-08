@@ -235,7 +235,9 @@ class ListProduct extends OrigListProduct
         if (empty($productBillingFrequencies)
             || $product->getData(Attribute::SUBSCRIPTION_PURCHASE_TYPE) == PurchaseType::ONE_TIME_PURCHASE_TYPE
         ) {
-            return $this->formatCurrency($product->getPrice(), false);
+            return $product->getTypeId() === Grouped::TYPE_CODE
+                ? null
+                : $this->formatCurrency($product->getPrice(), false);
         }
 
         $result = null;
@@ -287,7 +289,8 @@ class ListProduct extends OrigListProduct
      */
     public function isSubscriptionPrice($product)
     {
-        return $this->productView->getCustomerGroupLimitation($product);
+        return $this->productView->getCustomerGroupLimitation($product)
+            && $product->getTypeId() !== Grouped::TYPE_CODE;
     }
 
     /**

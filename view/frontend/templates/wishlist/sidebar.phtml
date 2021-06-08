@@ -66,7 +66,8 @@ $wishlistHelper = $this->helper(\Magento\Wishlist\Helper\Data::class);
                                             </div>
                                             <!-- /ko -->
                                             <!-- ko ifnot: is_subscribe_only -->
-                                            <div class="product-subscribe-addtocart-buttons-container">
+                                            <div class="product-subscribe-addtocart-buttons-container"
+                                                 data-bind="mageInit: {'tnwSubscribeListButtons':{}}">
                                                 <div class="product-subscribe-button">
                                                     <button type="button"
                                                             title="<?= $escaper->escapeHtml(__('Auto-Ship')) ?>"
@@ -86,7 +87,7 @@ $wishlistHelper = $this->helper(\Magento\Wishlist\Helper\Data::class);
                                                     </button>
                                                 </div>
                                                 <div class="product-addtocart-button-hidden"
-                                                     data-bind="css: 'wishlist-subscription-dropdown-hidden-' + $index()">
+                                                     data-bind="css: 'subscription-dropdown-hidden-' + $index()">
                                                     <div class="actions-primary">
                                                         <!-- ko if: product_has_required_options -->
                                                         <a href="#" data-bind="attr: {'data-post': add_to_cart_params}"

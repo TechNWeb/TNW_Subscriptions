@@ -66,4 +66,12 @@
             </join>
         </attribute>
     </extension_attributes>
+    <extension_attributes for="Magento\Catalog\Api\Data\ProductRenderInterface">
+        <attribute code="subs_top_message" type="string"/>
+        <attribute code="subs_trial_price" type="string"/>
+        <attribute code="subs_addtocart_params" type="string"/>
+        <attribute code="is_subscribe" type="boolean"/>
+        <attribute code="is_subscribe_only" type="boolean"/>
+        <attribute code="is_one_time_purchase" type="boolean"/>
+    </extension_attributes>
 </config>

@@ -37,7 +37,9 @@ var config = {
             'Magento_ConfigurableProduct/js/configurable' : {
                 'TNW_Subscriptions/js/configurable-mixin' : true
             },
-
+            'Magento_Catalog/js/product/addtocart-button' : {
+                'TNW_Subscriptions/js/product/addtocart-button-mixin' : true
+            }
         }
     }
 };
