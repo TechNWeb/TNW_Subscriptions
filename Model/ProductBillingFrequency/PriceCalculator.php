@@ -188,7 +188,7 @@ class PriceCalculator
         if ($quote->getItemsQty() && $this->request->getParam('subscribe_qty')){
             $qty = (int) $quote->getItemsQty() + (int) $subscribeQty;
         }
-        $finQty = $qty ? $qty : $subscribeQty;
+        $finalQty = $qty ? $qty : $subscribeQty;
         $productTierPrice = null;
         $product = $this->productRepository
             ->getById($productId);
@@ -197,7 +197,7 @@ class PriceCalculator
                 ? $this->customerSession->getCustomer()->getGroupId()
                 : $this->customerSession->isLoggedIn();
             foreach ($product->getTierPrice() as $tierPrice) {
-                if (($tierPrice['price_qty'] <= $finQty || $tierPrice['price_qty'] == 1)
+                if (($tierPrice['price_qty'] <= $finalQty || $tierPrice['price_qty'] == 1)
                     && ($tierPrice['cust_group'] == $customerGroupId
                         || $tierPrice['all_groups'])
                 ) {
