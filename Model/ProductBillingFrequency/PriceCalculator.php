@@ -64,9 +64,16 @@ class PriceCalculator
      */
     protected $customerSession;
 
+    /**
+     * @var RequestInterface
+     */
     protected $request;
 
+    /**
+     * @var CheckoutSession
+     */
     protected $checkoutSession;
+
     /**
      * PriceCalculator constructor.
      * @param ProductRepository $productRepository
@@ -75,6 +82,8 @@ class PriceCalculator
      * @param QuoteSessionInterface $session
      * @param FormatInterface $localeFormat
      * @param Session $customerSession
+     * @param RequestInterface $request
+     * @param CheckoutSession $checkoutSession
      */
     public function __construct(
         ProductRepository $productRepository,
@@ -177,6 +186,7 @@ class PriceCalculator
      * @param $productId
      * @return mixed|null
      * @throws NoSuchEntityException
+     * @throws \Magento\Framework\Exception\LocalizedException
      */
     private function getProductTierPrice($productId)
     {
