@@ -57,8 +57,9 @@ class SubscriptionAmount extends BaseAmount
         }
 
         if ($defaultData['price'] != $defaultData['old_price']) {
-            $result .= sprintf('<span class="old-price "> Regilar price %s</span>',
-                $this->formatCurrency($defaultData['old_price'], false));
+            $result .= sprintf('<span class="old-price "> Regular Price %s</span>',
+                $this->formatCurrency($defaultData['old_price'], false)
+            );
         }
         return $result;
     }
