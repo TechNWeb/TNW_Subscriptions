@@ -7,9 +7,9 @@
 
 <?php if ($block->getSubscriptionProfiles()): ?>
     <?php foreach ($block->getSubscriptionsWithStock() as $key => $profiles): ?>
-        <?php if ($key === 'in_stock'): ?>
+        <?php if ($key === 'in_stock' && $profiles): ?>
             <h3><?= $escaper->escapeHtml(__('Products')) ?></h3>
-        <?php else: ?>
+        <?php elseif($key === 'out_stock' && $profiles): ?>
             <h3><?= $escaper->escapeHtml(__('Out of stock')) ?></h3>
             <p>
                 <?= $escaper->escapeHtml(
@@ -19,6 +19,7 @@
             </p>
         <?php endif; ?>
         <table class="email-items">
+            <?php if($profiles): ?>
             <thead>
                 <tr>
                     <th class="item-info">
@@ -32,6 +33,7 @@
                     </th>
                 </tr>
             </thead>
+            <?php endif; ?>
             <tbody>
             <?php foreach ($profiles as $subscriptionProfile): ?>
                 <?php $block->setSubscriptionProfile($subscriptionProfile) ?>
