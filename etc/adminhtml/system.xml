@@ -245,7 +245,7 @@
                 </field>
                 <field id="unlock_preset_qty_status" translate="label comment" type="select" sortOrder="30" showInDefault="1"
                        showInWebsite="1">
-                    <label>Unlock Preset Quiantity</label>
+                    <label>Unlock Preset Quantity</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                     <comment>Product quantity will be preset for a customer and a customer cannot change product quantity when buying products.</comment>
                 </field>
@@ -265,7 +265,7 @@
 
             <group id="discount" translate="label" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="0">
                 <label>Discount</label>
-                <comment>Default catalog setting for the product to determine if products purchased as pasrt fo a subscription should be offered with a flat discount.</comment>
+                <comment>Default catalog setting for the product to determine if products purchased as part of subscription should be offered with a flat discount.</comment>
                 <field id="offer_flat_discount_status" translate="label" type="select" sortOrder="10" showInDefault="1"
                        showInWebsite="1">
                     <label>Offer Flat Discount</label>
