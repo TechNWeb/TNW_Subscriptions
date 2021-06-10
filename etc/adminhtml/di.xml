@@ -21,6 +21,10 @@
                     <item name="class" xsi:type="string">TNW\Subscriptions\Ui\DataProvider\Product\Form\Modifier\Composite</item>
                     <item name="sortOrder" xsi:type="number">201</item>
                 </item>
+                <item name="billing_cycle" xsi:type="array">
+                    <item name="class" xsi:type="string">TNW\Subscriptions\Ui\DataProvider\Product\Form\Modifier\Attributes</item>
+                    <item name="sortOrder" xsi:type="number">100</item>
+                </item>
             </argument>
         </arguments>
     </virtualType>
