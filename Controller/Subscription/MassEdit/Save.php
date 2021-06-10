@@ -282,18 +282,18 @@ class Save extends Action
             && $data['billing_address']['same_as_shipping'] == '1'
         ) {
             $data['billing_address'] = $data['shipping_address'];
-            if (array_key_exists('shipping_address_id',$data['shipping_address'])) {
+            if (array_key_exists('shipping_address_id', $data['shipping_address'])) {
                 $data['billing_address']['customer_billing_address_id']
                     = $data['shipping_address']['shipping_address_id'];
             }
         } else {
             $data['billing_address']['customer_billing_address_id'] = $data['billing_address']['billing_address_id'];
         }
-        if (array_key_exists('shipping_address_id',$data['shipping_address'])) {
+        if (array_key_exists('shipping_address_id', $data['shipping_address'])) {
             $data['shipping_address']['customer_shipping_address_id']
                 = $data['shipping_address']['shipping_address_id'];
         }
-        if (array_key_exists('shipping_method',$data)) {
+        if (array_key_exists('shipping_method', $data)) {
             $data['shipping_method_id'] = $data['shipping_method'];
         }
         return $data;

@@ -15,5 +15,4 @@ interface QuoteItemExtensionAttributesInterface extends SalesExtensionAttributes
      */
     const QUOTE_ITEM_EXTENSION_TABLE = 'tnw_subscriptions_quote_item_extension_entity';
     /**#@-*/
-
 }

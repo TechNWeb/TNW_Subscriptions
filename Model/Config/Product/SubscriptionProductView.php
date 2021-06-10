@@ -327,9 +327,9 @@ class SubscriptionProductView
             $customerGroups = $this->config->getCustomerGroupLimit($websiteId);
             if ($customerGroups != null) {
                 if (array_search(
-                        $this->customerSession->getCustomer()->getGroupId(),
-                        explode(',', $customerGroups)
-                    ) !== false) {
+                    $this->customerSession->getCustomer()->getGroupId(),
+                    explode(',', $customerGroups)
+                ) !== false) {
                     return true;
                 }
             }
