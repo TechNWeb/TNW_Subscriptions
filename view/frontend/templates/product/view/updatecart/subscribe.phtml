@@ -27,7 +27,9 @@
                             "defaultUntilCancelled" : "<?= $block->getDefaultUntilCancelled() ?>",
                             "defaultSubscribeQty" : "<?= $block->getDefaultSubscribeQty() ?>",
                             "defaultStartOn" : "<?= $block->getDefaultStartOn() ?>",
-                            "products" : <?= $block->getProductDataArray() ?>
+                            "products" : <?= $block->getProductDataArray() ?>,
+                            "defaultIsTrial" : <?= $block->getIsTrial() ?>,
+                            "isTrialAvailableForUser" : true
                         }
                     }
                 }

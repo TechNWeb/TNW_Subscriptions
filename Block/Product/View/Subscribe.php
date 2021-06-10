@@ -824,6 +824,7 @@ class Subscribe extends View
         if ($productDataObject->getData(Attribute::SUBSCRIPTION_TRIAL_STATUS)) {
             return [
                 'trial_price' => $productDataObject->getData(Attribute::SUBSCRIPTION_TRIAL_PRICE),
+                'trial_can_skip' => $productDataObject->getData(Attribute::SUBSCRIPTION_TRIAL_CAN_SKIP),
                 'trial_length' => $productDataObject->getData(Attribute::SUBSCRIPTION_TRIAL_LENGTH),
                 'trial_length_unit' => $productDataObject->getData(Attribute::SUBSCRIPTION_TRIAL_LENGTH_UNIT),
                 'trial_start_date' => $productDataObject->getData(Attribute::SUBSCRIPTION_TRIAL_START_DATE),
@@ -869,5 +870,26 @@ class Subscribe extends View
     public function isAllowedAddToCart()
     {
         return $this->subscriptionProductViewConfig->getCustomerGroupLimitation($this->getProduct());
+    }
+
+    /**
+     * @return bool
+     * @throws NoSuchEntityException
+     */
+    public function getIsCanSkipTrial()
+    {
+        $product = $this->getProductDataObject();
+        return $product->getData(Attribute::SUBSCRIPTION_TRIAL_STATUS)
+            && $product->getData(Attribute::SUBSCRIPTION_TRIAL_CAN_SKIP);
+    }
+
+    /**
+     * @return string
+     * @throws NoSuchEntityException
+     */
+    public function getIsTrial()
+    {
+        $preconfigured = $this->preconfiguredValue('subscription_data/unique/is_trial');
+        return $this->_jsonEncoder->encode((int)$preconfigured);
     }
 }

@@ -303,6 +303,15 @@ class Form extends AbstractDataProvider
                             ],
                         ],
                     ],
+                    'use_trial' => [
+                        'arguments' => [
+                            'data' => [
+                                'config' => [
+                                    'visible' => $this->getCanSkipTrial(),
+                                ]
+                            ]
+                        ]
+                    ],
                     'trial_period' => [
                         'arguments' => [
                             'data' => [
@@ -929,5 +938,31 @@ class Form extends AbstractDataProvider
                 ],
             ],
         ];
+    }
+
+    /**
+     * @param null $productId
+     * @return bool|null
+     */
+    protected function getCanSkipTrial($productId = null)
+    {
+        $productId = $productId ?: $this->getRequestProductId();
+            try {
+                $arguments = [];
+                $childProduct = $this->getChildProductFromRequest();
+                $childProduct = $childProduct ?: $this->getChildProductFromCurrentItem();
+                if ($childProduct) {
+                    $arguments['child_product'] = $childProduct;
+                }
+                $productData = $this->getProductObjectData($productId, $arguments);
+                $show = $productData->getData(Attribute::SUBSCRIPTION_TRIAL_STATUS);
+                if ($show) {
+                    $trialCanSkip = (bool)$productData->getData(Attribute::SUBSCRIPTION_TRIAL_CAN_SKIP);
+                }
+            } catch (\Exception $e) {
+                $this->context->log($e->getMessage());
+            }
+
+        return $trialCanSkip ?? null;
     }
 }

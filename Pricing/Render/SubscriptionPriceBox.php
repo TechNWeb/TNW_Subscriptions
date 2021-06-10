@@ -195,6 +195,7 @@ class SubscriptionPriceBox extends BasePriceBox
             $productTypeManager = $this->productTypeResolver->resolve($product->getTypeId());
 
             $trialPriceStatus = $product->getData(SubscriptionProductAttributes::SUBSCRIPTION_TRIAL_STATUS);
+            $trialCanSkip = $product->getData(SubscriptionProductAttributes::SUBSCRIPTION_TRIAL_CAN_SKIP);
 
             $productBillingFrequencies = $this->frequencyOptionRepository
                 ->getListByProductId($product->getId())
@@ -227,13 +228,15 @@ class SubscriptionPriceBox extends BasePriceBox
                         $trialPeriod = $product->getData(SubscriptionProductAttributes::SUBSCRIPTION_TRIAL_LENGTH);
                         $trialUnitId = $product->getData(SubscriptionProductAttributes::SUBSCRIPTION_TRIAL_LENGTH_UNIT);
 
-                        $topMessage = __('Try for %1', $this->getFrequencyTrialWithUnit($trialPeriod, $trialUnitId));
-                        $bottomMessage = __(
-                            'then %1 / every %2',
-                            $this->formatCurrency($price, false),
-                            $frequencyUnit
-                        );
-                        $price = $trialPrice + $initialFee;
+                        if (!$trialCanSkip) {
+                            $topMessage = __('Try for %1', $this->getFrequencyTrialWithUnit($trialPeriod, $trialUnitId));
+                            $bottomMessage = __(
+                                'then %1 / every %2',
+                                $this->formatCurrency($price, false),
+                                $frequencyUnit
+                            );
+                            $price = $trialPrice + $initialFee;
+                        }
                     } elseif ($initialFee) {
                         $customPrice = $this->formatCurrency($price, false);
                         $topMessage = __('Initial charge');

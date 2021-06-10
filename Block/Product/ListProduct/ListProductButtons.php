@@ -386,4 +386,23 @@ class ListProductButtons extends Template
         }
         return '';
     }
+
+    /**
+     * @return bool
+     */
+    public function getTrialStatus()
+    {
+        return (bool)$this->getProduct()->getData(Attribute::SUBSCRIPTION_TRIAL_STATUS);
+    }
+
+    /**
+     * @return bool
+     */
+    public function getCanSkipTrial()
+    {
+        if ($this->getTrialStatus()) {
+            return (bool)$this->getProduct()->getData(Attribute::SUBSCRIPTION_TRIAL_CAN_SKIP);
+        }
+        return false;
+    }
 }

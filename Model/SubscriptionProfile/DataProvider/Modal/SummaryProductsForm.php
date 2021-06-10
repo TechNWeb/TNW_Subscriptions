@@ -842,4 +842,17 @@ class SummaryProductsForm extends ModifyForm
 
         return !empty($result) ? $result : [];
     }
+
+    /**
+     * @return array
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     */
+    protected function getEditFieldsetDefinition()
+    {
+        $result = parent::getEditFieldsetDefinition();
+        if (isset($result['children']['left']['children']['use_trial'])) {
+            unset($result['children']['left']['children']['use_trial']);
+        }
+        return $result;
+    }
 }

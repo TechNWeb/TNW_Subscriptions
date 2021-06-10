@@ -96,6 +96,7 @@ class ModifyForm extends Form
         'qty',
         'super_attribute',
         'additional_attribute',
+        'use_trial',
     ];
 
     /**
@@ -193,6 +194,7 @@ class ModifyForm extends Form
                         'price' => $itemPrice
                     ],
                     'savings_calculation' => $this->getSavingsCalculationType($this->currentProduct),
+                    'use_trial' => (int)$subBuyRequest[Create::UNIQUE]['is_trial'],
                 ];
 
                 /** @var ModifierInterface $modifier */
@@ -473,6 +475,10 @@ class ModifyForm extends Form
         $hideQty = $this->getSubAttributeFromItem(Attribute::SUBSCRIPTION_HIDE_QTY);
         if (!$hideQty) {
             $result['children']['left']['children']['qty_container'] = $this->getQtyDefinition();
+        }
+        $canSkipTrial = $this->getSubAttributeFromItem(Attribute::SUBSCRIPTION_TRIAL_CAN_SKIP);
+        if ($canSkipTrial) {
+            $result['children']['left']['children']['use_trial'] = $this->getUseTrialDefenition();
         }
         return $result;
     }
@@ -1323,5 +1329,49 @@ class ModifyForm extends Form
         }
         $productData = $this->getProductObjectData($this->currentProduct->getId(), $arguments);
         return $productData->getData($subAttribute);
+    }
+
+    /**
+     * Returns Use Trial field definition.
+     *
+     * @return array
+     */
+    protected function getUseTrialDefenition()
+    {
+        return [
+            'arguments' => [
+                'data' => [
+                    'config' => [
+                        'sortOrder' => 35,
+                        'multiple' => false,
+                        'label' => __('Use Trial:'),
+                        'dataType' => 'text',
+                        'formElement' => UiForm\Element\Checkbox::NAME,
+                        'componentType' => UiForm\Element\Checkbox::NAME,
+                        'dataScope' => 'use_trial',
+                        'elementTmpl' => 'ui/form/components/single/switcher',
+                        'additionalClasses' => 'field-wide',
+                        'visible' => true,
+                        'previewLabelYes' => __('Yes'),
+                        'previewLabelNo' => __('No'),
+                        'component' => 'TNW_Subscriptions/js/components/field/preview-checkbox-trial',
+                        'template' => 'TNW_Subscriptions/form/element/template/field-with-preview',
+                        'imports' => [
+                            'showPreview' => $this->currentFormName . ':previewMode'
+                        ],
+                        'modifySubscription' => true,
+                        'parentForm' => $this->currentFormName,
+                        'valueMap' => [
+                            'false' => 0,
+                            'true' => 1
+                        ],
+                        'toggleLabels' => [
+                            'on' => __('Yes'),
+                            'off' => __('No')
+                        ]
+                    ]
+                ]
+            ]
+        ];
     }
 }

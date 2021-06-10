@@ -133,6 +133,10 @@ class UpgradeData implements UpgradeDataInterface
             $this->addInheritProductAttribute($eavSetup);
         }
 
+        if (version_compare($context->getVersion(), '2.3.27', '<')) {
+            $this->addSubscriptionCanSkipAttribute($eavSetup);
+        }
+
         $setup->endSetup();
     }
 
@@ -565,6 +569,46 @@ class UpgradeData implements UpgradeDataInterface
         $connection->delete(
             $configTable,
             $setup->getConnection()->prepareSqlCondition('path', $path)
+        );
+    }
+
+    /**
+     * Add 'Can Skip Trial' product attribute.
+     *
+     * @param EavSetup $eavSetup
+     * @return void
+     * @throws \Magento\Framework\Exception\LocalizedException
+     * @throws \Zend_Validate_Exception
+     */
+    private function addSubscriptionCanSkipAttribute(EavSetup $eavSetup)
+    {
+        $eavSetup->addAttribute(
+            Product::ENTITY,
+            Attribute::SUBSCRIPTION_TRIAL_CAN_SKIP,
+            [
+                'type' => 'int',
+                'backend' => '',
+                'frontend' => '',
+                'label' => 'Can Skipped',
+                'input' => 'boolean',
+                'class' => '',
+                'source' => \Magento\Eav\Model\Entity\Attribute\Source\Boolean::class,
+                'global' => ScopedAttributeInterface::SCOPE_WEBSITE,
+                'visible' => true,
+                'required' => false,
+                'user_defined' => true,
+                'default' => null,
+                'searchable' => false,
+                'filterable' => false,
+                'comparable' => false,
+                'visible_on_front' => false,
+                'used_in_product_listing' => true,
+                'unique' => false,
+                'apply_to' => 'simple,virtual,downloadable,configurable',
+                'system' => 1,
+                'group' => 'Subscription Options',
+                'sort_order' => 25,
+            ]
         );
     }
 }
