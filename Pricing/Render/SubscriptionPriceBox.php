@@ -250,7 +250,8 @@ class SubscriptionPriceBox extends BasePriceBox
                         'frequency_unit_message' => $frequencyUnitMessage,
                         'top_message' => $topMessage,
                         'bottom_message' => $bottomMessage,
-                        'trial_price_status' => $trialPriceStatus
+                        'trial_price_status' => $trialPriceStatus,
+                        'old_price' => $billingFrequency->getPrice(),
                     ];
                 }
             }
