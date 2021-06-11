@@ -195,7 +195,7 @@ class PriceCalculator
             ? $this->request->getParam('subscribe_qty')
             : $this->request->getParam('item_qty');
         $quote = $this->checkoutSession->getQuote();
-        if ($quote->getItemsQty() && $this->request->getParam('subscribe_qty')){
+        if ($quote->getItemsQty() && $this->request->getParam('subscribe_qty')) {
             $qty = (int) $quote->getItemsQty() + (int) $subscribeQty;
         }
         $finalQty = $qty ? $qty : $subscribeQty;
