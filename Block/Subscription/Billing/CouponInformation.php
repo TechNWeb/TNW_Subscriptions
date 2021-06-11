@@ -147,9 +147,11 @@ class CouponInformation extends ContentAbstract
                     $this->salesRule,
                     $quote->getShippingAddress()
                 );
+                $billingAddress = $quote->getBillingAddress();
+                $billingAddress['payment_method'] = $this->getSubscriptionProfile()->getPayment()->getEngineCode();
                 $validForBillingAddress = $this->couponUtility->canProcessRule(
                     $this->salesRule,
-                    $quote->getBillingAddress()
+                    $billingAddress
                 );
                 return $validForShippingAddress || $validForBillingAddress;
             } catch (\Exception $exception) {
