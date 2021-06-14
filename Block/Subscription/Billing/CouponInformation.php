@@ -65,7 +65,6 @@ class CouponInformation extends ContentAbstract
      * @var FormContext
      */
     private $formContext;
-
     /**
      * CouponInformation constructor.
      * @param Context $context
@@ -142,14 +141,15 @@ class CouponInformation extends ContentAbstract
                 } else {
                     return false;
                 }
-
                 $validForShippingAddress = $this->couponUtility->canProcessRule(
                     $this->salesRule,
                     $quote->getShippingAddress()
                 );
+                $billingAddress = $quote->getBillingAddress();
+                $billingAddress['payment_method'] = $this->getSubscriptionProfile()->getPayment()->getEngineCode();
                 $validForBillingAddress = $this->couponUtility->canProcessRule(
                     $this->salesRule,
-                    $quote->getBillingAddress()
+                    $billingAddress
                 );
                 return $validForShippingAddress || $validForBillingAddress;
             } catch (\Exception $exception) {
