@@ -18,6 +18,8 @@ use TNW\Subscriptions\Model\QuoteSessionInterface;
 use TNW\Subscriptions\Model\ResourceModel\ProductBillingFrequency\Collection;
 use TNW\Subscriptions\Model\ResourceModel\ProductBillingFrequency\CollectionFactory;
 use Magento\Customer\Model\Session;
+use Magento\Framework\App\RequestInterface;
+use Magento\Checkout\Model\Session as CheckoutSession;
 
 /**
  * Calculate unit price for billing frequency.
@@ -63,6 +65,16 @@ class PriceCalculator
     protected $customerSession;
 
     /**
+     * @var RequestInterface
+     */
+    protected $request;
+
+    /**
+     * @var CheckoutSession
+     */
+    protected $checkoutSession;
+
+    /**
      * PriceCalculator constructor.
      * @param ProductRepository $productRepository
      * @param CollectionFactory $productBillingFrequencyCollectionFactory
@@ -70,6 +82,8 @@ class PriceCalculator
      * @param QuoteSessionInterface $session
      * @param FormatInterface $localeFormat
      * @param Session $customerSession
+     * @param RequestInterface $request
+     * @param CheckoutSession $checkoutSession
      */
     public function __construct(
         ProductRepository $productRepository,
@@ -77,7 +91,9 @@ class PriceCalculator
         Context $context,
         QuoteSessionInterface $session,
         FormatInterface $localeFormat,
-        Session $customerSession
+        Session $customerSession,
+        RequestInterface $request,
+        CheckoutSession $checkoutSession
     ) {
         $this->customerSession = $customerSession;
         $this->productRepository = $productRepository;
@@ -85,6 +101,8 @@ class PriceCalculator
         $this->context = $context;
         $this->session = $session;
         $this->localeFormat = $localeFormat;
+        $this->request = $request;
+        $this->checkoutSession = $checkoutSession;
     }
 
     /**
@@ -145,6 +163,9 @@ class PriceCalculator
                 ) {
                     $product['price'] = $product['child_product_price'];
                 }
+                if ($productPrice != null) {
+                    $productPrice = $tierPrice;
+                }
                 $discountAmount = $this->getDiscountAmount($product, $productPrice);
                 $origPrice = $this->convertToCurrency($product->getData('child_product_price'));
                 $discountedPrice = ($origPrice - $discountAmount) >= 0 ? $origPrice - $discountAmount : 0;
@@ -165,16 +186,28 @@ class PriceCalculator
      * @param $productId
      * @return mixed|null
      * @throws NoSuchEntityException
+     * @throws \Magento\Framework\Exception\LocalizedException
      */
     private function getProductTierPrice($productId)
     {
+        $qty = false;
+        $subscribeQty = $this->request->getParam('subscribe_qty')
+            ? $this->request->getParam('subscribe_qty')
+            : $this->request->getParam('item_qty');
+        $quote = $this->checkoutSession->getQuote();
+        if ($quote->getItemsQty() && $this->request->getParam('subscribe_qty')) {
+            $qty = (int) $quote->getItemsQty() + (int) $subscribeQty;
+        }
+        $finalQty = $qty ? $qty : $subscribeQty;
         $productTierPrice = null;
         $product = $this->productRepository
             ->getById($productId);
         if ($product && $product->getId() && $product->getTierPrice()) {
-            $customerGroupId = $this->customerSession->getCustomer()->getGroupId();
+            $customerGroupId = $this->customerSession->isLoggedIn()
+                ? $this->customerSession->getCustomer()->getGroupId()
+                : $this->customerSession->isLoggedIn();
             foreach ($product->getTierPrice() as $tierPrice) {
-                if ($tierPrice['price_qty'] == 1
+                if (($tierPrice['price_qty'] <= $finalQty || $tierPrice['price_qty'] == 1)
                     && ($tierPrice['cust_group'] == $customerGroupId
                         || $tierPrice['all_groups'])
                 ) {
