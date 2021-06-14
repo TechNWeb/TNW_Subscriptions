@@ -65,6 +65,7 @@ class CouponInformation extends ContentAbstract
      * @var FormContext
      */
     private $formContext;
+
     /**
      * CouponInformation constructor.
      * @param Context $context
@@ -141,6 +142,7 @@ class CouponInformation extends ContentAbstract
                 } else {
                     return false;
                 }
+
                 $validForShippingAddress = $this->couponUtility->canProcessRule(
                     $this->salesRule,
                     $quote->getShippingAddress()
