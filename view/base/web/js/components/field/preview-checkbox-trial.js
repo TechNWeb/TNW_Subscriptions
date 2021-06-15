@@ -33,7 +33,7 @@ define([
             if (this.value()) {
                 result = this.previewLabelYes;
             } else {
-            result = this.previewLabelNo;
+                result = this.previewLabelNo;
             }
 
             return result;

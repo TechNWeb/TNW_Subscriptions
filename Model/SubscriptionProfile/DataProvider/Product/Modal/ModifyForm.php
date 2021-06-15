@@ -194,7 +194,7 @@ class ModifyForm extends Form
                         'price' => $itemPrice
                     ],
                     'savings_calculation' => $this->getSavingsCalculationType($this->currentProduct),
-                    'use_trial' => (int)$subBuyRequest[Create::UNIQUE]['is_trial'],
+                    'use_trial' => (int) $subBuyRequest[Create::UNIQUE]['is_trial'],
                 ];
 
                 /** @var ModifierInterface $modifier */

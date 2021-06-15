@@ -96,19 +96,19 @@ $customOptions = $block->getPreconfiguredCustomOptions();
                             </div>
                         </div>
                         <?php if ($block->getIsCanSkipTrial()): ?>
-                        <div class="fieldset">
-                            <div class="field trial">
-                                <label class="label"><span><?= $escaper->escapeHtml(__('Use Trial')) ?>:</span></label>
-                                <div class="control">
-                                    <input type="checkbox"
-                                           id="use_trial"
-                                           name="cart[<?= /* @noEscape */ $_itemId; ?>][use_trial]"
-                                           value="1"
-                                           <?= $block->getIsTrial() ? 'checked' : '' ?>
-                                    />
+                            <div class="fieldset">
+                                <div class="field trial">
+                                    <label class="label"><span><?= $escaper->escapeHtml(__('Use Trial')); ?>:</span></label>
+                                    <div class="control">
+                                        <input type="checkbox"
+                                               id="use_trial"
+                                               name="cart[<?= /* @noEscape */ $_itemId; ?>][use_trial]"
+                                               value="1"
+                                               <?= $block->getIsTrial() ? 'checked' : ''; ?>
+                                        />
+                                    </div>
                                 </div>
                             </div>
-                        </div>
                         <?php endif; ?>
                         <div class="fieldset">
                             <div class="field term">

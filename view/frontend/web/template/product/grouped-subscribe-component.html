@@ -12,6 +12,7 @@
                 <th class="col item" scope="col" translate="'Product Name'"/>
                 <th class="col frequency" scope="col" translate="'Frequency'"/>
                 <th class="col qty" scope="col" translate="'Qty'"/>
+                <th class="col trial" scope="col" translate="'Trial'" data-bind="visible: hasTrial()"/>
             </tr>
         </thead>
         <tbody each="data: subscriptionProducts, as: 'product'">
@@ -44,6 +45,25 @@
                                class="input-text qty"/>
                     </div>
                 </td>
+                <td class="col trial" if="product.is_salable && $parent.hasTrialStatus">
+                    <div class="control trial">
+                        <input if="$parent.canSkipTrial(product)"
+                               data-bind="attr:{
+                                    name: $parent.getFieldName(product, 'use_trial'),
+                                    checked: true,
+                                    disabled: !$parent.canSkipTrial(product)
+                                }"
+                               type="checkbox"
+                               value="1"
+                               class="input-text trial"/>
+                        <input ifnot="$parent.canSkipTrial(product)"
+                               data-bind="attr:{
+                                    name: $parent.getFieldName(product, 'use_trial')
+                                }"
+                               value="1"
+                               type="hidden"/>
+                    </div>
+                </td>
                 <td class="col unavailable" ifnot="product.is_salable" colspan="2">
                     <span translate="'Out of stock'"/>
                 </td>
@@ -57,8 +77,8 @@
             <tr class="second-row">
             <!-- ko if: $parent.canSubscribe(product) -->
                 <td class="col item" colspan="3">
-                    <span class="subscription-price" html="$parent.getSubscriptionPrice(product)"></span>,
-
+                    <span class="subscription-price" html="$parent.getSubscriptionPrice(product)"></span>
+                    <span class="subscription-trial" html="$parent.getTrialMessage(product)"></span>,
                     <span class="period-label" translate="'until canceled'" if="$parent.isInfinite(product)"/>
                     <a ifnot="$parent.isInfinite(product)"
                        class="period-label trigger"

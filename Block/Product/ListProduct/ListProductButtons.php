@@ -392,7 +392,7 @@ class ListProductButtons extends Template
      */
     public function getTrialStatus()
     {
-        return (bool)$this->getProduct()->getData(Attribute::SUBSCRIPTION_TRIAL_STATUS);
+        return (bool) $this->getProduct()->getData(Attribute::SUBSCRIPTION_TRIAL_STATUS);
     }
 
     /**
@@ -401,7 +401,7 @@ class ListProductButtons extends Template
     public function getCanSkipTrial()
     {
         if ($this->getTrialStatus()) {
-            return (bool)$this->getProduct()->getData(Attribute::SUBSCRIPTION_TRIAL_CAN_SKIP);
+            return (bool) $this->getProduct()->getData(Attribute::SUBSCRIPTION_TRIAL_CAN_SKIP);
         }
         return false;
     }

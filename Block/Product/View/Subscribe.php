@@ -19,6 +19,7 @@ use Magento\CatalogInventory\Api\Data\StockItemInterface;
 use Magento\Checkout\Block\Cart\Item\Renderer;
 use Magento\ConfigurableProduct\Model\Product\Type\Configurable;
 use Magento\Customer\Model\Session;
+use Magento\Directory\Model\Currency;
 use Magento\Downloadable\Model\Product\Type;
 use Magento\Framework\DataObject;
 use Magento\Framework\Exception\LocalizedException;
@@ -42,6 +43,7 @@ use TNW\Subscriptions\Model\ProductBillingFrequency\PriceCalculator;
 use TNW\Subscriptions\Model\ProductBillingFrequency\SavingsCalculation;
 use TNW\Subscriptions\Model\ProductSubscriptionProfile\ProductTypeManagerResolver;
 use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Modal\Form;
+use TNW\Subscriptions\Model\Context as SubscriptionContext;
 
 /**
  * Subscribe product block instance
@@ -108,6 +110,21 @@ class Subscribe extends View
     private $serializer;
 
     /**
+     * @var SubscriptionContext
+     */
+    protected $subscriptionContext;
+
+    /**
+     * @var Currency
+     */
+    private $currentCurrency;
+
+    /**
+     * @var Context
+     */
+    private $context;
+
+    /**
      * @param Context $context
      * @param UrlEncoderInterface $urlEncoder
      * @param EncoderInterface $jsonEncoder
@@ -149,6 +166,7 @@ class Subscribe extends View
         ProductTypeManagerResolver $subscriptionTypeResolver,
         PriceCalculator $priceCalculator,
         Config\Source\TrialLengthUnitType $trialLengthUnitType,
+        SubscriptionContext $subscriptionContext,
         array $data = []
     ) {
         $this->subscriptionProductViewConfig = $subscriptionProductViewConfig;
@@ -159,6 +177,8 @@ class Subscribe extends View
         $this->subscriptionTypeResolver = $subscriptionTypeResolver;
         $this->priceCalculator = $priceCalculator;
         $this->trialLengthUnitType = $trialLengthUnitType;
+        $this->subscriptionContext = $subscriptionContext;
+        $this->context = $context;
         parent::__construct(
             $context,
             $urlEncoder,
@@ -890,6 +910,39 @@ class Subscribe extends View
     public function getIsTrial()
     {
         $preconfigured = $this->preconfiguredValue('subscription_data/unique/is_trial');
-        return $this->_jsonEncoder->encode((int)$preconfigured);
+        return $this->_jsonEncoder->encode((int) $preconfigured);
+    }
+
+    /**
+     * @return string
+     * @throws NoSuchEntityException
+     */
+    public function getPriceFormatData()
+    {
+        $currencyCode = $this->getCurrentCurrency()->getCurrencyCode();
+
+        return $this->subscriptionContext->getPriceFormatData($currencyCode);
+    }
+
+    /**
+     * @return Currency
+     * @throws NoSuchEntityException
+     */
+    private function getCurrentCurrency()
+    {
+        if ($this->currentCurrency === null) {
+            $currencyCode = $this->context->getSession()->getCurrencyId();
+            if ($currencyCode) {
+                $this->currentCurrency = $this->context->getCurrencyFactory()
+                    ->create()
+                    ->load($currencyCode);
+            } else {
+                $this->currentCurrency = $this->context->getStoreManager()
+                    ->getStore()
+                    ->getBaseCurrency();
+            }
+        }
+
+        return $this->currentCurrency;
     }
 }

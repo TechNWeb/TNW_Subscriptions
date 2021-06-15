@@ -13,6 +13,8 @@ define([
             activeInputSelector: 'input[name=subscribe_active]',
             subscriptionProducts: [],
             recurringOnlyText: $t('Product is not available for purchase at this time'),
+            hasTrialStatus: false,
+            priceFormat: {},
             tracks: {
                 subscriptionProducts: true
             },
@@ -178,6 +180,39 @@ define([
 
         canSubscribe: function (product) {
             return this.getPurchaseType(product) ? this.getPurchaseType(product) !== '1' : false;
+        },
+
+        hasTrial: function () {
+            var values = _.values(this.products.children);
+            _.each(values, function (product) {
+                if (product.trial_data !== null) {
+                    this.hasTrialStatus = true;
+                }
+            }, this);
+            return this.hasTrialStatus;
+        },
+
+        canSkipTrial: function (product) {
+            if (product.trial_data) {
+                return parseInt(product.trial_data.trial_can_skip);
+            }
+            return false;
+        },
+
+        getTrialMessage: function (product) {
+            var trialData = product.trial_data,
+                trialLabelString = $t('(Try %p %u%p)'),
+                trialPrice = $t(' FREE');
+            if (trialData) {
+                trialPrice = trialData.trial_price
+                    ? $t(' for ') + priceUtils.formatPrice(trialData.trial_price, this.priceFormat, false)
+                    : trialPrice;
+                return trialLabelString
+                    .replace('%p', trialData.trial_length)
+                    .replace('%u', trialData.trial_label)
+                    .replace('%p', trialPrice)
+            }
+            return '';
         }
     });
 });

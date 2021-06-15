@@ -14,6 +14,7 @@ $_product = $block->getCurrentProduct();
 $pos = $block->getCurrentPosForActions();
 $viewMode = $block->getCurrentViewMode();
 $position = $block->getCurrentPosition();
+$isTrialAllowedForCustomer = !in_array((int)$_product->getId(), $block->getCurrentCustomerProductsHistoryList(), true);
 ?>
 
 <div class="actions-primary<?= /* @noEscape */ strpos($pos, $viewMode . '-primary') ? $position : ''; ?>">
@@ -25,12 +26,12 @@ $position = $block->getCurrentPosition();
                         <?php $postParams = $block->getCurrentPostParams(); ?>
                         <form data-role="tocart-subscriptions-form"
                               action="<?= /* @noEscape */ $postParams['action']; ?>" method="post">
-                            <input type="hidden" name="subscribe_active" value="1" />
+                            <input type="hidden" name="subscribe_active" value="1"/>
                             <input type="hidden" name="subscribe_button"
-                                   value="<?= /* @noEscape */ $postParams['subscribe_button'] = 1; ?>" />
+                                   value="<?= /* @noEscape */ $postParams['subscribe_button'] = 1; ?>"/>
                             <input type="hidden" name="subscribe_options"
                                    value='<?= /* @noEscape */
-                                        $block->getSubscribeOptionsJson($block->getSubscribeOptions()); ?>' />
+                                        $block->getSubscribeOptionsJson($block->getSubscribeOptions()); ?>'/>
                             <input type="hidden" name="<?= /* @noEscape */ Action::PARAM_NAME_URL_ENCODED; ?>"
                                    value="<?= /* @noEscape */ $postParams['data'][Action::PARAM_NAME_URL_ENCODED]; ?>"/>
                             <?= $block->getBlockHtml('formkey')?>
@@ -70,34 +71,80 @@ $position = $block->getCurrentPosition();
             <?php else: ?>
                 <?php if ($block->isOnlySubscribePurchase($_product)): ?>
                     <?php if ($block->getCanSkipTrial()): ?>
-                    <div class="product-subscribe-addtocart-buttons-container">
-                    <?php endif; ?>
-                    <?php if (!$block->getCanSkipTrial()): ?>
-                    <div class="product-subscribe-button">
-                        <?php $postParams = $block->getCurrentPostParams(); ?>
-                        <form data-role="tocart-subscriptions-form"
-                              action="<?= /* @noEscape */ $postParams['action']; ?>" method="post">
-                            <input type="hidden" name="subscribe_active" value="1" />
-                            <input type="hidden" name="subscribe_button"
-                                   value="<?= /* @noEscape */ $postParams['subscribe_button'] = 1; ?>"/>
-                            <input type="hidden" name="subscribe_options"
-                                   value='<?= /* @noEscape */
-                                    $block->getSubscribeOptionsJson($block->getSubscribeOptions()); ?>'/>
-                            <input type="hidden" name="<?= /* @noEscape */ Action::PARAM_NAME_URL_ENCODED; ?>"
-                                   value="<?= /* @noEscape */ $postParams['data'][Action::PARAM_NAME_URL_ENCODED]; ?>"/>
-                            <?= $block->getBlockHtml('formkey')?>
-                            <button type="submit"
-                                    title="<?= $escaper->escapeHtml(__('Auto-Ship')); ?>"
-                                    class="action tocart primary">
-                                <span><?= $escaper->escapeHtml(__('Auto-Ship')) ?></span>
-                            </button>
-                        </form>
-                    </div>
-                    <?php endif; ?>
-                    <?php if ($block->getCanSkipTrial()): ?>
+                        <div class="product-subscribe-addtocart-buttons-container">
+                            <?php if ($isTrialAllowedForCustomer === true): ?>
+                                <div class="product-subscribe-button">
+                                    <?php $postParams = $block->getCurrentPostParams(); ?>
+                                    <form data-role="tocart-form"
+                                          action="<?= /* @noEscape */ $postParams['action']; ?>" method="post">
+                                        <input type="hidden" name="subscribe_active" value="1" />
+                                        <input type="hidden" name="subscribe_button"
+                                               value="<?= /* @noEscape */ $postParams['subscribe_button'] = 1; ?>">
+                                        <input type="hidden" name="use_trial"
+                                               value="<?= /* @noEscape */ $postParams['use_trial'] = 1; ?>">
+                                        <input type="hidden" name="subscribe_options"
+                                               value='<?= /* @noEscape */
+                                                $block->getSubscribeOptionsJson($block->getSubscribeOptions()); ?>'>
+                                        <input type="hidden" name="<?= /* @noEscape */ Action::PARAM_NAME_URL_ENCODED; ?>"
+                                               value="<?= /* @noEscape */
+                                                $postParams['data'][Action::PARAM_NAME_URL_ENCODED]; ?>">
+                                        <?= $block->getBlockHtml('formkey'); ?>
+                                        <button type="submit"
+                                                title="<?= $escaper->escapeHtml(__('Use Trial')); ?>"
+                                                class="action tocart primary product-subscribe-trial-button">
+                                            <span><?= $escaper->escapeHtml(__('Use Trial')); ?></span>
+                                        </button>
+                                    </form>
+                                </div>
+                                <div class="product-subscribe-button-dropdown">
+                                    <button title="<?= $escaper->escapeHtml(__('Auto-Ship')); ?>"
+                                            class="action-toggle primary add"
+                                            data-toggle="dropdown"
+                                            data-product-id="<?= /* @noEscape */ $_product->getId(); ?>">
+                                        <span><?= $escaper->escapeHtml(__('Select')); ?></span>
+                                    </button>
+                                </div>
+                            <?php endif; ?>
+
+                            <?php if ($isTrialAllowedForCustomer === true): ?>
+                                <div class="product-addtocart-button-hidden subscription-dropdown-hidden-<?= /* @noEscape */ $_product->getId(); ?>">
+                            <?php else: ?>
+                                <div class="product-subscribe-button">
+                            <?php endif; ?>
+                                    <?php $postParams = $block->getCurrentPostParams(); ?>
+                                    <form data-role="tocart-subscriptions-form"
+                                          action="<?= /* @noEscape */ $postParams['action']; ?>" method="post">
+                                        <input type="hidden" name="subscribe_active" value="1" />
+                                        <input type="hidden" name="subscribe_button"
+                                               value="<?= /* @noEscape */ $postParams['subscribe_button'] = 1; ?>">
+                                        <input type="hidden" name="subscribe_options"
+                                               value='<?= /* @noEscape */
+                                                $block->getSubscribeOptionsJson($block->getSubscribeOptions()); ?>'>
+                                        <input type="hidden" name="<?= /* @noEscape */ Action::PARAM_NAME_URL_ENCODED; ?>"
+                                               value="<?= /* @noEscape */ $postParams['data'][Action::PARAM_NAME_URL_ENCODED]; ?>">
+                                        <?= $block->getBlockHtml('formkey'); ?>
+                                        <button type="submit"
+                                                title="<?= $escaper->escapeHtml(__('Auto-Ship')); ?>"
+                                                class="action tocart primary">
+                                            <span><?= $escaper->escapeHtml(__('Auto-Ship')); ?></span>
+                                        </button>
+                                    </form>
+                                </div>
+                            <?php if ($isTrialAllowedForCustomer !== true): ?>
+                                <div class="product-subscribe-button-dropdown">
+                                    <button title="<?= $escaper->escapeHtml(__('Auto-Ship')); ?>"
+                                            class="action-toggle primary add"
+                                            data-toggle="dropdown"
+                                            data-product-id="<?= /* @noEscape */ $_product->getId(); ?>">
+                                        <span><?= $escaper->escapeHtml(__('Select')); ?></span>
+                                    </button>
+                                </div>
+                            <?php endif; ?>
+                        </div>
+                    <?php else: ?>
                         <div class="product-subscribe-button">
                             <?php $postParams = $block->getCurrentPostParams(); ?>
-                            <form data-role="tocart-form"
+                            <form data-role="tocart-subscriptions-form"
                                   action="<?= /* @noEscape */ $postParams['action']; ?>" method="post">
                                 <input type="hidden" name="subscribe_active" value="1" />
                                 <input type="hidden" name="subscribe_button"
@@ -106,87 +153,60 @@ $position = $block->getCurrentPosition();
                                        value="<?= /* @noEscape */ $postParams['use_trial'] = 1; ?>">
                                 <input type="hidden" name="subscribe_options"
                                        value='<?= /* @noEscape */
-                                       $block->getSubscribeOptionsJson($block->getSubscribeOptions()); ?>'>
-                                <input type="hidden" name="<?= /* @noEscape */ Action::PARAM_NAME_URL_ENCODED; ?>"
-                                       value="<?= /* @noEscape */
-                                       $postParams['data'][Action::PARAM_NAME_URL_ENCODED]; ?>">
-                                <?= $block->getBlockHtml('formkey')?>
-                                <button type="submit"
-                                        title="<?= $escaper->escapeHtml(__('Use Trial')); ?>"
-                                        class="action tocart primary product-subscribe-trial-button">
-                                    <span><?= $escaper->escapeHtml(__('Use Trial')) ?></span>
-                                </button>
-                            </form>
-                        </div>
-                        <div class="product-subscribe-button-dropdown">
-                            <button title="<?= $escaper->escapeHtml(__('Auto-Ship')) ?>"
-                                    class="action-toggle primary add"
-                                    data-toggle="dropdown"
-                                    data-product-id="<?= /* @noEscape */ $_product->getId(); ?>">
-                                <span><?= $escaper->escapeHtml(__('Select')) ?></span>
-                            </button>
-                        </div>
-                        <div class="product-addtocart-button-hidden subscription-dropdown-hidden-<?= /* @noEscape */
-                        $_product->getId(); ?>">
-                            <?php $postParams = $block->getCurrentPostParams(); ?>
-                            <form data-role="tocart-subscriptions-form"
-                                  action="<?= /* @noEscape */ $postParams['action']; ?>" method="post">
-                                <input type="hidden" name="subscribe_active" value="1" />
-                                <input type="hidden" name="subscribe_button"
-                                       value="<?= /* @noEscape */ $postParams['subscribe_button'] = 1; ?>">
-                                <input type="hidden" name="subscribe_options"
-                                       value='<?= /* @noEscape */
-                                       $block->getSubscribeOptionsJson($block->getSubscribeOptions()); ?>'>
+                                        $block->getSubscribeOptionsJson($block->getSubscribeOptions()); ?>'>
                                 <input type="hidden" name="<?= /* @noEscape */ Action::PARAM_NAME_URL_ENCODED; ?>"
                                        value="<?= /* @noEscape */ $postParams['data'][Action::PARAM_NAME_URL_ENCODED]; ?>">
-                                <?= $block->getBlockHtml('formkey')?>
+                                <?= $block->getBlockHtml('formkey'); ?>
                                 <button type="submit"
                                         title="<?= $escaper->escapeHtml(__('Auto-Ship')); ?>"
                                         class="action tocart primary">
-                                    <span><?= $escaper->escapeHtml(__('Auto-Ship')) ?></span>
+                                    <span><?= $escaper->escapeHtml(__('Auto-Ship')); ?></span>
                                 </button>
                             </form>
                         </div>
-                    <?php if ($block->getCanSkipTrial()): ?>
-                    </div>
-                    <?php endif; ?>
                     <?php endif; ?>
                 <?php else: ?>
                     <div class="product-subscribe-addtocart-buttons-container">
                         <?php if ($block->getCanSkipTrial()): ?>
-                            <div class="product-subscribe-button">
-                                <?php $postParams = $block->getCurrentPostParams(); ?>
-                                <form data-role="tocart-form"
-                                      action="<?= /* @noEscape */ $postParams['action']; ?>" method="post">
-                                    <input type="hidden" name="subscribe_active" value="1" />
-                                    <input type="hidden" name="subscribe_button"
-                                           value="<?= /* @noEscape */ $postParams['subscribe_button'] = 1; ?>">
-                                    <input type="hidden" name="use_trial"
-                                           value="<?= /* @noEscape */ $postParams['use_trial'] = 1; ?>">
-                                    <input type="hidden" name="subscribe_options"
-                                           value='<?= /* @noEscape */
-                                           $block->getSubscribeOptionsJson($block->getSubscribeOptions()); ?>'>
-                                    <input type="hidden" name="<?= /* @noEscape */ Action::PARAM_NAME_URL_ENCODED; ?>"
-                                           value="<?= /* @noEscape */
-                                           $postParams['data'][Action::PARAM_NAME_URL_ENCODED]; ?>">
-                                    <?= $block->getBlockHtml('formkey')?>
-                                    <button type="submit"
-                                            title="<?= $escaper->escapeHtml(__('Use Trial')); ?>"
-                                            class="action tocart primary product-subscribe-trial-button">
-                                        <span><?= $escaper->escapeHtml(__('Use Trial')) ?></span>
+                            <?php if ($isTrialAllowedForCustomer === true): ?>
+                                <div class="product-subscribe-button">
+                                    <?php $postParams = $block->getCurrentPostParams(); ?>
+                                    <form data-role="tocart-form"
+                                          action="<?= /* @noEscape */ $postParams['action']; ?>" method="post">
+                                        <input type="hidden" name="subscribe_active" value="1" />
+                                        <input type="hidden" name="subscribe_button"
+                                               value="<?= /* @noEscape */ $postParams['subscribe_button'] = 1; ?>">
+                                        <input type="hidden" name="use_trial"
+                                               value="<?= /* @noEscape */ $postParams['use_trial'] = 1; ?>">
+                                        <input type="hidden" name="subscribe_options"
+                                               value='<?= /* @noEscape */
+                                                $block->getSubscribeOptionsJson($block->getSubscribeOptions()); ?>'>
+                                        <input type="hidden" name="<?= /* @noEscape */ Action::PARAM_NAME_URL_ENCODED; ?>"
+                                               value="<?= /* @noEscape */
+                                                $postParams['data'][Action::PARAM_NAME_URL_ENCODED]; ?>">
+                                        <?= $block->getBlockHtml('formkey'); ?>
+                                        <button type="submit"
+                                                title="<?= $escaper->escapeHtml(__('Use Trial')); ?>"
+                                                class="action tocart primary product-subscribe-trial-button">
+                                            <span><?= $escaper->escapeHtml(__('Use Trial')); ?></span>
+                                        </button>
+                                    </form>
+                                </div>
+                                <div class="product-subscribe-button-dropdown">
+                                    <button title="<?= $escaper->escapeHtml(__('Add to Cart')); ?>"
+                                            class="action-toggle primary add"
+                                            data-toggle="dropdown"
+                                            data-product-id="<?= /* @noEscape */ $_product->getId(); ?>">
+                                        <span><?= $escaper->escapeHtml(__('Select')); ?></span>
                                     </button>
-                                </form>
-                            </div>
-                            <div class="product-subscribe-button-dropdown">
-                                <button title="<?= $escaper->escapeHtml(__('Add to Cart')) ?>"
-                                        class="action-toggle primary add"
-                                        data-toggle="dropdown"
-                                        data-product-id="<?= /* @noEscape */ $_product->getId(); ?>">
-                                    <span><?= $escaper->escapeHtml(__('Select')) ?></span>
-                                </button>
-                            </div>
-                            <div class="product-addtocart-button-hidden subscription-dropdown-hidden-<?= /* @noEscape */
-                            $_product->getId(); ?>">
+                                </div>
+                            <?php endif; ?>
+
+                            <?php if ($isTrialAllowedForCustomer === true): ?>
+                                <div class="product-addtocart-button-hidden subscription-dropdown-hidden-<?= /* @noEscape */ $_product->getId(); ?>">
+                            <?php else: ?>
+                                <div class="product-subscribe-button">
+                            <?php endif; ?>
                                 <?php $postParams = $block->getCurrentPostParams(); ?>
                                 <form data-role="tocart-subscriptions-form"
                                       action="<?= /* @noEscape */ $postParams['action']; ?>" method="post">
@@ -195,85 +215,96 @@ $position = $block->getCurrentPosition();
                                            value="<?= /* @noEscape */ $postParams['subscribe_button'] = 1; ?>">
                                     <input type="hidden" name="subscribe_options"
                                            value='<?= /* @noEscape */
-                                           $block->getSubscribeOptionsJson($block->getSubscribeOptions()); ?>'>
+                                            $block->getSubscribeOptionsJson($block->getSubscribeOptions()); ?>'>
                                     <input type="hidden" name="<?= /* @noEscape */ Action::PARAM_NAME_URL_ENCODED; ?>"
                                            value="<?= /* @noEscape */
-                                           $postParams['data'][Action::PARAM_NAME_URL_ENCODED]; ?>">
-                                    <?= $block->getBlockHtml('formkey')?>
+                                            $postParams['data'][Action::PARAM_NAME_URL_ENCODED]; ?>">
+                                    <?= $block->getBlockHtml('formkey'); ?>
                                     <button type="submit"
                                             title="<?= $escaper->escapeHtml(__('Auto-Ship')); ?>"
                                             class="action tocart primary ">
-                                        <span><?= $escaper->escapeHtml(__('Auto-Ship')) ?></span>
+                                        <span><?= $escaper->escapeHtml(__('Auto-Ship')); ?></span>
                                     </button>
                                 </form>
                             </div>
-                        <div class="product-addtocart-button-hidden subscription-dropdown-hidden-<?= /* @noEscape */
-                        $_product->getId(); ?>">
-                            <?php $postParams = $block->getCurrentPostParams(); ?>
-                            <form data-role="tocart-form"
-                                  action="<?= /* @noEscape */ $postParams['action']; ?>" method="post">
-                                <input type="hidden" name="product"
-                                       value="<?= /* @noEscape */ $postParams['data']['product']; ?>">
-                                <input type="hidden" name="<?= /* @noEscape */ Action::PARAM_NAME_URL_ENCODED; ?>"
-                                       value="<?= /* @noEscape */
-                                       $postParams['data'][Action::PARAM_NAME_URL_ENCODED]; ?>">
-                                <?= $block->getBlockHtml('formkey')?>
-                                <button type="submit"
-                                        title="<?= $escaper->escapeHtml(__('Add to Cart')); ?>"
-                                        class="action tocart primary">
-                                    <span><?= $escaper->escapeHtml(__('Add to Cart')) ?></span>
-                                </button>
-                            </form>
-
-                        </div>
+                            <?php if ($isTrialAllowedForCustomer !== true): ?>
+                                <div class="product-subscribe-button-dropdown">
+                                    <button title="<?= $escaper->escapeHtml(__('Add to Cart')); ?>"
+                                            class="action-toggle primary add"
+                                            data-toggle="dropdown"
+                                            data-product-id="<?= /* @noEscape */ $_product->getId(); ?>">
+                                        <span><?= $escaper->escapeHtml(__('Select')); ?></span>
+                                    </button>
+                                </div>
+                            <?php endif; ?>
+                            <div class="product-addtocart-button-hidden subscription-dropdown-hidden-<?= /* @noEscape */
+                                $_product->getId(); ?>">
+                                <?php $postParams = $block->getCurrentPostParams(); ?>
+                                <form data-role="tocart-form"
+                                      action="<?= /* @noEscape */ $postParams['action']; ?>" method="post">
+                                    <input type="hidden" name="product"
+                                           value="<?= /* @noEscape */ $postParams['data']['product']; ?>">
+                                    <input type="hidden" name="<?= /* @noEscape */ Action::PARAM_NAME_URL_ENCODED; ?>"
+                                           value="<?= /* @noEscape */
+                                            $postParams['data'][Action::PARAM_NAME_URL_ENCODED]; ?>">
+                                    <?= $block->getBlockHtml('formkey'); ?>
+                                    <button type="submit"
+                                            title="<?= $escaper->escapeHtml(__('Add to Cart')); ?>"
+                                            class="action tocart primary">
+                                        <span><?= $escaper->escapeHtml(__('Add to Cart')); ?></span>
+                                    </button>
+                                </form>
+                            </div>
                         <?php else: ?>
-                        <div class="product-subscribe-button">
-                            <?php $postParams = $block->getCurrentPostParams(); ?>
-                            <form data-role="tocart-subscriptions-form"
-                                  action="<?= /* @noEscape */ $postParams['action']; ?>" method="post">
-                                <input type="hidden" name="subscribe_active" value="1" />
-                                <input type="hidden" name="subscribe_button"
-                                       value="<?= /* @noEscape */ $postParams['subscribe_button'] = 1; ?>"/>
-                                <input type="hidden" name="subscribe_options"
-                                       value='<?= /* @noEscape */
-                                        $block->getSubscribeOptionsJson($block->getSubscribeOptions()); ?>'/>
-                                <input type="hidden" name="<?= /* @noEscape */ Action::PARAM_NAME_URL_ENCODED; ?>"
+                            <div class="product-subscribe-button">
+                                <?php $postParams = $block->getCurrentPostParams(); ?>
+                                <form data-role="tocart-subscriptions-form"
+                                      action="<?= /* @noEscape */ $postParams['action']; ?>" method="post">
+                                    <input type="hidden" name="subscribe_active" value="1" />
+                                    <input type="hidden" name="subscribe_button"
+                                           value="<?= /* @noEscape */ $postParams['subscribe_button'] = 1; ?>">
+                                    <input type="hidden" name="use_trial"
+                                           value="<?= /* @noEscape */ $postParams['use_trial'] = 1; ?>">
+                                    <input type="hidden" name="subscribe_options"
+                                           value='<?= /* @noEscape */
+                                            $block->getSubscribeOptionsJson($block->getSubscribeOptions()); ?>'>
+                                    <input type="hidden" name="<?= /* @noEscape */ Action::PARAM_NAME_URL_ENCODED; ?>"
                                        value="<?= /* @noEscape */
-                                        $postParams['data'][Action::PARAM_NAME_URL_ENCODED]; ?>"/>
-                                <?= $block->getBlockHtml('formkey')?>
-                                <button type="submit"
-                                        title="<?= $escaper->escapeHtml(__('Auto-Ship')); ?>"
-                                        class="action tocart primary ">
-                                    <span><?= $escaper->escapeHtml(__('Auto-Ship')) ?></span>
+                                            $postParams['data'][Action::PARAM_NAME_URL_ENCODED]; ?>">
+                                    <?= $block->getBlockHtml('formkey'); ?>
+                                    <button type="submit"
+                                            title="<?= $escaper->escapeHtml(__('Auto-Ship')); ?>"
+                                            class="action tocart primary ">
+                                        <span><?= $escaper->escapeHtml(__('Auto-Ship')); ?></span>
+                                    </button>
+                                </form>
+                            </div>
+                            <div class="product-subscribe-button-dropdown">
+                                <button title="<?= $escaper->escapeHtml(__('Add to Cart')); ?>"
+                                        class="action-toggle primary add"
+                                        data-toggle="dropdown"
+                                        data-product-id="<?= /* @noEscape */ $_product->getId(); ?>">
+                                    <span><?= $escaper->escapeHtml(__('Select')); ?></span>
                                 </button>
-                            </form>
-                        </div>
-                        <div class="product-subscribe-button-dropdown">
-                            <button title="<?= $escaper->escapeHtml(__('Add to Cart')) ?>"
-                                    class="action-toggle primary add"
-                                    data-toggle="dropdown"
-                                    data-product-id="<?= /* @noEscape */ $_product->getId(); ?>">
-                                <span><?= $escaper->escapeHtml(__('Select')) ?></span>
-                            </button>
-                        </div>
-                        <div class="product-addtocart-button-hidden subscription-dropdown-hidden-<?= /* @noEscape */
-                            $_product->getId(); ?>">
-                            <?php $postParams = $block->getCurrentPostParams(); ?>
-                            <form data-role="tocart-form"
-                                  action="<?= /* @noEscape */ $postParams['action']; ?>" method="post">
-                                <input type="hidden" name="product"
-                                       value="<?= /* @noEscape */ $postParams['data']['product']; ?>"/>
-                                <input type="hidden" name="<?= /* @noEscape */ Action::PARAM_NAME_URL_ENCODED; ?>"
-                                       value="<?= /* @noEscape */
-                                        $postParams['data'][Action::PARAM_NAME_URL_ENCODED]; ?>"/>
-                                <?= $block->getBlockHtml('formkey')?>
-                                <button type="submit"
-                                        title="<?= $escaper->escapeHtml(__('Add to Cart')); ?>"
-                                        class="action tocart primary">
-                                    <span><?= $escaper->escapeHtml(__('Add to Cart')) ?></span>
-                                </button>
-                            </form>
-                        </div>
+                            </div>
+                            <div class="product-addtocart-button-hidden subscription-dropdown-hidden-<?= /* @noEscape */
+                                $_product->getId(); ?>">
+                                <?php $postParams = $block->getCurrentPostParams(); ?>
+                                <form data-role="tocart-form"
+                                      action="<?= /* @noEscape */ $postParams['action']; ?>" method="post">
+                                    <input type="hidden" name="product"
+                                           value="<?= /* @noEscape */ $postParams['data']['product']; ?>">
+                                    <input type="hidden" name="<?= /* @noEscape */ Action::PARAM_NAME_URL_ENCODED; ?>"
+                                           value="<?= /* @noEscape */
+                                            $postParams['data'][Action::PARAM_NAME_URL_ENCODED]; ?>">
+                                    <?= $block->getBlockHtml('formkey'); ?>
+                                    <button type="submit"
+                                            title="<?= $escaper->escapeHtml(__('Add to Cart')); ?>"
+                                            class="action tocart primary">
+                                        <span><?= $escaper->escapeHtml(__('Add to Cart')); ?></span>
+                                    </button>
+                                </form>
+                            </div>
                         <?php endif; ?>
                     </div>
                 <?php endif; ?>

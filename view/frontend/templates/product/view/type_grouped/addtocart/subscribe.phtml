@@ -24,7 +24,8 @@
                             "buttonLabel" : "<?= $escaper->escapeHtml(__('Add to Cart')) ?>",
                             "dateFormat": "<?= /** @noEscape  */$block->getDateFormat() ?>",
                             "minStartOn" : "<?= /** @noEscape  */ $block->getMinStartOn() ?>",
-                            "products" : <?= /** @noEscape  */ $block->getProductDataArray() ?>
+                            "products" : <?= /** @noEscape  */ $block->getProductDataArray() ?>,
+                            "priceFormat" : <?= /** @noEscape  */ $block->getPriceFormatData() ?>
                         }
                     }
                 }

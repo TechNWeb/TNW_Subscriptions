@@ -185,6 +185,28 @@ class Trial extends BaseModifier
             ]
         );
 
+        $meta = $this->arrayManager->merge(
+            $this->arrayManager->findPath(
+                Attribute::SUBSCRIPTION_TRIAL_CAN_SKIP,
+                $meta,
+                null,
+                'children'
+            ) . static::META_CONFIG_PATH,
+            $meta,
+            [
+                'imports' => [
+                    'visible' => 'ns = ${ $.ns }, index = ' . Attribute::SUBSCRIPTION_TRIAL_STATUS . ':checked',
+                    'disabled' => 'ns = ${ $.ns }, index = ' . Attribute::SUBSCRIPTION_TRIAL_STATUS. ':disabled',
+                    '__disableTmpl' => [
+                        'visible' => false,
+                        'disabled' => false
+                    ]
+                ],
+                'component' => 'Magento_Ui/js/form/element/single-checkbox',
+                'componentType' => 'field',
+            ]
+        );
+
         return $meta;
     }
 
