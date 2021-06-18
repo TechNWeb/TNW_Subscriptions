@@ -329,12 +329,8 @@ define([
         },
 
         getCanSkipTrial: function () {
-            var trialData;
-            trialData = this.get('currentProduct.trial_data');
-            if (trialData) {
-                return trialData.trial_can_skip === "1";
-            }
-            return false;
+            var trialData = this.get('currentProduct.trial_data');
+            return trialData ? trialData.trial_can_skip === "1" : false;
         },
 
         useTrialChanged: function (self, event) {
@@ -343,10 +339,10 @@ define([
 
         getTrialMessage: function () {
             var trialData = this.get('currentProduct.trial_data'),
-                trialLabelString = $t('Try %p %u%p'),
-                trialPrice = $t(' FREE');
+                trialLabelString = $t('Try %p %u %p'),
+                trialPrice = $t('FREE');
             if (trialData) {
-                trialPrice = trialData.trial_price
+                trialPrice = parseFloat(trialData.trial_price)
                     ? $t(' for ') + utils.formatPrice(trialData.trial_price, {}, false)
                     : trialPrice;
                 return trialLabelString

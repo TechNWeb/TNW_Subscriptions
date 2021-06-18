@@ -29,14 +29,7 @@ define([
          * @returns {string}
          */
         getPreviewLabel: function () {
-            var result;
-            if (this.value()) {
-                result = this.previewLabelYes;
-            } else {
-                result = this.previewLabelNo;
-            }
-
-            return result;
+            return this.value() ? this.previewLabelYes : this.previewLabelNo;
         },
 
         /**

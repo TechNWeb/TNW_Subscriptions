@@ -1,5 +1,8 @@
 <?php
-
+/**
+ * Copyright © 2021 TechNWeb, Inc. All rights reserved.
+ * See TNW_LICENSE.txt for license details.
+ */
 namespace TNW\Subscriptions\Setup\Patch\Data;
 
 use Magento\Catalog\Model\Product;

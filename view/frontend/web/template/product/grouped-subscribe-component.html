@@ -12,7 +12,7 @@
                 <th class="col item" scope="col" translate="'Product Name'"/>
                 <th class="col frequency" scope="col" translate="'Frequency'"/>
                 <th class="col qty" scope="col" translate="'Qty'"/>
-                <th class="col trial" scope="col" translate="'Trial'" data-bind="visible: hasTrial()"/>
+                <th class="col trial" scope="col" translate="'Trial'" data-bind="visible: hasTrialStatus"/>
             </tr>
         </thead>
         <tbody each="data: subscriptionProducts, as: 'product'">

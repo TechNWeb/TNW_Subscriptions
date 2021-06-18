@@ -112,7 +112,7 @@ class Subscribe extends View
     /**
      * @var SubscriptionContext
      */
-    protected $subscriptionContext;
+    private $subscriptionContext;
 
     /**
      * @var Currency
@@ -910,7 +910,7 @@ class Subscribe extends View
     public function getIsTrial()
     {
         $preconfigured = $this->preconfiguredValue('subscription_data/unique/is_trial');
-        return $this->_jsonEncoder->encode((int) $preconfigured);
+        return (int) $preconfigured;
     }
 
     /**

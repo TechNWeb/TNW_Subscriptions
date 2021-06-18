@@ -31,6 +31,7 @@ define([
                 )
             })
             this.manageRecurringOnly()
+            this.hasTrial()
         },
 
         manageRecurringOnly: function () {
@@ -193,18 +194,15 @@ define([
         },
 
         canSkipTrial: function (product) {
-            if (product.trial_data) {
-                return parseInt(product.trial_data.trial_can_skip);
-            }
-            return false;
+            return product.trial_data ? parseInt(product.trial_data.trial_can_skip) : 0;
         },
 
         getTrialMessage: function (product) {
             var trialData = product.trial_data,
-                trialLabelString = $t('(Try %p %u%p)'),
-                trialPrice = $t(' FREE');
+                trialLabelString = $t('(Try %p %u %p)'),
+                trialPrice = $t('FREE');
             if (trialData) {
-                trialPrice = trialData.trial_price
+                trialPrice = parseFloat(trialData.trial_price)
                     ? $t(' for ') + priceUtils.formatPrice(trialData.trial_price, this.priceFormat, false)
                     : trialPrice;
                 return trialLabelString
