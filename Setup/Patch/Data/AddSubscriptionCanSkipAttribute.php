@@ -14,7 +14,7 @@ use Magento\Framework\Setup\ModuleDataSetupInterface;
 use TNW\Subscriptions\Model\Product\Attribute;
 
 /**
- * Class AddSubscriptionCanSkipAttribute
+ * Class AddSubscriptionCanSkipAttribute - add EAV attribute
  */
 class AddSubscriptionCanSkipAttribute implements DataPatchInterface
 {
@@ -28,6 +28,11 @@ class AddSubscriptionCanSkipAttribute implements DataPatchInterface
      */
     private $moduleDataSetup;
 
+    /**
+     * AddSubscriptionCanSkipAttribute constructor.
+     * @param EavSetupFactory $eavSetupFactory
+     * @param ModuleDataSetupInterface $moduleDataSetup
+     */
     public function __construct(
         EavSetupFactory $eavSetupFactory,
         ModuleDataSetupInterface $moduleDataSetup
