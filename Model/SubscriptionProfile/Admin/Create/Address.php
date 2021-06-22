@@ -285,8 +285,10 @@ class Address extends Create
                 foreach ($address as $key => $addressValue) {
                     if (stripos($key, $attributeCode) !== false) {
                         $attributeKey = explode($attributeCode, $key)[1];
-                        $address[$attributeCode][$attributeKey] = $addressValue;
-                        unset($address[$key]);
+                        if (is_numeric($attributeKey)) {
+                            $address[$attributeCode][$attributeKey] = $addressValue;
+                            unset($address[$key]);
+                        }
                     }
                 }
             }

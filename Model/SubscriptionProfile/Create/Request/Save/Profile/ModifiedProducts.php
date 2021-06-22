@@ -26,13 +26,24 @@ class ModifiedProducts extends Base
                 $remove = $this->getFieldValue($data, 'remove', false);
                 $request = $this->getFieldValue($data, 'item_' . $objectItemId, false);
                 $request['product_id'] = $item->getProduct()->getId();
+                $oldAddressData = $saveModel->getShippingAddress()->getData();
+                $oldAddressData['street'] = $saveModel->getShippingAddress()->getStreet();
+                unset($oldAddressData['address_id']);
+                unset($oldAddressData['quote_id']);
+                unset($oldAddressData['entity_id']);
                 $saveModel->removeSubscriptions($item);
                 if (!$remove) {
                     $result = $saveModel->addToSubscription($request);
                     if (!$result) {
                         $this->errors[] = __('We can\'t add this item to your subscription shopping cart right now.');
                     } else {
+                        $result->getQuote()->removeAllAddresses();
                         $this->getSession()->addSubQuote($result->getQuote());
+                        $customerAddressId = array_key_exists('customer_address_id', $oldAddressData)
+                            ? $oldAddressData['customer_address_id']
+                            : null;
+                        $saveModel->setShippingAddress($oldAddressData, $customerAddressId);
+                        $saveModel->getQuoteCreator()->getCartRepository()->save($result->getQuote());
                     }
                 } else {
                     try {
