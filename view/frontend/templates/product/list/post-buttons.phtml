@@ -1,0 +1,105 @@
+<?php
+/**
+ * Copyright © 2018 TechNWeb, Inc. All rights reserved.
+ * See TNW_LICENSE.txt for license details.
+ */
+
+/**
+ * @var $block \TNW\Subscriptions\Block\Product\ListProduct\ListProductButtons
+ * @var $escaper \Magento\Framework\Escaper
+ */
+$_product = $block->getCurrentProduct();
+$_itemId = $block->getCurrentItemId();
+?>
+
+<div class="actions-primary">
+    <?php if ($block->isSubscribeAvailable($_product) && !$block->isOneTimePurchase($_product)): ?>
+        <?php if ($_product->getTypeId() == "configurable"): ?>
+            <div class="product-subscribe-addtocart-buttons-container">
+                <div class="product-subscribe-button">
+                    <button type="submit"
+                            data-role="tocart"
+                            data-item-id="<?= /* @noEscape */ $_itemId ?>"
+                            data-post='<?= /* @noEscape */ $block->getCurrentSubsDataPostParams() ?>'
+                            title="<?= $escaper->escapeHtml(__('Auto-Ship')); ?>"
+                            class="action tocart primary">
+                        <span><?= $escaper->escapeHtml(__('Auto-Ship')) ?></span>
+                    </button>
+                </div>
+                <div class="product-subscribe-button-dropdown">
+                    <button class="action-toggle primary add"
+                            data-toggle="dropdown"
+                            data-product-id="<?= /* @noEscape */ $_product->getId(); ?>">
+                        <span><?= $escaper->escapeHtml(__('Select')) ?></span>
+                    </button>
+                </div>
+                <div class="product-addtocart-button-hidden subscription-dropdown-hidden-<?= /* @noEscape */
+                    $_product->getId(); ?>">
+                        <button type="submit"
+                                data-role="tocart"
+                                data-item-id="<?= /* @noEscape */ $_itemId ?>"
+                                data-post='<?= /* @noEscape */ $block->getCurrentDataPostParams() ?>'
+                                title="<?= $escaper->escapeHtml(__('Add to Cart')); ?>"
+                                class="action tocart primary">
+                            <span><?= $escaper->escapeHtml(__('Add to Cart')) ?></span>
+                        </button>
+                </div>
+            </div>
+        <?php else: ?>
+            <?php if ($block->isOnlySubscribePurchase($_product)): ?>
+                <div class="product-subscribe-button">
+                    <button type="submit"
+                            data-role="tocart"
+                            data-item-id="<?= /* @noEscape */ $_itemId ?>"
+                            data-post='<?= /* @noEscape */ $block->getCurrentSubsDataPostParams() ?>'
+                            title="<?= $escaper->escapeHtml(__('Auto-Ship')); ?>"
+                            class="action tocart primary">
+                        <span><?= $escaper->escapeHtml(__('Auto-Ship')) ?></span>
+                    </button>
+                </div>
+            <?php else: ?>
+                <div class="product-subscribe-addtocart-buttons-container">
+                    <div class="product-subscribe-button">
+                        <button type="submit"
+                                data-role="tocart"
+                                data-item-id="<?= /* @noEscape */ $_itemId ?>"
+                                data-post='<?= /* @noEscape */ $block->getCurrentSubsDataPostParams() ?>'
+                                title="<?= $escaper->escapeHtml(__('Auto-Ship')); ?>"
+                                class="action tocart primary">
+                            <span><?= $escaper->escapeHtml(__('Auto-Ship')) ?></span>
+                        </button>
+                    </div>
+                    <div class="product-subscribe-button-dropdown">
+                        <button title="<?= $escaper->escapeHtml(__('Add to Cart')) ?>"
+                                class="action-toggle primary add"
+                                data-toggle="dropdown"
+                                data-product-id="<?= /* @noEscape */ $_product->getId(); ?>">
+                            <span><?= $escaper->escapeHtml(__('Select')) ?></span>
+                        </button>
+                    </div>
+                    <div class="product-addtocart-button-hidden subscription-dropdown-hidden-<?= /* @noEscape */
+                        $_product->getId(); ?>">
+                        <button type="submit"
+                                data-role="tocart"
+                                data-item-id="<?= /* @noEscape */ $_itemId ?>"
+                                data-post='<?= /* @noEscape */ $block->getCurrentDataPostParams() ?>'
+                                title="<?= $escaper->escapeHtml(__('Add to Cart')); ?>"
+                                class="action tocart primary">
+                            <span><?= $escaper->escapeHtml(__('Add to Cart')) ?></span>
+                        </button>
+                        </form>
+                    </div>
+                </div>
+            <?php endif; ?>
+        <?php endif; ?>
+    <?php else: ?>
+        <button type="submit"
+                data-role="tocart"
+                data-item-id="<?= /* @noEscape */ $_itemId ?>"
+                data-post='<?= /* @noEscape */ $block->getCurrentDataPostParams() ?>'
+                title="<?= $escaper->escapeHtml(__('Add to Cart')); ?>"
+                class="action tocart primary">
+            <span><?= $escaper->escapeHtml(__('Add to Cart')) ?></span>
+        </button>
+    <?php endif; ?>
+</div>

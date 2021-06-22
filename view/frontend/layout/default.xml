@@ -13,5 +13,10 @@
                 </argument>
             </arguments>
         </referenceBlock>
+        <referenceBlock name="wishlist_sidebar" template="TNW_Subscriptions::wishlist/sidebar.phtml"/>
+        <referenceBlock name="multiple-wishlist_sidebar" template="TNW_Subscriptions::wishlist/sidebar.phtml"/>
+        <referenceBlock name="content">
+            <block name="subs.buttons.init" template="TNW_Subscriptions::product/subs-buttons-widget.phtml" />
+        </referenceBlock>
     </body>
 </page>

@@ -6,8 +6,10 @@
 namespace TNW\Subscriptions\Block\Product\ListProduct;
 
 use Magento\Catalog\Api\Data\ProductInterface;
+use Magento\Framework\Exception\LocalizedException;
+use Magento\Framework\Exception\NoSuchEntityException;
+use Magento\Framework\Serialize\SerializerInterface;
 use Magento\Framework\View\Element\Template;
-use Magento\Store\Model\ScopeInterface;
 use TNW\Subscriptions\Api\BillingFrequencyRepositoryInterface as FrequencyRepository;
 use TNW\Subscriptions\Model\Config\Product\SubscriptionProductView;
 use TNW\Subscriptions\Model\Config\Source\PurchaseType;
@@ -15,7 +17,6 @@ use TNW\Subscriptions\Model\Product\Attribute;
 use TNW\Subscriptions\Api\ProductBillingFrequencyRepositoryInterface as FrequencyOptionRepository;
 use TNW\Subscriptions\Model\Config;
 use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Modal\Form as ModalForm;
-use Magento\Framework\Json\Encoder;
 use Magento\Customer\Model\Session;
 
 /**
@@ -46,14 +47,14 @@ class ListProductButtons extends Template
     private $config;
 
     /**
-     * @var Encoder
-     */
-    private $encoder;
-
-    /**
      * @var Session
      */
     private $customerSession;
+
+    /**
+     * @var SerializerInterface
+     */
+    private $serializer;
 
     /**
      * @param Template\Context $context
@@ -61,7 +62,7 @@ class ListProductButtons extends Template
      * @param FrequencyOptionRepository $frequencyOptionRepository
      * @param FrequencyRepository $frequencyRepository
      * @param Config $config
-     * @param Encoder $encoder
+     * @param SerializerInterface $serializer
      * @param Session $customerSession
      * @param array $data
      */
@@ -71,7 +72,7 @@ class ListProductButtons extends Template
         FrequencyOptionRepository $frequencyOptionRepository,
         FrequencyRepository $frequencyRepository,
         Config $config,
-        Encoder $encoder,
+        SerializerInterface $serializer,
         Session $customerSession,
         array $data = []
     ) {
@@ -79,8 +80,8 @@ class ListProductButtons extends Template
         $this->frequencyOptionRepository = $frequencyOptionRepository;
         $this->frequencyRepository = $frequencyRepository;
         $this->config = $config;
-        $this->encoder = $encoder;
         $this->customerSession = $customerSession;
+        $this->serializer = $serializer;
         parent::__construct($context, $data);
     }
 
@@ -92,6 +93,15 @@ class ListProductButtons extends Template
     public function getCurrentProduct()
     {
         return $this->getProduct() ?: null;
+    }
+
+    /**
+     * In case of wishlist item, return item id from original post params
+     * @return string|null
+     */
+    public function getCurrentItemId()
+    {
+        return !empty($this->getPostParams()['data']['item']) ? $this->getPostParams()['data']['item'] : null;
     }
 
     /**
@@ -140,6 +150,7 @@ class ListProductButtons extends Template
      *
      * @param ProductInterface $product
      * @return bool
+     * @throws LocalizedException
      */
     public function isSubscribeAvailable(ProductInterface $product)
     {
@@ -187,8 +198,8 @@ class ListProductButtons extends Template
      * Returns product billing frequencies as array.
      *
      * @return array
-     * @throws \Magento\Framework\Exception\LocalizedException
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     * @throws LocalizedException
+     * @throws NoSuchEntityException
      */
     public function getFrequencyOption()
     {
@@ -223,7 +234,7 @@ class ListProductButtons extends Template
      * Returns list of product billing frequencies.
      *
      * @return array
-     * @throws \Magento\Framework\Exception\LocalizedException
+     * @throws LocalizedException
      */
     private function getProductBillingFrequencies()
     {
@@ -256,8 +267,8 @@ class ListProductButtons extends Template
      * Get default value for Subscribe Qty
      *
      * @return float|int
-     * @throws \Magento\Framework\Exception\LocalizedException
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     * @throws LocalizedException
+     * @throws NoSuchEntityException
      */
     public function getDefaultSubscribeQty()
     {
@@ -322,8 +333,8 @@ class ListProductButtons extends Template
      * Get array of options to add in cart from category page
      *
      * @return array
-     * @throws \Magento\Framework\Exception\LocalizedException
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     * @throws LocalizedException
+     * @throws NoSuchEntityException
      */
     public function getSubscribeOptions()
     {
@@ -346,6 +357,33 @@ class ListProductButtons extends Template
      */
     public function getSubscribeOptionsJson($options)
     {
-        return $this->encoder->encode($options);
+        return $this->serializer->serialize($options);
+    }
+
+    /**
+     * Get original add to cart data-post params
+     * @return bool|string
+     */
+    public function getCurrentDataPostParams()
+    {
+        return $this->serializer->serialize($this->getCurrentPostParams());
+    }
+
+    /**
+     * Get add to cart data-post params with subscription part
+     * @return bool|string
+     * @throws LocalizedException
+     * @throws NoSuchEntityException
+     */
+    public function getCurrentSubsDataPostParams()
+    {
+        $origPostParams = $this->getCurrentPostParams();
+        if (!empty($origPostParams['data'])) {
+            $origPostParams['data']['subscribe_active'] = 1;
+            $origPostParams['data']['subscribe_button'] = 1;
+            $origPostParams['data']['subscribe_options'] = $this->serializer->serialize($this->getSubscribeOptions());
+            return $this->serializer->serialize($origPostParams);
+        }
+        return '';
     }
 }

@@ -1,0 +1,15 @@
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <referenceBlock name="customer.wishlist.item.cart" template="TNW_Subscriptions::wishlist/item/column/cart.phtml">
+            <block class="TNW\Subscriptions\Block\Product\ListProduct"
+                   name="helper.customer.wishlist.item.cart"
+                   as="helper.customer.wishlist.item.cart"/>
+        </referenceBlock>
+        <referenceBlock name="customer.wishlist.item.price" template="TNW_Subscriptions::wishlist/item/column/price.phtml">
+            <block class="TNW\Subscriptions\Block\Product\ListProduct"
+                   name="helper.customer.wishlist.item.price"
+                   as="helper.customer.wishlist.item.price"/>
+        </referenceBlock>
+    </body>
+</page>
