@@ -81,13 +81,15 @@ class AddDefaultValueForPurchaseType implements DataPatchInterface
             }
         }
 
-        $stores = $this->storeManager->getStores(true);
-        foreach ($stores as $store) {
-            $this->productAction->updateAttributes(
-                $ids,
-                [Attribute::SUBSCRIPTION_PURCHASE_TYPE => PurchaseType::ONE_TIME_PURCHASE_TYPE],
-                $store->getId()
-            );
+        if ($ids) {
+            $stores = $this->storeManager->getStores(true);
+            foreach ($stores as $store) {
+                $this->productAction->updateAttributes(
+                    $ids,
+                    [Attribute::SUBSCRIPTION_PURCHASE_TYPE => PurchaseType::ONE_TIME_PURCHASE_TYPE],
+                    $store->getId()
+                );
+            }
         }
     }
 }
