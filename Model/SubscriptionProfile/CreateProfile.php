@@ -8,7 +8,6 @@ namespace TNW\Subscriptions\Model\SubscriptionProfile;
 use Magento\Catalog\Model\Product as MagentoProduct;
 use Magento\Customer\Api\AddressRepositoryInterface;
 use Magento\Framework\Event\ManagerInterface;
-use Magento\Framework\Exception\LocalizedException;
 use Magento\Quote\Model\Quote as ModelQuote;
 use Magento\Quote\Model\Quote\Address as QuoteAddress;
 use Magento\Quote\Model\Quote\Payment;
@@ -17,7 +16,6 @@ use Magento\SalesRule\Model\Coupon as CouponModel;
 use Magento\SalesRule\Model\ResourceModel\Rule as RuleResource;
 use Magento\SalesRule\Model\Rule;
 use Magento\SalesRule\Model\Utility as CouponUtility;
-use TNW\Subscriptions\Api\Data\SubscriptionProfileInterface;
 use TNW\Subscriptions\Cron\Quote\Creator as QuoteGenerator;
 use TNW\Subscriptions\Model\Backend\Session\Quote as Session;
 use TNW\Subscriptions\Model\Context;
@@ -542,141 +540,6 @@ class CreateProfile extends BaseCreate
         }
 
         return $result;
-    }
-
-    /**
-     * Creates subscription profiles.
-     *
-     * @return SubscriptionProfileInterface[]
-     * @throws \Magento\Framework\Exception\CouldNotSaveException
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
-     * @throws LocalizedException
-     */
-    public function createSubscriptions()
-    {
-        $profiles = [];
-        $customer = $this->customerCreator->prepareCustomer();
-
-        $itemsRelationData = [];
-        /** @var ModelQuote $subQuote */
-        foreach ($this->getSubQuotes() as $subQuote) {
-            $this->quoteCreator->fillCustomerData($customer, $subQuote);
-            $this->quoteCreator->validate($subQuote);
-
-            // Reset profile
-            $this->profileManager->reset();
-
-            // Fill profile
-            $this->profileManager->populateProfileData($subQuote, $subQuote->getAllVisibleItems());
-
-            // Fill profile payment
-            $this->profileManager->populatePaymentData($subQuote->getPayment());
-
-            $oldStatus = $this->profileManager->getProfile()->getStatus();
-
-            try {
-                // Process profile
-                /** @var \Magento\Sales\Model\Order $order */
-                $order = $this->profileManager->processProfile($subQuote);
-            } catch (\Exception $e) {
-                $success = array_map(function (SubscriptionProfileInterface $profile) {
-                    return $profile->getLabel();
-                }, $profiles);
-
-                $successMessage = !empty($success)
-                    ? __('%1 profiles were paid successfully.', implode(', ', $success))
-                    : '';
-
-                throw new LocalizedException(__(
-                    'Payment transaction error: %1. %2 Not paid subscription plans still in your cart.',
-                    $e->getMessage(),
-                    $successMessage
-                ));
-            }
-
-            // Remove quote
-            $this->getSession()->removeSubQuote($subQuote);
-
-            // Save profile
-            $profile = $this->profileManager->saveProfile();
-
-            $newStatus = $this->profileManager->getProfile()->getStatus();
-            if ($oldStatus != $newStatus) {
-                //Add comment profile place.
-                $this->messageHistoryLogger->message(
-                    MessageHistoryLogger::MESSAGE_SUBSCRIPTION_STATUS_CHANGED,
-                    [
-                        $this->profileStatus->getLabelByValue($oldStatus),
-                        $this->profileStatus->getLabelByValue($newStatus)
-                    ],
-                    $profile->getId()
-                );
-            }
-
-            // Add comment about profile creation.
-            $this->messageHistoryLogger->message(
-                MessageHistoryLogger::MESSAGE_SUBSCRIPTION_CREATED,
-                [
-                    $profile->getLabel()
-                ],
-                $profile->getId()
-            );
-
-            // Add comment profile place.
-            $this->messageHistoryLogger->message(
-                MessageHistoryLogger::MESSAGE_ORDER_CREATED_FROM_QUOTE,
-                [
-                    $order->getEntityId(),
-                    $order->getIncrementId(),
-                    $this->messageHistoryLogger->getConvertedQuoteId($subQuote->getId())
-                ],
-                $profile->getId()
-            );
-
-            $startDate = $profile->getTrialStartDate() ?: $profile->getStartDate();
-            //Assign quote to new profile
-            $relation = $this->profileManager->assignQuoteToProfile($subQuote, $profile, $startDate);
-            //Add new relation to profile processing queue in "pending" state.
-            $queueItemIds = $this->queueManager->insertItems([$relation->getId()]);
-            $this->queueManager->makeRunning($queueItemIds);
-
-            $this->profileManager->assignOrderToProfile($relation, $order);
-            $this->queueManager->makeCompleted($queueItemIds);
-            $this->eventManager->dispatch(
-                'checkout_submit_all_after',
-                ['order' => $order, 'quote' => $subQuote]
-            );
-
-            /** @var \TNW\Subscriptions\Model\ProductSubscriptionProfile $product */
-            foreach ($profile->getProducts() as $product) {
-                $quoteItemId = $product->getData('quote_item_id');
-                if (empty($quoteItemId)) {
-                    continue;
-                }
-
-                $orderItem = $order->getItemByQuoteItemId($quoteItemId);
-                if (!$orderItem instanceof \Magento\Sales\Model\Order\Item) {
-                    continue;
-                }
-
-                $itemsRelationData[] = [
-                    'profile_item_id' => $product->getId(),
-                    'quote_item_id' => $quoteItemId,
-                    'order_item_id' => $orderItem->getId()
-                ];
-            }
-
-            //Generate quote for next payment.
-            $this->quoteGenerator->generateProfileQuotes($profile, 1);
-
-            $profiles[] = $profile;
-            //TODO add here email sending
-        }
-
-        // Save Items Relation
-        $this->relationResource->insertSales($itemsRelationData);
-
-        return $profiles;
     }
 
     /**

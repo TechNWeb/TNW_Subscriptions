@@ -562,17 +562,6 @@ class Manager
     }
 
     /**
-     * Engine profile processing.
-     *
-     * @param Quote $quote
-     * @return OrderInterface
-     */
-    public function processProfile(Quote $quote)
-    {
-        return $this->getEngine()->processProfile($quote);
-    }
-
-    /**
      * Processes payment method data
      *
      * @param $requestData
