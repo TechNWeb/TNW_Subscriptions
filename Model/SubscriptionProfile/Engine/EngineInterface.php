@@ -36,6 +36,14 @@ interface EngineInterface
     public function getProfile();
 
     /**
+     * Processes profile.
+     *
+     * @param Quote $quote
+     * @return OrderInterface
+     */
+    public function processProfile(Quote $quote);
+
+    /**
      * Returns payment information needed for engine.
      *
      * @param Payment $payment

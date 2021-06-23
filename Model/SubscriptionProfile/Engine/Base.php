@@ -200,6 +200,26 @@ class Base implements EngineInterface
 
     /**
      * {@inheritdoc}
+     * @throws \Exception
+     */
+    public function processProfile(Quote $quote)
+    {
+        try {
+            $this->validatePayment($quote);
+            $order = $this->getCartManagement()->submit($quote);
+            $this->updateProfileStatus();
+
+            return $order;
+        } catch (\Exception $e) {
+            $this->getProfile()->setStatus(ProfileStatus::STATUS_PAST_DUE);
+            $quote->setReservedOrderId(null);
+            $quote->save();
+            throw $e;
+        }
+    }
+
+    /**
+     * {@inheritdoc}
      */
     public function getPaymentInfo(SubscriptionProfileInterface $profile)
     {
