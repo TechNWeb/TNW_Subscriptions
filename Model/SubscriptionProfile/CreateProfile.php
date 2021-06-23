@@ -9,6 +9,7 @@ use Magento\Catalog\Model\Product as MagentoProduct;
 use Magento\Customer\Api\AddressRepositoryInterface;
 use Magento\Framework\Event\ManagerInterface;
 use Magento\Framework\Exception\LocalizedException;
+use Magento\InventorySalesApi\Api\Data\SalesChannelInterface;
 use Magento\Quote\Model\Quote as ModelQuote;
 use Magento\Quote\Model\Quote\Address as QuoteAddress;
 use Magento\Quote\Model\Quote\Payment;
@@ -30,6 +31,11 @@ use TNW\Subscriptions\Model\SubscriptionProfile\Admin\Create\Customer;
 use TNW\Subscriptions\Model\SubscriptionProfile\Admin\Create\Product;
 use TNW\Subscriptions\Model\SubscriptionProfile\Create as BaseCreate;
 use TNW\Subscriptions\Model\Source\ProfileStatus;
+use Magento\InventorySalesApi\Api\GetProductSalableQtyInterface;
+use Magento\InventorySalesApi\Api\StockResolverInterface;
+use Magento\Store\Model\StoreManagerInterface;
+use Magento\Framework\Controller\Result\RedirectFactory;
+use Magento\Framework\Message\ManagerInterface as MessageManager;
 
 /**
  * Class for creating subscription profile.
@@ -149,6 +155,26 @@ class CreateProfile extends BaseCreate
     private $couponUtility;
 
     /**
+     * @var GetProductSalableQtyInterface
+     */
+    private $getProductSalableQty;
+
+    /**
+     * @var StockResolverInterface
+     */
+    private $stock;
+
+    /**
+     * @var StoreManagerInterface
+     */
+    private $storeManager;
+
+    /**
+     * @var MessageManager
+     */
+    private $messageManager;
+
+    /**
      * CreateProfile constructor.
      * @param Context $context
      * @param QuoteSessionInterface $session
@@ -168,6 +194,10 @@ class CreateProfile extends BaseCreate
      * @param RuleResource $ruleResource
      * @param Rule $salesRule
      * @param CouponUtility $couponUtility
+     * @param GetProductSalableQtyInterface $getProductSalableQty
+     * @param StockResolverInterface $stock
+     * @param StoreManagerInterface $storeManager
+     * @param MessageManager $messageManager
      */
     public function __construct(
         Context $context,
@@ -187,7 +217,11 @@ class CreateProfile extends BaseCreate
         CouponModel $coupon,
         RuleResource $ruleResource,
         Rule $salesRule,
-        CouponUtility $couponUtility
+        CouponUtility $couponUtility,
+        GetProductSalableQtyInterface  $getProductSalableQty,
+        StockResolverInterface $stock,
+        StoreManagerInterface $storeManager,
+        MessageManager $messageManager
     ) {
         $this->addressRepository = $addressRepository;
         $this->addressCreator = $addressCreator;
@@ -205,6 +239,11 @@ class CreateProfile extends BaseCreate
         $this->ruleResource = $ruleResource;
         $this->couponUtility = $couponUtility;
         $this->salesRule = $salesRule;
+        $this->getProductSalableQty = $getProductSalableQty;
+        $this->stock = $stock;
+        $this->storeManager = $storeManager;
+        $this->messageManager = $messageManager;
+
 
         parent::__construct($context, $session);
     }
@@ -281,6 +320,11 @@ class CreateProfile extends BaseCreate
         $this->productModifier->setData($productData);
         $product = $this->productModifier->getProduct();
         $quote = $this->getSubQuote();
+        $websiteCode = $this->storeManager->getWebsite()->getCode();
+        $stockId = $this->stock->execute(SalesChannelInterface::TYPE_WEBSITE, $websiteCode)->getStockId();
+        if ($this->getProductSalableQty->execute($product->getSku(), $stockId) < $productData['subscribe_qty']) {
+            $this->messageManager->addErrorMessage(__('The requested qty is not available'));
+        }
         if (isset($productData['coupon_code'])) {
             $quote->setCouponCode($productData['coupon_code']);
         }
