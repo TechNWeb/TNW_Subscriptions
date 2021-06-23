@@ -989,6 +989,13 @@ class Manager
                 $profileItemIds[] = $profileProduct->getId();
 
                 $quoteItem->setData('profile_item_ids', array_unique($profileItemIds));
+                $orders = $this->orderCollectionFactory->create();
+                $orders->join(
+                    ['relation' => $orders->getTable(SubscriptionProfileOrderInterface::MAIN_TABLE)],
+                    'main_table.entity_id=relation.' . SubscriptionProfileOrderInterface::MAGENTO_ORDER_ID,
+                    []
+                )->addFieldToFilter('relation.subscription_profile_id', $profile->getId());
+                $quoteItem->setData('billing_cycle', count($orders->getItems()) + 1);
             }
         }
         if (count($quote->getAllVisibleItems())) {

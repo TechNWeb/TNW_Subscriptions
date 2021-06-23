@@ -98,6 +98,5 @@ class EmailOverview extends \Magento\Framework\View\Element\Template
     public function getCouponDetails()
     {
         return $this->getChildHtml('coupon-details');
-
     }
 }

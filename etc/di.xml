@@ -1530,4 +1530,9 @@
             </argument>
         </arguments>
     </type>
+    <type name="Magento\SalesRule\Model\Rule\Condition\Product">
+        <plugin name="add_billing_cycle_validation"
+                type="TNW\Subscriptions\Plugin\SalesRule\Model\Rule\Condition\Product"
+                sortOrder="10"/>
+    </type>
 </config>

@@ -18,5 +18,6 @@
         <attribute name="tnw_subscr_inf_subscriptions"/>
         <attribute name="tnw_subscr_inheritance"/>
         <attribute name="short_description"/>
+        <attribute name="billing_cycle"/>
     </group>
 </config>

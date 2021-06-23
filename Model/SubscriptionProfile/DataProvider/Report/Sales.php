@@ -327,8 +327,8 @@ class Sales extends AbstractDataProvider
                     'total' => $total,
                     'sku' => '',
                     'name' => 'Period Total',
-                    'qty' => NULL,
-                    'interval' => NULL
+                    'qty' => null,
+                    'interval' => null
                 ];
             }
         }
