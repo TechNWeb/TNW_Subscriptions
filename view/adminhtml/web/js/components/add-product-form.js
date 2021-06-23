@@ -3,9 +3,9 @@ define(
         'jquery',
         'Magento_Ui/js/form/form',
         'uiRegistry',
-        'underscore',
+        'underscore'
     ],
-    function ($, Component, registry,  _) {
+    function ($, Component, registry, _) {
         'use strict';
 
         return Component.extend({
@@ -29,6 +29,7 @@ define(
                 var mainModal,
                     grid,
                     subProductListing;
+
                 mainModal = registry.get('index=' + this.source.mainModal);
                 if (this.responseData().error) {
                     mainModal.closeModal();
@@ -198,7 +199,7 @@ define(
                 var rowIndex,
                     grid,
                     productId;
-                console.log('here')
+
                 productId = this.getModalForm().configurableData.product_id;
                 grid = this.getModalGrid();
 
@@ -269,7 +270,7 @@ define(
              */
             ajaxSubmit: function () {
                 this.validate();
-                console.log('321')
+
                 if (!this.additionalInvalid && !this.source.get('params.invalid')) {
                     this.setAdditionalData(this.getModalForm().configurableData);
 
