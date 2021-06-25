@@ -11,18 +11,18 @@ use Magento\Framework\Controller\ResultFactory;
 use Magento\Framework\Message\ManagerInterface;
 use Magento\Framework\Registry;
 use Magento\Framework\View\Result\PageFactory;
-use TNW\Subscriptions\Controller\Subscription\AbstractSave;
 use TNW\Subscriptions\Model\Processor\Request as RequestProcessor;
 use TNW\Subscriptions\Model\Processor\Response as ResponseProcessor;
 use TNW\Subscriptions\Model\SubscriptionProfile;
 use TNW\Subscriptions\Model\SubscriptionProfile\BillingCyclesManager;
 use TNW\Subscriptions\Model\SubscriptionProfile\Manager as ProfileManager;
 use TNW\Subscriptions\Model\SubscriptionProfileOrder\Manager as ProfileOrderManager;
+use Magento\Framework\App\Action;
 
 /**
  * Saves modified subscription profile.
  */
-class Save extends AbstractSave
+class Save extends Action\Action
 {
     /**
      * Subscription profile manager
@@ -64,6 +64,18 @@ class Save extends AbstractSave
     protected $messageManager;
 
     /**
+     * @var PageFactory
+     */
+    protected $resultPageFactory;
+
+    /**
+     * Save processor model.
+     *
+     * @var RequestProcessor
+     */
+    private $saveProcessor;
+
+    /**
      * @param Context $context
      * @param PageFactory $resultPageFactory
      * @param RequestProcessor $saveProcessor
@@ -94,7 +106,9 @@ class Save extends AbstractSave
         $this->messageManager = $messageManager;
         $this->profileOrderManager = $profileOrderManager;
         $this->billingCyclesManager = $billingCyclesManager;
-        parent::__construct($context, $resultPageFactory, $saveProcessor);
+        $this->resultPageFactory = $resultPageFactory;
+        $this->saveProcessor = $saveProcessor;
+        parent::__construct($context);
     }
 
     /**
@@ -211,14 +225,46 @@ class Save extends AbstractSave
     }
 
     /**
-     * @inheritdoc
+     * @param array $errors
+     * @return array
      */
     protected function getJsonResponse(array $errors)
     {
         $request = $this->getRequest()->getParams();
-        $response = parent::getJsonResponse($errors);
-        $response['data'] = $this->responseProcessor->processResponse($request);
+        $result = ['data' => [], 'error' => false];
+        if (!empty($errors)) {
+            $errorMessages = [];
+            $needReload = false;
+            foreach ($errors as $error) {
+                if (!empty($error)) {
+                    if (is_array($error)) {
+                        $errorMessages[] = reset($error);
+                        if (isset($error['needReload'])) {
+                            $needReload = $needReload || ($error['needReload'] ? true : false);
+                        }
+                    } else {
+                        $errorMessages[] = $error;
+                    }
+                }
+            }
+            $result = [
+                'error_messages' => $errorMessages,
+                'error' => true,
+                'needReload' => $needReload,
+            ];
+        }
+        $result['data'] = $this->responseProcessor->processResponse($request);
+        return $result;
+    }
 
-        return $response;
+
+    /**
+     * Returns request same model.
+     *
+     * @return RequestProcessor
+     */
+    protected function getSaveProcessor()
+    {
+        return $this->saveProcessor;
     }
 }
