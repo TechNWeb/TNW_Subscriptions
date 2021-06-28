@@ -69,6 +69,6 @@ class CustomerAccountChecker implements CustomerAccountCheckerInterface
                 $result = self::IS_CUSTOMER_EXISTS | self::IS_SUBSCRIBE_ACTIVE;
             }
         }
-        return (int)$result;
+        return $result;
     }
 }

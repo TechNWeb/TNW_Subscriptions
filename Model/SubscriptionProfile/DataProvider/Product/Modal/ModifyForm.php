@@ -465,6 +465,7 @@ class ModifyForm extends Form
                         'term' => $this->getTermDefinition(),
                         'period' => $this->getPeriodDefenition(),
                         'start_on' => $this->getStartOnDefinition(),
+                        'trial_period' => $this->getTrialPeriodDefenition(),
                         'initial_fee' => $this->getInitialFeeDefinition(),
                     ]
                 ],

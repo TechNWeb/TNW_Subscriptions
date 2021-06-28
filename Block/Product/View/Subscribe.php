@@ -749,7 +749,6 @@ class Subscribe extends View
                     $childArray[$childProduct->getId()]['qtyValidators'] = $this->getQtyValidators($childProduct);
                     $childArray[$childProduct->getId()]['isTrialAvailableForUser'] =
                         $this->isProductTrialAvailableForCurrentCustomer($childProduct->getId());
-
                 }
 
                 $associatedProducts = $this->getProduct()->getTypeInstance()

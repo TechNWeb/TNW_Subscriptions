@@ -175,7 +175,7 @@ class UpdateQuoteItem
         Quote $subject,
         Quote $result
     ) {
-        $addProductActionList = new ArrayObject();
+        $addProductList = new ArrayObject();
         foreach ($result->getAllItems() as $item) {
             if ($item->getChildren()) {
                 continue;
@@ -200,18 +200,20 @@ class UpdateQuoteItem
                     }
 
                     $result->deleteItem($itemToDelete);
-                    $addProductActionList->append(function ($quote) use ($itemToDelete, $buyRequest) {
-                        try {
-                            $quote->addProduct(clone $itemToDelete->getProduct(), clone $buyRequest);
-                        } catch (LocalizedException $e) {
-                            $quote->deleteItem(clone $itemToDelete);
-                        }
-                    });
+                    $addProductList->append([
+                        'item' => clone $itemToDelete,
+                        'itemProduct' => clone $itemToDelete->getProduct(),
+                        'buyRequest' => clone $buyRequest,
+                    ]);
                 }
             }
         }
-        foreach ($addProductActionList->getIterator() as $callable) {
-            call_user_func($callable, $result);
+        foreach ($addProductList->getIterator() as $itemToAdd) {
+            try {
+                $result->addProduct($itemToAdd['itemProduct'], $itemToAdd['buyRequest']);
+            } catch (LocalizedException $e) {
+                $result->deleteItem($itemToAdd['item']);
+            }
         }
         return $result;
     }
@@ -248,7 +250,9 @@ class UpdateQuoteItem
                     $usedProducts = $product->getTypeInstance()->getUsedProducts($product);
                     foreach ($usedProducts as $variation) {
                         if ($variation->getId() == $selectedConfigurableOption) {
-                            $productTrialStatus = $variation->getData(SubscriptionProductAttributes::SUBSCRIPTION_TRIAL_STATUS);
+                            $productTrialStatus = $variation->getData(
+                                SubscriptionProductAttributes::SUBSCRIPTION_TRIAL_STATUS
+                            );
                             break;
                         }
                     }

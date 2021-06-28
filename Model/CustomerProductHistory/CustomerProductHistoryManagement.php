@@ -14,7 +14,7 @@ use TNW\Subscriptions\Model\CustomerProductHistoryRepository;
 use TNW\Subscriptions\Model\ResourceModel\CustomerProductHistory\CollectionFactory;
 
 /**
- * Class CustomerProductHistoryManagement
+ * Class CustomerProductHistoryManagement - additional functionality for checking trial availability
  */
 class CustomerProductHistoryManagement implements CustomerProductHistoryManagementInterface
 {
