@@ -152,12 +152,12 @@ $canApplyMsrp = $helper->isShowBeforeOrderConfirm($product) && $helper->isMinima
             isOnetime = $("input[id=cart-<?= /* @noEscape */ $_item->getId(); ?>-onetime]").val(),
             qty = $('.qty');
         cartRadioSubscribe.on('change', function (e) {
-            if (isSubscription && <?= !(int)$groupsViewModel->allowDisplaySubscribeQty($_item) ?>) {
+            if (isSubscription && <?= (int) !$groupsViewModel->allowDisplaySubscribeQty($_item) ?>) {
                 cartQty.addClass('hidden');
             }
         });
         cartRadioOnetime.on('change', function (e) {
-            if (isOnetime && <?= !(int)$groupsViewModel->allowDisplaySubscribeQty($_item) ?>) {
+            if (isOnetime && <?= (int) !$groupsViewModel->allowDisplaySubscribeQty($_item) ?>) {
                 qty.removeClass('hidden');
             }
         })
