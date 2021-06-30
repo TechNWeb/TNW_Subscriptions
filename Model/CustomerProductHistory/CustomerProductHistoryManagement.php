@@ -8,6 +8,7 @@ namespace TNW\Subscriptions\Model\CustomerProductHistory;
 use Magento\Customer\Model\Session;
 use Magento\Framework\Api\FilterBuilder;
 use Magento\Framework\Api\SearchCriteriaBuilder;
+use Magento\Framework\App\ObjectManager;
 use TNW\Subscriptions\Api\CustomerProductHistoryManagementInterface;
 use TNW\Subscriptions\Api\Data\CustomerProductHistoryInterface;
 use TNW\Subscriptions\Model\CustomerProductHistoryRepository;
@@ -49,20 +50,17 @@ class CustomerProductHistoryManagement implements CustomerProductHistoryManageme
      * @param FilterBuilder $filterBuilder
      * @param CustomerProductHistoryRepository $customerProductHistoryRepository
      * @param CollectionFactory $customerProductHistoryCollectionFactory
-     * @param Session $customerSession
      */
     public function __construct(
         SearchCriteriaBuilder $searchCriteriaBuilder,
         FilterBuilder $filterBuilder,
         CustomerProductHistoryRepository $customerProductHistoryRepository,
-        CollectionFactory $customerProductHistoryCollectionFactory,
-        Session $customerSession
+        CollectionFactory $customerProductHistoryCollectionFactory
     ) {
         $this->searchCriteriaBuilder = $searchCriteriaBuilder;
         $this->filterBuilder = $filterBuilder;
         $this->customerProductHistoryRepository = $customerProductHistoryRepository;
         $this->customerProductHistoryCollectionFactory = $customerProductHistoryCollectionFactory;
-        $this->customerSession = $customerSession;
     }
 
     /**
@@ -116,11 +114,22 @@ class CustomerProductHistoryManagement implements CustomerProductHistoryManageme
     public function getUniqueProductsInSubscriptionsForCurrentCustomer(): array
     {
         $customerProductHistoryList = [];
-        if ($this->customerSession->isLoggedIn() && $this->customerSession->getCustomerId()) {
+        if ($this->getCustomerSession()->isLoggedIn() && $this->getCustomerSession()->getCustomerId()) {
             $customerProductHistoryList = $this->getUniqueProductsInSubscriptionsForCustomer(
                 (int)$this->customerSession->getCustomerId()
             );
         }
         return $customerProductHistoryList;
+    }
+
+    /**
+     * @return Session
+     */
+    private function getCustomerSession(): Session
+    {
+        if ($this->customerSession === null) {
+            $this->customerSession = ObjectManager::getInstance()->create(Session::class);
+        }
+        return $this->customerSession;
     }
 }
