@@ -868,6 +868,10 @@ class ModifyForm extends Form
      */
     protected function getPeriodDefenition()
     {
+        $objects = $this->getObjects();
+        $firstObject = array_shift($objects);
+        $term = $firstObject ? $firstObject->getTotalBillingCycles() : false;
+        $defaultPeriodValue = $term == 1 ? $term : self::DEFAULT_PERIOD_VALUE;
         $infiniteSubscriptions = (bool)$this->getSubAttributeFromItem(
             Attribute::SUBSCRIPTION_INFINITE_SUBSCRIPTIONS
         );
@@ -886,7 +890,7 @@ class ModifyForm extends Form
                         'last_phrase' => __('payments'),
                         'validation' => [
                             'required-entry' => true,
-                            'validate-number-range' => self::DEFAULT_PERIOD_VALUE.'-9999999999',
+                            'validate-number-range' => (int) $defaultPeriodValue . '-9999999999',
                         ],
                         'imports' => [
                             'onTermChange' => $this->getCurrentFormName()
