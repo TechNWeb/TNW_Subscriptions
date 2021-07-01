@@ -18,8 +18,9 @@ use Magento\Catalog\Api\ProductAttributeRepositoryInterface;
 use Magento\Eav\Setup\EavSetupFactory;
 
 /**
+ * Add filtering in product grid by 'Available For' attr and setup default value for this attr
+ *
  * Class AddDefaultValueForPurchaseType
- * @package TNW\Subscriptions\Setup\Patch\Data
  */
 class AddDefaultValueForPurchaseType implements DataPatchInterface
 {
