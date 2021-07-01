@@ -534,7 +534,7 @@ class ProductsForm extends SummaryProductsForm
      */
     protected function getPeriodDefenition()
     {
-        $term = $this->getCurrentProfile() ? $this->getCurrentProfile()->getData('total_billing_cycles') : false;
+        $term = $this->getCurrentProfile() ? $this->getCurrentProfile()->getTotalBillingCycles() : false;
         $defaultPeriodValue = $term == 1 ? $term : self::DEFAULT_PERIOD_VALUE;
         $infiniteSubscriptions = (bool)$this->getSubAttributeFromItem(
             Attribute::SUBSCRIPTION_INFINITE_SUBSCRIPTIONS

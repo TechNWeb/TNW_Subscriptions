@@ -868,7 +868,9 @@ class ModifyForm extends Form
      */
     protected function getPeriodDefenition()
     {
-        $term = $this->getObjects() ? $this->getObjects()[0]->getData('total_billing_cycles') : false;
+        $objects = $this->getObjects();
+        $firstObject = array_shift($objects);
+        $term = $firstObject ? $firstObject->getTotalBillingCycles() : false;
         $defaultPeriodValue = $term == 1 ? $term : self::DEFAULT_PERIOD_VALUE;
         $infiniteSubscriptions = (bool)$this->getSubAttributeFromItem(
             Attribute::SUBSCRIPTION_INFINITE_SUBSCRIPTIONS
