@@ -1,4 +1,8 @@
 <?php
+/**
+ * Copyright © 2021 TechNWeb, Inc. All rights reserved.
+ * See TNW_LICENSE.txt for license details.
+ */
 
 namespace TNW\Subscriptions\Setup\Patch\Data;
 
@@ -10,7 +14,13 @@ use TNW\Subscriptions\Model\Product\Attribute;
 use Magento\Catalog\Model\ResourceModel\Product\Collection;
 use Magento\Store\Model\StoreManagerInterface;
 use Magento\Catalog\Model\Product\Action;
+use Magento\Catalog\Api\ProductAttributeRepositoryInterface;
+use Magento\Eav\Setup\EavSetupFactory;
 
+/**
+ * Class AddDefaultValueForPurchaseType
+ * @package TNW\Subscriptions\Setup\Patch\Data
+ */
 class AddDefaultValueForPurchaseType implements DataPatchInterface
 {
     /**
@@ -29,20 +39,44 @@ class AddDefaultValueForPurchaseType implements DataPatchInterface
     private $productAction;
 
     /**
+     * @var ProductAttributeRepositoryInterface
+     */
+    private $attributeRepository;
+
+    /**
+     * @var ModuleDataSetupInterface
+     */
+    private $setup;
+
+    /**
+     * @var EavSetupFactory
+     */
+    private $eavSetupFactory;
+
+    /**
      * AddDefaultValueForPurchaseType constructor.
      * @param Collection $productCollection
      * @param StoreManagerInterface $storeManager
      * @param Action $productAction
+     * @param ProductAttributeRepositoryInterface $attributeRepository
+     * @param ModuleDataSetupInterface $setup
+     * @param EavSetupFactory $eavSetupFactory
      */
     public function __construct(
         Collection $productCollection,
         StoreManagerInterface $storeManager,
-        Action $productAction
+        Action $productAction,
+        ProductAttributeRepositoryInterface $attributeRepository,
+        ModuleDataSetupInterface $setup,
+        EavSetupFactory $eavSetupFactory
     )
     {
         $this->productCollection = $productCollection;
         $this->storeManager = $storeManager;
         $this->productAction = $productAction;
+        $this->attributeRepository = $attributeRepository;
+        $this->setup = $setup;
+        $this->eavSetupFactory = $eavSetupFactory;
     }
 
     /**
@@ -62,12 +96,19 @@ class AddDefaultValueForPurchaseType implements DataPatchInterface
     }
 
     /**
-     *  Add default value Attribute::SUBSCRIPTION_PURCHASE_TYPE for filtering on product grid
-     *
      * @return AddDefaultValueForPurchaseType|void
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
     public function apply()
     {
+        $eavSetup = $this->eavSetupFactory->create(['setup' => $this->setup]);
+        $id = $this->attributeRepository->get(Attribute::SUBSCRIPTION_PURCHASE_TYPE)->getAttributeId();
+        $eavSetup->updateAttribute(\Magento\Catalog\Model\Product::ENTITY, $id, 'filterable', 1, null);
+        $eavSetup->updateAttribute(\Magento\Catalog\Model\Product::ENTITY, $id, 'filterable_in_search', 1, null);
+        $eavSetup->updateAttribute(\Magento\Catalog\Model\Product::ENTITY, $id, 'is_used_in_grid', 1, null);
+        $eavSetup->updateAttribute(\Magento\Catalog\Model\Product::ENTITY, $id, 'is_visible_in_grid', 1, null);
+        $eavSetup->updateAttribute(\Magento\Catalog\Model\Product::ENTITY, $id, 'is_filterable_in_grid', 1, null);
+
         $products = $this->productCollection
             ->addFieldToFilter('type_id', ['neq' => Type::TYPE_BUNDLE])
             ->addAttributeToSelect(Attribute::SUBSCRIPTION_PURCHASE_TYPE)

@@ -133,10 +133,6 @@ class UpgradeData implements UpgradeDataInterface
             $this->addInheritProductAttribute($eavSetup);
         }
 
-        if (version_compare($context->getVersion(), '2.3.28', '<')) {
-            $this->upgradeAvailableForAttribute($eavSetup);
-        }
-
         $setup->endSetup();
     }
 
@@ -569,28 +565,6 @@ class UpgradeData implements UpgradeDataInterface
         $connection->delete(
             $configTable,
             $setup->getConnection()->prepareSqlCondition('path', $path)
-        );
-    }
-
-    /**
-     * Upgrade 'Available For' attribute
-     *
-     * @param EavSetup $eavSetupFactory
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
-     */
-    protected function upgradeAvailableForAttribute(EavSetup $eavSetupFactory)
-    {
-        $id = $this->attributeRepository->get(Attribute::SUBSCRIPTION_PURCHASE_TYPE)->getAttributeId();
-        $eavSetupFactory->updateAttribute(\Magento\Catalog\Model\Product::ENTITY, $id, 'filterable', 1, null);
-        $eavSetupFactory->updateAttribute(\Magento\Catalog\Model\Product::ENTITY, $id, 'filterable_in_search', 1, null);
-        $eavSetupFactory->updateAttribute(\Magento\Catalog\Model\Product::ENTITY, $id, 'is_used_in_grid', 1, null);
-        $eavSetupFactory->updateAttribute(\Magento\Catalog\Model\Product::ENTITY, $id, 'is_visible_in_grid', 1, null);
-        $eavSetupFactory->updateAttribute(
-            \Magento\Catalog\Model\Product::ENTITY,
-            $id,
-            'is_filterable_in_grid',
-            1,
-            null
         );
     }
 }
