@@ -32,8 +32,7 @@
             <block class="TNW\Subscriptions\Block\Subscription\Billing\EmailCouponInformation"
                    name="subscription.info.view.coupon"
                    template="TNW_Subscriptions::subscription_profile/summary/overview/coupon-code.phtml"
-                   as="coupon-details"
-            />
+                   as="coupon-details"/>
         </block>
     </body>
 </page>

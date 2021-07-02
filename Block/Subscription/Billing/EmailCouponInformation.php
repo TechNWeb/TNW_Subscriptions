@@ -1,11 +1,12 @@
 <?php
-
-
+/**
+ * Copyright © 2018 TechNWeb, Inc. All rights reserved.
+ * See TNW_LICENSE.txt for license details.
+ */
 namespace TNW\Subscriptions\Block\Subscription\Billing;
 
 use Magento\Framework\Registry;
 use Magento\Framework\View\Element\Template\Context;
-use Magento\Quote\Model\Quote;
 use TNW\Subscriptions\Api\Data\SubscriptionProfileInterface;
 use TNW\Subscriptions\Block\Subscription\Info\ContentAbstract;
 use TNW\Subscriptions\Model\MessagePool;
@@ -19,6 +20,9 @@ use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Modal\Conte
 use TNW\Subscriptions\Model\SubscriptionProfile\Manager as ProfileManager;
 use TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Form\Modifier\SummaryInsertForm;
 
+/**
+ * Block for view used coupon code information in emails
+ */
 class EmailCouponInformation extends ContentAbstract
 {
     /**
@@ -89,8 +93,7 @@ class EmailCouponInformation extends ContentAbstract
         RuleResource $ruleResource,
         FormContext $formContext,
         array $data = []
-    )
-    {
+    ) {
         $this->couponUtility = $utility;
         $this->salesRule = $salesRule;
         $this->profileManager = $profileManager;
