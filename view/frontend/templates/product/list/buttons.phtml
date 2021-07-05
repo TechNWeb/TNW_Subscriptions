@@ -149,8 +149,10 @@ $isTrialAllowedForCustomer = !in_array((int)$_product->getId(), $block->getCurre
                                 <input type="hidden" name="subscribe_active" value="1" />
                                 <input type="hidden" name="subscribe_button"
                                        value="<?= /* @noEscape */ $postParams['subscribe_button'] = 1; ?>">
+                                <?php if ($isTrialAllowedForCustomer === true): ?>
                                 <input type="hidden" name="use_trial"
                                        value="<?= /* @noEscape */ $postParams['use_trial'] = 1; ?>">
+                                <?php endif; ?>
                                 <input type="hidden" name="subscribe_options"
                                        value='<?= /* @noEscape */
                                         $block->getSubscribeOptionsJson($block->getSubscribeOptions()); ?>'>
@@ -263,8 +265,10 @@ $isTrialAllowedForCustomer = !in_array((int)$_product->getId(), $block->getCurre
                                     <input type="hidden" name="subscribe_active" value="1" />
                                     <input type="hidden" name="subscribe_button"
                                            value="<?= /* @noEscape */ $postParams['subscribe_button'] = 1; ?>">
+                                    <?php if ($isTrialAllowedForCustomer === true): ?>
                                     <input type="hidden" name="use_trial"
                                            value="<?= /* @noEscape */ $postParams['use_trial'] = 1; ?>">
+                                    <?php endif; ?>
                                     <input type="hidden" name="subscribe_options"
                                            value='<?= /* @noEscape */
                                             $block->getSubscribeOptionsJson($block->getSubscribeOptions()); ?>'>

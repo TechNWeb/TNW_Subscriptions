@@ -1423,4 +1423,8 @@
                 type="Magento\Framework\Api\SearchResults"/>
     <preference for="TNW\Subscriptions\Api\CustomerAccountCheckerInterface"
                 type="TNW\Subscriptions\Model\Customer\CustomerAccountChecker"/>
+    <type name="Magento\Checkout\Model\Session">
+        <plugin name="tnw_subscription_trial_availability_checker"
+                type="TNW\Subscriptions\Plugin\Checkout\Model\Session"/>
+    </type>
 </config>
