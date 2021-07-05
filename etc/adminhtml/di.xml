@@ -252,10 +252,6 @@
         </arguments>
     </virtualType>
 
-    <type name="Magento\Sales\Model\ResourceModel\Order\Grid\Collection">
-        <plugin name="tnw_subscriptions" type="TNW\Subscriptions\Plugin\Model\ResourceModel\Order\Grid\Collection" />
-    </type>
-
     <type name="Magento\Sales\Block\Adminhtml\Order\View\Items\Renderer\DefaultRenderer">
         <plugin name="tnw_subscriptions_sales_order_items_column_initial_fee"
                 type="TNW\Subscriptions\Plugin\Sales\Block\Order\Items\Column\Renderer\AddInitialFee"
