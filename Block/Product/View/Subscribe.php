@@ -19,6 +19,7 @@ use Magento\CatalogInventory\Api\Data\StockItemInterface;
 use Magento\Checkout\Block\Cart\Item\Renderer;
 use Magento\ConfigurableProduct\Model\Product\Type\Configurable;
 use Magento\Customer\Model\Session;
+use Magento\Directory\Model\Currency;
 use Magento\Downloadable\Model\Product\Type;
 use Magento\Framework\DataObject;
 use Magento\Framework\Exception\LocalizedException;
@@ -31,6 +32,7 @@ use Magento\Framework\Url\EncoderInterface as UrlEncoderInterface;
 use Magento\GroupedProduct\Model\Product\Type\Grouped;
 use Magento\Framework\Stdlib\StringUtils;
 use TNW\Subscriptions\Api\BillingFrequencyRepositoryInterface as FrequencyRepository;
+use TNW\Subscriptions\Api\CustomerProductHistoryManagementInterface;
 use TNW\Subscriptions\Api\Data\ProductBillingFrequencyInterface;
 use TNW\Subscriptions\Api\ProductBillingFrequencyRepositoryInterface as FrequencyOptionRepository;
 use TNW\Subscriptions\Model\Config;
@@ -42,6 +44,7 @@ use TNW\Subscriptions\Model\ProductBillingFrequency\PriceCalculator;
 use TNW\Subscriptions\Model\ProductBillingFrequency\SavingsCalculation;
 use TNW\Subscriptions\Model\ProductSubscriptionProfile\ProductTypeManagerResolver;
 use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Modal\Form;
+use TNW\Subscriptions\Model\Context as SubscriptionContext;
 
 /**
  * Subscribe product block instance
@@ -108,6 +111,27 @@ class Subscribe extends View
     private $serializer;
 
     /**
+     * @var SubscriptionContext
+     */
+    private $subscriptionContext;
+
+    /**
+     * @var Currency
+     */
+    private $currentCurrency;
+
+    /**
+     * @var Context
+     */
+    private $context;
+
+    /**
+     * @var CustomerProductHistoryManagementInterface
+     */
+    private $customerProductHistoryManagement;
+
+    /**
+     * Subscribe constructor.
      * @param Context $context
      * @param UrlEncoderInterface $urlEncoder
      * @param EncoderInterface $jsonEncoder
@@ -127,6 +151,8 @@ class Subscribe extends View
      * @param ProductTypeManagerResolver $subscriptionTypeResolver
      * @param PriceCalculator $priceCalculator
      * @param Config\Source\TrialLengthUnitType $trialLengthUnitType
+     * @param SubscriptionContext $subscriptionContext
+     * @param CustomerProductHistoryManagementInterface $customerProductHistoryManagement
      * @param array $data
      */
     public function __construct(
@@ -149,6 +175,8 @@ class Subscribe extends View
         ProductTypeManagerResolver $subscriptionTypeResolver,
         PriceCalculator $priceCalculator,
         Config\Source\TrialLengthUnitType $trialLengthUnitType,
+        SubscriptionContext $subscriptionContext,
+        CustomerProductHistoryManagementInterface $customerProductHistoryManagement,
         array $data = []
     ) {
         $this->subscriptionProductViewConfig = $subscriptionProductViewConfig;
@@ -159,6 +187,9 @@ class Subscribe extends View
         $this->subscriptionTypeResolver = $subscriptionTypeResolver;
         $this->priceCalculator = $priceCalculator;
         $this->trialLengthUnitType = $trialLengthUnitType;
+        $this->subscriptionContext = $subscriptionContext;
+        $this->context = $context;
+        $this->customerProductHistoryManagement = $customerProductHistoryManagement;
         parent::__construct(
             $context,
             $urlEncoder,
@@ -674,7 +705,10 @@ class Subscribe extends View
                 'trial_data' => $this->getTrialDataByProduct($productData),
                 'recurring_settings' => $this->getRecurringSettingsByProduct($this->getProduct()),
                 'qtyValidators' => $this->getQtyValidators($this->getProduct()),
-                'preconfigured' => $preconfiguredValues
+                'preconfigured' => $preconfiguredValues,
+                'isTrialAvailableForUser' => $this->isProductTrialAvailableForCurrentCustomer(
+                    $this->getProduct()->getId()
+                ),
             ]
         ];
 
@@ -713,6 +747,8 @@ class Subscribe extends View
                         $productDataObject
                     );
                     $childArray[$childProduct->getId()]['qtyValidators'] = $this->getQtyValidators($childProduct);
+                    $childArray[$childProduct->getId()]['isTrialAvailableForUser'] =
+                        $this->isProductTrialAvailableForCurrentCustomer($childProduct->getId());
                 }
 
                 $associatedProducts = $this->getProduct()->getTypeInstance()
@@ -747,6 +783,8 @@ class Subscribe extends View
                         $productDataObject
                     );
                     $childArray[$childProduct->getId()]['qtyValidators'] = $this->getQtyValidators($childProduct);
+                    $childArray[$childProduct->getId()]['isTrialAvailableForUser'] =
+                        $this->isProductTrialAvailableForCurrentCustomer($childProduct->getId());
                 }
 
                 $result['children'] = $childArray;
@@ -824,6 +862,7 @@ class Subscribe extends View
         if ($productDataObject->getData(Attribute::SUBSCRIPTION_TRIAL_STATUS)) {
             return [
                 'trial_price' => $productDataObject->getData(Attribute::SUBSCRIPTION_TRIAL_PRICE),
+                'trial_can_skip' => $productDataObject->getData(Attribute::SUBSCRIPTION_TRIAL_CAN_SKIP),
                 'trial_length' => $productDataObject->getData(Attribute::SUBSCRIPTION_TRIAL_LENGTH),
                 'trial_length_unit' => $productDataObject->getData(Attribute::SUBSCRIPTION_TRIAL_LENGTH_UNIT),
                 'trial_start_date' => $productDataObject->getData(Attribute::SUBSCRIPTION_TRIAL_START_DATE),
@@ -869,5 +908,70 @@ class Subscribe extends View
     public function isAllowedAddToCart()
     {
         return $this->subscriptionProductViewConfig->getCustomerGroupLimitation($this->getProduct());
+    }
+
+    /**
+     * @return bool
+     * @throws NoSuchEntityException
+     */
+    public function getIsCanSkipTrial()
+    {
+        $product = $this->getProductDataObject();
+        return $product->getData(Attribute::SUBSCRIPTION_TRIAL_STATUS)
+            && $product->getData(Attribute::SUBSCRIPTION_TRIAL_CAN_SKIP);
+    }
+
+    /**
+     * @return string
+     * @throws NoSuchEntityException
+     */
+    public function getIsTrial()
+    {
+        $preconfigured = $this->preconfiguredValue('subscription_data/unique/is_trial');
+        return (int) $preconfigured;
+    }
+
+    /**
+     * @return string
+     * @throws NoSuchEntityException
+     */
+    public function getPriceFormatData()
+    {
+        $currencyCode = $this->getCurrentCurrency()->getCurrencyCode();
+
+        return $this->subscriptionContext->getPriceFormatData($currencyCode);
+    }
+
+    /**
+     * @return Currency
+     * @throws NoSuchEntityException
+     */
+    private function getCurrentCurrency()
+    {
+        if ($this->currentCurrency === null) {
+            $currencyCode = $this->context->getSession()->getCurrencyId();
+            if ($currencyCode) {
+                $this->currentCurrency = $this->context->getCurrencyFactory()
+                    ->create()
+                    ->load($currencyCode);
+            } else {
+                $this->currentCurrency = $this->context->getStoreManager()
+                    ->getStore()
+                    ->getBaseCurrency();
+            }
+        }
+
+        return $this->currentCurrency;
+    }
+
+    /**
+     * @param $productId
+     * @return bool
+     */
+    public function isProductTrialAvailableForCurrentCustomer($productId)
+    {
+        $customerProductHistoryList = $this->customerProductHistoryManagement
+            ->getUniqueProductsInSubscriptionsForCurrentCustomer();
+        return !in_array((int)$productId, $customerProductHistoryList, true);
     }
 }

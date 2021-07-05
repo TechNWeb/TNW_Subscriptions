@@ -13,6 +13,7 @@ use Magento\Framework\Pricing\PriceCurrencyInterface;
 use Magento\Framework\Pricing\Render\RendererPool;
 use Magento\Framework\Pricing\SaleableInterface;
 use Magento\Framework\View\Element\Template;
+use TNW\Subscriptions\Api\CustomerProductHistoryManagementInterface;
 use TNW\Subscriptions\Api\ProductBillingFrequencyRepositoryInterface as FrequencyOptionRepository;
 use TNW\Subscriptions\Model\Config\Source\TrialLengthUnitType;
 use TNW\Subscriptions\Model\ProductBillingFrequency\DescriptionCreator;
@@ -62,6 +63,7 @@ class SubcsriptionConfigurablePriceBox extends SubscriptionPriceBox
      * @param Manager $moduleManager
      * @param Data $swatchHelper
      * @param SubscriptionProductView $subscriptionProductViewConfig
+     * @param CustomerProductHistoryManagementInterface $customerProductHistoryManagement
      * @param array $data
      */
     public function __construct(
@@ -81,6 +83,7 @@ class SubcsriptionConfigurablePriceBox extends SubscriptionPriceBox
         Manager $moduleManager,
         Data $swatchHelper,
         SubscriptionProductView $subscriptionProductViewConfig,
+        CustomerProductHistoryManagementInterface $customerProductHistoryManagement,
         array $data = []
     ) {
         parent::__construct(
@@ -97,6 +100,7 @@ class SubcsriptionConfigurablePriceBox extends SubscriptionPriceBox
             $profileManager,
             $productTypeResolver,
             $subscriptionProductViewConfig,
+            $customerProductHistoryManagement,
             $data
         );
 

@@ -140,6 +140,22 @@
                 </item>
             </argument>
         </field>
+        <field name="use_trial" formElement="checkbox">
+            <settings>
+                <label translate="true">Use Trial</label>
+            </settings>
+            <formElements>
+                <checkbox>
+                    <settings>
+                        <prefer>toggle</prefer>
+                        <valueMap>
+                            <map name="false" xsi:type="number">0</map>
+                            <map name="true" xsi:type="number">1</map>
+                        </valueMap>
+                    </settings>
+                </checkbox>
+            </formElements>
+        </field>
         <field name="trial_period">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">

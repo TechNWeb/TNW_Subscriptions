@@ -11,12 +11,14 @@
  * @var $block \TNW\Subscriptions\Block\Product\ListProduct
  * @var $imageBlockBuilder \Magento\Catalog\Block\Product\ImageBlockBuilder
  * @var $escaper \Magento\Framework\Escaper
+ * @var $_customerProductsHistoryListViewModel \TNW\Subscriptions\Block\Product\CustomerProductsHistoryList
  */
 ?>
 <?php
 $_productCollection = $block->getLoadedProductCollection();
 $_helper = $this->helper('Magento\Catalog\Helper\Output');
 $_subscriptionBlock = $block->getChildBlock('helper.category.products.list');
+$_customerProductsHistoryListViewModel = $block->getData('customerProductsHistoryList');
 ?>
 <?php if (!$_productCollection->count()): ?>
     <div class="message info empty">
@@ -41,6 +43,9 @@ $_subscriptionBlock = $block->getChildBlock('helper.category.products.list');
      * Position for actions regarding image size changing in vde if needed
      */
     $pos = $block->getPositioned();
+    $_subscriptionBlock->setCurrentCustomerProductHistoryList(
+        $_customerProductsHistoryListViewModel->getCurrentCustomerProductHistoryList()
+    );
     ?>
     <div class="products wrapper <?= /* @noEscape */ $viewMode; ?> products-<?= /* @noEscape */ $viewMode; ?>">
         <?php $iterator = 1; ?>

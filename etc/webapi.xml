@@ -78,4 +78,12 @@
             <parameter name="cartId" force="true">%tnw_subscriptions_cart_id%</parameter>
         </data>
     </route>
+
+    <!-- Checking customer's authorization status -->
+    <route url="/V1/tnw-subscriptions-customer/isCustomerExistsAndShouldBeLoggedIn" method="POST">
+        <service class="TNW\Subscriptions\Api\CustomerAccountCheckerInterface" method="isCustomerExistsAndShouldBeLoggedIn"/>
+        <resources>
+            <resource ref="anonymous"/>
+        </resources>
+    </route>
 </routes>
