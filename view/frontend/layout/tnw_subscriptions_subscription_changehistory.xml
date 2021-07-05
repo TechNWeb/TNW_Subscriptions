@@ -14,6 +14,7 @@
                    template="subscription/change-history.phtml"
                    name="subscription.info.change.history"
                    after="subscription.info.links"
+                   cacheable="false"
             />
         </referenceContainer>
     </body>

@@ -255,9 +255,16 @@ class Product extends Create
             $productData['hide_qty'] =
                 (bool) $this->getSubsAttribute(Attribute::SUBSCRIPTION_HIDE_QTY);
             $startOn = $this->getSubsAttribute(Attribute::SUBSCRIPTION_START_DATE);
-            $isTrial = !empty($productData['modify_profile']) && $productData['modify_profile']
-                ? false
-                : (bool) $this->getSubsAttribute(Attribute::SUBSCRIPTION_TRIAL_STATUS);
+            $isTrial = false;
+            if (isset($productData['use_trial'])
+                && filter_var($productData['use_trial'], FILTER_VALIDATE_BOOLEAN)
+                && $this->getSubsAttribute(Attribute::SUBSCRIPTION_TRIAL_STATUS)
+                && (empty($productData['modify_profile']) || !$productData['modify_profile'])
+            ) {
+                $isTrial = true;
+            } else {
+                $productData['modify_profile'] = true;
+            }
             $trialPeriod = $trialUnitId = null;
             if ($isTrial) {
                 $childTrial = $this->getInheritanceConfig(Attribute::SUBSCRIPTION_TRIAL_STATUS);

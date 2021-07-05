@@ -13,6 +13,8 @@ define([
             activeInputSelector: 'input[name=subscribe_active]',
             subscriptionProducts: [],
             recurringOnlyText: $t('Product is not available for purchase at this time'),
+            hasTrialStatus: false,
+            priceFormat: {},
             tracks: {
                 subscriptionProducts: true
             },
@@ -29,6 +31,7 @@ define([
                 )
             })
             this.manageRecurringOnly()
+            this.hasTrial()
         },
 
         manageRecurringOnly: function () {
@@ -178,6 +181,36 @@ define([
 
         canSubscribe: function (product) {
             return this.getPurchaseType(product) ? this.getPurchaseType(product) !== '1' : false;
+        },
+
+        hasTrial: function () {
+            var values = _.values(this.products.children);
+            _.each(values, function (product) {
+                if (product.trial_data !== null && product.isTrialAvailableForUser) {
+                    this.hasTrialStatus = true;
+                }
+            }, this);
+            return this.hasTrialStatus;
+        },
+
+        canSkipTrial: function (product) {
+            return product.trial_data ? parseInt(product.trial_data.trial_can_skip) : 0;
+        },
+
+        getTrialMessage: function (product) {
+            var trialData = product.trial_data,
+                trialLabelString = $t('(Try %p %u %p)'),
+                trialPrice = $t('FREE');
+            if (trialData && trialData.trial_can_skip === '1' && product.isTrialAvailableForUser) {
+                trialPrice = parseFloat(trialData.trial_price)
+                    ? $t(' for ') + priceUtils.formatPrice(trialData.trial_price, this.priceFormat, false)
+                    : trialPrice;
+                return trialLabelString
+                    .replace('%p', trialData.trial_length)
+                    .replace('%u', trialData.trial_label)
+                    .replace('%p', trialPrice)
+            }
+            return '';
         }
     });
 });

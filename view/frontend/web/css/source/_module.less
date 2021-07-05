@@ -986,7 +986,24 @@
             top: 5px;
         }
     }
+
+    #product-comparison {
+        .cell.product.info {
+            .product-item-actions {
+                .tocart {
+                    .lib-font-size(13px);
+                    border-radius: 0;
+                    line-height: 1;
+                    padding-bottom: @indent__s;
+                    padding-top: @indent__s;
+                    white-space: nowrap;
+                }
+            }
+        }
+    }
+
 }
+
 //
 //  Desktop
 //  _____________________________________________
@@ -2130,6 +2147,10 @@
                 font-weight: 600;
                 text-transform: uppercase;
             }
+
+            .old-price {
+                display: block;
+            }
         }
     }
 }
@@ -2429,4 +2450,10 @@ div.shipping-details-content {
 }
 .order-details-items .sub-profile-option {
     padding-top: 20px;
+}
+.products-grid.wishlist .product-item .box-tocart .tocart {
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+    font-size: 1.3rem;
+    line-height: 1.3rem;
 }

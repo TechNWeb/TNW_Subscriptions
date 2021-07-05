@@ -1,0 +1,65 @@
+<!--
+/**
+ * Copyright © 2018 TechNWeb, Inc. All rights reserved.
+ * See TNW_LICENSE.txt for license details.
+ */
+-->
+<if args="isAllowed()">
+    <if args="isSalable($row())">
+        <if args="isSubscribe($row()) && !isOneTimePurchase($row())">
+            <if args="isSubscribeOnly($row())">
+                <div class="product-subscribe-button">
+                    <button type="button"
+                            attr="'data-mage-init': getDataMageInit($row()),
+                              'data-post': getSubsAddToCartParams($row())"
+                            class="action primary subscribe">
+                        <span data-role="button-text" translate="'Auto-Ship'"/>
+                    </button>
+                </div>
+            </if>
+            <ifnot args="isSubscribeOnly($row())">
+                <div class="product-subscribe-addtocart-buttons-container"
+                     data-bind="mageInit: {'tnwSubscribeListButtons':{}}">
+                    <div class="product-subscribe-button">
+                        <button type="button"
+                                attr="'data-mage-init': getDataMageInit($row()),
+                              'data-post': getSubsAddToCartParams($row())"
+                                class="action primary subscribe">
+                            <span data-role="button-text" translate="'Auto-Ship'"/>
+                        </button>
+                    </div>
+                    <div class="product-subscribe-button-dropdown">
+                        <button class="action-toggle primary add" data-toggle="dropdown"
+                                attr="'data-product-id': $row()['id']">
+                            <span translate="'Select'"></span>
+                        </button>
+                    </div>
+                    <div css="getHiddenButtonClass($row())">
+                        <button class="action tocart primary"
+                                attr="'data-mage-init': getDataMageInit($row()),
+                              'data-post': getDataPost($row()),
+                               title: getLabel()"
+                                type="button">
+                            <span text="getLabel()"/>
+                        </button>
+                    </div>
+                </div>
+            </ifnot>
+        </if>
+        <if args="!isSubscribe($row()) || isOneTimePurchase($row())">
+            <button class="action tocart primary"
+                    attr="'data-mage-init': getDataMageInit($row()),
+                              'data-post': getDataPost($row()),
+                               title: getLabel()"
+                    type="button">
+                <span text="getLabel()"/>
+            </button>
+        </if>
+    </if>
+    <ifnot args="isSalable($row())">
+        <div class="stock unavailable">
+            <text args="$t('Availability')"/>
+            <span translate="'Out of stock'"/>
+        </div>
+    </ifnot>
+</if>

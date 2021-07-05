@@ -3,6 +3,7 @@
     <group name="quote_item">
         <attribute name="tnw_subscr_purchase_type"/>
         <attribute name="tnw_subscr_trial_status"/>
+        <attribute name="tnw_subscr_trial_can_skip"/>
         <attribute name="tnw_subscr_trial_length"/>
         <attribute name="tnw_subscr_trial_length_unit"/>
         <attribute name="tnw_subscr_lock_product_price"/>
@@ -18,5 +19,6 @@
         <attribute name="tnw_subscr_inf_subscriptions"/>
         <attribute name="tnw_subscr_inheritance"/>
         <attribute name="short_description"/>
+        <attribute name="billing_cycle"/>
     </group>
 </config>

@@ -9,10 +9,15 @@ use Magento\Catalog\Api\CategoryRepositoryInterface;
 use Magento\Catalog\Block\Product\Context;
 use Magento\Catalog\Block\Product\ListProduct as OrigListProduct;
 use Magento\Catalog\Model\Layer\Resolver;
+use Magento\Catalog\Model\Product;
+use Magento\Framework\App\ActionInterface;
 use Magento\Framework\Data\Helper\PostHelper;
 use Magento\Framework\DataObject;
 use Magento\Framework\Pricing\PriceCurrencyInterface;
+use Magento\Framework\Serialize\SerializerInterface;
+use Magento\Framework\Url\EncoderInterface;
 use Magento\Framework\Url\Helper\Data;
+use Magento\GroupedProduct\Model\Product\Type\Grouped;
 use TNW\Subscriptions\Api\Data\ProductBillingFrequencyInterface;
 use TNW\Subscriptions\Api\ProductBillingFrequencyRepositoryInterface as FrequencyOptionRepository;
 use TNW\Subscriptions\Model\Config\Source\TrialLengthUnitType;
@@ -35,6 +40,11 @@ class ListProduct extends OrigListProduct
      * @var array
      */
     private $postParamsToButtonsBlock = [];
+
+    /**
+     * @var array
+     */
+    private $currentCustomerProductHistoryList = [];
 
     /**
      * @var TrialLengthUnitType
@@ -62,6 +72,16 @@ class ListProduct extends OrigListProduct
     private $productView;
 
     /**
+     * @var EncoderInterface
+     */
+    private $urlEncoder;
+
+    /**
+     * @var SerializerInterface
+     */
+    private $serializer;
+
+    /**
      * ListProduct constructor.
      * @param Context $context
      * @param PostHelper $postDataHelper
@@ -73,6 +93,8 @@ class ListProduct extends OrigListProduct
      * @param PriceCalculator $priceCalculator
      * @param FrequencyOptionRepository $frequencyOptionRepository
      * @param SubscriptionProductView $productView
+     * @param EncoderInterface $urlEncoder
+     * @param SerializerInterface $serializer
      * @param array $data
      */
     public function __construct(
@@ -86,6 +108,8 @@ class ListProduct extends OrigListProduct
         PriceCalculator $priceCalculator,
         FrequencyOptionRepository $frequencyOptionRepository,
         SubscriptionProductView $productView,
+        EncoderInterface $urlEncoder,
+        SerializerInterface $serializer,
         array $data = []
     ) {
         parent::__construct($context, $postDataHelper, $layerResolver, $categoryRepository, $urlHelper, $data);
@@ -94,6 +118,8 @@ class ListProduct extends OrigListProduct
         $this->priceCalculator = $priceCalculator;
         $this->frequencyOptionRepository = $frequencyOptionRepository;
         $this->productView = $productView;
+        $this->urlEncoder = $urlEncoder;
+        $this->serializer = $serializer;
     }
 
     /**
@@ -103,11 +129,17 @@ class ListProduct extends OrigListProduct
      * @param String $pos
      * @param String $viewMode
      * @param String $position
-     * @param array $postParams
+     * @param array|string $postParams
      * @return void
      */
     public function prepareParamsToButtonsBlock($product, $pos, $viewMode, $position, $postParams)
     {
+        if (empty($postParams)) {
+            $postParams = $this->getAddToCartPostParams($product);
+        }
+        if (is_string($postParams)) {
+            $postParams = $this->serializer->unserialize($postParams);
+        }
         $this->postParamsToButtonsBlock = [
             'data' => [
                 'product' => $product,
@@ -115,6 +147,29 @@ class ListProduct extends OrigListProduct
                 'view_mode' => $viewMode,
                 'position' => $position,
                 'post_params' => $postParams
+            ]
+        ];
+
+        if (!empty($this->currentCustomerProductHistoryList)) {
+            $this->postParamsToButtonsBlock['data']['customer_products_history_list'] =
+                $this->currentCustomerProductHistoryList;
+        }
+    }
+
+    /**
+     * Get post parameters.
+     *
+     * @param Product $product
+     * @return array
+     */
+    public function getAddToCartPostParams(Product $product)
+    {
+        $url = $this->getAddToCartUrl($product);
+        return [
+            'action' => $url,
+            'data' => [
+                'product' => $product->getEntityId(),
+                ActionInterface::PARAM_NAME_URL_ENCODED => $this->urlEncoder->encode($url),
             ]
         ];
     }
@@ -125,14 +180,16 @@ class ListProduct extends OrigListProduct
      * @return mixed
      * @throws \Magento\Framework\Exception\LocalizedException
      */
-    public function getButtonsHtml()
+    public function getButtonsHtml($dataPostButton = false)
     {
         $buyButtonsBlock = $this->getLayout()->createBlock(
             \TNW\Subscriptions\Block\Product\ListProduct\ListProductButtons::class,
-            'category.products.list_' . $this->postParamsToButtonsBlock['data']['product']->getId(),
+            $this->getNameInLayout() . '_' . $this->postParamsToButtonsBlock['data']['product']->getId(),
             $this->postParamsToButtonsBlock
-        )->setTemplate('TNW_Subscriptions::product/list/buttons.phtml');
-        return $buyButtonsBlock->toHtml();
+        );
+        return $dataPostButton
+            ? $buyButtonsBlock->setTemplate('TNW_Subscriptions::product/list/post-buttons.phtml')->toHtml()
+            : $buyButtonsBlock->setTemplate('TNW_Subscriptions::product/list/buttons.phtml')->toHtml();
     }
 
     /**
@@ -147,6 +204,7 @@ class ListProduct extends OrigListProduct
         if (isset($productArray['tnw_subscr_trial_status'])
             && $productArray['tnw_subscr_trial_status'] != 0
             && $productArray['tnw_subscr_purchase_type'] != PurchaseType::ONE_TIME_PURCHASE_TYPE
+            && $this->isProductTrialAvailableForCurrentCustomer($product)
         ) {
             $topMessage = __('Try for %1', $this->getFrequencyTrialWithUnit(
                 $productArray['tnw_subscr_trial_length'],
@@ -188,12 +246,17 @@ class ListProduct extends OrigListProduct
         if (empty($productBillingFrequencies)
             || $product->getData(Attribute::SUBSCRIPTION_PURCHASE_TYPE) == PurchaseType::ONE_TIME_PURCHASE_TYPE
         ) {
-            return $this->formatCurrency($product->getPrice(), false);
+            return $product->getTypeId() === Grouped::TYPE_CODE
+                ? null
+                : $this->formatCurrency($product->getPrice(), false);
         }
 
         $result = null;
         $trialStatus = $product->getData(SubscriptionProductAttributes::SUBSCRIPTION_TRIAL_STATUS);
         $trialPrice = $product->getData(SubscriptionProductAttributes::SUBSCRIPTION_TRIAL_PRICE);
+        if (!$this->isProductTrialAvailableForCurrentCustomer($product)) {
+            $trialStatus = 0;
+        }
         if ($trialStatus == 1) {
             $result = sprintf('<span class="free">%s</span>', __('Free'));
         }
@@ -240,7 +303,8 @@ class ListProduct extends OrigListProduct
      */
     public function isSubscriptionPrice($product)
     {
-        return $this->productView->getCustomerGroupLimitation($product);
+        return $this->productView->getCustomerGroupLimitation($product)
+            && $product->getTypeId() !== Grouped::TYPE_CODE;
     }
 
     /**
@@ -253,7 +317,30 @@ class ListProduct extends OrigListProduct
     {
         return $product->getTypeId() == Type::TYPE_SIMPLE
             || $product->getTypeId() == Type::TYPE_VIRTUAL
+            || $product->getTypeId() == Grouped::TYPE_CODE
             || $product->getTypeId() == DownloadableType::TYPE_DOWNLOADABLE;
+    }
+
+    /**
+     * Set products history list for logged in customer
+     *
+     * @param array $products
+     * @return void
+     */
+    public function setCurrentCustomerProductHistoryList(array $products)
+    {
+        $this->currentCustomerProductHistoryList = $products;
+    }
+
+    /**
+     * Check is product trial available for current customer
+     *
+     * @param $product
+     * @return bool
+     */
+    private function isProductTrialAvailableForCurrentCustomer($product)
+    {
+        return !in_array((int)$product->getId(), $this->currentCustomerProductHistoryList, true);
     }
 
     /**

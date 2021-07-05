@@ -97,7 +97,11 @@ class Quote extends AdminQuote
         if (!$session->getCustomerId()) {
             $quote->setBillingAddress($this->addressCreator->getEmptyAddress());
         } else {
-            $quote->setCustomerAddressData($session->getCustomer()->getAddresses());
+            $customer = $session->getCustomer();
+            if (!$customer) {
+                $customer = $this->customerRepository->getById($session->getCustomerId());
+            }
+            $quote->setCustomerAddressData($customer->getAddresses());
         }
         $subQuotes = $session->getSubQuotes();
         $donorQuote = null;

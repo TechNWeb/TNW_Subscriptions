@@ -379,69 +379,6 @@ class Manager
     }
 
     /**
-     * Processes queue item and add order to profile relation.
-     * Return true if queue item need to be post-processed.
-     *
-     * @param Queue $item
-     * @return bool
-     * @throws \Magento\Framework\Exception\LocalizedException
-     */
-    public function processItem(Queue $item)
-    {
-        $profile = $this->profileRepository->getById($item->getSubscriptionProfileId());
-        $quote = $this->cartRepository->get($item->getMagentoQuoteId());
-
-        if ($this->itemOnHold($item)) {
-            return false;
-        }
-
-        $oldStatus = $profile->getStatus();
-
-        try {
-            $order = $this->profileManager->setProfile($profile)
-                ->processProfile($quote);
-        } finally {
-            $this->profileRepository->save($profile);
-
-            $newStatus = $profile->getStatus();
-            if ($oldStatus != $newStatus) {
-                //Add comment profile place.
-                $this->messageHistoryLogger->message(
-                    SubscriptionProfile\MessageHistoryLogger::MESSAGE_SUBSCRIPTION_STATUS_CHANGED,
-                    [
-                        $this->profileStatus->getLabelByValue($oldStatus),
-                        $this->profileStatus->getLabelByValue($newStatus)
-                    ],
-                    $profile->getId(),
-                    false,
-                    false,
-                    true
-                );
-            }
-        }
-
-        //Add comment profile place.
-        $this->messageHistoryLogger->message(
-            SubscriptionProfile\MessageHistoryLogger::MESSAGE_ORDER_CREATED_FROM_QUOTE,
-            [
-                $order->getEntityId(),
-                $order->getIncrementId(),
-                $this->messageHistoryLogger->getConvertedQuoteId($quote->getId())
-            ],
-            $profile->getId(),
-            false,
-            false,
-            true
-        );
-
-        $relation = $this->relationManager->getRelationById($item->getProfileOrderId())
-            ->setMagentoOrderId($order->getId());
-        $this->relationManager->saveRelation($relation);
-
-        return true;
-    }
-
-    /**
      * @param $groupQueue
      * @throws \Magento\Framework\Exception\CouldNotSaveException
      * @throws \Magento\Framework\Exception\LocalizedException
@@ -541,8 +478,6 @@ class Manager
                     if ($profile->getTrialStartDate() && time() < strtotime($profile->getStartDate())) {
                         $profile->setStatus(ProfileStatus::STATUS_TRIAL);
                     }
-                    $profile->setShippingMethod($order->getShippingMethod());
-                    $profile->setShippingDescription($order->getShippingDescription());
 
                     $this->profileManager->setProfile($profile);
                     $this->profileManager->saveProfile();
@@ -575,6 +510,19 @@ class Manager
                         false,
                         true
                     );
+
+                    if ($quote->getCouponCode() === "") {
+                        $this->messageHistoryLogger->message(
+                            SubscriptionProfile\MessageHistoryLogger::COUPON_INVALID,
+                            [
+                                $profile->getCouponCode()
+                            ],
+                            $profile->getId(),
+                            false,
+                            false,
+                            true
+                        );
+                    }
 
                     $relation = $this->relationManager
                         ->getRelationById($queue->getProfileOrderId())

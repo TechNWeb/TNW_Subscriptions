@@ -20,19 +20,48 @@ class ModifiedProducts extends Base
         if ($objectId) {
             $objectItemId = $this->getFieldValue($data, 'objectItemId', false);
             if ($objectItemId) {
-                $quote = $saveModel->getQuoteCreator()->getCartRepository()->get($objectId);
+                try {
+                    $quote = $saveModel->getQuoteCreator()->getCartRepository()->get($objectId);
+                } catch (\Exception $e) {
+                    return $this;
+                }
                 $quoteId = $quote->getId();
                 $item = $quote->getItemById($objectItemId);
                 $remove = $this->getFieldValue($data, 'remove', false);
                 $request = $this->getFieldValue($data, 'item_' . $objectItemId, false);
                 $request['product_id'] = $item->getProduct()->getId();
+                $oldCustomer = $quote->getCustomer();
+                $oldAddressData = $saveModel->getShippingAddress()->getData();
+                $oldAddressSet = false;
+                if ((array_key_exists('customer_address_id', $oldAddressData)
+                        && $oldAddressData['customer_address_id'])
+                    || (array_key_exists('firstname', $oldAddressData)
+                        && $oldAddressData['firstname'])
+                ) {
+                    $oldAddressData['street'] = $saveModel->getShippingAddress()->getStreet();
+                    unset($oldAddressData['address_id']);
+                    unset($oldAddressData['quote_id']);
+                    unset($oldAddressData['entity_id']);
+                    $oldAddressSet = true;
+                }
                 $saveModel->removeSubscriptions($item);
                 if (!$remove) {
                     $result = $saveModel->addToSubscription($request);
                     if (!$result) {
                         $this->errors[] = __('We can\'t add this item to your subscription shopping cart right now.');
                     } else {
+                        $result->getQuote()->assignCustomer($oldCustomer);
+                        if ($oldAddressSet) {
+                            $result->getQuote()->removeAllAddresses();
+                        }
                         $this->getSession()->addSubQuote($result->getQuote());
+                        if ($oldAddressSet) {
+                            $customerAddressId = array_key_exists('customer_address_id', $oldAddressData)
+                                ? $oldAddressData['customer_address_id']
+                                : null;
+                            $saveModel->setShippingAddress($oldAddressData, $customerAddressId);
+                            $saveModel->getQuoteCreator()->getCartRepository()->save($result->getQuote());
+                        }
                     }
                 } else {
                     try {

@@ -143,13 +143,19 @@ class CouponInformation extends ContentAbstract
                     return false;
                 }
 
+                if (!in_array($quote->getCustomerGroupId(), $this->salesRule->getCustomerGroupIds())) {
+                    return false;
+                }
+
                 $validForShippingAddress = $this->couponUtility->canProcessRule(
                     $this->salesRule,
                     $quote->getShippingAddress()
                 );
+                $billingAddress = $quote->getBillingAddress();
+                $billingAddress['payment_method'] = $this->getSubscriptionProfile()->getPayment()->getEngineCode();
                 $validForBillingAddress = $this->couponUtility->canProcessRule(
                     $this->salesRule,
-                    $quote->getBillingAddress()
+                    $billingAddress
                 );
                 return $validForShippingAddress || $validForBillingAddress;
             } catch (\Exception $exception) {

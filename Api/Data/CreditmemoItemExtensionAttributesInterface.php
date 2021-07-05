@@ -1,6 +1,6 @@
 <?php
 /**
-* Copyright © 2021 TechNWeb, Inc. All rights reserved.
+ * Copyright © 2021 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
 namespace TNW\Subscriptions\Api\Data;
@@ -15,5 +15,4 @@ interface CreditmemoItemExtensionAttributesInterface extends SalesExtensionAttri
      */
     const CREDITMEMO_ITEM_EXTENSION_TABLE = 'tnw_subscriptions_creditmemo_item_extension_entity';
     /**#@-*/
-
 }

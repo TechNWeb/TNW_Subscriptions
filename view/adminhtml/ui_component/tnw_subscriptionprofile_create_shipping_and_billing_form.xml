@@ -58,13 +58,11 @@
                 </item>
             </argument>
             <settings>
-                <disabled>true</disabled>
-                <visible>false</visible>
                 <label translate="true">Automatically Choose Carrier</label>
                 <dataScope>shipping_method</dataScope>
                 <options>
                     <option name="0" xsi:type="array">
-                        <item name="value" xsi:type="string">cheapest</item>
+                        <item name="value" xsi:type="string">tnwautoship_cheapest</item>
                         <item name="label" xsi:type="string" translate="true">Cheapest available</item>
                         <item name="tooltip" xsi:type="array">
                             <item name="description" xsi:type="string" translate="true">
@@ -72,15 +70,15 @@
                             </item>
                         </item>
                     </option>
-                    <option name="1" xsi:type="array">
-                        <item name="value" xsi:type="string">fastest</item>
-                        <item name="label" xsi:type="string" translate="true">Fastest delivery</item>
-                        <item name="tooltip" xsi:type="array">
-                            <item name="description" xsi:type="string" translate="true">
-                                NOTE: Shipping method will automatically be selected based on the available option with fastest delivery.
-                            </item>
-                        </item>
-                    </option>
+<!--                    <option name="1" xsi:type="array">-->
+<!--                        <item name="value" xsi:type="string">tnwautoship_fastest</item>-->
+<!--                        <item name="label" xsi:type="string" translate="true">Fastest delivery</item>-->
+<!--                        <item name="tooltip" xsi:type="array">-->
+<!--                            <item name="description" xsi:type="string" translate="true">-->
+<!--                                NOTE: Shipping method will automatically be selected based on the available option with fastest delivery.-->
+<!--                            </item>-->
+<!--                        </item>-->
+<!--                    </option>-->
                 </options>
             </settings>
         </radioset>

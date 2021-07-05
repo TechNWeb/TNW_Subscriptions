@@ -30,8 +30,12 @@ define(
                     grid,
                     subProductListing;
 
+                mainModal = registry.get('index=' + this.source.mainModal);
+                if (this.responseData().error) {
+                    mainModal.closeModal();
+                    window.location.reload();
+                }
                 if (this.responseStatus()) {
-                    mainModal = registry.get('index=' + this.source.mainModal);
                     //reset grid
                     grid = registry.get('index= '+ this.source.modalGrid);
                     grid.destroyInserted();
@@ -188,7 +192,7 @@ define(
 
             /**
              * Updates Modal grid action label and "qty" column
-             * 
+             *
              * @return {void}
              */
             updateModalGrid: function () {

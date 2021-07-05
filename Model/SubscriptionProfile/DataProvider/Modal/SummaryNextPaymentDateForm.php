@@ -88,7 +88,6 @@ class SummaryNextPaymentDateForm extends AbstractDataProvider
 
     /**
      * @inheritdoc
-     * @throws \Exception
      */
     public function getData()
     {
@@ -96,7 +95,9 @@ class SummaryNextPaymentDateForm extends AbstractDataProvider
 
         $data[SummaryInsertForm::FORM_DATA_KEY] = $this->getProfileId();
         $data['entity_id'] = $this->getProfileId();
-        $scheduledAt = $this->profileManager->getNextProfileRelation()->getScheduledAt();
+        $scheduledAt = $this->profileManager->getNextProfileRelation()
+            ? $this->profileManager->getNextProfileRelation()->getScheduledAt()
+            : false;
         $data[self::NEXT_PAYMENT_DATE_VALUE_FIELD] = $scheduledAt;
         $data[self::NEXT_PAYMENT_DATE_VIEW_FIELD]
             = $this->localeDate->formatDate($scheduledAt, IntlDateFormatter::MEDIUM);
@@ -139,8 +140,8 @@ class SummaryNextPaymentDateForm extends AbstractDataProvider
                                     'arguments' => [
                                         'data' => $this->getEditFieldConfig(),
                                     ],
-                                ]
-                            ]
+                                ],
+                            ],
                         ],
                         self::NEXT_PAYMENT_DATE_EDIT_FIELDSET => [
                             'children' => [
@@ -152,9 +153,9 @@ class SummaryNextPaymentDateForm extends AbstractDataProvider
                                             ],
                                         ],
                                     ],
-                                ]
+                                ],
                             ],
-                        ]
+                        ],
                     ],
                 ],
             ]
@@ -192,8 +193,8 @@ class SummaryNextPaymentDateForm extends AbstractDataProvider
                     'visible' => $isEditVisible ? 'ns = ${ $.ns }, index = next_payment_date:preview' : '',
                     '__disableTmpl' => [
                         'visible' => false
-                    ]
-                ]
+                    ],
+                ],
             ],
         ];
 

@@ -19,6 +19,15 @@ var config = {
             'Magento_Checkout/js/model/quote' : {
                 'TNW_Subscriptions/js/checkout/model/quote-mixin' : true
             },
+            'Magento_Checkout/js/checkout-data' : {
+                'TNW_Subscriptions/js/checkout/checkout-data-mixin' : true
+            },
+            'Magento_Checkout/js/view/form/element/email' : {
+                'TNW_Subscriptions/js/checkout/view/form/element/email-mixin' : true
+            },
+            'Magento_Checkout/js/view/shipping' : {
+                'TNW_Subscriptions/js/checkout/view/shipping-mixin' : true
+            },
             'Magento_Checkout/js/view/minicart' : {
                 'TNW_Subscriptions/js/checkout/view/minicart-mixin' : true
             },
@@ -37,7 +46,9 @@ var config = {
             'Magento_ConfigurableProduct/js/configurable' : {
                 'TNW_Subscriptions/js/configurable-mixin' : true
             },
-
+            'Magento_Catalog/js/product/addtocart-button' : {
+                'TNW_Subscriptions/js/product/addtocart-button-mixin' : true
+            }
         }
     }
 };

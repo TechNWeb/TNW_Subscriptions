@@ -36,21 +36,47 @@ $wishlistHelper = $this->helper(\Magento\Wishlist\Helper\Data::class);
                                         <span data-bind="text: product_name"></span>
                                     </a>
                                 </strong>
+                                <!-- ko if: subs_top_message -->
+                                <strong class="product-item-name" data-bind="html: subs_top_message"></strong>
+                                <!-- /ko -->
+                                <!-- ko if: subs_trial_price -->
+                                <div class="price-box price-final_price">
+                                    <span class="price-wrapper" data-role="priceBox">
+                                        <span class="price" data-bind="html: subs_trial_price"></span>
+                                    </span>
+                                </div>
+                                <!-- /ko -->
+                                <!-- ko ifnot: subs_trial_price -->
                                 <div data-bind="html: product_price"></div>
+                                <!-- /ko -->
                                 <div class="product-item-actions">
                                     <div class="actions-primary">
                                     <!-- ko if: product_is_saleable_and_visible -->
-                                        <!-- ko if: is_subscribe_and_addtocart -->
-                                            <div class="product-subscribe-addtocart-buttons-container">
+                                        <!-- ko if: is_subscribe && !is_one_time_purchase -->
+                                            <!-- ko if: is_subscribe_only -->
+                                            <div class="product-subscribe-button">
+                                                <button type="button"
+                                                        title="<?= $escaper->escapeHtml(__('Auto-Ship')) ?>"
+                                                        data-bind="attr: {'data-post': subs_addtocart_params}"
+                                                        class="action primary subscribe">
+                                                        <span data-role="button-text">
+                                                            <?= $escaper->escapeHtml(__('Auto-Ship')) ?>
+                                                        </span>
+                                                </button>
+                                            </div>
+                                            <!-- /ko -->
+                                            <!-- ko ifnot: is_subscribe_only -->
+                                            <div class="product-subscribe-addtocart-buttons-container"
+                                                 data-bind="mageInit: {'tnwSubscribeListButtons':{}}">
                                                 <div class="product-subscribe-button">
-                                                    <a data-bind="attr: { href: product_url }">
-                                                        <button type="button" title="Subscribe"
-                                                                class="action primary subscribe">
-                                                            <span data-role="button-text">
-                                                                <?= $escaper->escapeHtml(__('Auto-Ship')) ?>
-                                                            </span>
-                                                        </button>
-                                                    </a>
+                                                    <button type="button"
+                                                            title="<?= $escaper->escapeHtml(__('Auto-Ship')) ?>"
+                                                            data-bind="attr: {'data-post': subs_addtocart_params}"
+                                                            class="action primary subscribe">
+                                                        <span data-role="button-text">
+                                                            <?= $escaper->escapeHtml(__('Auto-Ship')) ?>
+                                                        </span>
+                                                    </button>
                                                 </div>
                                                 <div class="product-subscribe-button-dropdown">
                                                     <button title="<?= $escaper->escapeHtml(__('Add to Cart')) ?>"
@@ -61,7 +87,7 @@ $wishlistHelper = $this->helper(\Magento\Wishlist\Helper\Data::class);
                                                     </button>
                                                 </div>
                                                 <div class="product-addtocart-button-hidden"
-                                                     data-bind="css: 'wishlist-subscription-dropdown-hidden-' + $index()">
+                                                     data-bind="css: 'subscription-dropdown-hidden-' + $index()">
                                                     <div class="actions-primary">
                                                         <!-- ko if: product_has_required_options -->
                                                         <a href="#" data-bind="attr: {'data-post': add_to_cart_params}"
@@ -78,33 +104,20 @@ $wishlistHelper = $this->helper(\Magento\Wishlist\Helper\Data::class);
                                                     </div>
                                                 </div>
                                             </div>
-                                        <!-- /ko -->
-                                        <!-- ko ifnot: is_subscribe_and_addtocart -->
-                                            <!-- ko if: is_subscribe -->
-                                                <div class="product-subscribe-button">
-                                                    <a data-bind="attr: { href: product_url }">
-                                                        <button type="button" title="Subscribe"
-                                                                class="action primary subscribe">
-                                                            <span data-role="button-text">
-                                                                <?= $escaper->escapeHtml(__('Auto-Ship')) ?>
-                                                            </span>
-                                                        </button>
-                                                    </a>
-                                                </div>
                                             <!-- /ko -->
-                                            <!-- ko ifnot: is_subscribe -->
-                                                <!-- ko if: product_has_required_options -->
-                                                    <a href="#" data-bind="attr: {'data-post': add_to_cart_params}"
-                                                       class="action tocart primary">
-                                                        <span><?= $escaper->escapeHtml(__('Add to Cart')) ?></span>
-                                                    </a>
-                                                <!-- /ko -->
-                                                <!-- ko ifnot: product_has_required_options -->
-                                                    <button type="button" class="action tocart primary"
-                                                            data-bind="attr: {'data-post': add_to_cart_params}">
-                                                        <span><?= $escaper->escapeHtml(__('Add to Cart')) ?></span>
-                                                    </button>
-                                                <!-- /ko -->
+                                        <!-- /ko -->
+                                        <!-- ko if: !is_subscribe || is_one_time_purchase  -->
+                                            <!-- ko if: product_has_required_options -->
+                                                <a href="#" data-bind="attr: {'data-post': add_to_cart_params}"
+                                                   class="action tocart primary">
+                                                    <span><?= $escaper->escapeHtml(__('Add to Cart')) ?></span>
+                                                </a>
+                                            <!-- /ko -->
+                                            <!-- ko ifnot: product_has_required_options -->
+                                                <button type="button" class="action tocart primary"
+                                                        data-bind="attr: {'data-post': add_to_cart_params}">
+                                                    <span><?= $escaper->escapeHtml(__('Add to Cart')) ?></span>
+                                                </button>
                                             <!-- /ko -->
                                         <!-- /ko -->
                                     <!-- /ko -->
@@ -149,16 +162,4 @@ $wishlistHelper = $this->helper(\Magento\Wishlist\Helper\Data::class);
         }
     }
 </script>
-    <?php if (!$block->isRedirectToCartEnabled()): ?>
-        <script type="text/x-magento-init">
-        {
-            "[data-role=tocart-form], .form.map.checkout": {
-                "catalogAddToCart": {}
-            },
-            "*": {
-                "tnwSubscribeListButtons": {}
-            }
-        }
-        </script>
-    <?php endif; ?>
 <?php endif ?>

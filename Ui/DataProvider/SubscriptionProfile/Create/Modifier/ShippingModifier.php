@@ -5,6 +5,8 @@
  */
 namespace TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Modifier;
 
+use Magento\Framework\App\Config\ScopeConfigInterface;
+use Magento\Store\Model\ScopeInterface;
 use TNW\Subscriptions\Model\QuoteSessionInterface;
 use TNW\Subscriptions\Model\Source\ShippingMethods;
 use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Modal\Context;
@@ -17,6 +19,8 @@ class ShippingModifier implements \Magento\Ui\DataProvider\Modifier\ModifierInte
     const SHIPPING_FIELDSET = 'shipping_methods';
 
     const SHIPPING_SPECIFIC_FIELDSET = 'specific_shipping';
+
+    const SHIPPING_AUTO_FIELDSET = 'auto_shipping';
 
     /**
      * @var QuoteSessionInterface
@@ -34,19 +38,27 @@ class ShippingModifier implements \Magento\Ui\DataProvider\Modifier\ModifierInte
     private $formContext;
 
     /**
+     * @var ScopeConfigInterface
+     */
+    private $scopeConfig;
+
+    /**
      * ShippingModifier constructor.
      * @param QuoteSessionInterface $session
      * @param ShippingMethods $shippingMethods
      * @param Context $formContext
+     * @param ScopeConfigInterface $scopeConfig
      */
     public function __construct(
         QuoteSessionInterface $session,
         ShippingMethods $shippingMethods,
-        Context $formContext
+        Context $formContext,
+        ScopeConfigInterface $scopeConfig
     ) {
         $this->session = $session;
         $this->shippingMethods = $shippingMethods;
         $this->formContext = $formContext;
+        $this->scopeConfig = $scopeConfig;
     }
 
     /**
@@ -82,6 +94,16 @@ class ShippingModifier implements \Magento\Ui\DataProvider\Modifier\ModifierInte
                                     ]
                                 ]
                             ]
+                        ],
+                        static::SHIPPING_AUTO_FIELDSET => [
+                            'arguments' => [
+                                'data' => [
+                                    'config' => [
+                                        'visible' => $this->isAutoShipEnabled(),
+                                        'disabled' => !$this->isAutoShipEnabled()
+                                    ]
+                                ]
+                            ]
                         ]
                     ]
                 ]
@@ -102,7 +124,10 @@ class ShippingModifier implements \Magento\Ui\DataProvider\Modifier\ModifierInte
             $this->shippingMethods->setQuote($subQuote);
             $rates = $this->shippingMethods->getShippingRates();
             foreach ($rates as $rate) {
-                if (!empty($options[$rate->getCode()])) {
+                if (!empty($options[$rate->getCode()])
+                    || $rate->getCarrier() == 'tnwautoship'
+                    || $rate->getErrorMessage()
+                ) {
                     continue;
                 }
                 if (in_array($rate->getMethod(), $this->shippingMethods->getDontCostDependedMethodsCodes())) {
@@ -134,5 +159,17 @@ class ShippingModifier implements \Magento\Ui\DataProvider\Modifier\ModifierInte
             $isVirtual = $subQuote->getIsVirtual() ? $isVirtual : false;
         }
         return $isVirtual;
+    }
+
+    /**
+     * @return bool
+     */
+    private function isAutoShipEnabled()
+    {
+        return (bool)$this->scopeConfig->getValue(
+            'carriers/tnwautoship/active',
+            ScopeInterface::SCOPE_STORES,
+            $this->session->getStoreId()
+        );
     }
 }

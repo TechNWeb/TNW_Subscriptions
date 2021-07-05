@@ -13,6 +13,7 @@ use Magento\Framework\Pricing\Render\PriceBox as BasePriceBox;
 use Magento\Framework\Pricing\Render\RendererPool;
 use Magento\Framework\Pricing\SaleableInterface;
 use Magento\Framework\View\Element\Template;
+use TNW\Subscriptions\Api\CustomerProductHistoryManagementInterface;
 use TNW\Subscriptions\Api\Data\ProductBillingFrequencyInterface;
 use TNW\Subscriptions\Api\ProductBillingFrequencyRepositoryInterface as FrequencyOptionRepository;
 use TNW\Subscriptions\Model\Config\Source\TrialLengthUnitType;
@@ -78,6 +79,11 @@ class SubscriptionPriceBox extends BasePriceBox
     private $subscriptionProductViewConfig;
 
     /**
+     * @var CustomerProductHistoryManagementInterface
+     */
+    private $customerProductHistoryManagement;
+
+    /**
      * SubscriptionPriceBox constructor.
      * @param Template\Context $context
      * @param SaleableInterface $saleableItem
@@ -92,6 +98,7 @@ class SubscriptionPriceBox extends BasePriceBox
      * @param ProfileManager $profileManager
      * @param ProductTypeManagerResolver $productTypeResolver
      * @param \TNW\Subscriptions\Model\Config\Product\SubscriptionProductView $subscriptionProductViewConfig
+     * @param CustomerProductHistoryManagementInterface $customerProductHistoryManagement
      * @param array $data
      */
     public function __construct(
@@ -108,6 +115,7 @@ class SubscriptionPriceBox extends BasePriceBox
         ProfileManager $profileManager,
         ProductTypeManagerResolver $productTypeResolver,
         \TNW\Subscriptions\Model\Config\Product\SubscriptionProductView $subscriptionProductViewConfig,
+        CustomerProductHistoryManagementInterface $customerProductHistoryManagement,
         array $data = []
     ) {
         parent::__construct($context, $saleableItem, $price, $rendererPool, $data);
@@ -121,6 +129,7 @@ class SubscriptionPriceBox extends BasePriceBox
         $this->profileManager = $profileManager;
         $this->productTypeResolver = $productTypeResolver;
         $this->subscriptionProductViewConfig = $subscriptionProductViewConfig;
+        $this->customerProductHistoryManagement = $customerProductHistoryManagement;
     }
 
     /**
@@ -195,6 +204,12 @@ class SubscriptionPriceBox extends BasePriceBox
             $productTypeManager = $this->productTypeResolver->resolve($product->getTypeId());
 
             $trialPriceStatus = $product->getData(SubscriptionProductAttributes::SUBSCRIPTION_TRIAL_STATUS);
+            $trialCanSkip = $product->getData(SubscriptionProductAttributes::SUBSCRIPTION_TRIAL_CAN_SKIP);
+            $isProductTrialAvailableForCurrentCustomer = !in_array(
+                (int)$product->getId(),
+                $this->customerProductHistoryManagement->getUniqueProductsInSubscriptionsForCurrentCustomer(),
+                true
+            );
 
             $productBillingFrequencies = $this->frequencyOptionRepository
                 ->getListByProductId($product->getId())
@@ -227,13 +242,15 @@ class SubscriptionPriceBox extends BasePriceBox
                         $trialPeriod = $product->getData(SubscriptionProductAttributes::SUBSCRIPTION_TRIAL_LENGTH);
                         $trialUnitId = $product->getData(SubscriptionProductAttributes::SUBSCRIPTION_TRIAL_LENGTH_UNIT);
 
-                        $topMessage = __('Try for %1', $this->getFrequencyTrialWithUnit($trialPeriod, $trialUnitId));
-                        $bottomMessage = __(
-                            'then %1 / every %2',
-                            $this->formatCurrency($price, false),
-                            $frequencyUnit
-                        );
-                        $price = $trialPrice + $initialFee;
+                        if (!$trialCanSkip && $isProductTrialAvailableForCurrentCustomer) {
+                            $topMessage = __('Try for %1', $this->getFrequencyTrialWithUnit($trialPeriod, $trialUnitId));
+                            $bottomMessage = __(
+                                'then %1 / every %2',
+                                $this->formatCurrency($price, false),
+                                $frequencyUnit
+                            );
+                            $price = $trialPrice + $initialFee;
+                        }
                     } elseif ($initialFee) {
                         $customPrice = $this->formatCurrency($price, false);
                         $topMessage = __('Initial charge');
@@ -250,7 +267,8 @@ class SubscriptionPriceBox extends BasePriceBox
                         'frequency_unit_message' => $frequencyUnitMessage,
                         'top_message' => $topMessage,
                         'bottom_message' => $bottomMessage,
-                        'trial_price_status' => $trialPriceStatus
+                        'trial_price_status' => $trialPriceStatus,
+                        'old_price' => $billingFrequency->getPrice(),
                     ];
                 }
             }

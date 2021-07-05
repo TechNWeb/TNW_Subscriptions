@@ -133,6 +133,9 @@ class Trial extends BaseModifier
                         'disabled' => false
                     ]
                 ],
+                'validation' => [
+                    'validate-number' => true,
+                ],
                 'addbefore' => $this->locator->getStore()->getBaseCurrency()->getCurrencySymbol(),
                 'component' => 'TNW_Subscriptions/js/components/tnw-subscr-price',
                 'componentType' => 'field',
@@ -178,6 +181,28 @@ class Trial extends BaseModifier
                     ]
                 ],
                 'component' => 'TNW_Subscriptions/js/components/tnw-subscr-start-date',
+                'componentType' => 'field',
+            ]
+        );
+
+        $meta = $this->arrayManager->merge(
+            $this->arrayManager->findPath(
+                Attribute::SUBSCRIPTION_TRIAL_CAN_SKIP,
+                $meta,
+                null,
+                'children'
+            ) . static::META_CONFIG_PATH,
+            $meta,
+            [
+                'imports' => [
+                    'visible' => 'ns = ${ $.ns }, index = ' . Attribute::SUBSCRIPTION_TRIAL_STATUS . ':checked',
+                    'disabled' => 'ns = ${ $.ns }, index = ' . Attribute::SUBSCRIPTION_TRIAL_STATUS. ':disabled',
+                    '__disableTmpl' => [
+                        'visible' => false,
+                        'disabled' => false
+                    ]
+                ],
+                'component' => 'Magento_Ui/js/form/element/single-checkbox',
                 'componentType' => 'field',
             ]
         );

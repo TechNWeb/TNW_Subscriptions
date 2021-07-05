@@ -12,6 +12,7 @@ use Magento\Framework\Setup\InstallSchemaInterface;
 use Magento\Framework\Setup\ModuleContextInterface;
 use Magento\Framework\Setup\SchemaSetupInterface;
 use TNW\Subscriptions\Api\Data\BillingFrequencyInterface;
+use TNW\Subscriptions\Api\Data\CustomerProductHistoryInterface;
 use TNW\Subscriptions\Api\Data\OrderItemExtensionAttributesInterface;
 use TNW\Subscriptions\Api\Data\ProductBillingFrequencyInterface;
 use TNW\Subscriptions\Api\Data\QuoteItemExtensionAttributesInterface;
@@ -2054,5 +2055,48 @@ class InstallSchema implements InstallSchemaInterface
                 'comment' => 'subscription_profile_id'
             ]
         );
+    }
+
+    /**
+     * @param SchemaSetupInterface $setup
+     * @return void
+     * @throws \Zend_Db_Exception
+     */
+    private function addCustomerProductsHistoryTable(SchemaSetupInterface $setup)
+    {
+        $tableName = $setup->getTable(CustomerProductHistoryInterface::CUSTOMER_PRODUCT_HISTORY_TABLE);
+        if (!$setup->tableExists($tableName)) {
+            $customerProductHistoryTable = $setup->getConnection()
+                ->newTable($tableName)
+                ->addColumn(CustomerProductHistoryInterface::ID, Table::TYPE_INTEGER, null, [
+                    'identity' => true,
+                    'unsigned' => true,
+                    'nullable' => false,
+                    'primary' => true
+                ], 'ID')
+                ->addColumn(CustomerProductHistoryInterface::SUBSCRIPTION_PROFILE_ID, Table::TYPE_INTEGER, null, [
+                    'unsigned' => true,
+                    'nullable' => false,
+                ], 'Subscription Profile ID')
+                ->addColumn(CustomerProductHistoryInterface::CUSTOMER_ID, Table::TYPE_INTEGER, null, [
+                    'unsigned' => true,
+                    'nullable' => false,
+                ], 'Customer ID')
+                ->addColumn(CustomerProductHistoryInterface::MAGENTO_PRODUCT_ID, Table::TYPE_INTEGER, null, [
+                    'unsigned' => true,
+                    'nullable' => false,
+                ], 'Magento product ID')
+                ->addIndex(
+                    $setup->getIdxName(
+                        CustomerProductHistoryInterface::CUSTOMER_PRODUCT_HISTORY_TABLE,
+                        [
+                            CustomerProductHistoryInterface::CUSTOMER_ID,
+                            CustomerProductHistoryInterface::MAGENTO_PRODUCT_ID,
+                        ]
+                    ),
+                    [CustomerProductHistoryInterface::CUSTOMER_ID, CustomerProductHistoryInterface::MAGENTO_PRODUCT_ID]
+                );
+            $setup->getConnection()->createTable($customerProductHistoryTable);
+        }
     }
 }

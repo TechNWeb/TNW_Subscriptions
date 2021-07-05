@@ -17,5 +17,4 @@ interface InvoiceItemExtensionAttributesInterface extends SalesExtensionAttribut
      */
     const INVOICE_ITEM_EXTENSION_TABLE = 'tnw_subscriptions_invoice_item_extension_entity';
     /**#@-*/
-
 }

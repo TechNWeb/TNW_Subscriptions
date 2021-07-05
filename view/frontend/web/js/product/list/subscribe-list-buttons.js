@@ -5,16 +5,15 @@
 
 define([
     'jquery',
-], function ($j) {
+], function ($) {
     'use strict';
 
-    $j.widget('mage.tnwSubscribeListButtons', {
+    $.widget('mage.tnwSubscribeListButtons', {
         options: {
             subscriptionDropdownBlock: '.product-subscribe-button-dropdown',
             subscriptionDropdownButtonSelector: '.product-subscribe-button-dropdown button',
             subscriptionDropdownButtonsActive: '.product-addtocart-button-hidden',
             currentSubscriptionDropdownButtonsActive: '.subscription-dropdown-hidden-',
-            wishlistSubscriptionDropDownActive: '.wishlist-subscription-dropdown-hidden-'
         },
 
         /**
@@ -29,12 +28,9 @@ define([
          */
         _bind: function () {
             var widget = this;
-            $j(this.options.subscriptionDropdownButtonSelector).on('click', function() {
+            this.element.find(this.options.subscriptionDropdownButtonSelector).on('click', function (e) {
+                e.preventDefault();
                 widget._showDropdownContainer(this);
-            });
-
-            $j(".block-wishlist").on("click",this.options.subscriptionDropdownButtonSelector, function() {
-                widget._showDropdownContainerWishlist(this);
             });
         },
 
@@ -42,34 +38,18 @@ define([
          * Show drop down container.
          */
         _showDropdownContainer: function (elem) {
-            var jElem = $j(elem);
-            var prodId = jElem.data('product-id');
+            var jElem = $(elem);
+            var index = jElem.data('product-id') | jElem.data('wishlist-item-counter');
             if (!jElem.hasClass('active')) {
                 jElem.addClass('active');
 
-                $j(this.options.currentSubscriptionDropdownButtonsActive + prodId).addClass('active');
+                this.element.find(this.options.currentSubscriptionDropdownButtonsActive + index).addClass('active');
             } else {
                 jElem.removeClass('active');
-                $j(this.options.currentSubscriptionDropdownButtonsActive + prodId).removeClass('active');
-            }
-        },
-
-        /**
-         * Show drop down container wishlist block.
-         */
-        _showDropdownContainerWishlist: function (elem) {
-            var jElem = $j(elem);
-            var itemId = jElem.data('wishlist-item-counter');
-            if (!jElem.hasClass('active')) {
-                jElem.addClass('active');
-
-                $j(this.options.wishlistSubscriptionDropDownActive + itemId).addClass('active');
-            } else {
-                jElem.removeClass('active');
-                $j(this.options.wishlistSubscriptionDropDownActive + itemId).removeClass('active');
+                this.element.find(this.options.currentSubscriptionDropdownButtonsActive + index).removeClass('active');
             }
         }
     });
 
-    return $j.mage.tnwSubscribeListButtons;
+    return $.mage.tnwSubscribeListButtons;
 });
