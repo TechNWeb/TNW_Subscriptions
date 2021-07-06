@@ -57,6 +57,11 @@ define([
                 product.selectedFrequency = ko.observable(self.getDefaultFrequency(product))
                 product.term = ko.observable('1')
                 product.period = ko.observable(2)
+                product.useTrial = ko.observable(
+                    product.trial_data
+                    && product.trial_data.trial_can_skip === '1'
+                    && product.isTrialAvailableForUser
+                )
                 product.startOnDate = ko.observable($.datepicker.formatDate('mm/d/yy', self.getDefaultDate(product)))
                 product.startOnDateAlt = ko.observable($.datepicker.formatDate("MM dd", self.getDefaultDate(product)))
             })
@@ -131,7 +136,9 @@ define([
         },
 
         getSubscriptionPrice: function (product) {
-            return product.subscription_price[product.selectedFrequency()]
+            return product.useTrial()
+                ? product.subscription_price[product.selectedFrequency() + '_trial']
+                : product.subscription_price[product.selectedFrequency()]
         },
 
         getQtyValidators: function (product) {
@@ -196,21 +203,5 @@ define([
         canSkipTrial: function (product) {
             return product.trial_data ? parseInt(product.trial_data.trial_can_skip) : 0;
         },
-
-        getTrialMessage: function (product) {
-            var trialData = product.trial_data,
-                trialLabelString = $t('(Try %p %u %p)'),
-                trialPrice = $t('FREE');
-            if (trialData && trialData.trial_can_skip === '1' && product.isTrialAvailableForUser) {
-                trialPrice = parseFloat(trialData.trial_price)
-                    ? $t(' for ') + priceUtils.formatPrice(trialData.trial_price, this.priceFormat, false)
-                    : trialPrice;
-                return trialLabelString
-                    .replace('%p', trialData.trial_length)
-                    .replace('%u', trialData.trial_label)
-                    .replace('%p', trialPrice)
-            }
-            return '';
-        }
     });
 });

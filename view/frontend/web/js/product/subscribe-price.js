@@ -21,9 +21,10 @@ define([
          *
          * @param optionIndex
          * @param selectedProduct
+         * @param showTrial
          * @private
          */
-        _insertPriseBox: function (optionIndex, selectedProduct) {
+        _insertPriseBox: function (optionIndex, selectedProduct, showTrial = true) {
             var priceHtml,
                 productId;
 
@@ -32,11 +33,16 @@ define([
                 if (!optionIndex) {
                     return;
                 }
-                priceHtml = this.options.subscriptionPricesData[optionIndex];
+                priceHtml = (showTrial && this.options.subscriptionPricesData[optionIndex + '_trial'])
+                    ? this.options.subscriptionPricesData[optionIndex + '_trial']
+                    : this.options.subscriptionPricesData[optionIndex];
             // If configurable
             } else {
                 if (selectedProduct && !!optionIndex) {
-                    priceHtml = this.options.subscriptionPricesData[selectedProduct][optionIndex];
+                    priceHtml =
+                        (showTrial && this.options.subscriptionPricesData[selectedProduct][optionIndex + '_trial'])
+                            ? this.options.subscriptionPricesData[selectedProduct][optionIndex + '_trial']
+                            : this.options.subscriptionPricesData[selectedProduct][optionIndex];
                 } else if (selectedProduct && !optionIndex) {
                     priceHtml = $t('There is no auto-ship available for this option');
                 } else {

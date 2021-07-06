@@ -29,12 +29,16 @@ define([
             priceBox: '.price-box.price-final_price',
             altPriceBox: '.onetime-final-price',
             onetimeFields: '#product-addtocart-button, #qty',
+            useTrial: true,
             tracks: {
                 currentProduct: true,
                 useTrial: true,
                 selectedFrequency: true,
                 recurringQty: true,
                 scheduleDateInputVisible: true
+            },
+            listens: {
+                useTrial: 'togglePriceBoxes'
             },
             template: 'TNW_Subscriptions/product/subscribe-component'
         },
@@ -93,7 +97,7 @@ define([
                 priceWidget = $('.product-info-price').data('mageTnwSubscribePrice');
 
             if (priceWidget) {
-                priceWidget._insertPriseBox(this.selectedFrequency, this.getSelectedProductId());
+                priceWidget._insertPriseBox(this.selectedFrequency, this.getSelectedProductId(), this.useTrial);
             }
             if (selectedPurchaseType === undefined) {
                 $(this.subsPriceBox).show();
@@ -331,10 +335,6 @@ define([
         getCanSkipTrial: function () {
             var trialData = this.get('currentProduct.trial_data');
             return trialData ? trialData.trial_can_skip === "1" : false;
-        },
-
-        useTrialChanged: function (self, event) {
-            this.useTrial = $(event.target).is(":checked");
         },
 
         getTrialMessage: function () {
