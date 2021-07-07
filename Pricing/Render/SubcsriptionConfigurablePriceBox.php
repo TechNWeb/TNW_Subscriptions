@@ -14,6 +14,7 @@ use Magento\Framework\Pricing\PriceCurrencyInterface;
 use Magento\Framework\Pricing\Render\RendererPool;
 use Magento\Framework\Pricing\SaleableInterface;
 use Magento\Framework\View\Element\Template;
+use TNW\Subscriptions\Api\CustomerProductHistoryManagementInterface;
 use TNW\Subscriptions\Api\ProductBillingFrequencyRepositoryInterface as FrequencyOptionRepository;
 use TNW\Subscriptions\Model\Config\Source\TrialLengthUnitType;
 use TNW\Subscriptions\Model\ProductBillingFrequency\DescriptionCreator;
@@ -42,6 +43,7 @@ class SubcsriptionConfigurablePriceBox extends SubscriptionPriceBox
     private $swatchHelper;
 
     /**
+     * SubcsriptionConfigurablePriceBox constructor.
      * @param Template\Context $context
      * @param SaleableInterface $saleableItem
      * @param PriceInterface $price
@@ -57,6 +59,8 @@ class SubcsriptionConfigurablePriceBox extends SubscriptionPriceBox
      * @param HelperProduct $helperProduct
      * @param \Magento\Framework\Module\Manager $moduleManager
      * @param \Magento\Swatches\Helper\Data $swatchHelper
+     * @param \TNW\Subscriptions\Model\Config\Product\SubscriptionProductView $subscriptionProductViewConfig
+     * @param CustomerProductHistoryManagementInterface $customerProductHistoryManagement
      * @param array $data
      */
     public function __construct(
@@ -76,6 +80,7 @@ class SubcsriptionConfigurablePriceBox extends SubscriptionPriceBox
         \Magento\Framework\Module\Manager $moduleManager,
         \Magento\Swatches\Helper\Data $swatchHelper,
         \TNW\Subscriptions\Model\Config\Product\SubscriptionProductView $subscriptionProductViewConfig,
+        CustomerProductHistoryManagementInterface $customerProductHistoryManagement,
         array $data = []
     ) {
         parent::__construct(
@@ -92,6 +97,7 @@ class SubcsriptionConfigurablePriceBox extends SubscriptionPriceBox
             $profileManager,
             $productTypeResolver,
             $subscriptionProductViewConfig,
+            $customerProductHistoryManagement,
             $data
         );
 

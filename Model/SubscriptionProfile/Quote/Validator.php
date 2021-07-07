@@ -194,6 +194,7 @@ class Validator
             'product_id' => $item->getProduct()->getId(),
             'start_on' => $currentRequest[CreateProfile::UNIQUE]['start_on'],
             'qty' => $item->getQty(),
+            'use_trial' => (int) $currentRequest[CreateProfile::UNIQUE]['is_trial'],
         ];
         switch ($item->getProductType()) {
             case \Magento\ConfigurableProduct\Model\Product\Type\Configurable::TYPE_CODE:

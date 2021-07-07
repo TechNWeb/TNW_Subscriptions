@@ -11,7 +11,8 @@ define([
         $.widget('mage.catalogAddToCart', originalAddToCart, {
 
             options: {
-                subscribeButtonText : $t('Subscribe')
+                subscribeButtonText : $t('Subscribe'),
+                subscribeTrialButtonText : $t('Use Trial')
             },
 
             enableAddToCartButton: function (form) {
@@ -24,15 +25,20 @@ define([
 
                 setTimeout(function () {
                     var addToCartButtonTextDefault = self.options.addToCartButtonTextDefault || $t('Add to Cart'),
-                        subscribeButtonText = self.options.subscribeButtonText;
+                        subscribeButtonText = self.options.subscribeButtonText,
+                        subscribeTrialButtonText = self.options.subscribeTrialButtonText;
 
                     addToCartButton.removeClass(self.options.addToCartButtonDisabledClass);
 
                     addToCartButton.each(function () {
-                        $(this).attr('id') === 'product-subscribe-button'
-                            ? $(this).attr('title', subscribeButtonText).find('span').text(subscribeButtonText)
-                            : $(this).attr('title', addToCartButtonTextDefault)
+                        if ($(this).attr('id') === 'product-subscribe-button') {
+                            $(this).attr('title', subscribeButtonText).find('span').text(subscribeButtonText);
+                        } else if ($(this).hasClass('product-subscribe-trial-button')) {
+                            $(this).attr('title', subscribeButtonText).find('span').text(subscribeTrialButtonText);
+                        } else {
+                            $(this).attr('title', addToCartButtonTextDefault)
                                 .find('span').text(addToCartButtonTextDefault);
+                        }
                     })
                 }, 1000);
             }

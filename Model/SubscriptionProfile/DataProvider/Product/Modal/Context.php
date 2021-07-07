@@ -14,6 +14,7 @@ use Magento\Framework\ObjectManager\ContextInterface;
 use Magento\Quote\Api\Data\CartItemInterface;
 use Magento\Store\Model\StoreManagerInterface;
 use TNW\Subscriptions\Api\BillingFrequencyRepositoryInterface as BillingFrequencyRepository;
+use TNW\Subscriptions\Api\CustomerProductHistoryManagementInterface;
 use TNW\Subscriptions\Api\Data\ProductSubscriptionProfileInterface;
 use TNW\Subscriptions\Api\ProductBillingFrequencyRepositoryInterface as RecurringOptionRepository;
 use TNW\Subscriptions\Model\Config\Source\TrialLengthUnitType;
@@ -96,6 +97,11 @@ class Context implements ContextInterface
     private $savingsCalculation;
 
     /**
+     * @var CustomerProductHistoryManagementInterface
+     */
+    private $customerProductHistoryManagement;
+
+    /**
      * @param ProductRepositoryInterface $productRepository
      * @param RecurringOptionRepository $repository
      * @param BillingFrequencyRepository $frequencyRepository
@@ -106,6 +112,7 @@ class Context implements ContextInterface
      * @param ImageHelper $imageHelper
      * @param TrialLengthUnitType $unitType
      * @param SavingsCalculation $savingsCalculation
+     * @param CustomerProductHistoryManagementInterface $customerProductHistoryManagement
      */
     public function __construct(
         ProductRepositoryInterface $productRepository,
@@ -117,7 +124,8 @@ class Context implements ContextInterface
         CurrencyFactory $currencyFactory,
         ImageHelper $imageHelper,
         TrialLengthUnitType $unitType,
-        SavingsCalculation $savingsCalculation
+        SavingsCalculation $savingsCalculation,
+        CustomerProductHistoryManagementInterface $customerProductHistoryManagement
     ) {
         $this->productRepository = $productRepository;
         $this->recurringOptionRepository = $repository;
@@ -129,6 +137,7 @@ class Context implements ContextInterface
         $this->imageHelper = $imageHelper;
         $this->unitType = $unitType;
         $this->savingsCalculation = $savingsCalculation;
+        $this->customerProductHistoryManagement = $customerProductHistoryManagement;
     }
 
     /**
@@ -328,5 +337,13 @@ class Context implements ContextInterface
     public function getSavingsCalculation()
     {
         return $this->savingsCalculation;
+    }
+
+    /**
+     * @return CustomerProductHistoryManagementInterface
+     */
+    public function getCustomerProductHistoryManagement()
+    {
+        return $this->customerProductHistoryManagement;
     }
 }

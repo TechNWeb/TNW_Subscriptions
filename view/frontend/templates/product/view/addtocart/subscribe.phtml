@@ -4,7 +4,11 @@
  * See TNW_LICENSE.txt for license details.
  */
 
-/* @var $block \TNW\Subscriptions\Block\Product\View\Subscribe */
+/**
+ * @var $block \TNW\Subscriptions\Block\Product\View\Subscribe
+ * @var $customerProductsHistoryListViewModel \TNW\Subscriptions\Block\Product\CustomerProductsHistoryList
+ */
+$customerProductsHistoryListViewModel = $block->getData('customerProductsHistoryList');
 ?>
 <?php $block->getProduct()->setPriceCalculation()?>
 <div class="subscribe-container">
@@ -26,7 +30,8 @@
                             "defaultUntilCancelled" : "<?php echo $block->getDefaultUntilCancelled() ?>",
                             "defaultSubscribeQty" : "<?php echo $block->getDefaultSubscribeQty() ?>",
                             "defaultStartOn" : "<?php echo $block->getDefaultStartOn() ?>",
-                            "products" : <?php echo $block->getProductDataArray() ?>
+                            "products" : <?php echo $block->getProductDataArray() ?>,
+                            "isTrialAvailableForUser" : "<?= /* @noEscape */ $customerProductsHistoryListViewModel->isProductTrialAvailableForCurrentCustomer($block->getProduct()->getId()) ?>"
                         }
                     }
                 }
