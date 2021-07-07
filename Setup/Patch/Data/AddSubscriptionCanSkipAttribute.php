@@ -70,7 +70,7 @@ class AddSubscriptionCanSkipAttribute implements DataPatchInterface
                 'type' => 'int',
                 'backend' => '',
                 'frontend' => '',
-                'label' => 'Can Skipped',
+                'label' => 'Trial Can Be Skipped',
                 'input' => 'boolean',
                 'class' => '',
                 'source' => Boolean::class,

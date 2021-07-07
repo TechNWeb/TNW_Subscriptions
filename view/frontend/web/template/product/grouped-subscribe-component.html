@@ -50,9 +50,9 @@
                         <input if="$parent.canSkipTrial(product)"
                                data-bind="attr:{
                                     name: $parent.getFieldName(product, 'use_trial'),
-                                    checked: true,
                                     disabled: !$parent.canSkipTrial(product)
-                                }"
+                               },
+                               checked: product.useTrial"
                                type="checkbox"
                                value="1"
                                class="input-text trial"/>
@@ -64,21 +64,21 @@
                                type="hidden"/>
                     </div>
                 </td>
-                <td class="col unavailable" ifnot="product.is_salable" colspan="2">
+                <td class="col unavailable" ifnot="product.is_salable"
+                    data-bind="attr: {'colspan': $parent.hasTrialStatus ? 3 : 2}">
                     <span translate="'Out of stock'"/>
                 </td>
                 <!-- /ko -->
                 <!-- ko ifnot: $parent.canSubscribe(product) -->
-                    <td class="col no-subscription" colspan="2">
+                    <td class="col no-subscription" data-bind="attr: {'colspan': $parent.hasTrialStatus ? 3 : 2}">
                         <span translate="'Subscription unavailable'"/>
                     </td>
                 <!-- /ko -->
             </tr>
             <tr class="second-row">
             <!-- ko if: $parent.canSubscribe(product) -->
-                <td class="col item" colspan="3">
-                    <span class="subscription-price" html="$parent.getSubscriptionPrice(product)"></span>
-                    <span class="subscription-trial" html="$parent.getTrialMessage(product)"></span>,
+                <td class="col item" data-bind="attr: {'colspan': $parent.hasTrialStatus ? 4 : 3}">
+                    <span class="subscription-price" html="$parent.getSubscriptionPrice(product)"></span>,
                     <span class="period-label" translate="'until canceled'" if="$parent.isInfinite(product)"/>
                     <a ifnot="$parent.isInfinite(product)"
                        class="period-label trigger"
