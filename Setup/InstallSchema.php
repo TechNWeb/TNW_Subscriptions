@@ -51,6 +51,7 @@ class InstallSchema implements InstallSchemaInterface
         $this->createProductSubscriptionProfileEav($setup);
         $this->createSubscriptionProfileEav($setup);
         $this->addSubscriptionProfileIdColumnToSalesOrderGrid($setup);
+        $this->addCustomerProductsHistoryTable($setup);
 
         $setup->endSetup();
     }
