@@ -74,11 +74,15 @@ class GuestPaymentInformationManagement
             if (!isset($options['subscribe_active']) || !$options['subscribe_active']) {
                 continue;
             }
-            $customer = $this->customerRepository->get($email);
-            if ($customer && $quote->getCustomerIsGuest()) {
-                throw new \Magento\Framework\Exception\LocalizedException(__(
-                    'Already registered customer should be logged in to purchase subscription product.'
-                ));
+            try {
+                $customer = $this->customerRepository->get($email);
+                if ($customer && $quote->getCustomerIsGuest()) {
+                    throw new \Magento\Framework\Exception\LocalizedException(__(
+                        'Already registered customer should be logged in to purchase subscription product.'
+                    ));
+                }
+            } catch (\Magento\Framework\Exception\NoSuchEntityException $exception) {
+                continue;
             }
         }
 
