@@ -151,6 +151,8 @@ abstract class Base implements TypeInterface
             'type_id' => $product->getTypeId(),
             SubscriptionProductAttributes::SUBSCRIPTION_TRIAL_STATUS =>
                 $product->getData(SubscriptionProductAttributes::SUBSCRIPTION_TRIAL_STATUS),
+            SubscriptionProductAttributes::SUBSCRIPTION_TRIAL_CAN_SKIP =>
+                $product->getData(SubscriptionProductAttributes::SUBSCRIPTION_TRIAL_CAN_SKIP),
             SubscriptionProductAttributes::SUBSCRIPTION_TRIAL_PRICE =>
                 $product->getData(SubscriptionProductAttributes::SUBSCRIPTION_TRIAL_PRICE),
             SubscriptionProductAttributes::SUBSCRIPTION_TRIAL_LENGTH =>

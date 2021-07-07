@@ -127,6 +127,16 @@ class ListProductButtons extends Template
     }
 
     /**
+     * Return products history list for logged in customer.
+     *
+     * @return array
+     */
+    public function getCurrentCustomerProductsHistoryList()
+    {
+        return $this->getCustomerProductsHistoryList() ?: [];
+    }
+
+    /**
      * Get "Enable Subscriptions" config value for current website.
      *
      * @param ProductInterface $product
@@ -318,5 +328,24 @@ class ListProductButtons extends Template
     public function getSubscribeOptionsJson($options)
     {
         return $this->encoder->encode($options);
+    }
+
+    /**
+     * @return bool
+     */
+    public function getTrialStatus()
+    {
+        return (bool) $this->getProduct()->getData(Attribute::SUBSCRIPTION_TRIAL_STATUS);
+    }
+
+    /**
+     * @return bool
+     */
+    public function getCanSkipTrial()
+    {
+        if ($this->getTrialStatus()) {
+            return (bool) $this->getProduct()->getData(Attribute::SUBSCRIPTION_TRIAL_CAN_SKIP);
+        }
+        return false;
     }
 }

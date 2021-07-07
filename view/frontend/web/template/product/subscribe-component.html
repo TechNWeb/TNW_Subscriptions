@@ -8,6 +8,18 @@
     <span translate="'Please select options'"/>
 </div>
 <div class="fieldset" data-bind="visible: (currentProduct && getFrequencyOptions())">
+    <div class="field" data-bind="visible: getCanSkipTrial() && isTrialAvailableForUser">
+        <label class="label"><span translate="'Use Trial'"/>:</label>
+        <div class="control">
+            <input type="checkbox"
+                   id="use_trial"
+                   name="use_trial"
+                   value="1"
+                   data-bind="event: {change: useTrialChanged }, checked: useTrial"
+            />
+            <span data-bind="text: getTrialMessage()"></span>
+        </div>
+    </div>
     <div class="field required">
         <label class="label"><span translate="'Billing Frequency'"/>:</label>
         <div class="control">

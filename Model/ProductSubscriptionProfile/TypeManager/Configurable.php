@@ -197,7 +197,9 @@ class Configurable extends Base
                             Attribute::SUBSCRIPTION_TRIAL_PRICE =>
                                 $childProduct->getData(Attribute::SUBSCRIPTION_TRIAL_PRICE),
                             Attribute::SUBSCRIPTION_TRIAL_START_DATE =>
-                                $childProduct->getData(Attribute::SUBSCRIPTION_TRIAL_START_DATE)
+                                $childProduct->getData(Attribute::SUBSCRIPTION_TRIAL_START_DATE),
+                            Attribute::SUBSCRIPTION_TRIAL_CAN_SKIP =>
+                                $childProduct->getData(Attribute::SUBSCRIPTION_TRIAL_CAN_SKIP)
                         ];
 
                         $productData->addData($trialData);

@@ -14,6 +14,8 @@ define([
             selectedFrequency: null,
             scheduleDateInputVisible: false,
             recurringQty: null,
+            defaultIsTrial: true,
+            isTrialAvailableForUser: true,
             superAttributeSelectClass: '.super-attribute-select',
             selectedProductInput: '[name=selected_configurable_option]',
             swatchWidgetSelector : '.swatch-opt',
@@ -29,6 +31,7 @@ define([
             onetimeFields: '#product-addtocart-button, #qty',
             tracks: {
                 currentProduct: true,
+                useTrial: true,
                 selectedFrequency: true,
                 recurringQty: true,
                 scheduleDateInputVisible: true
@@ -41,6 +44,7 @@ define([
             var self = this;
             this._super();
             this.getFrequencyLabel = this.getFrequencyLabel.bind(this);
+            this.useTrial = this.isTrialAvailableForUser && this.defaultIsTrial;
 
             function initializePreselected() {
                 if (self.getSelectedProductId()) {
@@ -192,7 +196,7 @@ define([
             var trialData = this.get('currentProduct.trial_data'),
                 trialLabelString = $t(', try for %p %u%p'),
                 trialPrice = $t(' FREE');
-            if (trialData) {
+            if (trialData && this.useTrial) {
                 trialPrice = trialData.trial_price
                     ? $t(', starting at ') + utils.formatPrice(trialData.trial_price, {}, false)
                     : trialPrice;
@@ -248,7 +252,7 @@ define([
             if (option && option.label) {
                 label = option.is_default === '1' ? option.label + $t(' (most common)') : option.label;
             }
-            if (trialLabel) {
+            if (trialLabel && this.useTrial && !this.getCanSkipTrial()) {
                 label += trialLabel;
             } else if (savingsLabel) {
                 label += savingsLabel;
@@ -315,7 +319,31 @@ define([
         manageStartOn: function () {
             this.scheduleDateInputVisible = !this.scheduleDateInputVisible;
             $('.delivery-schedule-date').html($('#start_on_alt').val());
-        }
+        },
 
+        getCanSkipTrial: function () {
+            var trialData = this.get('currentProduct.trial_data');
+            return trialData ? trialData.trial_can_skip === "1" : false;
+        },
+
+        useTrialChanged: function (self, event) {
+            this.useTrial = $(event.target).is(":checked");
+        },
+
+        getTrialMessage: function () {
+            var trialData = this.get('currentProduct.trial_data'),
+                trialLabelString = $t('Try %p %u %p'),
+                trialPrice = $t('FREE');
+            if (trialData) {
+                trialPrice = parseFloat(trialData.trial_price)
+                    ? $t(' for ') + utils.formatPrice(trialData.trial_price, {}, false)
+                    : trialPrice;
+                return trialLabelString
+                    .replace('%p', trialData.trial_length)
+                    .replace('%u', trialData.trial_label)
+                    .replace('%p', trialPrice)
+            }
+            return false;
+        },
     });
 });
