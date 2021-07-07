@@ -1403,4 +1403,18 @@
         <plugin name="tnw_transparent_session_checker"
                 type="TNW\Subscriptions\Plugin\TransparentSessionChecker" sortOrder="10"/>
     </type>
+    <preference for="TNW\Subscriptions\Api\CustomerProductHistoryRepositoryInterface"
+                type="TNW\Subscriptions\Model\CustomerProductHistoryRepository"/>
+    <preference for="TNW\Subscriptions\Api\CustomerProductHistoryManagementInterface"
+                type="TNW\Subscriptions\Model\CustomerProductHistory\CustomerProductHistoryManagement"/>
+    <preference for="TNW\Subscriptions\Api\Data\CustomerProductHistoryInterface"
+                type="TNW\Subscriptions\Model\CustomerProductHistory"/>
+    <preference for="TNW\Subscriptions\Api\Data\CustomerProductHistorySearchResultsInterface"
+                type="Magento\Framework\Api\SearchResults"/>
+    <preference for="TNW\Subscriptions\Api\CustomerAccountCheckerInterface"
+                type="TNW\Subscriptions\Model\Customer\CustomerAccountChecker"/>
+    <type name="Magento\Checkout\Model\Session">
+        <plugin name="tnw_subscription_trial_availability_checker"
+                type="TNW\Subscriptions\Plugin\Checkout\Model\Session"/>
+    </type>
 </config>

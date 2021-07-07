@@ -10,13 +10,25 @@
     <body>
         <referenceContainer name="product.info.form.content">
             <block name="product.info.addtocart"  as="addtocart" class="TNW\Subscriptions\Block\Product\View\Subscribe" template="TNW_Subscriptions::product/view/addtocart-tabs.phtml">
-                <block class="TNW\Subscriptions\Block\Product\View\Subscribe" name="product.info.addtocart.subscription" as="addtocart_subscribe" template="TNW_Subscriptions::product/view/addtocart/subscribe.phtml"/>
+                <block class="TNW\Subscriptions\Block\Product\View\Subscribe" name="product.info.addtocart.subscription" as="addtocart_subscribe" template="TNW_Subscriptions::product/view/addtocart/subscribe.phtml">
+                    <arguments>
+                        <argument name="customerProductsHistoryList" xsi:type="object">
+                            TNW\Subscriptions\Block\Product\CustomerProductsHistoryList
+                        </argument>
+                    </arguments>
+                </block>
                 <block class="Magento\Catalog\Block\Product\View" name="product.info.addtocart.orig" as="addtocart_orig" template="product/view/addtocart.phtml"/>
             </block>
         </referenceContainer>
         <referenceBlock name="product.info.options.wrapper.bottom" >
             <block name="product.info.addtocart.additional" class="TNW\Subscriptions\Block\Product\View\Subscribe" template="TNW_Subscriptions::product/view/addtocart-tabs.phtml">
-                <block class="TNW\Subscriptions\Block\Product\View\Subscribe" name="product.info.addtocart.additional.subscription" as="addtocart_subscribe" template="TNW_Subscriptions::product/view/addtocart/subscribe.phtml"/>
+                <block class="TNW\Subscriptions\Block\Product\View\Subscribe" name="product.info.addtocart.additional.subscription" as="addtocart_subscribe" template="TNW_Subscriptions::product/view/addtocart/subscribe.phtml">
+                    <arguments>
+                        <argument name="customerProductsHistoryList" xsi:type="object">
+                            TNW\Subscriptions\Block\Product\CustomerProductsHistoryList
+                        </argument>
+                    </arguments>
+                </block>
                 <block class="Magento\Catalog\Block\Product\View" name="product.info.addtocart.additional.orig" as="addtocart_orig" template="product/view/addtocart.phtml"/>
             </block>
         </referenceBlock>

@@ -23,6 +23,8 @@ use Magento\Sales\Api\Data\OrderPaymentExtensionInterface;
 use Magento\Sales\Api\Data\OrderPaymentInterface;
 use Magento\Vault\Api\Data\PaymentTokenInterface;
 use TNW\Subscriptions\Api\BillingFrequencyRepositoryInterface;
+use TNW\Subscriptions\Api\CustomerProductHistoryRepositoryInterface;
+use TNW\Subscriptions\Api\Data\CustomerProductHistoryInterfaceFactory;
 use TNW\Subscriptions\Api\Data\SubscriptionProfileAddressInterface;
 use TNW\Subscriptions\Api\Data\SubscriptionProfileInterface;
 use TNW\Subscriptions\Api\Data\ProductSubscriptionProfileInterface;
@@ -204,6 +206,16 @@ class Manager
     private $serializer;
 
     /**
+     * @var CustomerProductHistoryInterfaceFactory
+     */
+    private $customerProductHistoryInterfaceFactory;
+
+    /**
+     * @var CustomerProductHistoryRepositoryInterface
+     */
+    private $customerProductHistoryRepository;
+
+    /**
      * Manager constructor.
      * @param EnginePool $enginePool
      * @param SubscriptionProfileRepository $subscriptionProfileRepository
@@ -228,6 +240,9 @@ class Manager
      * @param \TNW\Subscriptions\Model\Shipping\Free $freeShipping
      * @param QuoteFactory $quoteFactory
      * @param Quote\TotalsCollector $totalsCollector
+     * @param SerializerInterface $serializer
+     * @param CustomerProductHistoryInterfaceFactory $customerProductHistoryInterfaceFactory
+     * @param CustomerProductHistoryRepositoryInterface $customerProductHistoryRepository
      */
     public function __construct(
         EnginePool $enginePool,
@@ -253,7 +268,9 @@ class Manager
         \TNW\Subscriptions\Model\Shipping\Free $freeShipping,
         QuoteFactory $quoteFactory,
         \Magento\Quote\Model\Quote\TotalsCollector $totalsCollector,
-        SerializerInterface $serializer
+        SerializerInterface $serializer,
+        CustomerProductHistoryInterfaceFactory $customerProductHistoryInterfaceFactory,
+        CustomerProductHistoryRepositoryInterface $customerProductHistoryRepository
     ) {
         $this->totalsCollector = $totalsCollector;
         $this->quoteFactory = $quoteFactory;
@@ -279,6 +296,8 @@ class Manager
         $this->profileStatus = $profileStatus;
         $this->dataObjectFactory = $dataObjectFactory;
         $this->serializer = $serializer;
+        $this->customerProductHistoryInterfaceFactory = $customerProductHistoryInterfaceFactory;
+        $this->customerProductHistoryRepository = $customerProductHistoryRepository;
     }
 
     /**
@@ -1423,6 +1442,28 @@ class Manager
             ],
             $profile->getId()
         );
+
+        $customerProductHistoryItems = [];
+        foreach ($profile->getProducts() as $product) {
+            if (!$product->getParentId()) {
+                $customerProductHistoryItems[$product->getMagentoProductId()] =
+                    $this->customerProductHistoryInterfaceFactory->create()
+                        ->setProfileId($profile->getId())
+                        ->setCustomerId($profile->getCustomerId())
+                        ->setMagentoProductId($product->getMagentoProductId());
+
+                foreach ($product->getChildren() as $child) {
+                    $customerProductHistoryItems[$child->getMagentoProductId()] =
+                        $this->customerProductHistoryInterfaceFactory->create()
+                            ->setProfileId($profile->getId())
+                            ->setCustomerId($profile->getCustomerId())
+                            ->setMagentoProductId($child->getMagentoProductId());
+                }
+            }
+        }
+        array_walk($customerProductHistoryItems, function ($item) {
+            $this->customerProductHistoryRepository->save($item);
+        });
 
         $startDate = $profile->getTrialStartDate() ?: $profile->getStartDate();
         //Assign quote to new profile

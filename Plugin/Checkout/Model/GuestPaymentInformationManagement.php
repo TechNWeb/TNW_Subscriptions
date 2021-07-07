@@ -27,19 +27,27 @@ class GuestPaymentInformationManagement
     private $cartRepository;
 
     /**
+     * @var \Magento\Customer\Api\CustomerRepositoryInterface
+     */
+    private $customerRepository;
+
+    /**
      * GuestPaymentInformationManagement constructor.
      * @param \Magento\Quote\Model\QuoteIdMaskFactory $quoteIdMaskFactory
      * @param \Magento\Quote\Api\CartRepositoryInterface $cartRepository
      * @param \TNW\Subscriptions\Model\Payment\VaultPaymentAuthorization $vaultPaymentAuthorization
+     * @param \Magento\Customer\Api\CustomerRepositoryInterface $customerRepository
      */
     public function __construct(
         \Magento\Quote\Model\QuoteIdMaskFactory $quoteIdMaskFactory,
         \Magento\Quote\Api\CartRepositoryInterface $cartRepository,
-        \TNW\Subscriptions\Model\Payment\VaultPaymentAuthorization $vaultPaymentAuthorization
+        \TNW\Subscriptions\Model\Payment\VaultPaymentAuthorization $vaultPaymentAuthorization,
+        \Magento\Customer\Api\CustomerRepositoryInterface $customerRepository
     ) {
         $this->quoteIdMaskFactory = $quoteIdMaskFactory;
         $this->cartRepository = $cartRepository;
         $this->vaultPaymentAuthorization = $vaultPaymentAuthorization;
+        $this->customerRepository = $customerRepository;
     }
 
     /**
@@ -49,6 +57,7 @@ class GuestPaymentInformationManagement
      * @param \Magento\Quote\Api\Data\PaymentInterface $paymentMethod
      * @param \Magento\Quote\Api\Data\AddressInterface $billingAddress
      * @return array
+     * @throws \Magento\Framework\Exception\LocalizedException
      * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
     public function beforeSavePaymentInformationAndPlaceOrder(
@@ -58,13 +67,30 @@ class GuestPaymentInformationManagement
         \Magento\Quote\Api\Data\PaymentInterface $paymentMethod,
         \Magento\Quote\Api\Data\AddressInterface $billingAddress
     ) {
+        $quoteIdMask = $this->quoteIdMaskFactory->create()->load($cartId, 'masked_id');
+        $quote = $this->cartRepository->getActive($quoteIdMask->getQuoteId());
+
+        foreach ($quote->getItems() as $item) {
+            $options = $item->getBuyRequest();
+            if (!isset($options['subscribe_active']) || !$options['subscribe_active']) {
+                continue;
+            }
+            try {
+                $customer = $this->customerRepository->get($email);
+                if ($customer && $quote->getCustomerIsGuest()) {
+                    throw new \Magento\Framework\Exception\LocalizedException(__(
+                        'Already registered customer should be logged in to purchase subscription product.'
+                    ));
+                }
+            } catch (\Magento\Framework\Exception\NoSuchEntityException $exception) {
+                continue;
+            }
+        }
+
         // TODO: Hard use Vault
         $additionalData = $paymentMethod->getAdditionalData();
         $additionalData['is_active_payment_token_enabler'] = 1;
         $paymentMethod->setAdditionalData($additionalData);
-
-        $quoteIdMask = $this->quoteIdMaskFactory->create()->load($cartId, 'masked_id');
-        $quote = $this->cartRepository->getActive($quoteIdMask->getQuoteId());
 
         if ($quote->getBaseGrandTotal() < 0.0001) {
             $this->vaultPaymentAuthorization->processPreAuthForTrial(

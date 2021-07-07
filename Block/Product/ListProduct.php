@@ -35,6 +35,11 @@ class ListProduct extends OrigListProduct
     private $postParamsToButtonsBlock = [];
 
     /**
+     * @var array
+     */
+    private $currentCustomerProductHistoryList = [];
+
+    /**
      * @var TrialLengthUnitType
      */
     private $trialLengthUnitType;
@@ -107,6 +112,11 @@ class ListProduct extends OrigListProduct
                 'post_params' => $postParams
             ]
         ];
+
+        if (!empty($this->currentCustomerProductHistoryList)) {
+            $this->postParamsToButtonsBlock['data']['customer_products_history_list'] =
+                $this->currentCustomerProductHistoryList;
+        }
     }
 
     /**
@@ -137,6 +147,7 @@ class ListProduct extends OrigListProduct
             isset($productArray['tnw_subscr_trial_status'])
             && $productArray['tnw_subscr_trial_status'] != 0
             && $productArray['tnw_subscr_purchase_type'] != PurchaseType::ONE_TIME_PURCHASE_TYPE
+            && $this->isProductTrialAvailableForCurrentCustomer($product)
         ) {
             $topMessage = __('Try for %1', $this->getFrequencyTrialWithUnit(
                 $productArray['tnw_subscr_trial_length'],
@@ -183,6 +194,9 @@ class ListProduct extends OrigListProduct
         $result = null;
         $trialStatus = $product->getData(SubscriptionProductAttributes::SUBSCRIPTION_TRIAL_STATUS);
         $trialPrice = $product->getData(SubscriptionProductAttributes::SUBSCRIPTION_TRIAL_PRICE);
+        if (!$this->isProductTrialAvailableForCurrentCustomer($product)) {
+            $trialStatus = 0;
+        }
         if ($trialStatus == 1) {
             $result = sprintf('<span class="free">%s</span>', __('Free'));
         }
@@ -219,6 +233,28 @@ class ListProduct extends OrigListProduct
         $precision = PriceCurrencyInterface::DEFAULT_PRECISION
     ) {
         return $this->priceCurrency->format($amount, $includeContainer, $precision);
+    }
+
+    /**
+     * Set products history list for logged in customer
+     *
+     * @param array $products
+     * @return void
+     */
+    public function setCurrentCustomerProductHistoryList(array $products)
+    {
+        $this->currentCustomerProductHistoryList = $products;
+    }
+
+    /**
+     * Check is product trial available for current customer
+     *
+     * @param $product
+     * @return bool
+     */
+    private function isProductTrialAvailableForCurrentCustomer($product)
+    {
+        return !in_array((int)$product->getId(), $this->currentCustomerProductHistoryList, true);
     }
 
     /**

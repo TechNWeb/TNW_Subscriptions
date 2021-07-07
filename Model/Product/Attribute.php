@@ -16,6 +16,7 @@ class Attribute
      */
     const SUBSCRIPTION_PURCHASE_TYPE = 'tnw_subscr_purchase_type';
     const SUBSCRIPTION_TRIAL_STATUS = 'tnw_subscr_trial_status';
+    const SUBSCRIPTION_TRIAL_CAN_SKIP = 'tnw_subscr_trial_can_skip';
     const SUBSCRIPTION_TRIAL_LENGTH = 'tnw_subscr_trial_length';
     const SUBSCRIPTION_TRIAL_LENGTH_UNIT = 'tnw_subscr_trial_length_unit';
     const SUBSCRIPTION_LOCK_PRODUCT_PRICE = 'tnw_subscr_lock_product_price';
@@ -40,6 +41,7 @@ class Attribute
         return [
             self::SUBSCRIPTION_PURCHASE_TYPE,
             self::SUBSCRIPTION_TRIAL_STATUS,
+            self::SUBSCRIPTION_TRIAL_CAN_SKIP,
             self::SUBSCRIPTION_TRIAL_LENGTH,
             self::SUBSCRIPTION_TRIAL_LENGTH_UNIT,
             self::SUBSCRIPTION_LOCK_PRODUCT_PRICE,
