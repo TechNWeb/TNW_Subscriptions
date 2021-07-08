@@ -3,7 +3,6 @@
  *  Copyright © 2018 TechNWeb, Inc. All rights reserved.
  *  See TNW_LICENSE.txt for license details.
  */
-
 namespace TNW\Subscriptions\Pricing\Render;
 
 use Magento\Framework\DataObject;
@@ -27,7 +26,6 @@ use TNW\Subscriptions\Model\SubscriptionProfile\Manager as ProfileManager;
 
 /**
  * Class for subscription_price rendering
- *
  */
 class SubscriptionPriceBox extends BasePriceBox
 {
@@ -230,20 +228,24 @@ class SubscriptionPriceBox extends BasePriceBox
                         $trialPeriod = $product->getData(SubscriptionProductAttributes::SUBSCRIPTION_TRIAL_LENGTH);
                         $trialUnitId = $product->getData(SubscriptionProductAttributes::SUBSCRIPTION_TRIAL_LENGTH_UNIT);
 
-                        if (!$trialCanSkip && $isProductTrialAvailableForCurrentCustomer) {
-                            $topMessage = __('Try for %1', $this->getFrequencyTrialWithUnit($trialPeriod, $trialUnitId));
-                            $bottomMessage = __(
+                        if ($isProductTrialAvailableForCurrentCustomer) {
+                            $topTrialMessage = __(
+                                'Try for %1',
+                                $this->getFrequencyTrialWithUnit($trialPeriod, $trialUnitId)
+                            );
+                            $bottomTrialMessage = __(
                                 'then %1 / every %2',
                                 $this->formatCurrency($price, false),
                                 $frequencyUnit
                             );
-                            $price = $trialPrice + $initialFee;
+                            $trialPrice = $trialPrice + $initialFee;
                         }
-                    } elseif ($initialFee) {
-                            $customPrice = $this->formatCurrency($price, false);
-                            $topMessage = __('Initial charge');
-                            $price = (float)$price + $initialFee;
-                            $bottomMessage = __('then %1 / every %2', $customPrice, $frequencyUnit);
+                    }
+                    if ($initialFee) {
+                        $customPrice = $this->formatCurrency($price, false);
+                        $topMessage = __('Initial charge');
+                        $price = (float) $price + $initialFee;
+                        $bottomMessage = __('then %1 / every %2', $customPrice, $frequencyUnit);
                     } else {
                         $frequencyUnitMessage = __(' / every %1', $frequencyUnit);
                     }
@@ -257,6 +259,16 @@ class SubscriptionPriceBox extends BasePriceBox
                         'bottom_message' => $bottomMessage,
                         'trial_price_status' => $trialPriceStatus
                     ];
+                    if (isset($trialPrice) && isset($topTrialMessage) && isset($bottomTrialMessage)) {
+                        $result[$billingFrequencyId]['trial_price_data'] = [
+                            'price' => $trialPrice,
+                            'frequency_unit_message' => '',
+                            'top_message' => $topTrialMessage,
+                            'bottom_message' => $bottomTrialMessage,
+                            'trial_price_status' => $trialPriceStatus,
+                            'old_price' => $billingFrequency->getPrice(),
+                        ];
+                    }
                 }
             }
         }
@@ -344,11 +356,21 @@ class SubscriptionPriceBox extends BasePriceBox
             $currentArguments['billing_frequency'] = array_replace($billingFrequencyData, $arguments);
             $resultAmount = parent::renderAmount($amount, $currentArguments);
             $result[$key] = $resultAmount;
+            if (isset($billingFrequencyData['trial_price_data'])) {
+                $trialArguments['billing_frequency']
+                    = array_replace($billingFrequencyData['trial_price_data'], $arguments);
+                $trialAmount = parent::renderAmount($amount, $trialArguments);
+            }
             if (!empty($arguments['configurable_mapping'])) {
                 $result[$key] = [
                     'amount' => $resultAmount,
                     'frequency_price' => $billingFrequencyData['price'],
                 ];
+                if (isset($trialAmount)) {
+                    $result[$key]['amount_trial'] = $trialAmount;
+                }
+            } elseif (isset($trialAmount)) {
+                $result[$key . '_trial'] = $trialAmount;
             }
         }
 

@@ -138,6 +138,9 @@ class SubcsriptionConfigurablePriceBox extends SubscriptionPriceBox
                 foreach ($productsAmount as $frequencyId => $data) {
                     $priceMap[$frequencyId][$key] = $data['frequency_price'];
                     $result[$key][$frequencyId] = $data['amount'];
+                    if (isset($data['amount_trial'])) {
+                        $result[$key][$frequencyId . '_trial'] = $data['amount_trial'];
+                    }
                 }
             } else {
                 $result[$key] = [];

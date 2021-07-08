@@ -10,10 +10,12 @@ use Magento\Catalog\Api\ProductRepositoryInterface;
 use Magento\Catalog\Block\Product\Context;
 use Magento\Framework\Pricing\PriceCurrencyInterface;
 use TNW\Subscriptions\Api\BillingFrequencyRepositoryInterface as FrequencyRepository;
+use TNW\Subscriptions\Api\CustomerProductHistoryManagementInterface;
 use TNW\Subscriptions\Api\Data\SubscriptionProfileInterface;
 use TNW\Subscriptions\Api\ProductBillingFrequencyRepositoryInterface as FrequencyOptionRepository;
 use TNW\Subscriptions\Model\Config;
 use TNW\Subscriptions\Model\Config\Product\SubscriptionProductView;
+use TNW\Subscriptions\Model\Context as SubscriptionContext;
 use TNW\Subscriptions\Model\ProductBillingFrequency\PriceCalculator;
 use TNW\Subscriptions\Model\ProductBillingFrequency\SavingsCalculation;
 use TNW\Subscriptions\Model\ProductSubscriptionProfile\ProductTypeManagerResolver;
@@ -40,6 +42,7 @@ class Edit extends \TNW\Subscriptions\Block\Product\View\Subscribe
     private $subscriptionProfile;
 
     /**
+     * Edit constructor.
      * @param Context $context
      * @param \Magento\Framework\Url\EncoderInterface $urlEncoder
      * @param \Magento\Framework\Json\EncoderInterface $jsonEncoder
@@ -59,6 +62,8 @@ class Edit extends \TNW\Subscriptions\Block\Product\View\Subscribe
      * @param PriceCalculator $priceCalculator
      * @param Config\Source\TrialLengthUnitType $trialLengthUnitType
      * @param ProfileManager $profileManager
+     * @param SubscriptionContext $subscriptionContext
+     * @param CustomerProductHistoryManagementInterface $customerProductHistoryManagement
      * @param array $data
      */
     public function __construct(
@@ -81,13 +86,15 @@ class Edit extends \TNW\Subscriptions\Block\Product\View\Subscribe
         PriceCalculator $priceCalculator,
         Config\Source\TrialLengthUnitType $trialLengthUnitType,
         ProfileManager $profileManager,
+        SubscriptionContext $subscriptionContext,
+        CustomerProductHistoryManagementInterface $customerProductHistoryManagement,
         array $data = []
     ) {
         $this->profileManager = $profileManager;
         parent::__construct($context, $urlEncoder, $jsonEncoder, $string, $productHelper, $productTypeConfig,
             $localeFormat, $customerSession, $productRepository, $priceCurrency, $subscriptionProductViewConfig,
             $config, $frequencyOptionRepository, $frequencyRepository, $savingsCalculation, $subscriptionTypeResolver,
-            $priceCalculator, $trialLengthUnitType, $data);
+            $priceCalculator, $trialLengthUnitType, $subscriptionContext, $customerProductHistoryManagement, $data);
     }
 
     /**
