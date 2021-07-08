@@ -321,7 +321,9 @@ class CreateProfile extends BaseCreate
         $quote = $this->getSubQuote();
         $websiteCode = $this->storeManager->getWebsite()->getCode();
         $stockId = $this->stock->execute(SalesChannelInterface::TYPE_WEBSITE, $websiteCode)->getStockId();
-        if ($this->getProductSalableQty->execute($product->getSku(), $stockId) < $productData['subscribe_qty']) {
+        if ($this->getProductSalableQty->execute($product->getSku(), $stockId)
+            < ($productData['subscribe_qty'] ?? $productData['qty'])
+        ) {
             $this->messageManager->addErrorMessage(__('The requested qty is not available'));
         }
         if (isset($productData['coupon_code'])) {
