@@ -1427,4 +1427,8 @@
         <plugin name="tnw_subscription_trial_availability_checker"
                 type="TNW\Subscriptions\Plugin\Checkout\Model\Session"/>
     </type>
+    <type name="Magento\Framework\View\File\Collector\Decorator\ModuleOutput">
+        <plugin name="tnw-include-required-static-assets"
+                type="TNW\Subscriptions\Plugin\IncludeRequiredStaticAssets"/>
+    </type>
 </config>
