@@ -152,7 +152,7 @@ class ProductSubscriptionProfileRepository implements ProductSubscriptionProfile
         $searchResults->setTotalCount($collection->getSize());
 
         foreach ($collection as $productSubscriptionProfileModel) {
-            $this->addChildren($productSubscriptionProfileModel); //hereee
+            $this->addChildren($productSubscriptionProfileModel);
         }
 
         return $searchResults;
