@@ -25,6 +25,7 @@ interface ProductBillingFrequencyInterface
     const IS_DISABLED = 'is_disabled';
     const FLAG = 'flag';
     const SUBSC_PROFILE_ID_FOR_GRID = 'subsc_profile_id_for_grid';
+    /**#@-*/
 
     /**
      * Get id
