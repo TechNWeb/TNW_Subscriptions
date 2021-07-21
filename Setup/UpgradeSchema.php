@@ -150,6 +150,10 @@ class UpgradeSchema implements UpgradeSchemaInterface
             $this->addCustomerProductsHistoryTable($setup);
         }
 
+        if (version_compare($context->getVersion(), '2.3.31', '<')) {
+            $this->addColumnForSubscGrid($setup);
+        }
+
         $setup->endSetup();
     }
 
@@ -885,5 +889,41 @@ class UpgradeSchema implements UpgradeSchemaInterface
             );
 
         $setup->getConnection()->createTable($table);
+    }
+
+    /**
+     *  add column for store grid subscription data
+     *  MPOW-541: Product page: Link to grid with active subscriptions, pre-filtered Grid
+     *
+     * @param SchemaSetupInterface $setup
+     */
+    private function addColumnForSubscGrid(SchemaSetupInterface $setup)
+    {
+        $table = $setup->getTable(
+            ProductBillingFrequencyInterface::SUBSCRIPTIONS_PRODUCT_BILLING_FREQUENCY_TABLE
+        );
+        $setup->getConnection()
+            ->addColumn(
+                $table,
+                'flag',
+                [
+                    'type' => Table::TYPE_BOOLEAN,
+                    'nullable' => false,
+                    'default' => 0,
+                    'comment' => 'Flag'
+                ]
+            );
+        $setup->getConnection()
+            ->addColumn(
+                $table,
+                'subsc_profile_id_for_grid',
+                [
+                    'type' => Table::TYPE_TEXT,
+                    'length' => 255,
+                    'nullable' => true,
+                    'default' => null,
+                    'comment' => 'subsc_profile_id_for_grid'
+                ]
+            );
     }
 }

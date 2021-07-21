@@ -166,4 +166,38 @@ class ProductBillingFrequency extends \Magento\Framework\Model\AbstractModel imp
     {
         return $this->setData(self::IS_DISABLED, $isDisabled);
     }
+
+    /**
+     * @return array|mixed|null
+     */
+    public function getFlag()
+    {
+        return $this->getData(self::FLAG);
+    }
+
+    /**
+     * @param $flag
+     * @return mixed|ProductBillingFrequency
+     */
+    public function setFlag($flag)
+    {
+        return $this->setData(self::FLAG, $flag);
+    }
+
+    /**
+     * @return array|mixed|null
+     */
+    public function getSubscProfileIdForGrid()
+    {
+        return $this->getData(self::SUBSC_PROFILE_ID_FOR_GRID);
+    }
+
+    /**
+     * @param $subsIdForGrid
+     * @return mixed|ProductBillingFrequency
+     */
+    public function setSubscProfileIdForGrid($subsIdForGrid)
+    {
+        return $this->setData(self::SUBSC_PROFILE_ID_FOR_GRID, $subsIdForGrid);
+    }
 }
