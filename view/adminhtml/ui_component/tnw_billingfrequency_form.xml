@@ -73,21 +73,6 @@
                 </item>
             </argument>
         </field>
-        <field name="website_id">
-            <argument name="data" xsi:type="array">
-                <item name="options" xsi:type="object">Magento\Config\Model\Config\Source\Website</item>
-                <item name="config" xsi:type="array">
-                    <item name="label" xsi:type="string" translate="true">Website</item>
-                    <item name="dataType" xsi:type="string">number</item>
-                    <item name="formElement" xsi:type="string">select</item>
-                    <item name="validation" xsi:type="array">
-                        <item name="required-entry" xsi:type="boolean">true</item>
-                    </item>
-                    <item name="source" xsi:type="string">BillingFrequency</item>
-                    <item name="dataScope" xsi:type="string">website_id</item>
-                </item>
-            </argument>
-        </field>
         <field name="label">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
