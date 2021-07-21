@@ -66,17 +66,39 @@ class AvailableGridSubscriptionProfile
         ];
         $ids = [];
         $billingFrequencies = false;
+        $oldBillingFrequencies = false;
+
+        $oldBillingFrequencyId = $subscriptionProfile->getOrigData('billing_frequency_id')
+            ? $subscriptionProfile->getOrigData('billing_frequency_id')
+            : $subscriptionProfile->getBillingFrequencyId();
+
+        if ($subscriptionProfile->getBillingFrequencyId() !== $oldBillingFrequencyId) {
+            foreach ($subscriptionProfile->getProducts() as $product) {
+                $oldBillingFrequencies = $this->getProductBillingFrequency(
+                    $product->getMagentoProductId(),
+                    $oldBillingFrequencyId
+                );
+            }
+            foreach ($oldBillingFrequencies as $oldFrequency) {
+                if ($oldFrequency->getSubscProfileIdForGrid()) {
+                    $ids = $this->json->unserialize($oldFrequency->getSubscProfileIdForGrid());
+                }
+                if (($key = array_search($subscriptionProfile->getId(), $ids)) !== false) {
+                    unset($ids[$key]);
+                    $oldFrequency->setSubscProfileIdForGrid($this->json->serialize($ids));
+                    if (!$ids) {
+                        $oldFrequency->setFlag(0);
+                    }
+                }
+                $this->productBillingFrequency->save($oldFrequency);
+            }
+        }
 
         foreach ($subscriptionProfile->getProducts() as $product) {
-            $searchCriteria = $this->searchCriteriaBuilder->addFilter(
-                'magento_product_id',
-                $product->getMagentoProductId()
-            )->addFilter(
-                'billing_frequency_id',
+            $billingFrequencies = $this->getProductBillingFrequency(
+                $product->getMagentoProductId(),
                 $subscriptionProfile->getBillingFrequencyId()
-            )->create();
-
-            $billingFrequencies = $this->productBillingFrequency->getList($searchCriteria)->getItems();
+            );
         }
 
         if ($billingFrequencies) {
@@ -110,5 +132,24 @@ class AvailableGridSubscriptionProfile
                 $this->productBillingFrequency->save($frequency);
             }
         }
+    }
+
+    /**
+     * @param $magentoProductId
+     * @param $billingFrequencyId
+     * @return \TNW\Subscriptions\Api\Data\ProductBillingFrequencyInterface[]
+     * @throws \Magento\Framework\Exception\LocalizedException
+     */
+    private function getProductBillingFrequency($magentoProductId, $billingFrequencyId)
+    {
+        $searchCriteria = $this->searchCriteriaBuilder->addFilter(
+            'magento_product_id',
+            $magentoProductId
+        )->addFilter(
+            'billing_frequency_id',
+            $billingFrequencyId
+        )->create();
+
+        return $this->productBillingFrequency->getList($searchCriteria)->getItems();
     }
 }
