@@ -117,8 +117,7 @@ class AvailableGridSubscriptionProfile
                     }
                 } else {
                     $key = array_search($subscriptionProfile->getId(), $ids);
-                    if ($key !== false && !in_array($subscriptionProfile->getStatus(), $searchStatuses)
-                    ) {
+                    if ($key !== false && !in_array($subscriptionProfile->getStatus(), $searchStatuses)) {
                         unset($ids[$key]);
                         $frequency->setSubscProfileIdForGrid($this->json->serialize($ids));
                     }
