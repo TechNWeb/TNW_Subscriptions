@@ -3,7 +3,6 @@
  * Copyright © 2021 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
-
 namespace TNW\Subscriptions\Setup\Patch\Data;
 
 use Magento\Framework\Setup\ModuleDataSetupInterface;
@@ -16,7 +15,6 @@ use TNW\Subscriptions\Model\ProductBillingFrequency\AvailableGridSubscriptionPro
  * Add Subscription Id to product billing frequency table for generate grid on remove BF from product
  *
  * Class AddSubscIdForCreateGrid
- * @package TNW\Subscriptions\Setup\Patch\Data
  */
 class AddSubscIdForCreateGrid implements DataPatchInterface
 {
@@ -52,8 +50,7 @@ class AddSubscIdForCreateGrid implements DataPatchInterface
         SubscriptionProfileRepositoryInterface $subscriptionProfileRepository,
         SearchCriteriaBuilder $searchCriteriaBuilder,
         AvailableGridSubscriptionProfile $availableGridSubscriptionProfile
-    )
-    {
+    ) {
         $this->moduleDataSetup = $moduleDataSetup;
         $this->subscriptionProfileRepository = $subscriptionProfileRepository;
         $this->searchCriteriaBuilder = $searchCriteriaBuilder;

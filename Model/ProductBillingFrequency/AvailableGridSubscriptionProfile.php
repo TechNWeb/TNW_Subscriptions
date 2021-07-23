@@ -3,7 +3,6 @@
  * Copyright © 2021 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
-
 namespace TNW\Subscriptions\Model\ProductBillingFrequency;
 
 use Magento\Framework\Api\SearchCriteriaBuilder;
@@ -15,11 +14,9 @@ use Magento\Framework\Serialize\Serializer\Json;
  * Add Subscription Id to product billing frequency table for generate grid on remove BF from product
  *
  * Class AvailableGridSubscriptionProfile
- * @package TNW\Subscriptions\Model\ProductBillingFrequency
  */
 class AvailableGridSubscriptionProfile
 {
-
     /**
      * @var SearchCriteriaBuilder
      */
@@ -45,8 +42,7 @@ class AvailableGridSubscriptionProfile
         SearchCriteriaBuilder $searchCriteriaBuilder,
         ProductBillingFrequencyRepositoryInterface $productBillingFrequency,
         Json $json
-    )
-    {
+    ) {
         $this->searchCriteriaBuilder = $searchCriteriaBuilder;
         $this->productBillingFrequency = $productBillingFrequency;
         $this->json = $json;
@@ -83,7 +79,8 @@ class AvailableGridSubscriptionProfile
                 if ($oldFrequency->getSubscProfileIdForGrid()) {
                     $ids = $this->json->unserialize($oldFrequency->getSubscProfileIdForGrid());
                 }
-                if (($key = array_search($subscriptionProfile->getId(), $ids)) !== false) {
+                $key = array_search($subscriptionProfile->getId(), $ids);
+                if ($key !== false) {
                     unset($ids[$key]);
                     $oldFrequency->setSubscProfileIdForGrid($this->json->serialize($ids));
                     if (!$ids) {
@@ -119,8 +116,8 @@ class AvailableGridSubscriptionProfile
                         $frequency->setFlag(1);
                     }
                 } else {
-                    if (($key = array_search($subscriptionProfile->getId(), $ids)) !== false
-                        && !in_array($subscriptionProfile->getStatus(), $searchStatuses)
+                    $key = array_search($subscriptionProfile->getId(), $ids);
+                    if ($key !== false && !in_array($subscriptionProfile->getStatus(), $searchStatuses)
                     ) {
                         unset($ids[$key]);
                         $frequency->setSubscProfileIdForGrid($this->json->serialize($ids));
