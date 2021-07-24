@@ -95,7 +95,9 @@ class SummaryNextPaymentDateForm extends AbstractDataProvider
 
         $data[SummaryInsertForm::FORM_DATA_KEY] = $this->getProfileId();
         $data['entity_id'] = $this->getProfileId();
-        $scheduledAt = $this->profileManager->getNextProfileRelation()->getScheduledAt();
+        $scheduledAt = $this->profileManager->getNextProfileRelation()
+            ? $this->profileManager->getNextProfileRelation()->getScheduledAt()
+            : false;
         $data[self::NEXT_PAYMENT_DATE_VALUE_FIELD] = $scheduledAt;
         $data[self::NEXT_PAYMENT_DATE_VIEW_FIELD]
             = $this->localeDate->formatDate($scheduledAt, IntlDateFormatter::MEDIUM);
