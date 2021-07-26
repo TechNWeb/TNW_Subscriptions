@@ -83,9 +83,6 @@ class AvailableGridSubscriptionProfile
                 if ($key !== false) {
                     unset($ids[$key]);
                     $oldFrequency->setSubscProfileIdForGrid($this->json->serialize($ids));
-                    if (!$ids) {
-                        $oldFrequency->setFlag(0);
-                    }
                 }
                 $this->productBillingFrequency->save($oldFrequency);
             }
@@ -112,17 +109,11 @@ class AvailableGridSubscriptionProfile
                     $subId = $subscriptionProfile->getId();
                     array_push($ids, $subId);
                     $frequency->setSubscProfileIdForGrid($this->json->serialize($ids));
-                    if ($frequency->getFlag() !== 1) {
-                        $frequency->setFlag(1);
-                    }
                 } else {
                     $key = array_search($subscriptionProfile->getId(), $ids);
                     if ($key !== false && !in_array($subscriptionProfile->getStatus(), $searchStatuses)) {
                         unset($ids[$key]);
                         $frequency->setSubscProfileIdForGrid($this->json->serialize($ids));
-                    }
-                    if (!$ids) {
-                        $frequency->setFlag(0);
                     }
                 }
                 $this->productBillingFrequency->save($frequency);

@@ -24,7 +24,6 @@ interface ProductBillingFrequencyInterface
     const PRESET_QTY = 'preset_qty';
     const PRESET_QTY_SET_BY_MERCHANT = 'preset_qty_set_by_merchant';
     const IS_DISABLED = 'is_disabled';
-    const FLAG = 'flag';
     const SUBSC_PROFILE_ID_FOR_GRID = 'subsc_profile_id_for_grid';
 
     /**
@@ -131,17 +130,6 @@ interface ProductBillingFrequencyInterface
      * @return mixed
      */
     public function setIsDisabled($isDisabled);
-
-    /**
-     * @return mixed
-     */
-    public function getFlag();
-
-    /**
-     * @param $flag
-     * @return mixed
-     */
-    public function setFlag($flag);
 
     /**
      * @return mixed
