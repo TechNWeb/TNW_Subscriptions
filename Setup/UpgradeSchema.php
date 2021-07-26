@@ -905,24 +905,13 @@ class UpgradeSchema implements UpgradeSchemaInterface
         $setup->getConnection()
             ->addColumn(
                 $table,
-                'flag',
-                [
-                    'type' => Table::TYPE_BOOLEAN,
-                    'nullable' => false,
-                    'default' => 0,
-                    'comment' => 'Flag'
-                ]
-            );
-        $setup->getConnection()
-            ->addColumn(
-                $table,
                 'subsc_profile_id_for_grid',
                 [
                     'type' => Table::TYPE_TEXT,
                     'length' => 255,
                     'nullable' => true,
                     'default' => null,
-                    'comment' => 'subsc_profile_id_for_grid'
+                    'comment' => 'Store Subscription profiles id for grid on remove BF'
                 ]
             );
     }
