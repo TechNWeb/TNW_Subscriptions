@@ -29,9 +29,7 @@ use TNW\Subscriptions\Api\Data\ProductBillingFrequencyInterface;
 use TNW\Subscriptions\Model\Config;
 use TNW\Subscriptions\Model\Context;
 use TNW\Subscriptions\Model\Product\Attribute;
-use TNW\Subscriptions\Model\Source\ProfileStatus;
-use TNW\Subscriptions\Model\SubscriptionProfileRepository;
-use TNW\Subscriptions\Model\ProductSubscriptionProfileRepository;
+use Magento\Framework\Serialize\Serializer\Json;
 
 /**
  * Data provider for "Recurring Options" panel
@@ -134,19 +132,14 @@ class RecurringOptions extends BaseModifier
     private $supportTypes;
 
     /**
-     * @var SubscriptionProfileRepository
-     */
-    private $profileRepository;
-
-    /**
-     * @var ProductSubscriptionProfileRepository
-     */
-    private $productSubscriptionProfileRepository;
-
-    /**
      * @var UrlInterface
      */
     private $urlBuilder;
+
+    /**
+     * @var Json
+     */
+    private $json;
 
     /**
      * @param LocatorInterface $locator
@@ -158,8 +151,7 @@ class RecurringOptions extends BaseModifier
      * @param Config $config
      * @param array $supportTypes
      * @param UrlInterface $urlBuilder
-     * @param SubscriptionProfileRepository $profileRepository
-     * @param ProductSubscriptionProfileRepository $productSubscriptionProfileRepository
+     * @param Json $json
      */
     public function __construct(
         LocatorInterface $locator,
@@ -171,8 +163,7 @@ class RecurringOptions extends BaseModifier
         Config $config,
         array $supportTypes,
         UrlInterface $urlBuilder,
-        SubscriptionProfileRepository $profileRepository,
-        ProductSubscriptionProfileRepository $productSubscriptionProfileRepository
+        Json $json
     ) {
         $this->locator = $locator;
         $this->arrayManager = $arrayManager;
@@ -181,8 +172,7 @@ class RecurringOptions extends BaseModifier
         $this->config = $config;
         $this->supportTypes = $supportTypes;
         $this->urlBuilder = $urlBuilder;
-        $this->profileRepository = $profileRepository;
-        $this->productSubscriptionProfileRepository = $productSubscriptionProfileRepository;
+        $this->json = $json;
         parent::__construct($storeManager, $context);
     }
 
@@ -197,72 +187,27 @@ class RecurringOptions extends BaseModifier
 
             $productId = $this->locator->getProduct()->getId();
 
-            $searchStatuses = [
-                ProfileStatus::STATUS_ACTIVE,
-                ProfileStatus::STATUS_TRIAL,
-                ProfileStatus::STATUS_HOLDED,
-                ProfileStatus::STATUS_PAST_DUE
-            ];
-
-            $searchCriteria = $this->searchCriteriaBuilder->addFilter(
-                'magento_product_id',
-                $productId
-            )->create();
-
-            $subscriptionProfileIds = [];
-            $parentProductId = false;
-
-            $productSubscriptions = $this->productSubscriptionProfileRepository->getList($searchCriteria);
-            foreach ($productSubscriptions->getItems() as $productSubscription) {
-                $subscriptionProfileIds[] = $productSubscription->getSubscriptionProfileId();
-                if ($productSubscription->getParentId() && !$parentProductId) {
-                    $parentProductId = $this->productSubscriptionProfileRepository->getById(
-                        $productSubscription->getParentId()
-                    )->getMagentoProductId();
-                }
-            }
-
             /** @var ProductBillingFrequencyInterface $option */
             foreach ($productOptions as $option) {
                 $optionArray = $option->getData();
                 $optionArray = $this->formatPriceByPath(static::FIELD_PRICE_NAME, $optionArray);
                 $optionArray = $this->formatPriceByPath(static::FIELD_INITIAL_FEE_NAME, $optionArray);
-
-                if (!empty($subscriptionProfileIds)) {
-                    $profilesSearchCriteria = $this->searchCriteriaBuilder->addFilter(
-                        'status',
-                        $searchStatuses,
-                        'in'
-                    )->addFilter(
-                        'billing_frequency_id',
-                        $optionArray['billing_frequency_id']
-                    )->addFilter(
-                        'entity_id',
-                        $subscriptionProfileIds,
-                        'in'
-                    )->create();
-
-                    $subscriptionProfiles = $this->profileRepository->getList($profilesSearchCriteria);
-
-                    if ($subscriptionProfiles->getTotalCount()) {
+                if ($option->getSubscProfileIdForGrid() !== null) {
+                    $subscrProfileIds = $this->json->unserialize($option->getSubscProfileIdForGrid());
+                    if (!empty($subscrProfileIds)) {
                         $gridUrl = $this->urlBuilder->getUrl(
                             'tnw_subscriptions/subscriptionprofile/index',
                             [
-                                'status' => implode(',', $searchStatuses),
-                                'product_id' => $parentProductId ?: $productId,
-                                'child_sku' => $parentProductId ? $this->locator->getProduct()->getSku(): null,
-                                'billing_frequency_id' => $optionArray['billing_frequency_id']
+                                'entity_id' => implode(',', $subscrProfileIds),
                             ]
                         );
-
                         $optionArray['grid_url'] = $gridUrl;
                     }
                 }
-
                 $options[] = $optionArray;
             }
 
-            $data =  array_replace_recursive(
+            $data = array_replace_recursive(
                 $data,
                 [
                     $productId => [
