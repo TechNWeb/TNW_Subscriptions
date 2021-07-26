@@ -10,6 +10,9 @@ var config = {
             },
             'Magento_Ui/js/form/element/multiselect': {
                 'TNW_Subscriptions/js/form/element/multiselect/preview': true
+            },
+            'Magento_Ui/js/grid/filters/filters' : {
+                'TNW_Subscriptions/js/grid/filters/filters' : true
             }
         }
     }

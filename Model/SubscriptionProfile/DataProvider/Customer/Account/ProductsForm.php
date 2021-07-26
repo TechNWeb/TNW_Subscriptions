@@ -5,9 +5,14 @@
  */
 namespace TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Customer\Account;
 
+use Magento\CatalogInventory\Api\Data\StockItemInterface;
 use Magento\CatalogInventory\Api\StockRegistryInterface;
+use Magento\Framework\Exception\InputException;
+use Magento\Framework\Exception\LocalizedException;
+use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\Registry;
 use Magento\Framework\UrlInterface;
+use Magento\InventorySalesApi\Api\Data\SalesChannelInterface;
 use Magento\InventorySalesApi\Api\GetProductSalableQtyInterface;
 use Magento\Ui\Component\Container as UiContainer;
 use Magento\Ui\Component\Form as UiForm;
@@ -23,6 +28,8 @@ use TNW\Subscriptions\Model\SubscriptionProfile;
 use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Modal\SummaryProductsForm;
 use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Modal\Context as FormContext;
 use TNW\Subscriptions\Model\SubscriptionProfile\Manager;
+use Magento\InventorySalesApi\Api\StockResolverInterface;
+use Magento\Store\Model\StoreManagerInterface;
 
 /**
  * Subscription items form data provider for customer account dashboard page.
@@ -45,6 +52,16 @@ class ProductsForm extends SummaryProductsForm
     protected $productSalableQty;
 
     /**
+     * @var StockResolverInterface
+     */
+    protected $stockResolver;
+
+    /**
+     * @var StoreManagerInterface
+     */
+    protected $storeManager;
+
+    /**
      * @param string $name
      * @param string $primaryFieldName
      * @param string $requestFieldName
@@ -59,6 +76,8 @@ class ProductsForm extends SummaryProductsForm
      * @param StockRegistryInterface $stockRegistry
      * @param Config $subscriptionConfig
      * @param GetProductSalableQtyInterface $productSalableQty
+     * @param StockResolverInterface $stockResolver
+     * @param StoreManagerInterface $storeManager
      * @param string $scope
      * @param array $meta
      * @param array $data
@@ -78,12 +97,16 @@ class ProductsForm extends SummaryProductsForm
         StockRegistryInterface $stockRegistry,
         Config $subscriptionConfig,
         GetProductSalableQtyInterface $productSalableQty,
+        StockResolverInterface $stockResolver,
+        StoreManagerInterface $storeManager,
         $scope = '',
         array $meta = [],
         array $data = []
     ) {
         $this->subscriptionConfig = $subscriptionConfig;
         $this->productSalableQty = $productSalableQty;
+        $this->stockResolver = $stockResolver;
+        $this->storeManager = $storeManager;
         parent::__construct(
             $name,
             $primaryFieldName,
@@ -200,28 +223,30 @@ class ProductsForm extends SummaryProductsForm
      * Returns qty field definition.
      *
      * @return array
-     * @throws \Magento\Framework\Exception\InputException
-     * @throws \Magento\Framework\Exception\LocalizedException
+     * @throws InputException
+     * @throws LocalizedException
      */
     protected function getQtyDefinition()
     {
         $canUseDecimals = $this->canUseQtyDecimals();
         $productId = current($this->profileManager->getProfile()->getProducts())->getMagentoProductId();
         $websiteId = $this->profileManager->getProfile()->getWebsiteId();
+        $websiteCode = $this->storeManager->getWebsite()->getCode();
 
         $params = [];
-        /** @var \Magento\CatalogInventory\Api\Data\StockItemInterface $stockItem */
+        /** @var StockItemInterface $stockItem */
         $stockItem = $this->stockRegistry->getStockItem($productId, $websiteId);
         foreach ($this->profileManager->getProfile()->getProducts() as $item) {
             $product = $item->getChildren() ? $item->getChildren() : $item;
         }
+        $stockId = $this->stockResolver->execute(SalesChannelInterface::TYPE_WEBSITE, $websiteCode)->getStockId();
         $productSalableQty = $this->productSalableQty->execute(
             $product->getSku(),
-            $websiteId
+            $stockId
         );
 
         if ($product->getMagentoProductId() != $productId) {
-            /** @var \Magento\CatalogInventory\Api\Data\StockItemInterface $stockItem */
+            /** @var StockItemInterface $stockItem */
             $stockItem = $this->stockRegistry->getStockItem($product->getMagentoProductId(), $websiteId);
         }
         $params['minAllowed'] = $stockItem->getMinQty();
@@ -313,6 +338,7 @@ class ProductsForm extends SummaryProductsForm
      * Returns meta data.
      *
      * @return array
+     * @throws LocalizedException
      */
     protected function getMetaData()
     {
@@ -347,6 +373,7 @@ class ProductsForm extends SummaryProductsForm
      * @param string|int $objectId
      * @param string|int $itemId
      * @return array
+     * @throws NoSuchEntityException
      */
     protected function getForm($objectId, $itemId)
     {
@@ -439,7 +466,7 @@ class ProductsForm extends SummaryProductsForm
      * Returns middle container definition from description fieldset.
      *
      * @return array
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     * @throws NoSuchEntityException
      */
     protected function getMiddleContainerDefinition()
     {
@@ -475,7 +502,7 @@ class ProductsForm extends SummaryProductsForm
      * Return description fieldset definition.
      *
      * @return array
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     * @throws NoSuchEntityException
      */
     protected function getDescriptionFieldset()
     {
