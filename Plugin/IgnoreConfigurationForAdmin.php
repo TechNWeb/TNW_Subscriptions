@@ -9,6 +9,7 @@ use Magento\Framework\App\State;
 use Magento\Backend\App\Area\FrontNameResolver;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Module\Output\ConfigInterface;
+use Psr\Log\LoggerInterface;
 
 /**
  * Class IgnoreConfigurationForAdmin for modify isEnabled module
@@ -25,9 +26,11 @@ class IgnoreConfigurationForAdmin
      * @param State $state
      */
     public function __construct(
-        State $state
+        State $state,
+        LoggerInterface $logger
     ) {
         $this->state = $state;
+        $this->logger = $logger;
     }
 
     /**
@@ -41,9 +44,12 @@ class IgnoreConfigurationForAdmin
      */
     public function afterIsEnabled(ConfigInterface $config, $result, $moduleName)
     {
-        $state = $this->state->getAreaCode();
-        if ($moduleName == 'TNW_Subscriptions' && $state == FrontNameResolver::AREA_CODE) {
-            $result = false;
+        try {
+            $state = $this->state->getAreaCode();
+            if ($moduleName == 'TNW_Subscriptions' && $state == FrontNameResolver::AREA_CODE) {
+                $result = false;
+            }
+        } catch (LocalizedException $e) {
         }
         return $result;
     }
