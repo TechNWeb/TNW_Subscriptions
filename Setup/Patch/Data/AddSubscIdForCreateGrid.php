@@ -62,7 +62,13 @@ class AddSubscIdForCreateGrid implements DataPatchInterface
      */
     public static function getDependencies()
     {
-        return [];
+        return [
+            AddSubscriptionCanSkipAttribute::class,
+            PopulateCustomerProductHistoryWithAggregatedData::class,
+            PopulateSalesOrderGridWithSubscriptionProfileIds::class,
+            PopulateWebsiteModuleState::class
+
+        ];
     }
 
     /**
@@ -82,7 +88,8 @@ class AddSubscIdForCreateGrid implements DataPatchInterface
         $this->moduleDataSetup->startSetup();
 
         $connection = $this->moduleDataSetup->getConnection();
-        $select = $connection->select()->from('tnw_subscriptions_subscription_profile_entity')->limit(1);
+        $table = $this->moduleDataSetup->getTable('tnw_subscriptions_subscription_profile_entity');
+        $select = $connection->select()->from($table)->limit(1);
         $isAvailableProfile = $connection->fetchOne($select);
 
         if (!empty($isAvailableProfile)) {
