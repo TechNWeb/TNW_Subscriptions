@@ -80,10 +80,17 @@ class AddSubscIdForCreateGrid implements DataPatchInterface
     public function apply()
     {
         $this->moduleDataSetup->startSetup();
-        $subscProfiles = $this->subscriptionProfileRepository->getList($this->searchCriteriaBuilder->create())
-            ->getItems();
-        foreach ($subscProfiles as $subscProfile) {
-            $this->availableGridSubscriptionProfile->getDataForUrl($subscProfile);
+
+        $connection = $this->moduleDataSetup->getConnection();
+        $select = $connection->select()->from('tnw_subscriptions_subscription_profile_entity')->limit(1);
+        $isAvailableProfile = $connection->fetchOne($select);
+
+        if (!empty($isAvailableProfile)) {
+            $subscProfiles = $this->subscriptionProfileRepository->getList($this->searchCriteriaBuilder->create())
+                ->getItems();
+            foreach ($subscProfiles as $subscProfile) {
+                $this->availableGridSubscriptionProfile->getDataForUrl($subscProfile);
+            }
         }
         $this->moduleDataSetup->endSetup();
     }
