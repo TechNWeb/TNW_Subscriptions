@@ -50,8 +50,7 @@ class AddSubscIdForCreateGrid implements DataPatchInterface
         SubscriptionProfileRepositoryInterface $subscriptionProfileRepository,
         SearchCriteriaBuilder $searchCriteriaBuilder,
         AvailableGridSubscriptionProfile $availableGridSubscriptionProfile
-    )
-    {
+    ) {
         $this->moduleDataSetup = $moduleDataSetup;
         $this->subscriptionProfileRepository = $subscriptionProfileRepository;
         $this->searchCriteriaBuilder = $searchCriteriaBuilder;
