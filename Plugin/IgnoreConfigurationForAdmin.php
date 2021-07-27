@@ -9,7 +9,6 @@ use Magento\Framework\App\State;
 use Magento\Backend\App\Area\FrontNameResolver;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Module\Output\ConfigInterface;
-use Psr\Log\LoggerInterface;
 
 /**
  * Class IgnoreConfigurationForAdmin for modify isEnabled module
@@ -26,11 +25,9 @@ class IgnoreConfigurationForAdmin
      * @param State $state
      */
     public function __construct(
-        State $state,
-        LoggerInterface $logger
+        State $state
     ) {
         $this->state = $state;
-        $this->logger = $logger;
     }
 
     /**
