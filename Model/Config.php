@@ -7,6 +7,7 @@
 namespace TNW\Subscriptions\Model;
 
 use Magento\Framework\App\Config\ScopeConfigInterface;
+use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Store\Model\StoreManagerInterface;
 use Magento\Framework\App\Request\Http;
 use Magento\Store\Model\ScopeInterface;
@@ -114,6 +115,16 @@ class Config
     private $isSubscriptionsActive;
 
     /**
+     * @var Collection
+     */
+    private $customerGroupCollectionequest;
+
+    /**
+     * @var SubscriptionProfileRepository
+     */
+    private $profileRepository;
+
+    /**
      * Config constructor.
      * @param ScopeConfigInterface $scopeConfig
      * @param StoreManagerInterface $storeManager
@@ -127,7 +138,8 @@ class Config
         Http $request,
         Manager $moduleManager,
         ObjectManagerInterface $objectManager,
-        Collection $customerGroupCollection
+        Collection $customerGroupCollection,
+        SubscriptionProfileRepository $profileRepository
     ) {
         if ($moduleManager->isEnabled("Magento_Paypal")) {
              $this->paypalConfig = $objectManager->get(\Magento\Paypal\Model\Config::class);
@@ -136,6 +148,7 @@ class Config
         $this->storeManager = $storeManager;
         $this->request = $request;
         $this->customerGroupCollectionequest = $customerGroupCollection;
+        $this->profileRepository = $profileRepository;
     }
 
     /**
@@ -439,11 +452,14 @@ class Config
      * Get Website Id passed to request or get current if nothing.
      *
      * @return int
+     * @throws NoSuchEntityException
      */
     public function getWebsiteId()
     {
         $website = null;
-        $websiteId = $this->request->getParam('website');
+        /** Getting actual website id, where subscription was created */
+        $subscriptionProfileId = $this->request->getParam('subscription_profile_id');
+        $websiteId = $this->profileRepository->getById($subscriptionProfileId)->getWebsiteId();
         if ($websiteId) {
             if (!is_array($websiteId)) {
                 $website = $this->getWebsite($websiteId);
