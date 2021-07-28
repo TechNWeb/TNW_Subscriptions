@@ -62,7 +62,12 @@ class AddSubscIdForCreateGrid implements DataPatchInterface
      */
     public static function getDependencies()
     {
-        return [];
+        return [
+            AddSubscriptionCanSkipAttribute::class,
+            PopulateCustomerProductHistoryWithAggregatedData::class,
+            PopulateSalesOrderGridWithSubscriptionProfileIds::class,
+            PopulateWebsiteModuleState::class
+        ];
     }
 
     /**
