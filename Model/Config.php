@@ -17,6 +17,7 @@ use TNW\Subscriptions\Block\Adminhtml\System\Config\PaymentMethods\ActiveMethods
 use Magento\Framework\Module\Manager;
 use Magento\Framework\ObjectManagerInterface;
 use Magento\Customer\Model\ResourceModel\Group\Collection;
+use Psr\Log\LoggerInterface;
 
 /**
  * Class Config - config model for subscriptions
@@ -125,12 +126,20 @@ class Config
     private $profileRepository;
 
     /**
+     * @var LoggerInterface
+     */
+    private $logger;
+
+    /**
      * Config constructor.
      * @param ScopeConfigInterface $scopeConfig
      * @param StoreManagerInterface $storeManager
      * @param Http $request
      * @param Manager $moduleManager
      * @param ObjectManagerInterface $objectManager
+     * @param Collection $customerGroupCollection
+     * @param SubscriptionProfileRepository $profileRepository
+     * @param LoggerInterface $logger
      */
     public function __construct(
         ScopeConfigInterface $scopeConfig,
@@ -139,7 +148,8 @@ class Config
         Manager $moduleManager,
         ObjectManagerInterface $objectManager,
         Collection $customerGroupCollection,
-        SubscriptionProfileRepository $profileRepository
+        SubscriptionProfileRepository $profileRepository,
+        LoggerInterface $logger
     ) {
         if ($moduleManager->isEnabled("Magento_Paypal")) {
              $this->paypalConfig = $objectManager->get(\Magento\Paypal\Model\Config::class);
@@ -149,6 +159,7 @@ class Config
         $this->request = $request;
         $this->customerGroupCollectionequest = $customerGroupCollection;
         $this->profileRepository = $profileRepository;
+        $this->logger = $logger;
     }
 
     /**
@@ -457,9 +468,14 @@ class Config
     public function getWebsiteId()
     {
         $website = null;
-        /** Getting actual website id, where subscription was created */
-        $subscriptionProfileId = $this->request->getParam('subscription_profile_id');
-        $websiteId = $this->profileRepository->getById($subscriptionProfileId)->getWebsiteId();
+        try {
+            /** Getting actual website id, where subscription was created */
+            $subscriptionProfileId = $this->request->getParam('subscription_profile_id');
+            $websiteId = $this->profileRepository->getById($subscriptionProfileId)->getWebsiteId();
+        } catch (NoSuchEntityException $e) {
+            $this->logger->debug($e->getLogMessage());
+            $websiteId = $this->request->getParam('website');
+        }
         if ($websiteId) {
             if (!is_array($websiteId)) {
                 $website = $this->getWebsite($websiteId);
