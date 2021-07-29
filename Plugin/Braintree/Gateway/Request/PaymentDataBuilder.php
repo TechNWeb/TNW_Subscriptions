@@ -5,6 +5,9 @@
  */
 namespace TNW\Subscriptions\Plugin\Braintree\Gateway\Request;
 
+use Magento\Framework\Exception\InputException;
+use Magento\Framework\Exception\NoSuchEntityException;
+use PayPal\Braintree\Gateway\Config\Config;
 use PayPal\Braintree\Gateway\Request\PaymentDataBuilder as DataBuilder;
 use Magento\Payment\Gateway\Helper\SubjectReader;
 use Magento\Framework\Encryption\EncryptorInterface;
@@ -25,16 +28,24 @@ class PaymentDataBuilder
     private $encryptor;
 
     /**
+     * @var Config
+     */
+    private $braintreeConfig;
+
+    /**
      * PaymentDataBuilder constructor.
      * @param SubjectReader $subjectReader
      * @param EncryptorInterface $encryptor
+     * @param Config $braintreeConfig
      */
     public function __construct(
         SubjectReader $subjectReader,
-        EncryptorInterface $encryptor
+        EncryptorInterface $encryptor,
+        Config $braintreeConfig
     ) {
         $this->subjectReader = $subjectReader;
         $this->encryptor = $encryptor;
+        $this->braintreeConfig = $braintreeConfig;
     }
 
     /**
@@ -58,6 +69,15 @@ class PaymentDataBuilder
             $result['paymentMethodToken'] = $this->encryptor->decrypt($tokenHash);
             unset($result[DataBuilder::PAYMENT_METHOD_NONCE]);
             $payment->unsAdditionalInformation('token_hash');
+        }
+        try {
+            $storeId = $paymentDO->getOrder()->getStoreId() ?? null;
+            $merchantAccountId = $this->braintreeConfig->getMerchantAccountId($storeId);
+        } catch (InputException | NoSuchEntityException $exception) {
+            $merchantAccountId = null;
+        }
+        if (!empty($merchantAccountId)) {
+            $result[DataBuilder::MERCHANT_ACCOUNT_ID] = $merchantAccountId;
         }
 
         return $result;
