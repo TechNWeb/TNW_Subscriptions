@@ -167,7 +167,7 @@ class UpgradeSchema implements UpgradeSchemaInterface
         }
 
         if (version_compare($context->getVersion(), '2.2.79', '<')) {
-            $this->addColumnForSubscGrid($setup);
+            $this->addColumnForSubscriptionGrid($setup);
         }
 
         $setup->endSetup();
@@ -868,7 +868,7 @@ class UpgradeSchema implements UpgradeSchemaInterface
      *
      * @param SchemaSetupInterface $setup
      */
-    private function addColumnForSubscGrid(SchemaSetupInterface $setup)
+    private function addColumnForSubscriptionGrid(SchemaSetupInterface $setup)
     {
         $table = $setup->getTable(
             ProductBillingFrequencyInterface::SUBSCRIPTIONS_PRODUCT_BILLING_FREQUENCY_TABLE
@@ -876,7 +876,7 @@ class UpgradeSchema implements UpgradeSchemaInterface
         $setup->getConnection()
             ->addColumn(
                 $table,
-                'subsc_profile_id_for_grid',
+                'subscription_profile_ids',
                 [
                     'type' => Table::TYPE_TEXT,
                     'length' => 255,
