@@ -41,9 +41,12 @@ class IgnoreConfigurationForAdmin
      */
     public function afterIsEnabled(ConfigInterface $config, $result, $moduleName)
     {
-        $state = $this->state->getAreaCode();
-        if ($moduleName == 'TNW_Subscriptions' && $state == FrontNameResolver::AREA_CODE) {
-            $result = false;
+        try {
+            $state = $this->state->getAreaCode();
+            if ($moduleName == 'TNW_Subscriptions' && $state == FrontNameResolver::AREA_CODE) {
+                $result = false;
+            }
+        } catch (LocalizedException $e) {
         }
         return $result;
     }
