@@ -170,17 +170,17 @@ class ProductBillingFrequency extends \Magento\Framework\Model\AbstractModel imp
     /**
      * @return array|mixed|null
      */
-    public function getSubscProfileIdForGrid()
+    public function getSubscriptionProfileIds()
     {
-        return $this->getData(self::SUBSC_PROFILE_ID_FOR_GRID);
+        return $this->getData(self::SUBSCRIPTION_PROFILE_ID_FOR_GRID);
     }
 
     /**
      * @param $subsIdForGrid
      * @return mixed|ProductBillingFrequency
      */
-    public function setSubscProfileIdForGrid($subsIdForGrid)
+    public function setSubscriptionProfileIds($subsIdForGrid)
     {
-        return $this->setData(self::SUBSC_PROFILE_ID_FOR_GRID, $subsIdForGrid);
+        return $this->setData(self::SUBSCRIPTION_PROFILE_ID_FOR_GRID, $subsIdForGrid);
     }
 }

@@ -5,18 +5,19 @@
  */
 namespace TNW\Subscriptions\Setup\Patch\Data;
 
+use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Setup\ModuleDataSetupInterface;
 use Magento\Framework\Setup\Patch\DataPatchInterface;
 use TNW\Subscriptions\Api\SubscriptionProfileRepositoryInterface;
 use Magento\Framework\Api\SearchCriteriaBuilder;
-use TNW\Subscriptions\Model\ProductBillingFrequency\AvailableGridSubscriptionProfile;
+use TNW\Subscriptions\Model\ProductBillingFrequency\AvailableSubscriptionProfileGrid;
 
 /**
  * Add Subscription Id to product billing frequency table for generate grid on remove BF from product
  *
- * Class AddSubscIdForCreateGrid
+ * Class StoreSubscriptionProfileIdsForFormingGrid
  */
-class AddSubscIdForCreateGrid implements DataPatchInterface
+class StoreSubscriptionProfileIdsForFormingGrid implements DataPatchInterface
 {
     /**
      * @var ModuleDataSetupInterface $moduleDataSetup
@@ -34,27 +35,28 @@ class AddSubscIdForCreateGrid implements DataPatchInterface
     private $searchCriteriaBuilder;
 
     /**
-     * @var AvailableGridSubscriptionProfile
+     * @var AvailableSubscriptionProfileGrid
      */
-    private $availableGridSubscriptionProfile;
+    private $availableSubscriptionProfileGrid;
 
     /**
-     * AddSubscIdForCreateGrid constructor.
+     * StoreSubscriptionProfileIdsForFormingGrid constructor.
+     *
      * @param ModuleDataSetupInterface $moduleDataSetup
      * @param SubscriptionProfileRepositoryInterface $subscriptionProfileRepository
      * @param SearchCriteriaBuilder $searchCriteriaBuilder
-     * @param AvailableGridSubscriptionProfile $availableGridSubscriptionProfile
+     * @param AvailableSubscriptionProfileGrid $availableSubscriptionProfileGrid
      */
     public function __construct(
         ModuleDataSetupInterface $moduleDataSetup,
         SubscriptionProfileRepositoryInterface $subscriptionProfileRepository,
         SearchCriteriaBuilder $searchCriteriaBuilder,
-        AvailableGridSubscriptionProfile $availableGridSubscriptionProfile
+        AvailableSubscriptionProfileGrid $availableSubscriptionProfileGrid
     ) {
         $this->moduleDataSetup = $moduleDataSetup;
         $this->subscriptionProfileRepository = $subscriptionProfileRepository;
         $this->searchCriteriaBuilder = $searchCriteriaBuilder;
-        $this->availableGridSubscriptionProfile = $availableGridSubscriptionProfile;
+        $this->availableSubscriptionProfileGrid = $availableSubscriptionProfileGrid;
     }
 
     /**
@@ -79,8 +81,8 @@ class AddSubscIdForCreateGrid implements DataPatchInterface
     }
 
     /**
-     * @return AddSubscIdForCreateGrid|void
-     * @throws \Magento\Framework\Exception\LocalizedException
+     * @return StoreSubscriptionProfileIdsForFormingGrid|void
+     * @throws LocalizedException
      */
     public function apply()
     {
@@ -94,7 +96,7 @@ class AddSubscIdForCreateGrid implements DataPatchInterface
             $subscProfiles = $this->subscriptionProfileRepository->getList($this->searchCriteriaBuilder->create())
                 ->getItems();
             foreach ($subscProfiles as $subscProfile) {
-                $this->availableGridSubscriptionProfile->getDataForUrl($subscProfile);
+                $this->availableSubscriptionProfileGrid->saveSubscriptionProfileIdsForFormingGrid($subscProfile);
             }
         }
         $this->moduleDataSetup->endSetup();

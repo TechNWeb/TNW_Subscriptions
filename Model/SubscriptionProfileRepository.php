@@ -27,7 +27,7 @@ use TNW\Subscriptions\Model\SubscriptionProfile\MessageHistoryLogger;
 use TNW\Subscriptions\Model\SubscriptionProfile\Status\HistoryLogger;
 use TNW\Subscriptions\Model\SubscriptionProfile\Status\HistoryManager;
 use TNW\Subscriptions\Model\SubscriptionProfileOrder\Manager as ProfileOrderManager;
-use TNW\Subscriptions\Model\ProductBillingFrequency\AvailableGridSubscriptionProfile;
+use TNW\Subscriptions\Model\ProductBillingFrequency\AvailableSubscriptionProfileGrid;
 
 /**
  * Repository for subscription profiles.
@@ -137,9 +137,9 @@ class SubscriptionProfileRepository implements SubscriptionProfileRepositoryInte
     private $isAutomated = false;
 
     /**
-     * @var AvailableGridSubscriptionProfile
+     * @var AvailableSubscriptionProfileGrid
      */
-    private $availableGridSubscriptionProfile;
+    private $availableSubscriptionProfileGrid;
 
     /**
      * SubscriptionProfileRepository constructor.
@@ -157,7 +157,7 @@ class SubscriptionProfileRepository implements SubscriptionProfileRepositoryInte
      * @param HistoryLogger $statusHistoryLogger
      * @param MessageHistoryLogger $messageHistoryLogger
      * @param EmailNotifierFactory $emailNotifierFactory
-     * @param AvailableGridSubscriptionProfile $availableGridSubscriptionProfile
+     * @param AvailableSubscriptionProfileGrid $availableSubscriptionProfileGrid
      */
     public function __construct(
         ResourceSubscriptionProfile $resource,
@@ -174,7 +174,7 @@ class SubscriptionProfileRepository implements SubscriptionProfileRepositoryInte
         HistoryLogger $statusHistoryLogger,
         MessageHistoryLogger $messageHistoryLogger,
         EmailNotifierFactory $emailNotifierFactory,
-        AvailableGridSubscriptionProfile $availableGridSubscriptionProfile
+        AvailableSubscriptionProfileGrid $availableSubscriptionProfileGrid
     ) {
         $this->messageHistoryLogger = $messageHistoryLogger;
         $this->resource = $resource;
@@ -190,7 +190,7 @@ class SubscriptionProfileRepository implements SubscriptionProfileRepositoryInte
         $this->statusHistoryManager = $statusHistoryManager;
         $this->statusHistoryLogger = $statusHistoryLogger;
         $this->emailNotifierFactory = $emailNotifierFactory;
-        $this->availableGridSubscriptionProfile = $availableGridSubscriptionProfile;
+        $this->availableSubscriptionProfileGrid = $availableSubscriptionProfileGrid;
     }
 
     /**
@@ -221,7 +221,7 @@ class SubscriptionProfileRepository implements SubscriptionProfileRepositoryInte
                 $exception->getMessage()
             ), $exception);
         }
-        $this->availableGridSubscriptionProfile->getDataForUrl($subscriptionProfile);
+        $this->availableSubscriptionProfileGrid->saveSubscriptionProfileIdsForFormingGrid($subscriptionProfile);
 
         $newConfigOption = '';
         $parentProductName = '';
