@@ -122,7 +122,7 @@ jobs:
           - http.port: 9200
           - discovery.type: single-node
           - xpack.security.enabled: false
-          - ES_JAVA_OPTS: -Xms750m -Xmx750m
+          - ES_JAVA_OPTS: -Xms1500m -Xmx1500m
   
   m241-commerce-php74:
     <<: *base-image
