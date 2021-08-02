@@ -38,6 +38,7 @@
             <options>
                 <option name="title" xsi:type="string" translate="true">Mass change subscription information</option>
                 <option name="type" xsi:type="string">popup</option>
+                <option name="innerScroll" xsi:type="boolean">true</option>
                 <option name="clickableOverlay" xsi:type="boolean">false</option>
                 <option name="responsive" xsi:type="boolean">true</option>
             </options>
