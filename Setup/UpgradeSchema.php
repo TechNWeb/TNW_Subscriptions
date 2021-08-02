@@ -149,7 +149,7 @@ class UpgradeSchema implements UpgradeSchemaInterface
         if (version_compare($context->getVersion(), '2.3.28', '<')) {
             $this->addCustomerProductsHistoryTable($setup);
         }
-        if (version_compare($context->getVersion(), '2.3.31', '<')) {
+        if (version_compare($context->getVersion(), '2.3.32', '<')) {
             $this->addVaultThreeDSecureFields($setup);
         }
 
