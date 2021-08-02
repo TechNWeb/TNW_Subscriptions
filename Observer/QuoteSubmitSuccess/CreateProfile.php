@@ -167,6 +167,7 @@ class CreateProfile implements ObserverInterface
                     ) {
                         $vaultPaymentToken = $payment->getExtensionAttributes()->getVaultPaymentToken();
                         $vaultPaymentToken->setCustomerId($customer->getId());
+                        $this->populatePaymentTokenWithLiabilityInfo($payment, $vaultPaymentToken);
                         $this->paymentTokenManagement->saveTokenWithPaymentLink($vaultPaymentToken, $payment);
                     }
                 }
@@ -202,6 +203,7 @@ class CreateProfile implements ObserverInterface
                 $paymentToken->setIsVisible(true);
                 $paymentToken->setType('card');
                 $paymentToken->setPublicHash($this->generatePublicHash($paymentToken));
+                $this->populatePaymentTokenWithLiabilityInfo($order->getPayment(), $paymentToken);
                 $this->paymentTokenManagement->saveTokenWithPaymentLink($paymentToken, $order->getPayment());
                 $this->trialPaymentData['vault_payment_token'] = $paymentToken;
             }
@@ -265,5 +267,25 @@ class CreateProfile implements ObserverInterface
             . $paymentToken->getTokenDetails();
 
         return $this->encryptor->getHash($hashKey);
+    }
+
+    /**
+     * @param $payment
+     * @param $vaultPaymentToken
+     */
+    private function populatePaymentTokenWithLiabilityInfo($payment, $vaultPaymentToken)
+    {
+        if ($payment->getAdditionalInformation('liabilityShifted')
+            && $payment->getAdditionalInformation('eciFlag') == 'Success'
+        ) {
+            $vaultPaymentToken->setData(
+                'liability_shift_possible',
+                $payment->getAdditionalInformation('liabilityShiftPossible') == 'Yes' ? 1 : 0
+            );
+            $vaultPaymentToken->setData(
+                'liability_shifted',
+                $payment->getAdditionalInformation('liabilityShifted') == 'Yes' ? 1 : 0
+            );
+        }
     }
 }

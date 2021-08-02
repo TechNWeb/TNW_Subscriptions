@@ -149,6 +149,9 @@ class UpgradeSchema implements UpgradeSchemaInterface
         if (version_compare($context->getVersion(), '2.3.28', '<')) {
             $this->addCustomerProductsHistoryTable($setup);
         }
+        if (version_compare($context->getVersion(), '2.3.31', '<')) {
+            $this->addVaultThreeDSecureFields($setup);
+        }
 
         if (version_compare($context->getVersion(), '2.3.31', '<')) {
             $this->addColumnForSubscriptionGrid($setup);
@@ -200,6 +203,27 @@ class UpgradeSchema implements UpgradeSchemaInterface
             ], 'Base initial fee');
 
         $setup->getConnection()->createTable($table);
+    }
+
+    /**
+     * @param SchemaSetupInterface $setup
+     */
+    private function addVaultThreeDSecureFields(SchemaSetupInterface $setup)
+    {
+        $table = $setup->getTable('vault_payment_token');
+
+        $setup->getConnection()
+            ->addColumn($table, 'liability_shift_possible', [
+                'type' => Table::TYPE_SMALLINT,
+                'default' => '0',
+                'comment' => 'Is Liability Shift Possible'
+            ]);
+        $setup->getConnection()
+            ->addColumn($table, 'liability_shifted', [
+                'type' => Table::TYPE_SMALLINT,
+                'default' => '0',
+                'comment' => 'Is Liability Shifted'
+            ]);
     }
 
     /**
