@@ -263,6 +263,9 @@ class Subscribe extends View
         if ($this->getProduct()->getTypeId() === TypeBundle::TYPE_CODE) {
             return false;
         }
+        if (empty($this->getProductBillingFrequencies())) {
+            return false;
+        }
         $websiteId = $this->getProduct()->getStore()->getWebsiteId()
             ? $this->getProduct()->getStore()->getWebsiteId()
             : null;
@@ -311,6 +314,9 @@ class Subscribe extends View
      */
     public function isOneTimeAndSubscribePurchase()
     {
+        if (empty($this->getProductBillingFrequencies())) {
+            return false;
+        }
         return $this->getPurchaseType() ===  PurchaseType::ONE_TIME_AND_RECURRING_PURCHASE_TYPE
             && $this->subscriptionProductViewConfig->isOneTimeAndSubscribePurchase($this->getProduct());
     }
