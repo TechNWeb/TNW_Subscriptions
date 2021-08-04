@@ -153,7 +153,7 @@
                     <comment>The number of days before suspending a profile due to a failed payment.</comment>
                 </field>
             </group>
-            <group id="emails" translate="label" sortOrder="80" showInDefault="1" showInWebsite="1" showInStore="0">
+            <group id="emails" translate="label" sortOrder="80" showInDefault="1" showInWebsite="1" showInStore="1">
                 <label>Email Config</label>
                 <field id="email_identity" translate="label" type="select" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
                     <label>Email Sender</label>
