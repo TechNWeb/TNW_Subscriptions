@@ -9,8 +9,9 @@ define([
     'uiRegistry',
     'PayPal_Braintree/js/validator',
     'underscore',
+    'TNW_Subscriptions/js/form/subscription-profile/payment/braintree-3d-secure',
     'Magento_Ui/js/lib/spinner'
-], function ($, $t, PaymentBase, registry, validator, _) {
+], function ($, $t, PaymentBase, registry, validator, _, verify3DSecure) {
     'use strict';
 
     return PaymentBase.extend({
@@ -20,8 +21,9 @@ define([
                 client: null,
                 hostedFields: null
             },
-            braintreeClient: null,
+            braintreeClientInstance: null,
             hostedFieldsInstance: null,
+            paymentMethodNonce: null,
             grandTotal: null,
             selectedCardType: null,
             selector: 'co-transparent-form-braintree',
@@ -59,7 +61,7 @@ define([
          * @param {boolean} checkBoxChecked
          * @return void
          */
-        changeVisibility: function(checkBoxChecked) {
+        changeVisibility: function (checkBoxChecked) {
             if (checkBoxChecked && !this.clientToken) {
                 this.processErrors([$t('This payment is not available')]);
                 return;
@@ -81,14 +83,36 @@ define([
 
             $('body').trigger('processStart');
             this.hostedFieldsInstance.tokenize(function (tokenizeErr, payload) {
+                var form = registry.get('index = ' + self.options.formName);
                 if (tokenizeErr) {
                     self.processErrors([tokenizeErr.message]);
                     $('body').trigger('processStop');
                     return false;
                 }
-                var form = registry.get('index = '+self.options.formName);
-                form.source.data.payment.braintree.nonce = payload.nonce;
-                form.triggerSave([]);
+                self.paymentMethodNonce = payload.nonce;
+                if (self.three_d_enabled) {
+                    verify3DSecure.setConfig({
+                        'braintree' : self.braintree,
+                        'useCvvVault' : self.useCvvVault,
+                        'thresholdAmount' : self.thresholdAmount,
+                        'specificCountries' : self.specificCountries
+                    });
+                    $.when(verify3DSecure.validate(self))
+                        .done(function (nonce) {
+                            self.paymentMethodNonce = form.source.data.payment.braintree.nonce = nonce
+                                ? nonce
+                                : payload.nonce;
+                            form.triggerSave([]);
+                        })
+                        .fail(function (errorMessage) {
+                            self.processErrors([errorMessage]);
+                            $('body').trigger('processStop');
+                            return false;
+                        });
+                } else {
+                    form.source.data.payment.braintree.nonce = payload.nonce;
+                    form.triggerSave([]);
+                }
             });
         },
 
@@ -148,6 +172,7 @@ define([
                     client: clientInstance,
                     fields: self.getHostedFields()
                 };
+                self.braintreeClientInstance = clientInstance;
                 return self.braintree.hostedFields.create(options);
             }).then(function (hostedFieldsInstance) {
                 self.hostedFieldsInstance = hostedFieldsInstance;

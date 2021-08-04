@@ -241,7 +241,11 @@ class Braintree extends Base
             'dataContainer' => $this->getPaymentCode() . '-transparent-iframe',
             'code' => $this->getPaymentCode(),
             'clientToken' => $this->getClientToken(),
+            'three_d_enabled' => $this->braintreeConfig->isVerify3DSecure(),
+            'thresholdAmount' => $this->braintreeConfig->getThresholdAmount(),
+            'specificCountries' => $this->braintreeConfig->get3DSecureSpecificCountries(),
             'useCvv' => $this->hasVerification(),
+            'useCvvVault' => $this->braintreeConfig->isCvvEnabledVault(),
             'availableCardTypes' => $this->braintreeConfig->getAvailableCardTypes(),
             'ccTypesMapper' => $this->braintreeConfig->getCcTypesMapper(),
             'options' => [
