@@ -2,9 +2,15 @@
 namespace TNW\Subscriptions\Model\Payment\Braintree;
 
 use Exception;
+use Magento\Store\Api\Data\WebsiteInterface;
 use Psr\Log\LoggerInterface;
 use Magento\Framework\Module\Manager;
 use Magento\Framework\ObjectManagerInterface;
+use Magento\Framework\App\Request\Http as RequestHttp;
+use TNW\Subscriptions\Api\SubscriptionProfileRepositoryInterface;
+use Magento\Framework\App\Config\ScopeConfigInterface;
+use Magento\Store\Model\ScopeInterface;
+use Magento\Store\Model\StoreManagerInterface;
 
 /**
  * Braintree Adapter - braintree
@@ -27,6 +33,21 @@ class Adapter
     private $logger;
 
     /**
+     * @var SubscriptionProfileRepositoryInterface
+     */
+    private $profileRepository;
+
+    /**
+     * @var ScopeConfigInterface
+     */
+    private $scopeConfig;
+
+    /**
+     * @var StoreManagerInterface
+     */
+    private $storeManager;
+
+    /**
      * Adapter constructor.
      * @param LoggerInterface $logger
      * @param Manager $moduleManager
@@ -35,13 +56,21 @@ class Adapter
     public function __construct(
         LoggerInterface $logger,
         Manager $moduleManager,
-        ObjectManagerInterface $objectManager
+        ObjectManagerInterface $objectManager,
+        RequestHttp $http,
+        SubscriptionProfileRepositoryInterface $profileRepository,
+        ScopeConfigInterface $scopeConfig,
+        StoreManagerInterface $storeManager
     ) {
         if ($moduleManager->isEnabled("PayPal_Braintree")) {
             $this->config = $objectManager->get(\PayPal\Braintree\Gateway\Config\Config::class);
             $this->storeConfigResolver = $objectManager->get(\PayPal\Braintree\Model\StoreConfigResolver::class);
         }
         $this->logger = $logger;
+        $this->http = $http;
+        $this->profileRepository = $profileRepository;
+        $this->scopeConfig = $scopeConfig;
+        $this->storeManager = $storeManager;
 
         $this->initCredentials();
     }
@@ -96,6 +125,7 @@ class Adapter
 
     /**
      * Initialize credentials
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
     protected function initCredentials()
     {
@@ -103,38 +133,96 @@ class Adapter
             $storeId = $this->storeConfigResolver->getStoreId();
             $environmentIdentifier = $this->config->getValue($this->config::KEY_ENVIRONMENT, $storeId);
 
+            $subscriptionProfileId = $this->http->getParam('subscription_profile_id');
+            if ($subscriptionProfileId) {
+                $websiteId = $this->profileRepository->getById($subscriptionProfileId)->getWebsiteId();
+            }
             $this->environment(Environment::ENVIRONMENT_SANDBOX);
 
             if ($environmentIdentifier === Environment::ENVIRONMENT_PRODUCTION) {
                 $this->environment(Environment::ENVIRONMENT_PRODUCTION);
             }
 
-            $this->merchantId(
-                $this->config->getValue($this->config::KEY_MERCHANT_ID, $storeId)
-            );
-            $this->publicKey(
-                $this->config->getValue($this->config::KEY_PUBLIC_KEY, $storeId)
-            );
-            $this->privateKey(
-                $this->config->getValue($this->config::KEY_PRIVATE_KEY, $storeId)
-            );
+            if ($websiteId) {
+                $this->merchantId(
+                    $this->getValueByWebsiteId(
+                        $this->config::KEY_MERCHANT_ID,
+                        $websiteId,
+                        $environmentIdentifier
+                    )
+                );
+                $this->publicKey(
+                    $this->getValueByWebsiteId(
+                        $this->config::KEY_PUBLIC_KEY,
+                        $websiteId,
+                        $environmentIdentifier
+                    )
+                );
+                $this->privateKey(
+                    $this->getValueByWebsiteId(
+                        $this->config::KEY_PRIVATE_KEY,
+                        $websiteId,
+                        $environmentIdentifier
+                    )
+                );
+            } else {
+                $this->merchantId(
+                    $this->config->getValue($this->config::KEY_MERCHANT_ID, $storeId)
+                );
+                $this->publicKey(
+                    $this->config->getValue($this->config::KEY_PUBLIC_KEY, $storeId)
+                );
+                $this->privateKey(
+                    $this->config->getValue($this->config::KEY_PRIVATE_KEY, $storeId)
+                );
+            }
 
             if ($environmentIdentifier === Environment::ENVIRONMENT_SANDBOX) {
                 $configClass = get_class($this->config);
-                if (defined($configClass . '::KEY_SANDBOX_MERCHANT_ID')) {
-                    $this->merchantId(
-                        $this->config->getValue($this->config::KEY_SANDBOX_MERCHANT_ID, $storeId)
-                    );
-                }
-                if (defined($configClass . '::KEY_SANDBOX_PUBLIC_KEY')) {
-                    $this->publicKey(
-                        $this->config->getValue($this->config::KEY_SANDBOX_PUBLIC_KEY, $storeId)
-                    );
-                }
-                if (defined($configClass . '::KEY_SANDBOX_PRIVATE_KEY')) {
-                    $this->privateKey(
-                        $this->config->getValue($this->config::KEY_SANDBOX_PRIVATE_KEY, $storeId)
-                    );
+                if ($websiteId) {
+                    if (defined($configClass . '::KEY_SANDBOX_MERCHANT_ID')) {
+                        $this->merchantId(
+                            $this->getValueByWebsiteId(
+                                $this->config::KEY_MERCHANT_ID,
+                                $websiteId,
+                                $environmentIdentifier
+                            )
+                        );
+                    }
+                    if (defined($configClass . '::KEY_SANDBOX_PUBLIC_KEY')) {
+                        $this->publicKey(
+                            $this->getValueByWebsiteId(
+                                $this->config::KEY_PUBLIC_KEY,
+                                $websiteId,
+                                $environmentIdentifier
+                            )
+                        );
+                    }
+                    if (defined($configClass . '::KEY_SANDBOX_PRIVATE_KEY')) {
+                        $this->privateKey(
+                            $this->getValueByWebsiteId(
+                                $this->config::KEY_PRIVATE_KEY,
+                                $websiteId,
+                                $environmentIdentifier
+                            )
+                        );
+                    }
+                } else {
+                    if (defined($configClass . '::KEY_SANDBOX_MERCHANT_ID')) {
+                        $this->merchantId(
+                            $this->config->getValue($this->config::KEY_SANDBOX_MERCHANT_ID, $storeId)
+                        );
+                    }
+                    if (defined($configClass . '::KEY_SANDBOX_PUBLIC_KEY')) {
+                        $this->publicKey(
+                            $this->config->getValue($this->config::KEY_SANDBOX_PUBLIC_KEY, $storeId)
+                        );
+                    }
+                    if (defined($configClass . '::KEY_SANDBOX_PRIVATE_KEY')) {
+                        $this->privateKey(
+                            $this->config->getValue($this->config::KEY_SANDBOX_PRIVATE_KEY, $storeId)
+                        );
+                    }
                 }
             }
         }
@@ -357,5 +445,42 @@ class Adapter
             return \Braintree\Customer::find($id);
         }
         return null;
+    }
+
+    /**
+     * Retrieve information from payment configuration
+     *
+     * @param string $field
+     * @param int|null $storeId
+     *
+     * @return mixed
+     */
+    public function getValueByWebsiteId($field, $websiteId, $environmentIdentifier)
+    {
+        if ($environmentIdentifier === Environment::ENVIRONMENT_SANDBOX) {
+           $result = $this->scopeConfig->getValue(
+                'payment/braintree/sandbox_' . $field,
+                ScopeInterface::SCOPE_WEBSITES,
+                $this->getWebsite($websiteId)->getCode()
+            );
+        } else {
+            $result = $this->scopeConfig->getValue(
+                'payment/braintree/' . $field,
+                ScopeInterface::SCOPE_WEBSITES,
+                $websiteId
+            );
+        }
+        return $result;
+    }
+
+    /**
+     * Returns website by id.
+     *
+     * @param int|string $websiteId
+     * @return WebsiteInterface
+     */
+    public function getWebsite($websiteId)
+    {
+        return $this->storeManager->getWebsite($websiteId);
     }
 }
