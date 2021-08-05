@@ -134,6 +134,7 @@ class Adapter
             $environmentIdentifier = $this->config->getValue($this->config::KEY_ENVIRONMENT, $storeId);
 
             $subscriptionProfileId = $this->http->getParam('subscription_profile_id');
+            $websiteId = null;
             if ($subscriptionProfileId) {
                 $websiteId = $this->profileRepository->getById($subscriptionProfileId)->getWebsiteId();
             }
