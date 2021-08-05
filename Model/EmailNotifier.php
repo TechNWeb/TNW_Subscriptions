@@ -24,6 +24,13 @@ class EmailNotifier
     const XML_PATH_OUT_OF_STOCK = 'tnw_subscriptions_profile_options/emails/out_of_stock';
     const XML_PATH_RENEWAL = 'tnw_subscriptions_profile_options/emails/renewal';
 
+    const XML_PATH_ENABLE_COMMENT_ADDED = 'tnw_subscriptions_profile_options/email_config/comment_add';
+    const XML_PATH_ENABLE_STATUS_CHANGE = 'tnw_subscriptions_profile_options/email_config/status_change';
+    const XML_PATH_ENABLE_CARD_EXPIRE = 'tnw_subscriptions_profile_options/email_config/card_expire';
+    const XML_PATH_ENABLE_PAYMENT_FAILED = 'tnw_subscriptions_profile_options/email_config/payment_failed';
+    const XML_PATH_ENABLE_PAYMENT_RENEWAL = 'tnw_subscriptions_profile_options/email_config/renewal';
+    const XML_PATH_ENABLE_OUT_OF_STOCK = 'tnw_subscriptions_profile_options/email_config/renewal';
+
     /**
      * Core store config
      *
@@ -103,24 +110,31 @@ class EmailNotifier
             $date = $this->getNextProfileRelation($subscriptionProfile)
                 ? date('F jS, Y', strtotime($this->getNextProfileRelation($subscriptionProfile)->getScheduledAt()))
                 : null;
-            $this->sendNotificationEmail(
-                $this->scopeConfig->getValue(
-                    self::XML_PATH_STATUS_CHANGE_TEMPLATE,
-                    \Magento\Store\Model\ScopeInterface::SCOPE_STORE
-                ),
-                $storeId,
-                [
-                    'subscription' => $subscriptionProfile,
-                    'oldStatus' => $statusModel->getLabelByValue($oldStatus),
-                    'newStatus' => $statusModel->getLabelByValue($newStatus),
-                    'date' => $date,
-                    'customerName' => $customerName
-                ],
-                [
-                    'email' => $customerEmail,
-                    'name' => $customerName
-                ]
+            $enableEmailNotification = $this->scopeConfig->getValue(
+                self::XML_PATH_ENABLE_STATUS_CHANGE,
+                \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
+                $storeId
             );
+            if ($enableEmailNotification == 1) {
+                $this->sendNotificationEmail(
+                    $this->scopeConfig->getValue(
+                        self::XML_PATH_STATUS_CHANGE_TEMPLATE,
+                        \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+                    ),
+                    $storeId,
+                    [
+                        'subscription' => $subscriptionProfile,
+                        'oldStatus' => $statusModel->getLabelByValue($oldStatus),
+                        'newStatus' => $statusModel->getLabelByValue($newStatus),
+                        'date' => $date,
+                        'customerName' => $customerName
+                    ],
+                    [
+                        'email' => $customerEmail,
+                        'name' => $customerName
+                    ]
+                );
+            }
         }
     }
 
@@ -142,22 +156,29 @@ class EmailNotifier
             }
             if ($subscriptionProfile) {
                 list($storeId, $customerEmail, $customerName) = $this->getCustomerVars($subscriptionProfile);
-                $this->sendNotificationEmail(
-                    $this->scopeConfig->getValue(
-                        self::XML_PATH_COMMENT_ADDED_TEMPLATE,
-                        \Magento\Store\Model\ScopeInterface::SCOPE_STORE
-                    ),
-                    $storeId,
-                    [
-                        'subscription' => $subscriptionProfile,
-                        'comment' => $comment,
-                        'customerName' => $customerName
-                    ],
-                    [
-                        'email' => $customerEmail,
-                        'name' => $customerName
-                    ]
+                $enableEmailNotification = $this->scopeConfig->getValue(
+                    self::XML_PATH_ENABLE_COMMENT_ADDED,
+                    \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
+                    $storeId
                 );
+                if ($enableEmailNotification == 1) {
+                    $this->sendNotificationEmail(
+                        $this->scopeConfig->getValue(
+                            self::XML_PATH_COMMENT_ADDED_TEMPLATE,
+                            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+                        ),
+                        $storeId,
+                        [
+                            'subscription' => $subscriptionProfile,
+                            'comment' => $comment,
+                            'customerName' => $customerName
+                        ],
+                        [
+                            'email' => $customerEmail,
+                            'name' => $customerName
+                        ]
+                    );
+                }
             }
         }
     }
@@ -172,22 +193,29 @@ class EmailNotifier
     {
         if ($this->checkEmailTemplateSetting(self::XML_PATH_CARD_EXPIRE)) {
             list($storeId, $customerEmail, $customerName) = $this->getCustomerVars($subscriptionProfile);
-            $this->sendNotificationEmail(
-                $this->scopeConfig->getValue(
-                    self::XML_PATH_CARD_EXPIRE,
-                    \Magento\Store\Model\ScopeInterface::SCOPE_STORE
-                ),
-                $storeId,
-                [
-                    'subscription' => $subscriptionProfile,
-                    'customerName' => $customerName,
-                    'date' => date('F jS, Y', strtotime($date))
-                ],
-                [
-                    'email' => $customerEmail,
-                    'name' => $customerName
-                ]
+            $enableEmailNotification = $this->scopeConfig->getValue(
+                self::XML_PATH_ENABLE_CARD_EXPIRE,
+                \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
+                $storeId
             );
+            if ($enableEmailNotification == 1) {
+                $this->sendNotificationEmail(
+                    $this->scopeConfig->getValue(
+                        self::XML_PATH_CARD_EXPIRE,
+                        \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+                    ),
+                    $storeId,
+                    [
+                        'subscription' => $subscriptionProfile,
+                        'customerName' => $customerName,
+                        'date' => date('F jS, Y', strtotime($date))
+                    ],
+                    [
+                        'email' => $customerEmail,
+                        'name' => $customerName
+                    ]
+                );
+            }
         }
     }
 
@@ -200,26 +228,33 @@ class EmailNotifier
     {
         if ($this->checkEmailTemplateSetting(self::XML_PATH_PAYMENT_FAILED)) {
             list($storeId, $customerEmail, $customerName) = $this->getCustomerVars($subscriptionProfile);
-            $this->sendNotificationEmail(
-                $this->scopeConfig->getValue(
-                    self::XML_PATH_PAYMENT_FAILED,
-                    \Magento\Store\Model\ScopeInterface::SCOPE_STORE
-                ),
-                $storeId,
-                [
-                    'subscription' => $subscriptionProfile,
-                    'customerName' => $customerName,
-                    'attempt_interval' => $this->scopeConfig->getValue(
-                        'tnw_subscriptions_profile_options/past_due_profile_options/attempt_interval',
-                        \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
-                        $storeId
-                    )
-                ],
-                [
-                    'email' => $customerEmail,
-                    'name' => $customerName
-                ]
+            $enableEmailNotification = $this->scopeConfig->getValue(
+                self::XML_PATH_ENABLE_PAYMENT_FAILED,
+                \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
+                $storeId
             );
+            if ($enableEmailNotification == 1) {
+                $this->sendNotificationEmail(
+                    $this->scopeConfig->getValue(
+                        self::XML_PATH_PAYMENT_FAILED,
+                        \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+                    ),
+                    $storeId,
+                    [
+                        'subscription' => $subscriptionProfile,
+                        'customerName' => $customerName,
+                        'attempt_interval' => $this->scopeConfig->getValue(
+                            'tnw_subscriptions_profile_options/past_due_profile_options/attempt_interval',
+                            \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
+                            $storeId
+                        )
+                    ],
+                    [
+                        'email' => $customerEmail,
+                        'name' => $customerName
+                    ]
+                );
+            }
         }
     }
 
@@ -233,22 +268,29 @@ class EmailNotifier
     {
         if ($this->checkEmailTemplateSetting(self::XML_PATH_OUT_OF_STOCK)) {
             list($storeId, $customerEmail, $customerName) = $this->getCustomerVars($subscriptionProfile);
-            $this->sendNotificationEmail(
-                $this->scopeConfig->getValue(
-                    self::XML_PATH_OUT_OF_STOCK,
-                    \Magento\Store\Model\ScopeInterface::SCOPE_STORE
-                ),
-                $storeId,
-                [
-                    'subscription' => $subscriptionProfile,
-                    'customerName' => $customerName,
-                    'products' => implode(', ', $products)
-                ],
-                [
-                    'email' => $customerEmail,
-                    'name' => $customerName
-                ]
+            $enableEmailNotification = $this->scopeConfig->getValue(
+                self::XML_PATH_ENABLE_OUT_OF_STOCK,
+                \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
+                $storeId
             );
+            if ($enableEmailNotification == 1) {
+                $this->sendNotificationEmail(
+                    $this->scopeConfig->getValue(
+                        self::XML_PATH_OUT_OF_STOCK,
+                        \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+                    ),
+                    $storeId,
+                    [
+                        'subscription' => $subscriptionProfile,
+                        'customerName' => $customerName,
+                        'products' => implode(', ', $products)
+                    ],
+                    [
+                        'email' => $customerEmail,
+                        'name' => $customerName
+                    ]
+                );
+            }
         }
     }
 
@@ -283,8 +325,14 @@ class EmailNotifier
             if ($subscriptionProfiles) {
                 $subscriptionProfile = reset($subscriptionProfiles);
                 list($storeId, $customerEmail, $customerName) = $this->getCustomerVars($subscriptionProfile);
+                $enableEmailNotification = $this->scopeConfig->getValue(
+                    self::XML_PATH_ENABLE_COMMENT_ADDED,
+                    \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
+                    $storeId
+                );
                 if ($subscriptionProfile->getStatus() == ProfileStatus::STATUS_PAST_DUE
-                    || $subscriptionProfile->getStatus() == ProfileStatus::STATUS_ACTIVE) {
+                    || $subscriptionProfile->getStatus() == ProfileStatus::STATUS_ACTIVE
+                    && $enableEmailNotification == 1) {
                     $this->sendNotificationEmail(
                         $this->scopeConfig->getValue(
                             self::XML_PATH_RENEWAL,

@@ -40,6 +40,15 @@
                 <out_of_stock>tnw_subscriptions_profile_options_emails_out_of_stock</out_of_stock>
                 <confirmation_order>tnw_subscriptions_profile_options_emails_confirmation_order</confirmation_order>
             </emails>
+            <email_config>
+                <status_change>1</status_change>
+                <comment_add>1</comment_add>
+                <card_expire>1</card_expire>
+                <payment_failed>1</payment_failed>
+                <renewal>1</renewal>
+                <out_of_stock>1</out_of_stock>
+                <confirmation_order>1</confirmation_order>
+            </email_config>
             <notifications>
                 <renewals>1</renewals>
                 <expired_card>1</expired_card>

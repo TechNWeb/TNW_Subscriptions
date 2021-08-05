@@ -159,40 +159,103 @@
                     <label>Email Sender</label>
                     <source_model>Magento\Config\Model\Config\Source\Email\Identity</source_model>
                 </field>
+                <field id="enable_notification_comment_added" translate="label comment" type="select" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+                    <label>Send Subscription Profile Comment Add</label>
+                    <comment>Send notification "Subscription Profile Comment Add"</comment>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <config_path>tnw_subscriptions_profile_options/email_config/comment_add</config_path>
+                </field>
                 <field id="comment_added" translate="label comment" type="select" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
                     <label>Subscription Profile Comment Add</label>
                     <comment>Email template chosen based on theme fallback when "Default" option is selected.</comment>
                     <source_model>Magento\Config\Model\Config\Source\Email\Template</source_model>
+                    <depends>
+                        <field id="enable_notification_comment_added">1</field>
+                    </depends>
+                </field>
+                <field id="enable_notification_profile_status_change" translate="label comment" type="select" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+                    <label>Send Subscription Profile Status Change</label>
+                    <comment>Send notification "Profile Status Change"</comment>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <config_path>tnw_subscriptions_profile_options/email_config/status_change</config_path>
                 </field>
                 <field id="profile_status_change" translate="label comment" type="select" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
                     <label>Subscription Profile Status Change</label>
                     <comment>Email template chosen based on theme fallback when "Default" option is selected.</comment>
                     <source_model>Magento\Config\Model\Config\Source\Email\Template</source_model>
+                    <depends>
+                        <field id="enable_notification_profile_status_change">1</field>
+                    </depends>
+                </field>
+                <field id="enable_notification_card_expire" translate="label comment" type="select" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+                    <label>Send Subscription Profile Card Expire</label>
+                    <comment>Send notification "Subscription Profile Card Expire"</comment>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <config_path>tnw_subscriptions_profile_options/email_config/card_expire</config_path>
                 </field>
                 <field id="card_expire" translate="label comment" type="select" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
                     <label>Subscription Profile Card Expire</label>
                     <comment>Email template chosen based on theme fallback when "Default" option is selected.</comment>
                     <source_model>Magento\Config\Model\Config\Source\Email\Template</source_model>
+                    <depends>
+                        <field id="enable_notification_card_expire">1</field>
+                    </depends>
+                </field>
+                <field id="enable_notification_payment_failed" translate="label comment" type="select" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+                    <label>Send Subscription Profile Profile Failed</label>
+                    <comment>Send notification "Subscription Profile Profile Failed"</comment>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <config_path>tnw_subscriptions_profile_options/email_config/payment_failed</config_path>
                 </field>
                 <field id="payment_failed" translate="label comment" type="select" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
                     <label>Subscription Profile Profile Failed</label>
                     <comment>Email template chosen based on theme fallback when "Default" option is selected.</comment>
                     <source_model>Magento\Config\Model\Config\Source\Email\Template</source_model>
+                    <depends>
+                        <field id="enable_notification_payment_failed">1</field>
+                    </depends>
+                </field>
+                <field id="enable_notification_renewal" translate="label comment" type="select" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+                    <label>Send Subscription Profile Renewal</label>
+                    <comment>Send notification "Subscription Profile Renewal"</comment>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <config_path>tnw_subscriptions_profile_options/email_config/renewal</config_path>
                 </field>
                 <field id="renewal" translate="label comment" type="select" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
                     <label>Subscription Profile Renewal</label>
                     <comment>Email template chosen based on theme fallback when "Default" option is selected.</comment>
                     <source_model>Magento\Config\Model\Config\Source\Email\Template</source_model>
+                    <depends>
+                        <field id="enable_notification_renewal">1</field>
+                    </depends>
+                </field>
+                <field id="enable_notification_out_of_stock" translate="label comment" type="select" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+                    <label>Send Subscription Profile Out Of Stock Notification</label>
+                    <comment>Send notification "Subscription Profile Out Of Stock Notification"</comment>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <config_path>tnw_subscriptions_profile_options/email_config/out_of_stock</config_path>
                 </field>
                 <field id="out_of_stock" translate="label comment" type="select" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
                     <label>Subscription Profile Out Of Stock Notification</label>
                     <comment>Email template chosen based on theme fallback when "Default" option is selected.</comment>
                     <source_model>Magento\Config\Model\Config\Source\Email\Template</source_model>
+                    <depends>
+                        <field id="enable_notification_out_of_stock">1</field>
+                    </depends>
+                </field>
+                <field id="enable_notification_confirmation_order" translate="label comment" type="select" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+                    <label>Send Subscription Profile New Order</label>
+                    <comment>Send notification "Subscription Profile New Order"</comment>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <config_path>tnw_subscriptions_profile_options/email_config/confirmation_order</config_path>
                 </field>
                 <field id="confirmation_order" translate="label comment" type="select" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
                     <label>Subscription Profile New Order</label>
                     <comment>Email template chosen based on theme fallback when "Default" option is selected.</comment>
                     <source_model>Magento\Config\Model\Config\Source\Email\Template</source_model>
+                    <depends>
+                        <field id="enable_notification_confirmation_order">1</field>
+                    </depends>
                 </field>
             </group>
             <group id="notifications" translate="label" sortOrder="75" showInDefault="1" showInWebsite="0" showInStore="0">
