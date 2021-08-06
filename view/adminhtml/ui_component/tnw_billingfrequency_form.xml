@@ -122,4 +122,24 @@
             </argument>
         </field>
     </fieldset>
+    <fieldset name="bf_linked_products">
+        <settings>
+            <label translate="true">Linked BF Products</label>
+            <collapsible>false</collapsible>
+        </settings>
+        <insertListing name="bf_linked_products_grid">
+            <settings>
+                <autoRender>true</autoRender>
+                <ns>tnw_billingfrequency_product_listing</ns>
+                <externalProvider>tnw_billingfrequency_product_listing.tnw_billingfrequency_product_listing_data_source</externalProvider>
+<!--                <dataScope>tnw_billingfrequency_product_listing</dataScope>-->
+                <exports>
+                    <link name="billing_frequency_id">${ $.externalProvider }:params.billing_frequency_id</link>
+                </exports>
+                <imports>
+                    <link name="billing_frequency_id">${ $.provider }:data.id</link>
+                </imports>
+            </settings>
+        </insertListing>
+    </fieldset>
 </form>
