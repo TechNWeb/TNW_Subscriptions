@@ -19,7 +19,7 @@ $isTrialAllowedForCustomer = !in_array((int)$_product->getId(), $block->getCurre
 
 <div class="actions-primary<?= /* @noEscape */ strpos($pos, $viewMode . '-primary') ? $position : ''; ?>">
     <?php if ($_product->isSaleable()): ?>
-        <?php if ($block->isSubscribeAvailable($_product) && !$block->isOneTimePurchase($_product)): ?>
+        <?php if ($block->isSubscribeAvailable($_product) && !$block->isOneTimePurchase($_product) && $block->isBillingFrequencySet()): ?>
             <?php if ($_product->getTypeId() == "configurable"): ?>
                 <div class="product-subscribe-addtocart-buttons-container">
                     <div class="product-subscribe-button">
