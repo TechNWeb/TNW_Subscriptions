@@ -21,6 +21,9 @@ use TNW\Subscriptions\Api\SubscriptionProfileOrderRepositoryInterface;
 use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfileOrder as ResourceSubscriptionProfileOrder;
 use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfileOrder\CollectionFactory
     as SubscriptionProfileOrderCollectionFactory;
+use TNW\Subscriptions\Api\SubscriptionProfileRepositoryInterface;
+use Magento\Framework\Stdlib\DateTime\TimezoneInterface;
+use TNW\Subscriptions\Model\BillingFrequencyRepository;
 
 /**
  * Class SubscriptionProfileOrderRepository - repository object for subscription profile orders
@@ -73,6 +76,21 @@ class SubscriptionProfileOrderRepository implements SubscriptionProfileOrderRepo
     private $logger;
 
     /**
+     * @var SubscriptionProfileRepositoryInterface
+     */
+    private $profileRepository;
+
+    /**
+     * @var TimezoneInterface
+     */
+    private $timezone;
+
+    /**
+     * @var BillingFrequencyRepository
+     */
+    private $billingFrequencyRepository;
+
+    /**
      * @param ResourceSubscriptionProfileOrder $resource
      * @param SubscriptionProfileOrderFactory $subscriptionProfileOrderFactory
      * @param SubscriptionProfileOrderInterfaceFactory $dataSubscriptionProfileOrderFactory
@@ -91,6 +109,9 @@ class SubscriptionProfileOrderRepository implements SubscriptionProfileOrderRepo
         DataObjectHelper $dataObjectHelper,
         DataObjectProcessor $dataObjectProcessor,
         StoreManagerInterface $storeManager,
+        SubscriptionProfileRepositoryInterface $profileRepository,
+        TimezoneInterface $timezone,
+        BillingFrequencyRepository $billingFrequencyRepository,
         LoggerInterface $logger = null
     ) {
         $this->resource = $resource;
@@ -101,6 +122,9 @@ class SubscriptionProfileOrderRepository implements SubscriptionProfileOrderRepo
         $this->dataSubscriptionProfileOrderFactory = $dataSubscriptionProfileOrderFactory;
         $this->dataObjectProcessor = $dataObjectProcessor;
         $this->storeManager = $storeManager;
+        $this->profileRepository = $profileRepository;
+        $this->timezone = $timezone;
+        $this->billingFrequencyRepository = $billingFrequencyRepository;
         $objectManager = ObjectManager::getInstance();
         $this->logger = $logger ?: $objectManager->get(LoggerInterface::class);
     }
@@ -123,8 +147,39 @@ class SubscriptionProfileOrderRepository implements SubscriptionProfileOrderRepo
         if ($magentoOrderId) {
             try {
                 $profileIds = $this->resource->getProfileIdsByMagentoOrderId((int)$magentoOrderId);
+
+                $subscriptionProfile = $this->profileRepository->getById(
+                    $subscriptionProfileOrder->getSubscriptionProfileId()
+                );
+                $expirationCc = $this->resource->getCcEcpiration($subscriptionProfile);
+                $firstRecurring = $this->timezone->formatDate(
+                    $subscriptionProfile->getStartDate(),
+                    \IntlDateFormatter::MEDIUM
+                );
+                $startDate = $subscriptionProfile->getCreatedAt();
+                $billingFrequency = $this->billingFrequencyRepository->getById(
+                    $subscriptionProfile->getBillingFrequencyId()
+                );
+                $finalRecurring = $this->timezone->formatDate(
+                    $this->resource->getFinalDate(
+                    $billingFrequency,
+                    $subscriptionProfile->getTotalBillingCycles(),
+                    $startDate,
+                    $subscriptionProfile->getTerm(),
+                ),
+                    \IntlDateFormatter::MEDIUM
+                );
+                $paidRecurring = " / ∞";
+
                 if ($profileIds) {
                     $this->resource->populateSalesOrderGridWithProfileIds((int)$magentoOrderId, $profileIds);
+                    $this->resource->populateRecurringInstallmentData(
+                        $magentoOrderId,
+                        $paidRecurring,
+                        $finalRecurring,
+                        $firstRecurring,
+                        $expirationCc
+                    );
                 }
             } catch (\Exception $e) {
                 $this->logger->warning($e->getMessage());
