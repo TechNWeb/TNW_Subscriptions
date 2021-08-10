@@ -263,6 +263,9 @@ class Subscribe extends View
         if ($this->getProduct()->getTypeId() === TypeBundle::TYPE_CODE) {
             return false;
         }
+        if (empty($this->getProductBillingFrequencies())) {
+            return false;
+        }
         $websiteId = $this->getProduct()->getStore()->getWebsiteId()
             ? $this->getProduct()->getStore()->getWebsiteId()
             : null;
