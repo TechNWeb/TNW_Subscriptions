@@ -825,6 +825,7 @@ class Manager
             ->setIsVirtual($this->isQuoteHasVirtualProducts($quoteItems))
             ->setProfileCurrencyCode($quote->getQuoteCurrencyCode())
             ->setTerm($request['term'])
+            ->setStaticTotalBillingCycles(!$request['term'] ? $request['period'] : 0)
             ->setTotalBillingCycles(!$request['term'] ? $request['period'] - 1 : 0)
             ->setStartDate($startDate)
             ->setOriginalStartDate($startDate)

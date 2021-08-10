@@ -832,4 +832,20 @@ class SubscriptionProfile extends AbstractExtensibleModel implements Subscriptio
     {
         return $this->setData(self::COUPON_CODE, $couponCode);
     }
+
+    /**
+     * @inheritdoc
+     */
+    public function getStaticTotalBillingCycles()
+    {
+        return $this->getData(self::STATIC_TOTAL_BILLING_CYCLES);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function setStaticTotalBillingCycles($total)
+    {
+        return $this->setData(self::STATIC_TOTAL_BILLING_CYCLES, $total);
+    }
 }

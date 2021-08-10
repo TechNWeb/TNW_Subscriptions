@@ -96,7 +96,8 @@ class SubscriptionProfileOrder extends AbstractDb
         $paidRecurring,
         $finalRecurring,
         $firstRecurring,
-        $expireCc
+        $expireCc,
+        $totalBilling
     ) {
         $connection = $this->getConnection();
         $connection->update(
@@ -106,6 +107,7 @@ class SubscriptionProfileOrder extends AbstractDb
                 'subscription_final_installment_date' => $finalRecurring,
                 'subscription_first_installment_date' => $firstRecurring,
                 'subscription_expire_cc' => $expireCc,
+                'subscription_total_static_billing_cycles' => $totalBilling,
             ],
             ['entity_id = ?' => $magentoOrderId]
         );
@@ -158,5 +160,21 @@ class SubscriptionProfileOrder extends AbstractDb
                 break;
         }
         return $result;
+    }
+
+    /**
+     * @param $profileId
+     * @return array
+     * @throws LocalizedException
+     */
+    public function getProfileOrdersByProfileId($profileId)
+    {
+        $connection = $this->getConnection();
+
+        $select = $connection->select()
+            ->from($this->getMainTable(), ['*'])
+            ->order($this->getIdFieldName() . ' DESC')
+            ->where('subscription_profile_id = ?', $profileId);
+        return $connection->fetchAll($select);
     }
 }

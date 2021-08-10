@@ -169,7 +169,17 @@ class SubscriptionProfileOrderRepository implements SubscriptionProfileOrderRepo
                 ),
                     \IntlDateFormatter::MEDIUM
                 );
-                $paidRecurring = " / ∞";
+
+                $staticTotalBillingCycles = $subscriptionProfile->getStaticTotalBillingCycles();
+                $profileOrders = $this->resource->getProfileOrdersByProfileId(
+                    $subscriptionProfile->getId()
+                );
+
+                if (isset($staticTotalBillingCycles)) {
+                    $paidRecurring = count($profileOrders) . ' / ' . $staticTotalBillingCycles;
+                } else {
+                    $paidRecurring = count($profileOrders). " / ∞";
+                }
 
                 if ($profileIds) {
                     $this->resource->populateSalesOrderGridWithProfileIds((int)$magentoOrderId, $profileIds);
@@ -178,7 +188,8 @@ class SubscriptionProfileOrderRepository implements SubscriptionProfileOrderRepo
                         $paidRecurring,
                         $finalRecurring,
                         $firstRecurring,
-                        $expirationCc
+                        $expirationCc,
+                        $staticTotalBillingCycles
                     );
                 }
             } catch (\Exception $e) {
