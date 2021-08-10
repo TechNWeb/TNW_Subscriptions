@@ -855,6 +855,11 @@ class ModifyForm extends Form
                         'previewLabel' => __('until canceled'),
                         'component' => 'TNW_Subscriptions/js/components/field/preview-checkbox-term',
                         'template' => 'TNW_Subscriptions/form/element/template/checkbox-set-with-preview',
+                        'tooltip' => [
+                            'description' => __('Remaining orders under agreed subscription term.' .
+                            'After all orders from this term are created,' .
+                            'the subscription profile will be marked Complete.')
+                        ],
                         'imports' => [
                             'showPreview' => '${ $.parentFormName }:previewMode',
                             '__disableTmpl' => [

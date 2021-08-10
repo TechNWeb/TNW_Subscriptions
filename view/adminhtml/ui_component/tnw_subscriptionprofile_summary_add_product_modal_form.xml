@@ -91,6 +91,12 @@
                     <item name="default" xsi:type="number">0</item>
                     <item name="description" xsi:type="string" translate="true">Until canceled</item>
                     <item name="label" xsi:type="string" translate="true">Term:</item>
+                    <item name="tooltip" xsi:type="array">
+                        <item name="description" xsi:type="string" translate="true">
+                            Remaining orders under agreed subscription term. After all orders from this term are created,
+                            the subscription profile will be marked Complete.
+                        </item>
+                    </item>
                     <item name="dataScope" xsi:type="string">term</item>
                     <item name="additionalClasses" xsi:type="string">field-wide</item>
                 </item>
