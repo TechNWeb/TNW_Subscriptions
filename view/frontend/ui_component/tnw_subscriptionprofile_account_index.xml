@@ -115,6 +115,21 @@
                 </item>
             </argument>
         </column>
+        <column name="status" class="TNW\Subscriptions\Ui\Component\Listing\Column\SubscriptionProfile\Details">
+            <argument name="data" xsi:type="array">
+                <item name="options" xsi:type="object">TNW\Subscriptions\Ui\Component\Listing\Column\SubscriptionProfile\Status\Options</item>
+                <item name="config" xsi:type="array">
+                    <item name="bodyTmpl" xsi:type="string">TNW_Subscriptions/grid/subscription-details</item>
+                    <item name="component" xsi:type="string">TNW_Subscriptions/js/subscription-profile/grid/column/subscription-details</item>
+                    <item name="fieldAction" xsi:type="boolean">false</item>
+                    <item name="filter" xsi:type="string">select</item>
+                    <item name="dataType" xsi:type="string">select</item>
+                    <item name="label" translate="true" xsi:type="string">Status</item>
+                    <item name="sortable" xsi:type="boolean">false</item>
+                    <item name="draggable" xsi:type="boolean">false</item>
+                </item>
+            </argument>
+        </column>
         <column name="grand_total" class="TNW\Subscriptions\Ui\Component\Listing\Column\SubscriptionProfile\Total">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
