@@ -10,8 +10,10 @@
      css="$data.additionalClasses"
      attr="'data-config-scope': $data.scopeLabel, 'data-index': index">
     <legend class="field-label label" if="$data.label" attr="for: uid">
-        <span class="tnw-tooltip">
+        <span text="label" ifnot="$data.tooltip"/>
+        <span class="tnw-tooltip field-tooltip" if="$data.tooltip">
             <span class="tooltip-toggle">Term:</span>
+            <span class="field-tooltip-action"></span>
             <span class="tooltip-content" html="tooltip.description"/>
         </span>
     </legend>
