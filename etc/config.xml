@@ -39,33 +39,44 @@
             </notifications>
         </tnw_subscriptions_profile_options>
         <tnw_subscriptions_profile_notification>
+            <notifications>
+                <renewals>1</renewals>
+                <expired_card>1</expired_card>
+            </notifications>
             <send_comment_setting>
                 <comment_added_enable>1</comment_added_enable>
                 <comment_added>tnw_subscriptions_profile_notification_send_comment_setting_comment_added</comment_added>
+                <comment_added_copy_method>bcc</comment_added_copy_method>
             </send_comment_setting>
             <status_change_setting>
                 <status_change_enable>1</status_change_enable>
                 <profile_status_change>tnw_subscriptions_profile_notification_status_change_setting_profile_status_change</profile_status_change>
+                <status_change_copy_method>bcc</status_change_copy_method>
             </status_change_setting>
             <card_expire_setting>
                 <card_expire_enable>1</card_expire_enable>
                 <card_expire>tnw_subscriptions_profile_notification_card_expire_setting_card_expire</card_expire>
+                <card_expire_copy_method>bcc</card_expire_copy_method>
             </card_expire_setting>
             <payment_failed_setting>
                 <payment_failed_enable>1</payment_failed_enable>
                 <payment_failed>tnw_subscriptions_profile_notification_payment_failed_setting_payment_failed</payment_failed>
+                <payment_failed_copy_method>bcc</payment_failed_copy_method>
             </payment_failed_setting>
             <renewal_setting>
                 <renewal_enable>1</renewal_enable>
                 <renewal>tnw_subscriptions_profile_notification_renewal_setting_renewal</renewal>
+                <renewal_copy_method>bcc</renewal_copy_method>
             </renewal_setting>
             <out_of_stock_setting>
                 <out_of_stock_enable>1</out_of_stock_enable>
                 <out_of_stock>tnw_subscriptions_profile_notification_out_of_stock_setting_out_of_stock</out_of_stock>
+                <out_of_stock_copy_method>bcc</out_of_stock_copy_method>
             </out_of_stock_setting>
             <confirmation_order_setting>
                 <confirmation_order_enable>1</confirmation_order_enable>
                 <confirmation_order>tnw_subscriptions_profile_notification_confirmation_order_setting_confirmation_order</confirmation_order>
+                <confirmation_order_copy_method>bcc</confirmation_order_copy_method>
             </confirmation_order_setting>
         </tnw_subscriptions_profile_notification>
         <tnw_subscriptions_product>

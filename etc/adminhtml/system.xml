@@ -199,8 +199,7 @@
                        showInDefault="1" showInWebsite="1" showInStore="0" canRestore="1">
                     <label>Send Subscription Profile Comment Add</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-                    <config_path>tnw_subscriptions_profile_notification/send_comment_setting/comment_added_enable
-                    </config_path>
+                    <config_path>tnw_subscriptions_profile_notification/send_comment_setting/comment_added_enable</config_path>
                 </field>
                 <field id="comment_added" translate="label comment" type="select" sortOrder="20" showInDefault="1"
                        showInWebsite="1" showInStore="0" canRestore="1">
@@ -236,8 +235,7 @@
                        showInDefault="1" showInWebsite="1" showInStore="0" canRestore="1">
                     <label>Send Subscription Profile Status Change</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-                    <config_path>tnw_subscriptions_profile_notification/status_change_setting/status_change_enable
-                    </config_path>
+                    <config_path>tnw_subscriptions_profile_notification/status_change_setting/status_change_enable</config_path>
                 </field>
                 <field id="profile_status_change" translate="label comment" type="select" sortOrder="20"
                        showInDefault="1" showInWebsite="1" showInStore="0" canRestore="1">
@@ -273,8 +271,7 @@
                        showInWebsite="1" showInStore="0" canRestore="1">
                     <label>Send Subscription Profile Card Expire</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-                    <config_path>tnw_subscriptions_profile_notification/card_expire_setting/card_expire_enable
-                    </config_path>
+                    <config_path>tnw_subscriptions_profile_notification/card_expire_setting/card_expire_enable</config_path>
                 </field>
                 <field id="card_expire" translate="label comment" type="select" sortOrder="20" showInDefault="1"
                        showInWebsite="1" showInStore="0" canRestore="1">
@@ -310,8 +307,7 @@
                        showInDefault="1" showInWebsite="1" showInStore="0" canRestore="1">
                     <label>Send Subscription Profile Failed</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-                    <config_path>tnw_subscriptions_profile_notification/payment_failed_setting/payment_failed_enable
-                    </config_path>
+                    <config_path>tnw_subscriptions_profile_notification/payment_failed_setting/payment_failed_enable</config_path>
                 </field>
                 <field id="payment_failed" translate="label comment" type="select" sortOrder="20" showInDefault="1"
                        showInWebsite="1" showInStore="0" canRestore="1">
@@ -383,8 +379,7 @@
                        showInWebsite="1" showInStore="0" canRestore="1">
                     <label>Send Subscription Profile Out Of Stock Notification</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-                    <config_path>tnw_subscriptions_profile_notification/out_of_stock_setting/out_of_stock_enable
-                    </config_path>
+                    <config_path>tnw_subscriptions_profile_notification/out_of_stock_setting/out_of_stock_enable</config_path>
                 </field>
                 <field id="out_of_stock" translate="label comment" type="select" sortOrder="20" showInDefault="1"
                        showInWebsite="1" showInStore="0" canRestore="1">
@@ -420,9 +415,7 @@
                        showInDefault="1" showInWebsite="1" showInStore="0" canRestore="1">
                     <label>Send Subscription Profile New Order</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-                    <config_path>
-                        tnw_subscriptions_profile_notification/confirmation_order_setting/confirmation_order_enable
-                    </config_path>
+                    <config_path>tnw_subscriptions_profile_notification/confirmation_order_setting/confirmation_order_enable</config_path>
                 </field>
                 <field id="confirmation_order" translate="label comment" type="select" sortOrder="20" showInDefault="1"
                        showInWebsite="1" showInStore="0" canRestore="1">

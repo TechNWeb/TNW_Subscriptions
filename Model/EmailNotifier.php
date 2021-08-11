@@ -159,7 +159,8 @@ class EmailNotifier
                 $this->sendNotificationEmail(
                     $this->scopeConfig->getValue(
                         self::XML_PATH_STATUS_CHANGE_TEMPLATE,
-                        \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+                        \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
+                        $storeId
                     ),
                     $storeId,
                     [
@@ -209,7 +210,8 @@ class EmailNotifier
                     $this->sendNotificationEmail(
                         $this->scopeConfig->getValue(
                             self::XML_PATH_COMMENT_ADDED_TEMPLATE,
-                            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+                            \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
+                            $storeId
                         ),
                         $storeId,
                         [
@@ -250,7 +252,8 @@ class EmailNotifier
                 $this->sendNotificationEmail(
                     $this->scopeConfig->getValue(
                         self::XML_PATH_CARD_EXPIRE,
-                        \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+                        \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
+                        $storeId
                     ),
                     $storeId,
                     [
@@ -289,7 +292,8 @@ class EmailNotifier
                 $this->sendNotificationEmail(
                     $this->scopeConfig->getValue(
                         self::XML_PATH_PAYMENT_FAILED,
-                        \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+                        \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
+                        $storeId
                     ),
                     $storeId,
                     [
@@ -333,7 +337,8 @@ class EmailNotifier
                 $this->sendNotificationEmail(
                     $this->scopeConfig->getValue(
                         self::XML_PATH_OUT_OF_STOCK,
-                        \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+                        \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
+                        $storeId
                     ),
                     $storeId,
                     [
@@ -384,7 +389,7 @@ class EmailNotifier
                 $subscriptionProfile = reset($subscriptionProfiles);
                 list($storeId, $customerEmail, $customerName) = $this->getCustomerVars($subscriptionProfile);
                 $enableEmailNotification = $this->scopeConfig->getValue(
-                    self::XML_PATH_ENABLE_COMMENT_ADDED,
+                    self::XML_PATH_ENABLE_PAYMENT_RENEWAL,
                     \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
                     $storeId
                 );
@@ -396,7 +401,8 @@ class EmailNotifier
                     $this->sendNotificationEmail(
                         $this->scopeConfig->getValue(
                             self::XML_PATH_RENEWAL,
-                            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+                            \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
+                            $storeId
                         ),
                         $storeId,
                         [
