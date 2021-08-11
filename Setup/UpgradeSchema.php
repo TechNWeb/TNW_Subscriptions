@@ -879,7 +879,7 @@ class UpgradeSchema implements UpgradeSchemaInterface
                 'subscription_profile_ids',
                 [
                     'type' => Table::TYPE_TEXT,
-                    'length' => 255,
+                    'length' => Table::MAX_TEXT_SIZE,
                     'nullable' => true,
                     'default' => null,
                     'comment' => 'Store Subscription profiles id for grid on remove BF'
