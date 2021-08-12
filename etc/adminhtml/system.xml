@@ -266,7 +266,7 @@
             </group>
             <group id="card_expire_setting" translate="label" sortOrder="20" showInDefault="1" showInWebsite="1"
                    showInStore="0">
-                <label>Cart Expire Setting</label>
+                <label>Card Expire Setting</label>
                 <field id="card_expire_enable" translate="label comment" type="select" sortOrder="10" showInDefault="1"
                        showInWebsite="1" showInStore="0" canRestore="1">
                     <label>Send Subscription Profile Card Expire</label>
@@ -284,7 +284,7 @@
                 </field>
                 <field id="card_expire_copy_to" translate="label comment" type="text" sortOrder="30" showInDefault="1"
                        showInWebsite="1" showInStore="0">
-                    <label>Send Cart Expire Email Copy To</label>
+                    <label>Send Card Expire Email Copy To</label>
                     <comment>Comma-separated.</comment>
                     <validate>validate-emails</validate>
                     <depends>
@@ -293,7 +293,7 @@
                 </field>
                 <field id="card_expire_copy_method" translate="label" type="select" sortOrder="40" showInDefault="1"
                        showInWebsite="1" showInStore="0" canRestore="1">
-                    <label>Send Cart Expire Email Copy Method</label>
+                    <label>Send Card Expire Email Copy Method</label>
                     <source_model>Magento\Config\Model\Config\Source\Email\Method</source_model>
                     <depends>
                         <field id="card_expire_enable">1</field>
