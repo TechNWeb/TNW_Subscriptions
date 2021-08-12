@@ -163,49 +163,26 @@ class SubscriptionProfileOrderRepository implements SubscriptionProfileOrderRepo
         if ($magentoOrderId) {
             try {
                 $profileIds = $this->resource->getProfileIdsByMagentoOrderId((int)$magentoOrderId);
-
                 $subscriptionProfile = $this->profileRepository->getById(
                     $subscriptionProfileOrder->getSubscriptionProfileId()
                 );
-                $expirationCc = $this->subscriptionProfile->getCcEcpiration($subscriptionProfile);
-                $firstRecurring = $this->timezone->formatDate(
-                    $subscriptionProfile->getStartDate(),
-                    IntlDateFormatter::MEDIUM
-                );
-                $startDate = $subscriptionProfile->getCreatedAt();
-                $billingFrequency = $this->billingFrequencyRepository->getById(
-                    $subscriptionProfile->getBillingFrequencyId()
-                );
-                $finalRecurring = $this->timezone->formatDate(
-                    $this->subscriptionProfile->getFinalDate(
-                    $billingFrequency,
-                    $subscriptionProfile->getTotalBillingCycles(),
-                    $startDate,
-                    $subscriptionProfile->getTerm(),
-                ),g
-                    \IntlDateFormatter::MEDIUM
-                );
-
-                $staticTotalBillingCycles = $subscriptionProfile->getStaticTotalBillingCycles();
                 $profileOrders = $this->resource->getProfileOrdersByProfileId(
                     $subscriptionProfile->getId()
                 );
-
-                if (isset($staticTotalBillingCycles)) {
-                    $paidRecurring = count($profileOrders) . ' / ' . $staticTotalBillingCycles;
-                } else {
-                    $paidRecurring = count($profileOrders) . " / ∞";
-                }
+                $installRecurringData = $this->subscriptionProfile->getRecurringInstallmentData(
+                    $profileOrders,
+                    $subscriptionProfile
+                );
 
                 if ($profileIds) {
                     $this->resource->populateSalesOrderGridWithProfileIds((int)$magentoOrderId, $profileIds);
                     $this->resource->populateRecurringInstallmentData(
                         $magentoOrderId,
-                        $paidRecurring,
-                        $finalRecurring,
-                        $firstRecurring,
-                        $expirationCc,
-                        $staticTotalBillingCycles
+                        $installRecurringData['paidRecurring'],
+                        $installRecurringData['finalRecurring'],
+                        $installRecurringData['firstRecurring'],
+                        $installRecurringData['expirationCc'],
+                        $installRecurringData['staticTotalBillingCycles']
                     );
                 }
             } catch (Exception $e) {

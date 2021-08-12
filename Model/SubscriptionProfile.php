@@ -10,6 +10,7 @@ use Magento\Customer\Api\CustomerRepositoryInterface;
 use Magento\Framework\Api\AttributeValueFactory;
 use Magento\Framework\Api\ExtensionAttributesFactory;
 use Magento\Framework\Data\Collection\AbstractDb;
+use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\Model\AbstractExtensibleModel;
 use Magento\Framework\Model\Context as ModelContext;
 use Magento\Framework\Registry;
@@ -23,6 +24,8 @@ use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfile as Resource;
 use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfile\Payment\Collection as PaymentCollection;
 use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfile\Payment\CollectionFactory as PaymentCollectionFactory;
 use TNW\Subscriptions\Model\Source\ProfileStatus;
+use Magento\Framework\Stdlib\DateTime\TimezoneInterface;
+use TNW\Subscriptions\Model\BillingFrequencyRepository;
 
 /**
  * Subscription Profile model.
@@ -128,6 +131,16 @@ class SubscriptionProfile extends AbstractExtensibleModel implements Subscriptio
     ];
 
     /**
+     * @var TimezoneInterface
+     */
+    private $timezone;
+
+    /**
+     * @var \TNW\Subscriptions\Model\BillingFrequencyRepository
+     */
+    private $billingFrequencyRepository;
+
+    /**
      * SubscriptionProfile constructor.
      * @param ModelContext $context
      * @param Registry $registry
@@ -151,6 +164,8 @@ class SubscriptionProfile extends AbstractExtensibleModel implements Subscriptio
         SubscriptionProfileAttributeRepositoryInterface $metadataService,
         PaymentCollectionFactory $paymentCollectionFactory,
         UserContextInterface $userContext,
+        TimezoneInterface $timezone,
+        BillingFrequencyRepository $billingFrequencyRepository,
         Resource $resource = null,
         AbstractDb $resourceCollection = null,
         array $data = []
@@ -170,6 +185,8 @@ class SubscriptionProfile extends AbstractExtensibleModel implements Subscriptio
         $this->metadataService = $metadataService;
         $this->paymentCollectionFactory = $paymentCollectionFactory;
         $this->userContext = $userContext;
+        $this->timezone = $timezone;
+        $this->billingFrequencyRepository = $billingFrequencyRepository;
     }
 
     /**
@@ -285,7 +302,7 @@ class SubscriptionProfile extends AbstractExtensibleModel implements Subscriptio
 
     /**
      * @inheritdoc
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     * @throws NoSuchEntityException
      */
     public function getWebsite()
     {
@@ -851,6 +868,8 @@ class SubscriptionProfile extends AbstractExtensibleModel implements Subscriptio
     }
 
     /**
+     * Get is expiration date is now
+     *
      * @param $subscriptionProfile
      * @return string
      */
@@ -876,6 +895,15 @@ class SubscriptionProfile extends AbstractExtensibleModel implements Subscriptio
         return $result;
     }
 
+    /**
+     * Get last day of recurring
+     *
+     * @param $billingFrequency
+     * @param $totalBillingCycles
+     * @param $startDate
+     * @param $term
+     * @return false|string|null
+     */
     public function getFinalDate($billingFrequency, $totalBillingCycles, $startDate, $term)
     {
         $result = null;
@@ -896,6 +924,48 @@ class SubscriptionProfile extends AbstractExtensibleModel implements Subscriptio
                 $result = date("Y-m-d", strtotime($billingCycles, strtotime($startDate)));
                 break;
         }
+        return $result;
+    }
+
+    /**
+     * Get data for recurring installment columns
+     *
+     * @param $magentoOrderId
+     * @param $subscriptionProfile
+     * @return array
+     * @throws NoSuchEntityException
+     */
+    public function getRecurringInstallmentData($profileOrders, $subscriptionProfile)
+    {
+        $result = [];
+        $staticTotalBillingCycles = $subscriptionProfile->getStaticTotalBillingCycles();
+        $result['expirationCc'] = $this->getCcEcpiration($subscriptionProfile);
+        $result['firstRecurring'] = $this->timezone->formatDate(
+            $subscriptionProfile->getStartDate(),
+            \IntlDateFormatter::MEDIUM
+        );
+        $startDate = $subscriptionProfile->getCreatedAt();
+        $billingFrequency = $this->billingFrequencyRepository->getById(
+            $subscriptionProfile->getBillingFrequencyId()
+        );
+        $result['finalRecurring'] = $this->timezone->formatDate(
+            $this->getFinalDate(
+                $billingFrequency,
+                $staticTotalBillingCycles,
+                $startDate,
+                $subscriptionProfile->getTerm(),
+            ),
+            \IntlDateFormatter::MEDIUM
+        );
+
+        $result['staticTotalBillingCycles'] = $subscriptionProfile->getStaticTotalBillingCycles();
+
+        if (isset($staticTotalBillingCycles)) {
+            $result['paidRecurring'] = count($profileOrders) . ' / ' . $staticTotalBillingCycles;
+        } else {
+            $result['paidRecurring'] = count($profileOrders) . " / ∞";
+        }
+
         return $result;
     }
 }
