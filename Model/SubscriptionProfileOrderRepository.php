@@ -6,7 +6,10 @@
 
 namespace TNW\Subscriptions\Model;
 
+use Exception;
+use IntlDateFormatter;
 use Magento\Framework\Api\DataObjectHelper;
+use Magento\Framework\Api\SearchCriteriaInterface;
 use Magento\Framework\Api\SortOrder;
 use Magento\Framework\App\ObjectManager;
 use Magento\Framework\Exception\CouldNotDeleteException;
@@ -15,6 +18,7 @@ use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\Reflection\DataObjectProcessor;
 use Magento\Store\Model\StoreManagerInterface;
 use Psr\Log\LoggerInterface;
+use TNW\Subscriptions\Api\Data\SubscriptionProfileOrderInterface;
 use TNW\Subscriptions\Api\Data\SubscriptionProfileOrderInterfaceFactory;
 use TNW\Subscriptions\Api\Data\SubscriptionProfileOrderSearchResultsInterfaceFactory;
 use TNW\Subscriptions\Api\SubscriptionProfileOrderRepositoryInterface;
@@ -106,7 +110,8 @@ class SubscriptionProfileOrderRepository implements SubscriptionProfileOrderRepo
      * @param StoreManagerInterface $storeManager
      * @param SubscriptionProfileRepositoryInterface $profileRepository
      * @param TimezoneInterface $timezone
-     * @param \TNW\Subscriptions\Model\BillingFrequencyRepository $billingFrequencyRepository
+     * @param BillingFrequencyRepository $billingFrequencyRepository
+     * @param \TNW\Subscriptions\Model\SubscriptionProfile $subscriptionProfile
      * @param LoggerInterface|null $logger
      */
     public function __construct(
@@ -144,11 +149,11 @@ class SubscriptionProfileOrderRepository implements SubscriptionProfileOrderRepo
      * {@inheritdoc}
      */
     public function save(
-        \TNW\Subscriptions\Api\Data\SubscriptionProfileOrderInterface $subscriptionProfileOrder
+        SubscriptionProfileOrderInterface $subscriptionProfileOrder
     ) {
         try {
             $this->resource->save($subscriptionProfileOrder);
-        } catch (\Exception $exception) {
+        } catch (Exception $exception) {
             throw new CouldNotSaveException(__(
                 'Could not save the subscriptionProfileOrder: %1',
                 $exception->getMessage()
@@ -165,7 +170,7 @@ class SubscriptionProfileOrderRepository implements SubscriptionProfileOrderRepo
                 $expirationCc = $this->subscriptionProfile->getCcEcpiration($subscriptionProfile);
                 $firstRecurring = $this->timezone->formatDate(
                     $subscriptionProfile->getStartDate(),
-                    \IntlDateFormatter::MEDIUM
+                    IntlDateFormatter::MEDIUM
                 );
                 $startDate = $subscriptionProfile->getCreatedAt();
                 $billingFrequency = $this->billingFrequencyRepository->getById(
@@ -203,7 +208,7 @@ class SubscriptionProfileOrderRepository implements SubscriptionProfileOrderRepo
                         $staticTotalBillingCycles
                     );
                 }
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 $this->logger->warning($e->getMessage());
             }
         }
@@ -230,7 +235,7 @@ class SubscriptionProfileOrderRepository implements SubscriptionProfileOrderRepo
      * {@inheritdoc}
      */
     public function getList(
-        \Magento\Framework\Api\SearchCriteriaInterface $criteria
+        SearchCriteriaInterface $criteria
     ) {
         $searchResults = $this->searchResultsFactory->create();
         $searchResults->setSearchCriteria($criteria);
@@ -266,7 +271,7 @@ class SubscriptionProfileOrderRepository implements SubscriptionProfileOrderRepo
             $this->dataObjectHelper->populateWithArray(
                 $subscriptionProfileOrderData,
                 $subscriptionProfileOrderModel->getData(),
-                \TNW\Subscriptions\Api\Data\SubscriptionProfileOrderInterface::class
+                SubscriptionProfileOrderInterface::class
             );
             $items[] = $subscriptionProfileOrderData;
         }
@@ -278,11 +283,11 @@ class SubscriptionProfileOrderRepository implements SubscriptionProfileOrderRepo
      * {@inheritdoc}
      */
     public function delete(
-        \TNW\Subscriptions\Api\Data\SubscriptionProfileOrderInterface $subscriptionProfileOrder
+        SubscriptionProfileOrderInterface $subscriptionProfileOrder
     ) {
         try {
             $this->resource->delete($subscriptionProfileOrder);
-        } catch (\Exception $exception) {
+        } catch (Exception $exception) {
             throw new CouldNotDeleteException(__(
                 'Could not delete the SubscriptionProfileOrder: %1',
                 $exception->getMessage()
