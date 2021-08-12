@@ -524,12 +524,13 @@ interface SubscriptionProfileInterface extends CustomAttributesDataInterface
     public function setCouponCode($couponCode);
 
     /**
-     * @return mixed
+     * @return string|null
      */
     public function getStaticTotalBillingCycles();
 
     /**
-     * @return mixed
+     * @param string $total
+     * @return $this
      */
     public function setStaticTotalBillingCycles($total);
 }

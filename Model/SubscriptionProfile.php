@@ -18,6 +18,7 @@ use TNW\Subscriptions\Api\Data\SubscriptionProfileAddressInterface;
 use TNW\Subscriptions\Api\Data\SubscriptionProfileInterface;
 use TNW\Subscriptions\Api\Data\SubscriptionProfilePaymentInterface;
 use TNW\Subscriptions\Api\SubscriptionProfileAttributeRepositoryInterface;
+use TNW\Subscriptions\Model\Config\Source\BillingFrequencyUnitType;
 use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfile as Resource;
 use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfile\Payment\Collection as PaymentCollection;
 use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfile\Payment\CollectionFactory as PaymentCollectionFactory;
@@ -847,5 +848,54 @@ class SubscriptionProfile extends AbstractExtensibleModel implements Subscriptio
     public function setStaticTotalBillingCycles($total)
     {
         return $this->setData(self::STATIC_TOTAL_BILLING_CYCLES, $total);
+    }
+
+    /**
+     * @param $subscriptionProfile
+     * @return string
+     */
+    public function getCcEcpiration($subscriptionProfile)
+    {
+        $getExpireDate = json_decode($subscriptionProfile->getPayment()->getPaymentAdditionalInfo(), true);
+        $result = "--";
+        if (isset($getExpireDate['cc_exp_month']) && isset($getExpireDate['cc_exp_year'])) {
+            $ccExpMonth = (int)$getExpireDate['cc_exp_month'];
+            $ccExpYear = (int)$getExpireDate['cc_exp_year'];
+            $date = date("m.d.y");
+            $currentDate = explode('.', $date);
+            switch ($currentDate) {
+                case $currentDate['1'] > $ccExpMonth && $currentDate['2'] > $ccExpYear:
+                    $result = 'Yes';
+                    break;
+                case $currentDate['1'] == $ccExpMonth && $currentDate['2'] == $ccExpYear:
+                case $currentDate['1'] < $ccExpMonth && $currentDate['2'] < $ccExpYear:
+                    $result = 'No';
+                    break;
+            }
+        }
+        return $result;
+    }
+
+    public function getFinalDate($billingFrequency, $totalBillingCycles, $startDate, $term)
+    {
+        $result = null;
+        if ($term == '1') {
+            return "--";
+        }
+        switch ($billingFrequency->getUnit()) {
+            case BillingFrequencyUnitType::DAYS:
+                $billingCycles = "+" . $totalBillingCycles . " days";
+                $result = date("Y-m-d", strtotime($billingCycles, strtotime($startDate)));
+                break;
+            case BillingFrequencyUnitType::MONTHS:
+                $billingCycles = "+" . $totalBillingCycles . " months";
+                $result = date("Y-m-d", strtotime($billingCycles, strtotime($startDate)));
+                break;
+            case BillingFrequencyUnitType::YEARS:
+                $billingCycles = "+" . $totalBillingCycles . " years";
+                $result = date("Y-m-d", strtotime($billingCycles, strtotime($startDate)));
+                break;
+        }
+        return $result;
     }
 }

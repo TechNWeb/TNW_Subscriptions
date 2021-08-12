@@ -23,7 +23,7 @@ use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfileOrder\CollectionFac
     as SubscriptionProfileOrderCollectionFactory;
 use TNW\Subscriptions\Api\SubscriptionProfileRepositoryInterface;
 use Magento\Framework\Stdlib\DateTime\TimezoneInterface;
-use TNW\Subscriptions\Model\BillingFrequencyRepository;
+use TNW\Subscriptions\Model\SubscriptionProfile;
 
 /**
  * Class SubscriptionProfileOrderRepository - repository object for subscription profile orders
@@ -91,6 +91,11 @@ class SubscriptionProfileOrderRepository implements SubscriptionProfileOrderRepo
     private $billingFrequencyRepository;
 
     /**
+     * @var SubscriptionProfile
+     */
+    private $subscriptionProfile;
+
+    /**
      * @param ResourceSubscriptionProfileOrder $resource
      * @param SubscriptionProfileOrderFactory $subscriptionProfileOrderFactory
      * @param SubscriptionProfileOrderInterfaceFactory $dataSubscriptionProfileOrderFactory
@@ -99,6 +104,10 @@ class SubscriptionProfileOrderRepository implements SubscriptionProfileOrderRepo
      * @param DataObjectHelper $dataObjectHelper
      * @param DataObjectProcessor $dataObjectProcessor
      * @param StoreManagerInterface $storeManager
+     * @param SubscriptionProfileRepositoryInterface $profileRepository
+     * @param TimezoneInterface $timezone
+     * @param \TNW\Subscriptions\Model\BillingFrequencyRepository $billingFrequencyRepository
+     * @param LoggerInterface|null $logger
      */
     public function __construct(
         ResourceSubscriptionProfileOrder $resource,
@@ -112,6 +121,7 @@ class SubscriptionProfileOrderRepository implements SubscriptionProfileOrderRepo
         SubscriptionProfileRepositoryInterface $profileRepository,
         TimezoneInterface $timezone,
         BillingFrequencyRepository $billingFrequencyRepository,
+        SubscriptionProfile $subscriptionProfile,
         LoggerInterface $logger = null
     ) {
         $this->resource = $resource;
@@ -125,6 +135,7 @@ class SubscriptionProfileOrderRepository implements SubscriptionProfileOrderRepo
         $this->profileRepository = $profileRepository;
         $this->timezone = $timezone;
         $this->billingFrequencyRepository = $billingFrequencyRepository;
+        $this->subscriptionProfile = $subscriptionProfile;
         $objectManager = ObjectManager::getInstance();
         $this->logger = $logger ?: $objectManager->get(LoggerInterface::class);
     }
@@ -151,7 +162,7 @@ class SubscriptionProfileOrderRepository implements SubscriptionProfileOrderRepo
                 $subscriptionProfile = $this->profileRepository->getById(
                     $subscriptionProfileOrder->getSubscriptionProfileId()
                 );
-                $expirationCc = $this->resource->getCcEcpiration($subscriptionProfile);
+                $expirationCc = $this->subscriptionProfile->getCcEcpiration($subscriptionProfile);
                 $firstRecurring = $this->timezone->formatDate(
                     $subscriptionProfile->getStartDate(),
                     \IntlDateFormatter::MEDIUM
@@ -161,12 +172,12 @@ class SubscriptionProfileOrderRepository implements SubscriptionProfileOrderRepo
                     $subscriptionProfile->getBillingFrequencyId()
                 );
                 $finalRecurring = $this->timezone->formatDate(
-                    $this->resource->getFinalDate(
+                    $this->subscriptionProfile->getFinalDate(
                     $billingFrequency,
                     $subscriptionProfile->getTotalBillingCycles(),
                     $startDate,
                     $subscriptionProfile->getTerm(),
-                ),
+                ),g
                     \IntlDateFormatter::MEDIUM
                 );
 
@@ -178,7 +189,7 @@ class SubscriptionProfileOrderRepository implements SubscriptionProfileOrderRepo
                 if (isset($staticTotalBillingCycles)) {
                     $paidRecurring = count($profileOrders) . ' / ' . $staticTotalBillingCycles;
                 } else {
-                    $paidRecurring = count($profileOrders). " / ∞";
+                    $paidRecurring = count($profileOrders) . " / ∞";
                 }
 
                 if ($profileIds) {
