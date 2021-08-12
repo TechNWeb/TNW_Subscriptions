@@ -13,16 +13,61 @@ use TNW\Subscriptions\Model\Source\ProfileStatus;
 class EmailNotifier
 {
     const XML_PATH_EMAIL_IDENTITY = 'tnw_subscriptions_profile_options/emails/email_identity';
-    const XML_PATH_RENEWAL_NOTIFICATION_PERIOD = 'tnw_subscriptions_profile_options/notifications/renewals';
-    const XML_PATH_RENEWAL_SECOND_NOTIFICATION_PERIOD = 'tnw_subscriptions_profile_options/notifications/renewals_two';
-    const XML_PATH_EXPIRED_CARD_NOTIFICATION_PERIOD = 'tnw_subscriptions_profile_options/notifications/expired_card';
 
-    const XML_PATH_STATUS_CHANGE_TEMPLATE = 'tnw_subscriptions_profile_options/emails/profile_status_change';
-    const XML_PATH_COMMENT_ADDED_TEMPLATE = 'tnw_subscriptions_profile_options/emails/comment_added';
-    const XML_PATH_CARD_EXPIRE = 'tnw_subscriptions_profile_options/emails/card_expire';
-    const XML_PATH_PAYMENT_FAILED = 'tnw_subscriptions_profile_options/emails/payment_failed';
-    const XML_PATH_OUT_OF_STOCK = 'tnw_subscriptions_profile_options/emails/out_of_stock';
-    const XML_PATH_RENEWAL = 'tnw_subscriptions_profile_options/emails/renewal';
+    const XML_PATH_RENEWAL_NOTIFICATION_PERIOD = 'tnw_subscriptions_profile_notification/notifications/renewals';
+    const XML_PATH_RENEWAL_SECOND_NOTIFICATION_PERIOD =
+        'tnw_subscriptions_profile_notification/notifications/renewals_two';
+    const XML_PATH_EXPIRED_CARD_NOTIFICATION_PERIOD =
+        'tnw_subscriptions_profile_notification/notifications/expired_card';
+
+    const XML_PATH_STATUS_CHANGE_TEMPLATE =
+        'tnw_subscriptions_profile_notification/status_change_setting/profile_status_change';
+    const XML_PATH_COMMENT_ADDED_TEMPLATE = 'tnw_subscriptions_profile_notification/send_comment_setting/comment_added';
+    const XML_PATH_CARD_EXPIRE = 'tnw_subscriptions_profile_notification/card_expire_setting/card_expire';
+    const XML_PATH_PAYMENT_FAILED = 'tnw_subscriptions_profile_notification/payment_failed_setting/payment_failed';
+    const XML_PATH_OUT_OF_STOCK = 'tnw_subscriptions_profile_notification/out_of_stock_setting/out_of_stock';
+    const XML_PATH_RENEWAL = 'tnw_subscriptions_profile_notification/renewal_setting/renewal';
+
+    const XML_PATH_ENABLE_COMMENT_ADDED =
+        'tnw_subscriptions_profile_notification/send_comment_setting/comment_added_enable';
+    const XML_PATH_ENABLE_STATUS_CHANGE =
+        'tnw_subscriptions_profile_notification/status_change_setting/status_change_enable';
+    const XML_PATH_ENABLE_CARD_EXPIRE =
+        'tnw_subscriptions_profile_notification/card_expire_setting/card_expire_enable';
+    const XML_PATH_ENABLE_PAYMENT_FAILED =
+        'tnw_subscriptions_profile_notification/payment_failed_setting/payment_failed_enable';
+    const XML_PATH_ENABLE_PAYMENT_RENEWAL = 'tnw_subscriptions_profile_notification/renewal_setting/renewal_enable';
+    const XML_PATH_ENABLE_OUT_OF_STOCK =
+        'tnw_subscriptions_profile_notification/out_of_stock_setting/out_of_stock_enable';
+
+    const XML_PATH_COMMENT_ADDED_COPY_TO =
+        'tnw_subscriptions_profile_notification/send_comment_setting/comment_added_copy_to';
+    const XML_PATH_COMMENT_ADDED_COPY_METHOD =
+        'tnw_subscriptions_profile_notification/send_comment_setting/comment_added_copy_method';
+
+    const XML_PATH_STATUS_CHANGE_COPY_TO =
+        'tnw_subscriptions_profile_notification/status_change_setting/status_change_copy_to';
+    const XML_PATH_STATUS_CHANGE_COPY_METHOD =
+        'tnw_subscriptions_profile_notification/status_change_setting/status_change_copy_method';
+
+    const XML_PATH_CARD_EXPIRE_COPY_TO =
+        'tnw_subscriptions_profile_notification/card_expire_setting/card_expire_copy_to';
+    const XML_PATH_CARD_EXPIRE_COPY_METHOD =
+         'tnw_subscriptions_profile_notification/card_expire_setting/card_expire_copy_method';
+
+    const XML_PATH_PAYMENT_FAILED_COPY_TO =
+        'tnw_subscriptions_profile_notification/payment_failed_setting/payment_failed_copy_to';
+    const XML_PATH_PAYMENT_FAILED_COPY_METHOD =
+        'tnw_subscriptions_profile_notification/payment_failed_setting/payment_failed_copy_method';
+
+    const XML_PATH_PAYMENT_RENEWAL_COPY_TO = 'tnw_subscriptions_profile_notification/renewal_setting/renewal_copy_to';
+    const XML_PATH_PAYMENT_RENEWAL_COPY_METHOD =
+        'tnw_subscriptions_profile_notification/renewal_setting/renewal_copy_method';
+
+    const XML_PATH_OUT_OF_STOCK_COPY_TO =
+        'tnw_subscriptions_profile_notification/out_of_stock_setting/out_of_stock_copy_to';
+    const XML_PATH_OUT_OF_STOCK_COPY_METHOD =
+        'tnw_subscriptions_profile_notification/out_of_stock_setting/out_of_stock_copy_method';
 
     /**
      * Core store config
@@ -103,24 +148,36 @@ class EmailNotifier
             $date = $this->getNextProfileRelation($subscriptionProfile)
                 ? date('F jS, Y', strtotime($this->getNextProfileRelation($subscriptionProfile)->getScheduledAt()))
                 : null;
-            $this->sendNotificationEmail(
-                $this->scopeConfig->getValue(
-                    self::XML_PATH_STATUS_CHANGE_TEMPLATE,
-                    \Magento\Store\Model\ScopeInterface::SCOPE_STORE
-                ),
-                $storeId,
-                [
-                    'subscription' => $subscriptionProfile,
-                    'oldStatus' => $statusModel->getLabelByValue($oldStatus),
-                    'newStatus' => $statusModel->getLabelByValue($newStatus),
-                    'date' => $date,
-                    'customerName' => $customerName
-                ],
-                [
-                    'email' => $customerEmail,
-                    'name' => $customerName
-                ]
+            $enableEmailNotification = $this->scopeConfig->getValue(
+                self::XML_PATH_ENABLE_STATUS_CHANGE,
+                \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
+                $storeId
             );
+            if ($enableEmailNotification == 1) {
+                $copyTo = $this->getEmailCopyTo(self::XML_PATH_STATUS_CHANGE_COPY_TO, $storeId);
+                $copyMethod = $this->getCopyMethod(self::XML_PATH_STATUS_CHANGE_COPY_METHOD, $storeId);
+                $this->sendNotificationEmail(
+                    $this->scopeConfig->getValue(
+                        self::XML_PATH_STATUS_CHANGE_TEMPLATE,
+                        \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
+                        $storeId
+                    ),
+                    $storeId,
+                    [
+                        'subscription' => $subscriptionProfile,
+                        'oldStatus' => $statusModel->getLabelByValue($oldStatus),
+                        'newStatus' => $statusModel->getLabelByValue($newStatus),
+                        'date' => $date,
+                        'customerName' => $customerName
+                    ],
+                    [
+                        'email' => $customerEmail,
+                        'name' => $customerName
+                    ],
+                    $copyTo,
+                    $copyMethod
+                );
+            }
         }
     }
 
@@ -142,22 +199,34 @@ class EmailNotifier
             }
             if ($subscriptionProfile) {
                 list($storeId, $customerEmail, $customerName) = $this->getCustomerVars($subscriptionProfile);
-                $this->sendNotificationEmail(
-                    $this->scopeConfig->getValue(
-                        self::XML_PATH_COMMENT_ADDED_TEMPLATE,
-                        \Magento\Store\Model\ScopeInterface::SCOPE_STORE
-                    ),
-                    $storeId,
-                    [
-                        'subscription' => $subscriptionProfile,
-                        'comment' => $comment,
-                        'customerName' => $customerName
-                    ],
-                    [
-                        'email' => $customerEmail,
-                        'name' => $customerName
-                    ]
+                $enableEmailNotification = $this->scopeConfig->getValue(
+                    self::XML_PATH_ENABLE_COMMENT_ADDED,
+                    \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
+                    $storeId
                 );
+                if ($enableEmailNotification == 1) {
+                    $copyTo = $this->getEmailCopyTo(self::XML_PATH_COMMENT_ADDED_COPY_TO, $storeId);
+                    $copyMethod = $this->getCopyMethod(self::XML_PATH_COMMENT_ADDED_COPY_METHOD, $storeId);
+                    $this->sendNotificationEmail(
+                        $this->scopeConfig->getValue(
+                            self::XML_PATH_COMMENT_ADDED_TEMPLATE,
+                            \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
+                            $storeId
+                        ),
+                        $storeId,
+                        [
+                            'subscription' => $subscriptionProfile,
+                            'comment' => $comment,
+                            'customerName' => $customerName
+                        ],
+                        [
+                            'email' => $customerEmail,
+                            'name' => $customerName
+                        ],
+                        $copyTo,
+                        $copyMethod
+                    );
+                }
             }
         }
     }
@@ -172,22 +241,34 @@ class EmailNotifier
     {
         if ($this->checkEmailTemplateSetting(self::XML_PATH_CARD_EXPIRE)) {
             list($storeId, $customerEmail, $customerName) = $this->getCustomerVars($subscriptionProfile);
-            $this->sendNotificationEmail(
-                $this->scopeConfig->getValue(
-                    self::XML_PATH_CARD_EXPIRE,
-                    \Magento\Store\Model\ScopeInterface::SCOPE_STORE
-                ),
-                $storeId,
-                [
-                    'subscription' => $subscriptionProfile,
-                    'customerName' => $customerName,
-                    'date' => date('F jS, Y', strtotime($date))
-                ],
-                [
-                    'email' => $customerEmail,
-                    'name' => $customerName
-                ]
+            $enableEmailNotification = $this->scopeConfig->getValue(
+                self::XML_PATH_ENABLE_CARD_EXPIRE,
+                \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
+                $storeId
             );
+            if ($enableEmailNotification == 1) {
+                $copyTo = $this->getEmailCopyTo(self::XML_PATH_CARD_EXPIRE_COPY_TO, $storeId);
+                $copyMethod = $this->getCopyMethod(self::XML_PATH_CARD_EXPIRE_COPY_METHOD, $storeId);
+                $this->sendNotificationEmail(
+                    $this->scopeConfig->getValue(
+                        self::XML_PATH_CARD_EXPIRE,
+                        \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
+                        $storeId
+                    ),
+                    $storeId,
+                    [
+                        'subscription' => $subscriptionProfile,
+                        'customerName' => $customerName,
+                        'date' => date('F jS, Y', strtotime($date))
+                    ],
+                    [
+                        'email' => $customerEmail,
+                        'name' => $customerName
+                    ],
+                    $copyTo,
+                    $copyMethod
+                );
+            }
         }
     }
 
@@ -200,26 +281,38 @@ class EmailNotifier
     {
         if ($this->checkEmailTemplateSetting(self::XML_PATH_PAYMENT_FAILED)) {
             list($storeId, $customerEmail, $customerName) = $this->getCustomerVars($subscriptionProfile);
-            $this->sendNotificationEmail(
-                $this->scopeConfig->getValue(
-                    self::XML_PATH_PAYMENT_FAILED,
-                    \Magento\Store\Model\ScopeInterface::SCOPE_STORE
-                ),
-                $storeId,
-                [
-                    'subscription' => $subscriptionProfile,
-                    'customerName' => $customerName,
-                    'attempt_interval' => $this->scopeConfig->getValue(
-                        'tnw_subscriptions_profile_options/past_due_profile_options/attempt_interval',
+            $enableEmailNotification = $this->scopeConfig->getValue(
+                self::XML_PATH_ENABLE_PAYMENT_FAILED,
+                \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
+                $storeId
+            );
+            if ($enableEmailNotification == 1) {
+                $copyTo = $this->getEmailCopyTo(self::XML_PATH_PAYMENT_FAILED_COPY_TO, $storeId);
+                $copyMethod = $this->getCopyMethod(self::XML_PATH_PAYMENT_FAILED_COPY_METHOD, $storeId);
+                $this->sendNotificationEmail(
+                    $this->scopeConfig->getValue(
+                        self::XML_PATH_PAYMENT_FAILED,
                         \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
                         $storeId
-                    )
-                ],
-                [
-                    'email' => $customerEmail,
-                    'name' => $customerName
-                ]
-            );
+                    ),
+                    $storeId,
+                    [
+                        'subscription' => $subscriptionProfile,
+                        'customerName' => $customerName,
+                        'attempt_interval' => $this->scopeConfig->getValue(
+                            'tnw_subscriptions_profile_options/past_due_profile_options/attempt_interval',
+                            \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
+                            $storeId
+                        )
+                    ],
+                    [
+                        'email' => $customerEmail,
+                        'name' => $customerName
+                    ],
+                    $copyTo,
+                    $copyMethod
+                );
+            }
         }
     }
 
@@ -233,22 +326,34 @@ class EmailNotifier
     {
         if ($this->checkEmailTemplateSetting(self::XML_PATH_OUT_OF_STOCK)) {
             list($storeId, $customerEmail, $customerName) = $this->getCustomerVars($subscriptionProfile);
-            $this->sendNotificationEmail(
-                $this->scopeConfig->getValue(
-                    self::XML_PATH_OUT_OF_STOCK,
-                    \Magento\Store\Model\ScopeInterface::SCOPE_STORE
-                ),
-                $storeId,
-                [
-                    'subscription' => $subscriptionProfile,
-                    'customerName' => $customerName,
-                    'products' => implode(', ', $products)
-                ],
-                [
-                    'email' => $customerEmail,
-                    'name' => $customerName
-                ]
+            $enableEmailNotification = $this->scopeConfig->getValue(
+                self::XML_PATH_ENABLE_OUT_OF_STOCK,
+                \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
+                $storeId
             );
+            if ($enableEmailNotification == 1) {
+                $copyTo = $this->getEmailCopyTo(self::XML_PATH_OUT_OF_STOCK_COPY_TO, $storeId);
+                $copyMethod = $this->getCopyMethod(self::XML_PATH_OUT_OF_STOCK_COPY_METHOD, $storeId);
+                $this->sendNotificationEmail(
+                    $this->scopeConfig->getValue(
+                        self::XML_PATH_OUT_OF_STOCK,
+                        \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
+                        $storeId
+                    ),
+                    $storeId,
+                    [
+                        'subscription' => $subscriptionProfile,
+                        'customerName' => $customerName,
+                        'products' => implode(', ', $products)
+                    ],
+                    [
+                        'email' => $customerEmail,
+                        'name' => $customerName
+                    ],
+                    $copyTo,
+                    $copyMethod
+                );
+            }
         }
     }
 
@@ -283,12 +388,21 @@ class EmailNotifier
             if ($subscriptionProfiles) {
                 $subscriptionProfile = reset($subscriptionProfiles);
                 list($storeId, $customerEmail, $customerName) = $this->getCustomerVars($subscriptionProfile);
+                $enableEmailNotification = $this->scopeConfig->getValue(
+                    self::XML_PATH_ENABLE_PAYMENT_RENEWAL,
+                    \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
+                    $storeId
+                );
                 if ($subscriptionProfile->getStatus() == ProfileStatus::STATUS_PAST_DUE
-                    || $subscriptionProfile->getStatus() == ProfileStatus::STATUS_ACTIVE) {
+                    || $subscriptionProfile->getStatus() == ProfileStatus::STATUS_ACTIVE
+                    && $enableEmailNotification == 1) {
+                    $copyTo = $this->getEmailCopyTo(self::XML_PATH_PAYMENT_RENEWAL_COPY_TO, $storeId);
+                    $copyMethod = $this->getCopyMethod(self::XML_PATH_PAYMENT_RENEWAL_COPY_METHOD, $storeId);
                     $this->sendNotificationEmail(
                         $this->scopeConfig->getValue(
                             self::XML_PATH_RENEWAL,
-                            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+                            \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
+                            $storeId
                         ),
                         $storeId,
                         [
@@ -299,7 +413,9 @@ class EmailNotifier
                         [
                             'email' => $customerEmail,
                             'name' => $customerName
-                        ]
+                        ],
+                        $copyTo,
+                        $copyMethod
                     );
                 }
             }
@@ -311,12 +427,20 @@ class EmailNotifier
      * @param $storeId
      * @param array $vars
      * @param array $to
+     * @param string $copyTo
+     * @param string $copyMethod
      * @return $this
      * @throws \Magento\Framework\Exception\LocalizedException
      * @throws \Magento\Framework\Exception\MailException
      */
-    public function sendNotificationEmail($templateIdentifier, $storeId, $vars = [], $to = [])
-    {
+    public function sendNotificationEmail(
+        $templateIdentifier,
+        $storeId,
+        $vars = [],
+        $to = [],
+        $copyTo = [],
+        $copyMethod = ''
+    ) {
         $this->inlineTranslation->suspend();
         $this->transportBuilder->setTemplateIdentifier($templateIdentifier)
             ->setTemplateOptions(
@@ -335,6 +459,18 @@ class EmailNotifier
                 $to['email'],
                 $to['name']
             );
+
+        if (!empty($copyTo) && $copyMethod == 'bcc') {
+            foreach ($copyTo as $email) {
+                $this->transportBuilder->addBcc($email);
+            }
+        }
+        if (!empty($copyTo) && $copyMethod == 'copy') {
+            foreach ($copyTo as $email) {
+                $this->transportBuilder->addCc($email);
+            }
+        }
+
         $transport = $this->transportBuilder->getTransport();
         $transport->sendMessage();
         $this->inlineTranslation->resume();
@@ -389,5 +525,31 @@ class EmailNotifier
     private function getNextProfileRelation(SubscriptionProfile $profile)
     {
         return $this->profileOrderManager->getNextProfileRelation($profile, false);
+    }
+
+    /**
+     * Return email copy_to list
+     *
+     * @param $path
+     * @param $storeCode
+     * @return array|bool
+     */
+    public function getEmailCopyTo($path, $storeCode)
+    {
+        $data = $this->scopeConfig->getValue($path, \Magento\Store\Model\ScopeInterface::SCOPE_STORE, $storeCode);
+        if (!empty($data)) {
+            return array_map('trim', explode(',', $data));
+        }
+        return false;
+    }
+
+    /**
+     * @param $path
+     * @param $storeCode
+     * @return mixed
+     */
+    public function getCopyMethod($path, $storeCode)
+    {
+        return $this->scopeConfig->getValue($path, \Magento\Store\Model\ScopeInterface::SCOPE_STORE, $storeCode);
     }
 }
