@@ -415,4 +415,23 @@ class ListProductButtons extends Template
         }
         return false;
     }
+
+    /**
+     * Is product have billing frequencies
+     *
+     * @return bool|null
+     */
+    public function isBillingFrequencySet()
+    {
+        $result = null;
+        try {
+            $billingFrequencies = $this->getProductBillingFrequencies();
+            if (!empty($billingFrequencies)) {
+                $result = true;
+            }
+        } catch (LocalizedException $exception) {
+            $result = false;
+        }
+        return $result;
+    }
 }

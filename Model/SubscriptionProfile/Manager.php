@@ -1462,7 +1462,7 @@ class Manager
         $engine = null;
         $paymentPostData = $requestData['payment'] ?? [];
         foreach ($paymentPostData as $code => $methodData) {
-            if ($methodData['method']) {
+            if (array_key_exists('method', $methodData) && !empty($methodData['method'])) {
                 $engine = $code;
                 break;
             }
