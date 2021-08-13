@@ -7,7 +7,6 @@
 namespace TNW\Subscriptions\Model;
 
 use Exception;
-use IntlDateFormatter;
 use Magento\Framework\Api\DataObjectHelper;
 use Magento\Framework\Api\SearchCriteriaInterface;
 use Magento\Framework\Api\SortOrder;
@@ -27,7 +26,6 @@ use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfileOrder\CollectionFac
     as SubscriptionProfileOrderCollectionFactory;
 use TNW\Subscriptions\Api\SubscriptionProfileRepositoryInterface;
 use Magento\Framework\Stdlib\DateTime\TimezoneInterface;
-use TNW\Subscriptions\Model\SubscriptionProfile;
 
 /**
  * Class SubscriptionProfileOrderRepository - repository object for subscription profile orders
@@ -90,11 +88,6 @@ class SubscriptionProfileOrderRepository implements SubscriptionProfileOrderRepo
     private $timezone;
 
     /**
-     * @var BillingFrequencyRepository
-     */
-    private $billingFrequencyRepository;
-
-    /**
      * @var SubscriptionProfile
      */
     private $subscriptionProfile;
@@ -110,8 +103,7 @@ class SubscriptionProfileOrderRepository implements SubscriptionProfileOrderRepo
      * @param StoreManagerInterface $storeManager
      * @param SubscriptionProfileRepositoryInterface $profileRepository
      * @param TimezoneInterface $timezone
-     * @param BillingFrequencyRepository $billingFrequencyRepository
-     * @param \TNW\Subscriptions\Model\SubscriptionProfile $subscriptionProfile
+     * @param SubscriptionProfile $subscriptionProfile
      * @param LoggerInterface|null $logger
      */
     public function __construct(
@@ -125,7 +117,6 @@ class SubscriptionProfileOrderRepository implements SubscriptionProfileOrderRepo
         StoreManagerInterface $storeManager,
         SubscriptionProfileRepositoryInterface $profileRepository,
         TimezoneInterface $timezone,
-        BillingFrequencyRepository $billingFrequencyRepository,
         SubscriptionProfile $subscriptionProfile,
         LoggerInterface $logger = null
     ) {
@@ -139,7 +130,6 @@ class SubscriptionProfileOrderRepository implements SubscriptionProfileOrderRepo
         $this->storeManager = $storeManager;
         $this->profileRepository = $profileRepository;
         $this->timezone = $timezone;
-        $this->billingFrequencyRepository = $billingFrequencyRepository;
         $this->subscriptionProfile = $subscriptionProfile;
         $objectManager = ObjectManager::getInstance();
         $this->logger = $logger ?: $objectManager->get(LoggerInterface::class);

@@ -89,7 +89,11 @@ class SubscriptionProfileOrder extends AbstractDb
      * Populate Sales Order Grid with Profile Ids
      *
      * @param int $magentoOrderId
-     * @param string $profileIds
+     * @param $paidRecurring
+     * @param $finalRecurring
+     * @param $firstRecurring
+     * @param $expireCc
+     * @param $totalBilling
      */
     public function populateRecurringInstallmentData(
         $magentoOrderId,

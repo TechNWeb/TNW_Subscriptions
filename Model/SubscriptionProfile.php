@@ -25,7 +25,9 @@ use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfile\Payment\Collection
 use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfile\Payment\CollectionFactory as PaymentCollectionFactory;
 use TNW\Subscriptions\Model\Source\ProfileStatus;
 use Magento\Framework\Stdlib\DateTime\TimezoneInterface;
+use Magento\Framework\Serialize\Serializer\Json;
 use TNW\Subscriptions\Model\BillingFrequencyRepository;
+use IntlDateFormatter;
 
 /**
  * Subscription Profile model.
@@ -136,7 +138,12 @@ class SubscriptionProfile extends AbstractExtensibleModel implements Subscriptio
     private $timezone;
 
     /**
-     * @var \TNW\Subscriptions\Model\BillingFrequencyRepository
+     * @var Json
+     */
+    private $serializer;
+
+    /**
+     * @var BillingFrequencyRepository
      */
     private $billingFrequencyRepository;
 
@@ -165,6 +172,7 @@ class SubscriptionProfile extends AbstractExtensibleModel implements Subscriptio
         PaymentCollectionFactory $paymentCollectionFactory,
         UserContextInterface $userContext,
         TimezoneInterface $timezone,
+        Json $serializer,
         BillingFrequencyRepository $billingFrequencyRepository,
         Resource $resource = null,
         AbstractDb $resourceCollection = null,
@@ -186,6 +194,7 @@ class SubscriptionProfile extends AbstractExtensibleModel implements Subscriptio
         $this->paymentCollectionFactory = $paymentCollectionFactory;
         $this->userContext = $userContext;
         $this->timezone = $timezone;
+        $this->serializer = $serializer;
         $this->billingFrequencyRepository = $billingFrequencyRepository;
     }
 
@@ -873,22 +882,22 @@ class SubscriptionProfile extends AbstractExtensibleModel implements Subscriptio
      * @param $subscriptionProfile
      * @return string
      */
-    public function getCcEcpiration($subscriptionProfile)
+    public function getCcEcpirationStatus($subscriptionProfile)
     {
-        $getExpireDate = json_decode($subscriptionProfile->getPayment()->getPaymentAdditionalInfo(), true);
-        $result = "--";
+        $getExpireDate = $this->serializer->unserialize($subscriptionProfile->getPayment()->getPaymentAdditionalInfo());
+        $result = null;
         if (isset($getExpireDate['cc_exp_month']) && isset($getExpireDate['cc_exp_year'])) {
             $ccExpMonth = (int)$getExpireDate['cc_exp_month'];
             $ccExpYear = (int)$getExpireDate['cc_exp_year'];
-            $date = date("m.d.y");
-            $currentDate = explode('.', $date);
+            $date = date("j, n, Y");
+            $currentDate = explode(',', $date);
             switch ($currentDate) {
                 case $currentDate['1'] > $ccExpMonth && $currentDate['2'] > $ccExpYear:
-                    $result = 'Yes';
+                    $result = 1;
                     break;
                 case $currentDate['1'] == $ccExpMonth && $currentDate['2'] == $ccExpYear:
                 case $currentDate['1'] < $ccExpMonth && $currentDate['2'] < $ccExpYear:
-                    $result = 'No';
+                    $result = 0;
                     break;
             }
         }
@@ -902,13 +911,13 @@ class SubscriptionProfile extends AbstractExtensibleModel implements Subscriptio
      * @param $totalBillingCycles
      * @param $startDate
      * @param $term
-     * @return false|string|null
+     * @return string|null
      */
-    public function getFinalDate($billingFrequency, $totalBillingCycles, $startDate, $term)
+    public function getFinalDate($billingFrequency, $totalBillingCycles, $startDate, $term): ?string
     {
-        $result = null;
+        $result = '';
         if ($term == '1') {
-            return "--";
+            return null;
         }
         switch ($billingFrequency->getUnit()) {
             case BillingFrequencyUnitType::DAYS:
@@ -939,10 +948,10 @@ class SubscriptionProfile extends AbstractExtensibleModel implements Subscriptio
     {
         $result = [];
         $staticTotalBillingCycles = $subscriptionProfile->getStaticTotalBillingCycles();
-        $result['expirationCc'] = $this->getCcEcpiration($subscriptionProfile);
+        $result['expirationCc'] = $this->getCcEcpirationStatus($subscriptionProfile);
         $result['firstRecurring'] = $this->timezone->formatDate(
             $subscriptionProfile->getStartDate(),
-            \IntlDateFormatter::MEDIUM
+            IntlDateFormatter::MEDIUM
         );
         $startDate = $subscriptionProfile->getCreatedAt();
         $billingFrequency = $this->billingFrequencyRepository->getById(
@@ -955,15 +964,15 @@ class SubscriptionProfile extends AbstractExtensibleModel implements Subscriptio
                 $startDate,
                 $subscriptionProfile->getTerm(),
             ),
-            \IntlDateFormatter::MEDIUM
+            IntlDateFormatter::MEDIUM
         );
 
         $result['staticTotalBillingCycles'] = $subscriptionProfile->getStaticTotalBillingCycles();
 
         if (isset($staticTotalBillingCycles)) {
-            $result['paidRecurring'] = count($profileOrders) . ' / ' . $staticTotalBillingCycles;
+            $result['paidRecurring'] = implode(",", [count($profileOrders), $staticTotalBillingCycles]);
         } else {
-            $result['paidRecurring'] = count($profileOrders) . " / ∞";
+            $result['paidRecurring'] = implode(",", [count($profileOrders)]);
         }
 
         return $result;

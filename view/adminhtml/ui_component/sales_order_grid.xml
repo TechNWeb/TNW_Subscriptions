@@ -17,7 +17,7 @@
                 </item>
             </argument>
         </actionsColumn>
-        <column name="subscription_paid_installment">
+        <column name="subscription_paid_installment" class="TNW\Subscriptions\Ui\Component\Listing\Column\Sales\Order\Grid\PaidInstallment">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="bodyTmpl" xsi:type="string">ui/grid/cells/html</item>
@@ -47,7 +47,7 @@
                 </item>
             </argument>
         </column>
-        <column name="subscription_expire_cc">
+        <column name="subscription_expire_cc" class="TNW\Subscriptions\Ui\Component\Listing\Column\Sales\Order\Grid\ExpireCc">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="bodyTmpl" xsi:type="string">ui/grid/cells/html</item>
