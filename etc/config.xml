@@ -32,28 +32,42 @@
             </past_due_profile_options>
             <emails>
                 <email_identity>support</email_identity>
-                <comment_added>tnw_subscriptions_profile_options_emails_comment_added</comment_added>
-                <profile_status_change>tnw_subscriptions_profile_options_emails_profile_status_change</profile_status_change>
-                <card_expire>tnw_subscriptions_profile_options_emails_card_expire</card_expire>
-                <payment_failed>tnw_subscriptions_profile_options_emails_payment_failed</payment_failed>
-                <renewal>tnw_subscriptions_profile_options_emails_renewal</renewal>
-                <out_of_stock>tnw_subscriptions_profile_options_emails_out_of_stock</out_of_stock>
-                <confirmation_order>tnw_subscriptions_profile_options_emails_confirmation_order</confirmation_order>
             </emails>
-            <email_config>
-                <status_change>1</status_change>
-                <comment_add>1</comment_add>
-                <card_expire>1</card_expire>
-                <payment_failed>1</payment_failed>
-                <renewal>1</renewal>
-                <out_of_stock>1</out_of_stock>
-                <confirmation_order>1</confirmation_order>
-            </email_config>
             <notifications>
                 <renewals>1</renewals>
                 <expired_card>1</expired_card>
             </notifications>
         </tnw_subscriptions_profile_options>
+        <tnw_subscriptions_profile_notification>
+            <send_comment_setting>
+                <comment_added_enable>1</comment_added_enable>
+                <comment_added>tnw_subscriptions_profile_notification_send_comment_setting_comment_added</comment_added>
+            </send_comment_setting>
+            <status_change_setting>
+                <status_change_enable>1</status_change_enable>
+                <profile_status_change>tnw_subscriptions_profile_notification_status_change_setting_profile_status_change</profile_status_change>
+            </status_change_setting>
+            <card_expire_setting>
+                <card_expire_enable>1</card_expire_enable>
+                <card_expire>tnw_subscriptions_profile_notification_card_expire_setting_card_expire</card_expire>
+            </card_expire_setting>
+            <payment_failed_setting>
+                <payment_failed_enable>1</payment_failed_enable>
+                <payment_failed>tnw_subscriptions_profile_notification_payment_failed_setting_payment_failed</payment_failed>
+            </payment_failed_setting>
+            <renewal_setting>
+                <renewal_enable>1</renewal_enable>
+                <renewal>tnw_subscriptions_profile_notification_renewal_setting_renewal</renewal>
+            </renewal_setting>
+            <out_of_stock_setting>
+                <out_of_stock_enable>1</out_of_stock_enable>
+                <out_of_stock>tnw_subscriptions_profile_notification_out_of_stock_setting_out_of_stock</out_of_stock>
+            </out_of_stock_setting>
+            <confirmation_order_setting>
+                <confirmation_order_enable>1</confirmation_order_enable>
+                <confirmation_order>tnw_subscriptions_profile_notification_confirmation_order_setting_confirmation_order</confirmation_order>
+            </confirmation_order_setting>
+        </tnw_subscriptions_profile_notification>
         <tnw_subscriptions_product>
             <general>
                 <purchase_type>3</purchase_type> <!--One-Time and Recurring-->
