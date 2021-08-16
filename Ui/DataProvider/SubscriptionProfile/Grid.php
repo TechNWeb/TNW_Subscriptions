@@ -20,6 +20,10 @@ class Grid extends DataProvider
     {
         $field = $filter->getField();
 
+        if ($field === 'entity_id') {
+            $filter->setField('main_table.entity_id');
+        }
+
         if ($field === 'frequency_label') {
             $filter->setField('frequency.label');
         }
@@ -93,7 +97,7 @@ class Grid extends DataProvider
                     $paramName,
                     $paramValue
                 );
-                if ($paramName === 'status') {
+                if ($paramName === 'entity_id') {
                     $filter = $this->filterBuilder->setField($paramName)
                         ->setValue(explode(',', $paramValue))->setConditionType('in')->create();
                 } else {

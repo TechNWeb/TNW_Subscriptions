@@ -23,6 +23,7 @@ interface ProductBillingFrequencyInterface
     const PRESET_QTY = 'preset_qty';
     const PRESET_QTY_SET_BY_MERCHANT = 'preset_qty_set_by_merchant';
     const IS_DISABLED = 'is_disabled';
+    const SUBSCRIPTION_PROFILE_ID_FOR_GRID = 'subscription_profile_ids';
     /**#@-*/
 
     /**
@@ -129,4 +130,15 @@ interface ProductBillingFrequencyInterface
      * @return mixed
      */
     public function setIsDisabled($isDisabled);
+
+    /**
+     * @return mixed
+     */
+    public function getSubscriptionProfileIds();
+
+    /**
+     * @param $subsIdForGrid
+     * @return mixed
+     */
+    public function setSubscriptionProfileIds($subsIdForGrid);
 }
