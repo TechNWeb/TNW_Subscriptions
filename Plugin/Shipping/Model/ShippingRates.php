@@ -34,6 +34,7 @@ class ShippingRates
         foreach ($origResult->getAllRates() as $item) {
             if ($item->getData('carrier') === 'tnwautoship'
                 && $item->getData('method') === 'cheapest'
+                && $cheapest !== null
             ) {
                 $item->setPrice($cheapest->getData('price'));
                 $autoShipCheapestResult = $item;
