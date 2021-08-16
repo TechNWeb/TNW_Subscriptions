@@ -6,6 +6,8 @@
 namespace TNW\Subscriptions\Model\ProductBillingFrequency;
 
 use Magento\Framework\Api\SearchCriteriaBuilder;
+use Magento\Framework\Exception\LocalizedException;
+use TNW\Subscriptions\Api\Data\ProductBillingFrequencyInterface;
 use TNW\Subscriptions\Model\Source\ProfileStatus;
 use TNW\Subscriptions\Api\ProductBillingFrequencyRepositoryInterface;
 use Magento\Framework\Serialize\Serializer\Json;
@@ -13,9 +15,9 @@ use Magento\Framework\Serialize\Serializer\Json;
 /**
  * Add Subscription Id to product billing frequency table for generate grid on remove BF from product
  *
- * Class AvailableGridSubscriptionProfile
+ * Class AvailableSubscriptionProfileGrid
  */
-class AvailableGridSubscriptionProfile
+class AvailableSubscriptionProfileGrid
 {
     /**
      * @var SearchCriteriaBuilder
@@ -33,7 +35,8 @@ class AvailableGridSubscriptionProfile
     private $json;
 
     /**
-     * AvailableGridSubscriptionProfile constructor.
+     * AvailableSubscriptionProfileGrid constructor.
+     *
      * @param SearchCriteriaBuilder $searchCriteriaBuilder
      * @param ProductBillingFrequencyRepositoryInterface $productBillingFrequency
      * @param Json $json
@@ -50,9 +53,9 @@ class AvailableGridSubscriptionProfile
 
     /**
      * @param $subscriptionProfile
-     * @throws \Magento\Framework\Exception\LocalizedException
+     * @throws LocalizedException
      */
-    public function getDataForUrl($subscriptionProfile)
+    public function saveSubscriptionProfileIdsForFormingGrid($subscriptionProfile)
     {
         $searchStatuses = [
             ProfileStatus::STATUS_ACTIVE,
@@ -76,13 +79,13 @@ class AvailableGridSubscriptionProfile
                 );
             }
             foreach ($oldBillingFrequencies as $oldFrequency) {
-                if ($oldFrequency->getSubscProfileIdForGrid()) {
-                    $ids = $this->json->unserialize($oldFrequency->getSubscProfileIdForGrid());
+                if ($oldFrequency->getSubscriptionProfileIds()) {
+                    $ids = $this->json->unserialize($oldFrequency->getSubscriptionProfileIds());
                 }
                 $key = array_search($subscriptionProfile->getId(), $ids);
                 if ($key !== false) {
                     unset($ids[$key]);
-                    $oldFrequency->setSubscProfileIdForGrid($this->json->serialize($ids));
+                    $oldFrequency->setSubscriptionProfileIds($this->json->serialize($ids));
                 }
                 $this->productBillingFrequency->save($oldFrequency);
             }
@@ -97,8 +100,8 @@ class AvailableGridSubscriptionProfile
 
         if ($billingFrequencies) {
             foreach ($billingFrequencies as $frequency) {
-                if ($frequency->getSubscProfileIdForGrid()) {
-                    $ids = $this->json->unserialize($frequency->getSubscProfileIdForGrid());
+                if ($frequency->getSubscriptionProfileIds()) {
+                    $ids = $this->json->unserialize($frequency->getSubscriptionProfileIds());
                 }
 
                 $search = array_search($subscriptionProfile->getId(), $ids);
@@ -108,12 +111,12 @@ class AvailableGridSubscriptionProfile
                 ) {
                     $subId = $subscriptionProfile->getId();
                     array_push($ids, $subId);
-                    $frequency->setSubscProfileIdForGrid($this->json->serialize($ids));
+                    $frequency->setSubscriptionProfileIds($this->json->serialize($ids));
                 } else {
                     $key = array_search($subscriptionProfile->getId(), $ids);
                     if ($key !== false && !in_array($subscriptionProfile->getStatus(), $searchStatuses)) {
                         unset($ids[$key]);
-                        $frequency->setSubscProfileIdForGrid($this->json->serialize($ids));
+                        $frequency->setSubscriptionProfileIds($this->json->serialize($ids));
                     }
                 }
                 $this->productBillingFrequency->save($frequency);
@@ -124,8 +127,8 @@ class AvailableGridSubscriptionProfile
     /**
      * @param $magentoProductId
      * @param $billingFrequencyId
-     * @return \TNW\Subscriptions\Api\Data\ProductBillingFrequencyInterface[]
-     * @throws \Magento\Framework\Exception\LocalizedException
+     * @return ProductBillingFrequencyInterface[]
+     * @throws LocalizedException
      */
     private function getProductBillingFrequency($magentoProductId, $billingFrequencyId)
     {

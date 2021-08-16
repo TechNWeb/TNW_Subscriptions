@@ -192,8 +192,8 @@ class RecurringOptions extends BaseModifier
                 $optionArray = $option->getData();
                 $optionArray = $this->formatPriceByPath(static::FIELD_PRICE_NAME, $optionArray);
                 $optionArray = $this->formatPriceByPath(static::FIELD_INITIAL_FEE_NAME, $optionArray);
-                if ($option->getSubscProfileIdForGrid() !== null) {
-                    $subscrProfileIds = $this->json->unserialize($option->getSubscProfileIdForGrid());
+                if ($option->getSubscriptionProfileIds() !== null) {
+                    $subscrProfileIds = $this->json->unserialize($option->getSubscriptionProfileIds());
                     if (!empty($subscrProfileIds)) {
                         $gridUrl = $this->urlBuilder->getUrl(
                             'tnw_subscriptions/subscriptionprofile/index',
