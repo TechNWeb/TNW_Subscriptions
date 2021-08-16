@@ -12,6 +12,7 @@ use Magento\Framework\Registry;
 use Magento\Framework\View\Result\PageFactory;
 use TNW\Subscriptions\Controller\Adminhtml\SubscriptionProfile;
 use TNW\Subscriptions\Model\Backend\CreateProfile\StepPool;
+use TNW\Subscriptions\Model\Config;
 
 /**
  * Create subscription profile.
@@ -29,6 +30,11 @@ class Create extends SubscriptionProfile
     protected $stepPool;
 
     /**
+     * @var Config
+     */
+    private $config;
+
+    /**
      * @param Context                $context
      * @param Registry               $coreRegistry
      * @param DataPersistorInterface $dataPersistor
@@ -40,10 +46,12 @@ class Create extends SubscriptionProfile
         Registry $coreRegistry,
         DataPersistorInterface $dataPersistor,
         StepPool $stepPool,
+        Config $config,
         PageFactory $resultPageFactory
     ) {
         $this->stepPool = $stepPool;
         $this->resultPageFactory = $resultPageFactory;
+        $this->config = $config;
         parent::__construct($context, $coreRegistry, $dataPersistor);
     }
 
@@ -82,6 +90,7 @@ class Create extends SubscriptionProfile
      */
     protected function _isAllowed()
     {
-        return $this->_authorization->isAllowed('TNW_Subscriptions::SubscriptionProfile_create');
+        return $this->_authorization->isAllowed('TNW_Subscriptions::SubscriptionProfile_create')
+            && $this->config->isSubscriptionsActive();
     }
 }
