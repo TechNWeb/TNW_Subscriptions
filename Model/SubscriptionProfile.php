@@ -880,25 +880,28 @@ class SubscriptionProfile extends AbstractExtensibleModel implements Subscriptio
      * Get is expiration date is now
      *
      * @param $subscriptionProfile
-     * @return string
+     * @return int|null
      */
     public function getCcEcpirationStatus($subscriptionProfile)
     {
-        $getExpireDate = $this->serializer->unserialize($subscriptionProfile->getPayment()->getPaymentAdditionalInfo());
         $result = null;
-        if (isset($getExpireDate['cc_exp_month']) && isset($getExpireDate['cc_exp_year'])) {
-            $ccExpMonth = (int)$getExpireDate['cc_exp_month'];
-            $ccExpYear = (int)$getExpireDate['cc_exp_year'];
-            $date = date("j, n, Y");
-            $currentDate = explode(',', $date);
-            switch ($currentDate) {
-                case $currentDate['1'] > $ccExpMonth && $currentDate['2'] > $ccExpYear:
-                    $result = 1;
-                    break;
-                case $currentDate['1'] == $ccExpMonth && $currentDate['2'] == $ccExpYear:
-                case $currentDate['1'] < $ccExpMonth && $currentDate['2'] < $ccExpYear:
-                    $result = 0;
-                    break;
+        $paymentInfo = $subscriptionProfile->getPayment()->getPaymentAdditionalInfo();
+        if (isset($paymentInfo)) {
+            $getExpireDate = $this->serializer->unserialize($paymentInfo);
+            if (isset($getExpireDate['cc_exp_month']) && isset($getExpireDate['cc_exp_year'])) {
+                $ccExpMonth = (int)$getExpireDate['cc_exp_month'];
+                $ccExpYear = (int)$getExpireDate['cc_exp_year'];
+                $date = date("j, n, Y");
+                $currentDate = explode(',', $date);
+                switch ($currentDate) {
+                    case $currentDate['1'] > $ccExpMonth && $currentDate['2'] > $ccExpYear:
+                        $result = 1;
+                        break;
+                    case $currentDate['1'] == $ccExpMonth && $currentDate['2'] == $ccExpYear:
+                    case $currentDate['1'] < $ccExpMonth && $currentDate['2'] < $ccExpYear:
+                        $result = 0;
+                        break;
+                }
             }
         }
         return $result;
@@ -911,13 +914,13 @@ class SubscriptionProfile extends AbstractExtensibleModel implements Subscriptio
      * @param $totalBillingCycles
      * @param $startDate
      * @param $term
-     * @return string|null
+     * @return string
      */
     public function getFinalDate($billingFrequency, $totalBillingCycles, $startDate, $term): ?string
     {
         $result = '';
         if ($term == '1') {
-            return null;
+            return '';
         }
         switch ($billingFrequency->getUnit()) {
             case BillingFrequencyUnitType::DAYS:
@@ -939,7 +942,7 @@ class SubscriptionProfile extends AbstractExtensibleModel implements Subscriptio
     /**
      * Get data for recurring installment columns
      *
-     * @param $magentoOrderId
+     * @param $profileOrders
      * @param $subscriptionProfile
      * @return array
      * @throws NoSuchEntityException

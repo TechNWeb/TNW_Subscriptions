@@ -8,12 +8,12 @@ namespace TNW\Subscriptions\Ui\Component\Listing\Column\Sales\Order\Grid;
 use Magento\Ui\Component\Listing\Columns\Column;
 
 /**
- * Class ExpireCc - modifying data about cc expiration to Yes or No format
+ * Class FinalInstallment - modifying final date if it exist
  */
-class ExpireCc extends Column
+class FinalInstallment extends Column
 {
     /**
-     * Add Expiretion status to subscriptions profile page.
+     * Add final installment to subscriptions profile page.
      *
      * @param array $dataSource
      * @return array
@@ -22,17 +22,16 @@ class ExpireCc extends Column
     {
         if (isset($dataSource['data']['items'])) {
             foreach ($dataSource['data']['items'] as & $item) {
-                if (isset($item['subscription_expire_cc'])) {
-                    if ($item['subscription_expire_cc'] == 0) {
-                        $item['subscription_expire_cc'] = __("No") ;
-                    } else {
-                        $item['subscription_expire_cc'] = __("Yes") ;
+                if (!empty($item['subscription_final_installment_date'])) {
+                    if ($item['subscription_final_installment_date']
+                        == $item['subscription_first_installment_date']
+                    ) {
+                        $item['subscription_final_installment_date'] = "--";
                     }
-                } else {
-                    $item['subscription_expire_cc'] = "--";
                 }
             }
-            return $dataSource;
         }
+
+        return $dataSource;
     }
 }

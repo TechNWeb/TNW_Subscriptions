@@ -10,25 +10,11 @@ use Magento\Framework\View\Element\UiComponentFactory;
 use Magento\Ui\Component\Listing\Columns\Column;
 
 /**
- * Class PaidInstallment
+ * Class PaidInstallment - showing how many paid subscriptions
+ * orders have been made and how many are left
  */
 class PaidInstallment extends Column
 {
-    /**
-     * @param ContextInterface $context
-     * @param UiComponentFactory $uiComponentFactory
-     * @param array $components
-     * @param array $data
-     */
-    public function __construct(
-        ContextInterface $context,
-        UiComponentFactory $uiComponentFactory,
-        array $components,
-        array $data
-    ) {
-        parent::__construct($context, $uiComponentFactory, $components, $data);
-    }
-
     /**
      * Add paid installment to subscriptions profile page.
      *
