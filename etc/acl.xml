@@ -10,6 +10,8 @@
                           sortOrder="200"/>
                 <resource id="TNW_Subscriptions::config_product" title="TNW Subscriptions Config Product"
                           sortOrder="300"/>
+                <resource id="TNW_Subscriptions::config_profile_notification" title="TNW Subscriptions Config Profile Options"
+                          sortOrder="400"/>
                 <resource id="TNW_Subscriptions::config_payment" title="TNW Subscriptions Payment Product"
                           sortOrder="500"/>
                 <resource id="TNW_Subscriptions::config_customer" title="TNW Subscriptions Customer"

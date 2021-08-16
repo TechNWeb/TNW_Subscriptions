@@ -1431,4 +1431,8 @@
         <plugin name="tnw-include-required-static-assets"
                 type="TNW\Subscriptions\Plugin\IncludeRequiredStaticAssets"/>
     </type>
+    <type name="Magento\Framework\Module\Output\ConfigInterface">
+        <plugin name="tnw_ignore_configuration_for_admin"
+                type="TNW\Subscriptions\Plugin\IgnoreConfigurationForAdmin"/>
+    </type>
 </config>

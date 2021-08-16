@@ -255,7 +255,7 @@ class Manager
         ]);
         if ($additionalDate) {
             $additionalSearchableDate = strtotime(date('Y-m-d') . " +" . $additionalDate . " day");
-                $additionalPendingCondition = ' OR ' . implode(' AND ', [
+            $additionalPendingCondition = ' OR ' . implode(' AND ', [
                 $connection->prepareSqlCondition('relation.scheduled_at', [
                     'from' => date('Y-m-d 00:00:00', $additionalSearchableDate),
                     'to' => date('Y-m-d 23:59:59', $additionalSearchableDate)
@@ -411,6 +411,15 @@ class Manager
 
         foreach ($outOfStockProducts as $profileId => $outOfStockProductData) {
             $profile = $this->profileRepository->getById($profileId);
+            /** Setting the actual billing address from the profile
+             * for the quote no matter whether the address is
+             * saved in the address book or not
+             */
+            $quote->getBillingAddress()->addData($profile->getBillingAddress()->getData());
+            $quote->getBillingAddress()->setCustomerId(
+                $profile->getCustomerId()
+            );
+            
             if ($outOfStockProductData && is_array($outOfStockProductData)) {
                 try {
                     $this->emailNotifierFactory->create()->outOfStockProducts($profile, $outOfStockProductData);
