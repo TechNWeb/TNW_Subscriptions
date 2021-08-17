@@ -6,6 +6,11 @@
 namespace TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Form\Modifier;
 
 use Magento\Ui\Component\Form;
+use Magento\Framework\UrlInterface;
+use Magento\Framework\Registry;
+use Magento\Framework\App\Config\ScopeConfigInterface;
+use TNW\Subscriptions\Model\EmailNotifier;
+use \Magento\Ui\Component\Form\Fieldset;
 
 /**
  * Prepare orders history ui layout.
@@ -17,6 +22,29 @@ class OrdersHistory extends BaseFormModifier
      */
     const GROUP_ORDER_HISTORY = 'order_history';
     /**#@-*/
+
+    /**
+     * Core store config
+     *
+     * @var \Magento\Framework\App\Config\ScopeConfigInterface
+     */
+    protected $scopeConfig;
+
+    /**
+     * OrdersHistory constructor.
+     * @param UrlInterface $urlBuilder
+     * @param Registry $registry
+     * @param ScopeConfigInterface $scopeConfig
+     */
+    public function __construct(
+        UrlInterface $urlBuilder,
+        Registry $registry,
+        ScopeConfigInterface $scopeConfig
+    )
+    {
+        $this->scopeConfig = $scopeConfig;
+        parent::__construct($urlBuilder, $registry);
+    }
 
     /**
      * {@inheritdoc}
@@ -71,7 +99,26 @@ class OrdersHistory extends BaseFormModifier
                 ],
             ],
         ];
-
+        $meta['change_history'] = [
+            'children' => [
+                'comment_notify' => [
+                    'arguments' => [
+                        'data' => [
+                            'config' => [
+                                'content' => __('Fieldset Title'),
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ];
+//        $meta['comment_notify']['arguments']['data']['config']['additionalInfo'
+//        => ['visible' => 0, 'componentType' => 'container' ]
+//        ];
+//        $meta['comment_notify']['arguments']['data']['config']['visible'] = false;
+//        $meta['comment_notify']['arguments']['data']['config']['additionalInfo']['componentType'] = 'container';
+//        $meta[static::GROUP_ORDER_HISTORY]['change_history']['children']['comment_notify']['arguments']['data']['config']['additionalInfo']['visible'] = false;
+//            $meta['change_history'] = ['comment_notify']['arguments']['data']['config']['visible' => false];
         return $meta;
     }
 
@@ -84,6 +131,12 @@ class OrdersHistory extends BaseFormModifier
 
         if ($profile && $profile->getId()) {
             $data[$profile->getId()]['subscription_profile_id'] = $profile->getId();
+            $enableCommentAdd = $this->scopeConfig->getValue(
+                EmailNotifier::XML_PATH_ENABLE_COMMENT_ADDED,
+                \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
+                $profile->getWebsiteId()
+            );
+            $data[$profile->getId()]['disableCheckbox'] = $enableCommentAdd ? false : true;
         }
 
         return $data;

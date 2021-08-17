@@ -107,10 +107,14 @@
                         <item name="off" xsi:type="string" translate="true">Comment for internal use only</item>
                     </item>
                     <item name="default" xsi:type="string">1</item>
+                    <item name="additionalInfo" xsi:type="string" translate="true">Notification disable in configuration</item>
                 </item>
             </argument>
             <settings>
                 <labelVisible>false</labelVisible>
+                <imports>
+                    <link name="disabled">${ $.provider}:data.disableCheckbox</link>
+                </imports>
             </settings>
             <formElements>
                 <checkbox>
