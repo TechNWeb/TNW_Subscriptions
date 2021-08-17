@@ -21,6 +21,14 @@ class FirstInstallment extends Column
      */
     private $timezone;
 
+    /**
+     * FirstInstallment constructor.
+     * @param ContextInterface $context
+     * @param UiComponentFactory $uiComponentFactory
+     * @param TimezoneInterface $timezone
+     * @param array $components
+     * @param array $data
+     */
     public function __construct(
         ContextInterface $context,
         UiComponentFactory $uiComponentFactory,

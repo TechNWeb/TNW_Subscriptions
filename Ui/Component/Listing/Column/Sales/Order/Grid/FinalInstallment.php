@@ -21,6 +21,14 @@ class FinalInstallment extends Column
      */
     private $timezone;
 
+    /**
+     * FinalInstallment constructor.
+     * @param ContextInterface $context
+     * @param UiComponentFactory $uiComponentFactory
+     * @param TimezoneInterface $timezone
+     * @param array $components
+     * @param array $data
+     */
     public function __construct(
         ContextInterface $context,
         UiComponentFactory $uiComponentFactory,
