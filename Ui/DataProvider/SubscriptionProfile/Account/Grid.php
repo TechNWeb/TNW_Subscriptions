@@ -69,6 +69,9 @@ class Grid extends SubscriptionsGrid
                     $paramValue
                 );
                 if ($paramName == 'status') {
+                    if (isset($this->request->getParam('filters')['status'])) {
+                        continue;
+                    }
                     $paramValue = explode(',', $paramValue);
                     $this->addFilter(
                         $this->filterBuilder->setField($paramName)->setValue($paramValue)
