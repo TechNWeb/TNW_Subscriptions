@@ -9,6 +9,11 @@
     <body>
 
         <referenceBlock name="search_result_list">
+            <arguments>
+                <argument name="customerProductsHistoryList" xsi:type="object">
+                    TNW\Subscriptions\Block\Product\CustomerProductsHistoryList
+                </argument>
+            </arguments>
 
             <action method="setTemplate">
                 <argument name="template" xsi:type="string">TNW_Subscriptions::product/list.phtml</argument>
