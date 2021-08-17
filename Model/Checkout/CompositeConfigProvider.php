@@ -36,9 +36,6 @@ class CompositeConfigProvider implements ConfigProviderInterface
         $configs = [
             'isSubscriptionEnabled' => (bool) $this->config->isSubscriptionsActiveCurrent(),
         ];
-        if (empty($configs)) {
-            return [];
-        }
 
         return $configs;
     }
