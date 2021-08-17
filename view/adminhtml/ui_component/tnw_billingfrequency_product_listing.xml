@@ -40,7 +40,6 @@
     </dataSource>
     <listingToolbar name="listing_top">
         <paging name="listing_paging"/>
-        <filterSearch name="fulltext"/>
         <filters name="listing_filters"/>
         <massaction name="listing_massaction">
             <settings>
@@ -139,7 +138,17 @@
             </settings>
         </column>
         <column name="initial_fee" sortOrder="70">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="tooltipTpl" xsi:type="string">ui/form/element/helper/tooltip</item>
+                    <item name="tooltip" xsi:type="array">
+                        <item name="description" xsi:type="string">Fee charged once upon creation of the subscription. Leave blank if subscription has no initial fee.</item>
+                    </item>
+                </item>
+            </argument>
             <settings>
+                <resizeDefaultWidth>150</resizeDefaultWidth>
+                <headerTmpl>TNW_Subscriptions/grid/header/text-with-tooltip</headerTmpl>
                 <bodyTmpl>TNW_Subscriptions/grid/cells/text-with-additions</bodyTmpl>
                 <label translate="true">Initial Fee</label>
                 <filter>textRange</filter>

@@ -85,10 +85,7 @@ class LinkedDataProvider extends AbstractDataProvider
         return 'linked';
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function getData()
+    public function prepareCollection()
     {
         $collection = $this->getCollection();
         $collection->addAttributeToFilter(
@@ -111,8 +108,27 @@ class LinkedDataProvider extends AbstractDataProvider
 
         if ($this->getBillingFrequencyId()) {
             $this->joinTables($collection);
+            $collection->getSelect()->where(
+                'tnw_b_f.'. ProductBillingFrequencyInterface::BILLING_FREQUENCY_ID . ' IS NULL'
+            );
         }
+    }
 
+    /**
+     * @inheritDoc
+     */
+    public function getSearchResult()
+    {
+        $this->prepareCollection();
+        return parent::getSearchResult();
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getData()
+    {
+        $this->prepareCollection();
         return parent::getData();
     }
 
@@ -134,11 +150,7 @@ class LinkedDataProvider extends AbstractDataProvider
             ],
             'magento_product_id=entity_id',
             [
-                ProductBillingFrequencyInterface::INITIAL_FEE,
-                ProductBillingFrequencyInterface::PRESET_QTY,
                 ProductBillingFrequencyInterface::BILLING_FREQUENCY_ID,
-                ProductBillingFrequencyInterface::IS_DISABLED,
-                'tnw_' . ProductBillingFrequencyInterface::PRICE => ProductBillingFrequencyInterface::PRICE,
             ],
             $alias . '.' . ProductBillingFrequencyInterface::BILLING_FREQUENCY_ID . '=' . $frequencyId,
             'left'

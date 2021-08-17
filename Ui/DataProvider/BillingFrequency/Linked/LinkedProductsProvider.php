@@ -62,6 +62,7 @@ class LinkedProductsProvider extends DataProvider
         $this->productMetadata = $productMetadata;
         $this->attributeRepository = $attributeRepository;
         $this->storeManager = $storeManager;
+        $this->request = $request;
     }
 
     public function getMeta()
@@ -102,6 +103,10 @@ class LinkedProductsProvider extends DataProvider
         /** @var SearchResult $result */
         $result = parent::getSearchResult();
         if ($result->isLoaded()) {
+            return $result;
+        }
+        if (!$this->request->getParam('billing_frequency_id')) {
+            $result->getSelect()->where('id IS NULL');
             return $result;
         }
 

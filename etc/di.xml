@@ -216,13 +216,6 @@
                 disabled="false"/>
     </type>
 
-    <type name="TNW\Subscriptions\Model\BillingFrequency">
-        <plugin name="subscriptions_frequency_save_linked_products"
-                type="TNW\Subscriptions\Plugin\BillingFrequency\SaveLinkedProducts"
-                sortOrder="10"
-                disabled="false"/>
-    </type>
-
     <type name="Magento\Sales\Model\Order\Creditmemo">
         <plugin name="tnw_subscriptions_extension_attributes" type="TNW\Subscriptions\Plugin\Model\ExtensionAttributes" />
     </type>

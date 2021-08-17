@@ -113,6 +113,9 @@ class Delete extends Action implements HttpPostActionInterface
             )->addFilter(
                 'magento_product_id',
                 $productBillingFrequency->getMagentoProductId()
+            )->addFilter(
+                'billing_frequency_id',
+                $productBillingFrequency->getBillingFrequencyId()
             )->setPageSize(1)->setCurrentPage(1)->create();
             $productSubscriptionProfiles = $this->productSubscriptionProfileRepository->getList($searchCriteria);
             if ($productSubscriptionProfiles->getTotalCount() > 0) {

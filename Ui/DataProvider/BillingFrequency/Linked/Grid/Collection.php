@@ -10,6 +10,8 @@ class Collection extends SearchResult
     {
         $this->addFilterToMap('magento_product_id', 'main_table.magento_product_id');
         $this->addFilterToMap('product_name', 'nametable.value');
+        $this->addFilterToMap('original_price', 'pricetable.value');
+        $this->addFilterToMap('status', 'statustable.value');
         return parent::_initSelect();
     }
 }

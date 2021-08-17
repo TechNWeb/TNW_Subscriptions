@@ -6,15 +6,16 @@
 namespace TNW\Subscriptions\Model\BillingFrequency;
 
 use Magento\Framework\App\Request\DataPersistorInterface;
+use Magento\Ui\DataProvider\AbstractDataProvider;
+use TNW\Subscriptions\Model\ResourceModel\BillingFrequency\Collection;
 use TNW\Subscriptions\Model\ResourceModel\BillingFrequency\CollectionFactory;
-use TNW\Subscriptions\Ui\DataProvider\BillingFrequency\Form\Modifier\LinkedProducts;
 
 /**
  * Class DataProvider - for billing frequencies
  */
-class DataProvider extends \Magento\Ui\DataProvider\AbstractDataProvider
+class DataProvider extends AbstractDataProvider
 {
-    /** @var \TNW\Subscriptions\Model\ResourceModel\BillingFrequency\Collection */
+    /** @var Collection */
     protected $collection;
 
     /** @var DataPersistorInterface */
@@ -25,9 +26,6 @@ class DataProvider extends \Magento\Ui\DataProvider\AbstractDataProvider
      */
     protected $loadedData;
 
-    /** @var LinkedProducts */
-    protected $linkedProductsModifier;
-
     /**
      * DataProvider constructor.
      * @param string $name
@@ -35,7 +33,6 @@ class DataProvider extends \Magento\Ui\DataProvider\AbstractDataProvider
      * @param string $requestFieldName
      * @param CollectionFactory $collectionFactory
      * @param DataPersistorInterface $dataPersistor
-     * @param LinkedProducts $linkedProductsModifier
      * @param array $meta
      * @param array $data
      * @internal param CollectionFactory $blockCollectionFactory
@@ -46,13 +43,11 @@ class DataProvider extends \Magento\Ui\DataProvider\AbstractDataProvider
         $requestFieldName,
         CollectionFactory $collectionFactory,
         DataPersistorInterface $dataPersistor,
-        LinkedProducts $linkedProductsModifier,
         array $meta = [],
         array $data = []
     ) {
         $this->collection = $collectionFactory->create();
         $this->dataPersistor = $dataPersistor;
-        $this->linkedProductsModifier = $linkedProductsModifier;
         parent::__construct($name, $primaryFieldName, $requestFieldName, $meta, $data);
     }
 
@@ -85,21 +80,7 @@ class DataProvider extends \Magento\Ui\DataProvider\AbstractDataProvider
         if (!is_array($this->loadedData)) {
             $this->loadedData = [];
         }
-        
-        $this->loadedData = $this->linkedProductsModifier->modifyData($this->loadedData);
 
         return $this->loadedData;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getMeta()
-    {
-        $meta = parent::getMeta();
-
-        $meta = $this->linkedProductsModifier->modifyMeta($meta);
-
-        return $meta;
     }
 }

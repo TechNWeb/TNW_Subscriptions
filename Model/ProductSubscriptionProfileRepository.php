@@ -128,15 +128,21 @@ class ProductSubscriptionProfileRepository implements ProductSubscriptionProfile
                     $collection->addStoreFilter($filter->getValue(), false);
                     continue;
                 }
+                if ($filter->getField() === 'billing_frequency_id') {
+                    $collection->joinTable(
+                        ['profile_bf' => $collection->getTable(SubscriptionProfile::SUBSCRIPTION_PROFILE_ENTITY)],
+                        'entity_id = subscription_profile_id',
+                        ['billing_frequency_id' => 'billing_frequency_id']
+                    );
+                    $collection->addFilterToMap('billing_frequency_id', 'profile_bf.billing_frequency_id');
+                }
                 if ($filter->getField() === 'profile_status') {
                     $collection->joinTable(
-                        ['profile' => $collection->getTable(SubscriptionProfile::SUBSCRIPTION_PROFILE_ENTITY)],
+                        ['profile_st' => $collection->getTable(SubscriptionProfile::SUBSCRIPTION_PROFILE_ENTITY)],
                         'entity_id = subscription_profile_id',
-                        ['profile_status' => 'status'],
-                        ['status' => ['in' => $filter->getValue()]],
-                        'left'
+                        ['profile_status' => 'status']
                     );
-                    continue;
+                    $collection->addFilterToMap('profile_status', 'profile_st.status');
                 }
                 $condition = $filter->getConditionType() ?: 'eq';
                 $collection->addFieldToFilter($filter->getField(), [$condition => $filter->getValue()]);
