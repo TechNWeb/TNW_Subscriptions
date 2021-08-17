@@ -75,15 +75,34 @@ class CancelButtonPopup extends AbstractDataProvider
     public function getData()
     {
         $profileId = $this->dataPersistor->get('subscription_id');
-        $websiteId = $this->profileManager->loadProfile($profileId)->getWebsiteId();
-        $enableCommentAdd = $this->scopeConfig->getValue(
-            EmailNotifier::XML_PATH_ENABLE_STATUS_CHANGE,
-            \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
-            $websiteId
-        );
 
         return [
-            'tnw_subscriptionprofile_cancel_button_popup_form' => ['disableCheckbox' => (bool) !$enableCommentAdd]
+            'tnw_subscriptionprofile_cancel_button_popup_form' =>
+                ['disableCheckbox' => (bool) !$this->getConfigValue($profileId)]
+        ];
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getMeta()
+    {
+        $profileId = $this->dataPersistor->get('subscription_id');
+        $message = $this->getConfigValue($profileId) ? '' : __('Notification is disable in config.');
+        return [
+            'general' => [
+                'children' => [
+                    'comment_notify' => [
+                        'arguments' => [
+                            'data' => [
+                                'config' => [
+                                    'additionalInfo' => $message
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
         ];
     }
 
@@ -93,5 +112,21 @@ class CancelButtonPopup extends AbstractDataProvider
     public function addFilter(Filter $filter)
     {
         return $this;
+    }
+
+    /**
+     * Get config value
+     *
+     * @param $profileId
+     * @return mixed
+     */
+    private function getConfigValue($profileId)
+    {
+        $websiteId = $this->profileManager->loadProfile($profileId)->getWebsiteId();
+        return $this->scopeConfig->getValue(
+            EmailNotifier::XML_PATH_ENABLE_STATUS_CHANGE,
+            \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
+            $websiteId
+        );
     }
 }

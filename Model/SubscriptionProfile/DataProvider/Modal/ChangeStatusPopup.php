@@ -72,14 +72,7 @@ class ChangeStatusPopup extends AbstractDataProvider
         $profileId = $this->dataPersistor->get('subscription_id');
         $data['change_status_popup']['entity_id'] = $profileId;
         $data['change_status_popup']['cycles_count'] = 0;
-
-        $websiteId = $this->profileManager->loadProfile($profileId)->getWebsiteId();
-        $enableCommentAdd = $this->scopeConfig->getValue(
-            EmailNotifier::XML_PATH_ENABLE_STATUS_CHANGE,
-            \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
-            $websiteId
-        );
-        $data['change_status_popup']['disableCheckbox'] = $enableCommentAdd ? false : true;
+        $data['change_status_popup']['disableCheckbox'] = $this->getConfigValue($profileId) ? false : true;
 
         return $data;
     }
@@ -92,9 +85,43 @@ class ChangeStatusPopup extends AbstractDataProvider
         return $this;
     }
 
+    /**
+     * @inheritdoc
+     */
     public function getMeta()
     {
-        parent::getMeta();
+        $profileId = $this->dataPersistor->get('subscription_id');
+        $message = $this->getConfigValue($profileId) ? '' : __('Notification is disable in config.');
+        return [
+            'general' => [
+                'children' => [
+                    'comment_notify' => [
+                        'arguments' => [
+                            'data' => [
+                                'config' => [
+                                    'additionalInfo' => $message
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ];
+    }
 
+    /**
+     * Get config value
+     *
+     * @param $profileId
+     * @return mixed
+     */
+    private function getConfigValue($profileId)
+    {
+        $websiteId = $this->profileManager->loadProfile($profileId)->getWebsiteId();
+        return $this->scopeConfig->getValue(
+            EmailNotifier::XML_PATH_ENABLE_STATUS_CHANGE,
+            \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
+            $websiteId
+        );
     }
 }

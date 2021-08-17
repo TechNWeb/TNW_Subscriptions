@@ -10,7 +10,6 @@ use Magento\Framework\UrlInterface;
 use Magento\Framework\Registry;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use TNW\Subscriptions\Model\EmailNotifier;
-use \Magento\Ui\Component\Form\Fieldset;
 
 /**
  * Prepare orders history ui layout.
@@ -99,26 +98,6 @@ class OrdersHistory extends BaseFormModifier
                 ],
             ],
         ];
-        $meta['change_history'] = [
-            'children' => [
-                'comment_notify' => [
-                    'arguments' => [
-                        'data' => [
-                            'config' => [
-                                'content' => __('Fieldset Title'),
-                            ],
-                        ],
-                    ],
-                ],
-            ],
-        ];
-//        $meta['comment_notify']['arguments']['data']['config']['additionalInfo'
-//        => ['visible' => 0, 'componentType' => 'container' ]
-//        ];
-//        $meta['comment_notify']['arguments']['data']['config']['visible'] = false;
-//        $meta['comment_notify']['arguments']['data']['config']['additionalInfo']['componentType'] = 'container';
-//        $meta[static::GROUP_ORDER_HISTORY]['change_history']['children']['comment_notify']['arguments']['data']['config']['additionalInfo']['visible'] = false;
-//            $meta['change_history'] = ['comment_notify']['arguments']['data']['config']['visible' => false];
         return $meta;
     }
 

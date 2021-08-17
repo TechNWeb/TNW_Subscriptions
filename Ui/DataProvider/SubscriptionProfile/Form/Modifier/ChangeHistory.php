@@ -10,6 +10,8 @@ use Magento\Framework\UrlInterface;
 use Magento\Ui\Component\Container;
 use Magento\Ui\Component\Form;
 use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfile\MessageHistory\CollectionFactory;
+use Magento\Framework\App\Config\ScopeConfigInterface;
+use TNW\Subscriptions\Model\EmailNotifier;
 
 /**
  * Data provider for change history.
@@ -30,17 +32,28 @@ class ChangeHistory extends BaseFormModifier
     private $collectionFactory;
 
     /**
+     * Core store config
+     *
+     * @var \Magento\Framework\App\Config\ScopeConfigInterface
+     */
+    protected $scopeConfig;
+
+    /**
      * ChangeHistory constructor.
      *
      * @param UrlInterface $urlBuilder
      * @param Registry $registry
      * @param CollectionFactory $collectionFactory
+     * @param ScopeConfigInterface $scopeConfig
      */
     public function __construct(
         UrlInterface $urlBuilder,
         Registry $registry,
-        CollectionFactory $collectionFactory
+        CollectionFactory $collectionFactory,
+        ScopeConfigInterface $scopeConfig
     ) {
+        $this->scopeConfig = $scopeConfig;
+
         $this->collectionFactory = $collectionFactory;
         parent::__construct($urlBuilder, $registry);
     }
@@ -50,6 +63,15 @@ class ChangeHistory extends BaseFormModifier
      */
     public function modifyMeta(array $meta)
     {
+        $profile = $this->getProfile();
+
+        $enableCommentAdd = $this->scopeConfig->getValue(
+            EmailNotifier::XML_PATH_ENABLE_COMMENT_ADDED,
+            \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
+            $profile->getWebsiteId()
+        );
+
+        $message = $enableCommentAdd ? '' : __('Notification is disable in config.');
         $meta[static::GROUP_CHANGE_HISTORY] = [
             'children' => [
                 'change_history_listing' => [
@@ -86,6 +108,15 @@ class ChangeHistory extends BaseFormModifier
                                     'tnw_subscriptionprofile_form.areas.change_history:active' => 'forceRender',
                                 ]
                             ],
+                        ],
+                    ],
+                ],
+                'comment_notify' => [
+                    'arguments' => [
+                        'data' => [
+                            'config' => [
+                                'additionalInfo' => $message
+                            ]
                         ],
                     ],
                 ],
