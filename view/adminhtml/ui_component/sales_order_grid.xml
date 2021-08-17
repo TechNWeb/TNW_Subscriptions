@@ -37,7 +37,7 @@
                 </item>
             </argument>
         </column>
-        <column name="subscription_first_installment_date">
+        <column name="subscription_first_installment_date" class="TNW\Subscriptions\Ui\Component\Listing\Column\Sales\Order\Grid\FirstInstallment">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="bodyTmpl" xsi:type="string">ui/grid/cells/html</item>

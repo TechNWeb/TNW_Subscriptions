@@ -46,6 +46,8 @@ use Magento\Framework\DataObject;
 use TNW\Subscriptions\Model\Config\Source\ShippingFallback;
 use TNW\Subscriptions\Model\Config\Source\FreeShipping;
 use Magento\Sales\Model\ResourceModel\Order\Grid\CollectionFactory;
+use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfile as ProfileResource;
+use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfileOrder;
 
 /**
  * Class Manager - used for managing the subscription profiles
@@ -248,6 +250,16 @@ class Manager
     private $customerProductHistoryRepository;
 
     /**
+     * @var SubscriptionProfileOrder
+     */
+    private $subscriptionProfileOrder;
+
+    /**
+     * @var ProfileResource
+     */
+    private $profileResource;
+
+    /**
      * Manager constructor.
      * @param EnginePool $enginePool
      * @param SubscriptionProfileRepository $subscriptionProfileRepository
@@ -308,7 +320,9 @@ class Manager
         TimezoneInterface $localeDate,
         DateTime\DateTime $dateConversion,
         CustomerProductHistoryInterfaceFactory $customerProductHistoryInterfaceFactory,
-        CustomerProductHistoryRepositoryInterface $customerProductHistoryRepository
+        CustomerProductHistoryRepositoryInterface $customerProductHistoryRepository,
+        ProfileResource $profileResource,
+        SubscriptionProfileOrder $subscriptionProfileOrder
     ) {
         $this->orderCollectionFactory = $orderCollectionFactory;
         $this->totalsCollector = $totalsCollector;
@@ -339,6 +353,8 @@ class Manager
         $this->dateConversion = $dateConversion;
         $this->customerProductHistoryInterfaceFactory = $customerProductHistoryInterfaceFactory;
         $this->customerProductHistoryRepository = $customerProductHistoryRepository;
+        $this->profileResource = $profileResource;
+        $this->subscriptionProfileOrder = $subscriptionProfileOrder;
     }
 
     /**
@@ -483,6 +499,8 @@ class Manager
         $this->tempQuote = false;
 
         $this->subscriptionProfileRepository->save($profile);
+
+        $this->setStaticBillingCyclesForProfile($profile);
 
         $payment = $profile->getPayment()
             ->setProfileId($profile->getId());
@@ -1705,5 +1723,21 @@ class Manager
             );
             $this->historyLogger->log($message, $this->getProfile()->getId());
         }
+    }
+
+    /**
+     * @param $profile
+     * @throws LocalizedException
+     */
+    public function setStaticBillingCyclesForProfile($profile)
+    {
+        $profileOrders = $this->subscriptionProfileOrder->getProfileOrdersByProfileId(
+            $profile->getId()
+        );
+        $totalBillingCycles = count($profileOrders) + $profile->getTotalBillingCycles();
+        $this->profileResource->updateStaticBillingCyclesForProfile(
+            $profile->getId(),
+            $totalBillingCycles
+        );
     }
 }

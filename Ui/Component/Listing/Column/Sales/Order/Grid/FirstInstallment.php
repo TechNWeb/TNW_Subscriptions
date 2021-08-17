@@ -5,16 +5,16 @@
  */
 namespace TNW\Subscriptions\Ui\Component\Listing\Column\Sales\Order\Grid;
 
+use Magento\Framework\Stdlib\DateTime\TimezoneInterface;
 use Magento\Framework\View\Element\UiComponent\ContextInterface;
 use Magento\Framework\View\Element\UiComponentFactory;
 use Magento\Ui\Component\Listing\Columns\Column;
-use Magento\Framework\Stdlib\DateTime\TimezoneInterface;
 use IntlDateFormatter;
 
 /**
- * Class FinalInstallment - modifying final date if it exist
+ * Class FirstInstallment - modifying start date
  */
-class FinalInstallment extends Column
+class FirstInstallment extends Column
 {
     /**
      * @var TimezoneInterface
@@ -38,7 +38,7 @@ class FinalInstallment extends Column
     }
 
     /**
-     * Add final installment to subscriptions profile page.
+     * Add first installment to subscriptions profile page.
      *
      * @param array $dataSource
      * @return array
@@ -47,12 +47,10 @@ class FinalInstallment extends Column
     {
         if (isset($dataSource['data']['items'])) {
             foreach ($dataSource['data']['items'] as & $item) {
-                if (!isset($item['subscription_final_installment_date'])) {
-                    $item['subscription_final_installment_date'] = "--";
-                } else {
-                    $item['subscription_final_installment_date'] =
+                if ($item['subscription_first_installment_date']) {
+                    $item['subscription_first_installment_date'] =
                         $this->timezone->formatDate(
-                            $item['subscription_final_installment_date'],
+                            $item['subscription_first_installment_date'],
                             IntlDateFormatter::MEDIUM
                         );
                 }

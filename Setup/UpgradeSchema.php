@@ -154,7 +154,7 @@ class UpgradeSchema implements UpgradeSchemaInterface
             $this->addColumnForSubscriptionGrid($setup);
         }
 
-        if (version_compare($context->getVersion(), '2.3.33', '<')) {
+        if (version_compare($context->getVersion(), '2.3.34', '<')) {
             $this->addRecurringInstallmentDates($setup);
             $setup->getConnection()->addColumn(
                 $setup->getTable('tnw_subscriptions_subscription_profile_entity'),
@@ -953,7 +953,6 @@ class UpgradeSchema implements UpgradeSchemaInterface
             'subscription_final_installment_date',
             [
                 'type' => Table::TYPE_DATETIME,
-                'length' => 255,
                 'nullable' => true,
                 'default' => null,
                 'comment' => 'Recurring Final Installment Date',
@@ -964,7 +963,6 @@ class UpgradeSchema implements UpgradeSchemaInterface
             'subscription_first_installment_date',
             [
                 'type' => Table::TYPE_DATETIME,
-                'length' => 255,
                 'nullable' => true,
                 'default' => null,
                 'comment' => 'Recurring 1st Installment Date',

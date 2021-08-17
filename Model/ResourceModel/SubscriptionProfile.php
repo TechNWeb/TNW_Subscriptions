@@ -227,4 +227,23 @@ class SubscriptionProfile extends AbstractEntity
         }
         return $this->invoiceItems[$object->getId()];
     }
+
+    /**
+     * Update static billing cycles
+     * @param $profileId
+     * @param $totalBilling
+     */
+    public function updateStaticBillingCyclesForProfile(
+        $profileId,
+        $totalBilling
+    ) {
+        $connection = $this->getConnection();
+        $connection->update(
+            $this->getTable('tnw_subscriptions_subscription_profile_entity'),
+            [
+                'subscription_total_static_billing_cycles' => $totalBilling,
+            ],
+            ['entity_id = ?' => $profileId]
+        );
+    }
 }
