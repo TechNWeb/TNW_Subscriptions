@@ -7,14 +7,14 @@ define([], function () {
         return HostedFields.extend({
            isSubscriptionModuleEnabled() {
                let purchaseConditions = ["2", "3"];
-               let purchaseType = ["1 Purchase"]
+               let purchaseType = ["One-Time Purchase"]
 
                let currentItems = this.purchaseCondition();
                let purchaseTypes = this.purchaseType();
 
                return window.checkoutConfig.isSubscriptionEnabled
                    && purchaseConditions.some(el => currentItems.includes(el))
-                   && purchaseType.some(el => purchaseTypes.includes(el));
+                   && !purchaseType.some(el => purchaseTypes.includes(el));
            },
 
            purchaseType() {
