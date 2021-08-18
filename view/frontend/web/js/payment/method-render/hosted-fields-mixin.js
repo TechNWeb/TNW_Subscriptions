@@ -11,10 +11,20 @@ define([], function () {
 
                let currentItems = this.purchaseCondition();
                let purchaseTypes = this.purchaseType();
+               let conditionsResult = purchaseConditions.some(
+                   el => currentItems.includes(el)
+               );
+               let typesResult = purchaseType.some(el => purchaseTypes.includes(el));
+
+               if (purchaseTypes.length > 1
+                   && conditionsResult
+               ) {
+                   return true;
+               }
 
                return window.checkoutConfig.isSubscriptionEnabled
-                   && purchaseConditions.some(el => currentItems.includes(el))
-                   && !purchaseType.some(el => purchaseTypes.includes(el));
+                   && conditionsResult
+                   && !typesResult;
            },
 
            purchaseType() {
