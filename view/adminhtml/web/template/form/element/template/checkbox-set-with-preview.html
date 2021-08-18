@@ -10,10 +10,14 @@
      css="$data.additionalClasses"
      attr="'data-config-scope': $data.scopeLabel, 'data-index': index">
     <legend class="admin__field-label" if="$data.label" attr="for: uid">
-        <span text="label"/>
+        <div class="admin__field-tooltip">
+            <span text="label"/>
+            <a class="admin__field-tooltip-action action-help" target="_blank" tabindex="1" attr="href: tooltip.link"/>
+            <div class="admin__field-tooltip-content tnw-tooltip-content" html="tooltip.description"/>
+        </div>
     </legend>
 
-    <div class="admin__field-control"
+    <div class="admin__field-control tnw-field-control"
          css="'_with-tooltip': $data.tooltip">
 
         <div class="admin__control-preview" if="$data.showPreview">

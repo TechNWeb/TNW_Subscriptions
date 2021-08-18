@@ -760,4 +760,7 @@ button.action-editor.active:before {
 #co-transparent-form-braintree .payment-cvv .admin__control-text {
   width: 6rem;
 }
+.tnw-tooltip-content {
+  white-space: normal;
+}
 /*# sourceMappingURL=create-subscription.css.map */

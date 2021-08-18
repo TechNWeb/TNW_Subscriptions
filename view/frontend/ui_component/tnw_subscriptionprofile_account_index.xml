@@ -15,150 +15,124 @@
         </item>
         <item name="spinner" xsi:type="string">tnw_subscriptionprofile_columns</item>
     </argument>
-    <dataSource name="tnw_subscriptionprofile_grid_data_source">
-        <argument name="dataProvider" xsi:type="configurableObject">
-            <argument name="class" xsi:type="string">
-                TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Account\Grid
-            </argument>
-            <argument name="name" xsi:type="string">tnw_subscriptionprofile_grid_data_source</argument>
-            <argument name="primaryFieldName" xsi:type="string">entity_id</argument>
-            <argument name="requestFieldName" xsi:type="string">entity_id</argument>
-            <argument name="data" xsi:type="array">
-                <item name="config" xsi:type="array">
-                    <item name="component" xsi:type="string">Magento_Ui/js/grid/provider</item>
-                    <item name="direction" xsi:type="string">DESC</item>
-                    <item name="update_url" path="tnw_subscriptions/ui/render" xsi:type="url"/>
-                    <item name="filter_url_params" xsi:type="array">
-                        <item name="status" xsi:type="string">0,6</item>
-                    </item>
-                    <item name="storageConfig" xsi:type="array">
-                        <item name="indexField" xsi:type="string">entity_id</item>
-                    </item>
-                </item>
-            </argument>
-        </argument>
+    <dataSource name="tnw_subscriptionprofile_grid_data_source" component="Magento_Ui/js/grid/provider">
+        <settings>
+            <filterUrlParams>
+                <param name="status">0,6</param>
+            </filterUrlParams>
+            <storageConfig>
+                <param name="indexField" xsi:type="string">entity_id</param>
+            </storageConfig>
+            <updateUrl path="tnw_subscriptions/ui/render"/>
+        </settings>
+        <dataProvider name="tnw_subscriptionprofile_grid_data_source"
+                      class="TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Account\Grid">
+            <settings>
+                <primaryFieldName>entity_id</primaryFieldName>
+                <requestFieldName>entity_id</requestFieldName>
+            </settings>
+        </dataProvider>
     </dataSource>
     <listingToolbar name="listing_top">
-        <argument name="data" xsi:type="array">
-            <item name="config" xsi:type="array">
-                <item name="sticky" xsi:type="boolean">false</item>
-            </item>
-        </argument>
+        <settings>
+            <sticky>false</sticky>
+        </settings>
         <filters name="listing_filters"/>
         <massaction name="listing_massaction">
-            <argument name="data" xsi:type="array">
-                <item name="config" xsi:type="array">
-                    <item name="selectProvider" xsi:type="string">tnw_subscriptionprofile_account_index.tnw_subscriptionprofile_account_index.tnw_subscriptionprofile_columns.ids</item>
-                    <item name="component" xsi:type="string">Magento_Ui/js/grid/tree-massactions</item>
-                    <item name="indexField" xsi:type="string">entity_id</item>
-                </item>
-            </argument>
+            <settings>
+                <selectProvider>tnw_subscriptionprofile_account_index.tnw_subscriptionprofile_account_index.tnw_subscriptionprofile_columns.ids</selectProvider>
+                <indexField>entity_id</indexField>
+            </settings>
             <action name="delete">
-                <argument name="data" xsi:type="array">
-                    <item name="config" xsi:type="array">
-                        <item name="type" xsi:type="string">edit</item>
-                        <item name="label" xsi:type="string" translate="true">Change Shipping Address &amp; Method</item>
-                        <item name="callback" xsi:type="array">
-                            <item name="provider" xsi:type="string">index = tnw_subscriptionprofile_account_massedit_form</item>
-                            <item name="target" xsi:type="string">startMassEdit</item>
-                        </item>
-                    </item>
-                </argument>
+                <settings>
+                    <label translate="true">Change Shipping Address &amp; Method</label>
+                    <type>delete</type>
+                    <callback>
+                        <provider>index = tnw_subscriptionprofile_account_massedit_form</provider>
+                        <target>startMassEdit</target>
+                    </callback>
+                </settings>
             </action>
         </massaction>
     </listingToolbar>
     <columns name="tnw_subscriptionprofile_columns">
-        <argument name="data" xsi:type="array">
-            <item name="config" xsi:type="array">
-                <item name="childDefaults" xsi:type="array">
-                    <item name="fieldAction" xsi:type="array">
-                        <item name="provider"
-                              xsi:type="string">tnw_subscriptionprofile_account_index.tnw_subscriptionprofile_account_index.tnw_subscriptionprofile_columns_editor</item>
-                        <item name="target" xsi:type="string">startEdit</item>
-                        <item name="params" xsi:type="array">
-                            <item name="0" xsi:type="string">${ $.$data.rowIndex }</item>
-                            <item name="1" xsi:type="boolean">true</item>
-                        </item>
-                    </item>
-                </item>
-            </item>
-        </argument>
         <selectionsColumn name="ids">
-            <argument name="data" xsi:type="array">
-                <item name="config" xsi:type="array">
-                    <item name="indexField" xsi:type="string">entity_id</item>
-                </item>
-            </argument>
+            <settings>
+                <indexField>entity_id</indexField>
+            </settings>
         </selectionsColumn>
         <column name="entity_id">
-            <argument name="data" xsi:type="array">
-                <item name="config" xsi:type="array">
-                    <item name="visible" xsi:type="boolean">false</item>
-                    <item name="filter" xsi:type="string">text</item>
-                    <item name="sorting" xsi:type="string">desc</item>
-                    <item name="label" translate="true" xsi:type="string">ID</item>
-                </item>
-            </argument>
+            <settings>
+                <visible>false</visible>
+                <filter>text</filter>
+                <sorting>desc</sorting>
+                <label>ID</label>
+            </settings>
         </column>
-        <column name="frequency_label" class="TNW\Subscriptions\Ui\Component\Listing\Column\SubscriptionProfile\Details">
-            <argument name="data" xsi:type="array">
-                <item name="options" xsi:type="object">TNW\Subscriptions\Ui\Component\Listing\Column\SubscriptionProfile\Frequency\Options</item>
-                <item name="config" xsi:type="array">
-                    <item name="bodyTmpl" xsi:type="string">TNW_Subscriptions/grid/subscription-details</item>
-                    <item name="component" xsi:type="string">TNW_Subscriptions/js/subscription-profile/grid/column/subscription-details</item>
-                    <item name="fieldAction" xsi:type="boolean">false</item>
-                    <item name="filter" xsi:type="string">select</item>
-                    <item name="dataType" xsi:type="string">select</item>
-                    <item name="label" translate="true" xsi:type="string">Billing frequency</item>
-                    <item name="sortable" xsi:type="boolean">false</item>
-                    <item name="draggable" xsi:type="boolean">false</item>
-                </item>
-            </argument>
+        <column name="frequency_label"
+                class="TNW\Subscriptions\Ui\Component\Listing\Column\SubscriptionProfile\Details"
+                component="TNW_Subscriptions/js/subscription-profile/grid/column/subscription-details">
+            <settings>
+                <options class="TNW\Subscriptions\Ui\Component\Listing\Column\SubscriptionProfile\Frequency\Options"/>
+                <bodyTmpl>TNW_Subscriptions/grid/subscription-details</bodyTmpl>
+                <filter>select</filter>
+                <dataType>select</dataType>
+                <label translate="true">Billing frequency</label>
+                <sortable>false</sortable>
+                <draggable>false</draggable>
+            </settings>
+        </column>
+        <column name="status">
+            <settings>
+                <fieldClass>
+                    <class name="no-display">true</class>
+                </fieldClass>
+                <options class="TNW\Subscriptions\Ui\Component\Listing\Column\SubscriptionProfile\Status\Options"/>
+                <filter>select</filter>
+                <dataType>select</dataType>
+                <label translate="true">Status</label>
+                <sortable>false</sortable>
+                <draggable>false</draggable>
+            </settings>
         </column>
         <column name="grand_total" class="TNW\Subscriptions\Ui\Component\Listing\Column\SubscriptionProfile\Total">
-            <argument name="data" xsi:type="array">
-                <item name="config" xsi:type="array">
-                    <item name="visible" xsi:type="boolean">false</item>
-                    <item name="label" xsi:type="string" translate="true">Next Payment</item>
-                    <item name="sortable" xsi:type="boolean">false</item>
-                </item>
-            </argument>
+            <settings>
+                <visible>false</visible>
+                <label translate="true">Next Payment</label>
+                <sortable>false</sortable>
+            </settings>
         </column>
     </columns>
     <listingToolbar name="listing_bottom">
-        <argument name="data" xsi:type="array">
-            <item name="config" xsi:type="array">
-                <item name="sticky" xsi:type="boolean">false</item>
-            </item>
-        </argument>
+        <settings>
+            <sticky>false</sticky>
+        </settings>
         <paging name="listing_paging">
-            <argument name="data" xsi:type="array">
-                <item name="config" xsi:type="array">
-                    <item name="options" xsi:type="array">
-                        <item name="10" xsi:type="array">
-                            <item name="value" xsi:type="string">10</item>
-                            <item name="label" xsi:type="string">10</item>
-                        </item>
-                        <item name="20" xsi:type="array">
-                            <item name="value" xsi:type="string">20</item>
-                            <item name="label" xsi:type="string">20</item>
-                        </item>
-                        <item name="30" xsi:type="array">
-                            <item name="value" xsi:type="string">30</item>
-                            <item name="label" xsi:type="string">30</item>
-                        </item>
-                        <item name="50" xsi:type="array">
-                            <item name="value" xsi:type="string">50</item>
-                            <item name="label" xsi:type="string">50</item>
-                        </item>
-                        <item name="100" xsi:type="array">
-                            <item name="value" xsi:type="string">100</item>
-                            <item name="label" xsi:type="string">100</item>
-                        </item>
-                    </item>
-                    <item name="pageSize" xsi:type="string">10</item>
-                </item>
-            </argument>
+            <settings>
+                <options>
+                    <option name="10" xsi:type="array">
+                        <item name="value" xsi:type="string">10</item>
+                        <item name="label" xsi:type="string">10</item>
+                    </option>
+                    <option name="20" xsi:type="array">
+                        <item name="value" xsi:type="string">20</item>
+                        <item name="label" xsi:type="string">20</item>
+                    </option>
+                    <option name="30" xsi:type="array">
+                        <item name="value" xsi:type="string">30</item>
+                        <item name="label" xsi:type="string">30</item>
+                    </option>
+                    <option name="50" xsi:type="array">
+                        <item name="value" xsi:type="string">50</item>
+                        <item name="label" xsi:type="string">50</item>
+                    </option>
+                    <option name="100" xsi:type="array">
+                        <item name="value" xsi:type="string">100</item>
+                        <item name="label" xsi:type="string">100</item>
+                    </option>
+                </options>
+                <pageSize>10</pageSize>
+            </settings>
         </paging>
     </listingToolbar>
 </listing>
