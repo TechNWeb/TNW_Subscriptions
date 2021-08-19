@@ -25,6 +25,7 @@ jobs:
             ./git_release.sh
 
   m242-commerce-php74: &base-image
+    resource_class: large
     docker:
       - image: powersync/magento-builds:m242-commerce-php74
         auth:
@@ -434,8 +435,8 @@ workflows:
             - m240-open_source-php74
             - m241-commerce-php74
             - m241-open_source-php74
- #           - m242-commerce-php74
- #           - m242-open_source-php74
+            - m242-commerce-php74
+            - m242-open_source-php74
             
       - check-composer-installation:
           context: powersync
