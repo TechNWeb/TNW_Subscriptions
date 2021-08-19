@@ -28,7 +28,11 @@ class PaidInstallment extends Column
                 if (!empty($item['subscription_paid_installment'])) {
                     $options = explode(",", $item['subscription_paid_installment']);
                     if (isset($options)) {
-                        if (count($options) > 1 && $options[1] != 0 && $options[1] != -1) {
+                        if (count($options) > 1
+                            && $options[1] != 0
+                            && $options[1] != -1
+                            && $options[1] != 1
+                        ) {
                             $item['subscription_paid_installment'] = $options[0] . ' / ' . $options[1];
                         } else {
                             $item['subscription_paid_installment'] = $options[0] . ' / ∞';

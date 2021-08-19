@@ -1734,7 +1734,11 @@ class Manager
         $profileOrders = $this->subscriptionProfileOrder->getProfileOrdersByProfileId(
             $profile->getId()
         );
-        $totalBillingCycles = count($profileOrders) + ($profile->getTotalBillingCycles() - 1);
+        if (empty($profileOrders)) {
+            $totalBillingCycles = 1 + $profile->getTotalBillingCycles();
+        } else {
+            $totalBillingCycles = count($profileOrders) + ($profile->getTotalBillingCycles() - 1);
+        }
         $this->profileResource->updateStaticBillingCyclesForProfile(
             $profile->getId(),
             $totalBillingCycles

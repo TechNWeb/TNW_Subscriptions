@@ -872,7 +872,7 @@ class SubscriptionProfile extends AbstractExtensibleModel implements Subscriptio
      * @param $subscriptionProfile
      * @return int|null
      */
-    public function getCcEcpirationStatus($subscriptionProfile)
+    public function getCcEcpirationStatus($subscriptionProfile, $finalDate)
     {
         $result = null;
         $paymentInfo = $subscriptionProfile->getPayment()->getPaymentAdditionalInfo();
@@ -881,14 +881,15 @@ class SubscriptionProfile extends AbstractExtensibleModel implements Subscriptio
             if (isset($getExpireDate['cc_exp_month']) && isset($getExpireDate['cc_exp_year'])) {
                 $ccExpMonth = (int)$getExpireDate['cc_exp_month'];
                 $ccExpYear = (int)$getExpireDate['cc_exp_year'];
-                $date = date("j, n, Y");
-                $currentDate = explode(',', $date);
+                $currentDate = explode('-', $finalDate);
                 switch ($currentDate) {
-                    case $currentDate['1'] > $ccExpMonth && $currentDate['2'] > $ccExpYear:
+                    case $currentDate['1'] > $ccExpMonth && $currentDate['0'] > $ccExpYear:
                         $result = 1;
                         break;
-                    case $currentDate['1'] == $ccExpMonth && $currentDate['2'] == $ccExpYear:
-                    case $currentDate['1'] < $ccExpMonth && $currentDate['2'] < $ccExpYear:
+                    case $currentDate['1'] == $ccExpMonth && $currentDate['0'] == $ccExpYear:
+                    case $currentDate['1'] < $ccExpMonth && $currentDate['0'] < $ccExpYear:
+                    case $currentDate['1'] > $ccExpMonth && $currentDate['0'] < $ccExpYear:
+                    case $currentDate['1'] == $ccExpMonth && $currentDate['0'] < $ccExpYear:
                         $result = 0;
                         break;
                 }
@@ -941,7 +942,6 @@ class SubscriptionProfile extends AbstractExtensibleModel implements Subscriptio
     {
         $result = [];
         $staticTotalBillingCycles = $subscriptionProfile->getStaticTotalBillingCycles();
-        $result['expirationCc'] = $this->getCcEcpirationStatus($subscriptionProfile);
         $result['firstRecurring'] = $subscriptionProfile->getStartDate();
         $startDate = $subscriptionProfile->getCreatedAt();
         $billingFrequency = $this->billingFrequencyRepository->getById(
@@ -953,6 +953,7 @@ class SubscriptionProfile extends AbstractExtensibleModel implements Subscriptio
             $startDate,
             $subscriptionProfile->getTerm(),
         );
+        $result['expirationCc'] = $this->getCcEcpirationStatus($subscriptionProfile, $result['finalRecurring']);
 
         $result['staticTotalBillingCycles'] = $subscriptionProfile->getStaticTotalBillingCycles();
 
