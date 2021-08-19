@@ -141,4 +141,11 @@
         <plugin name="tnw_new_products_widget_subs"
                 type="TNW\Subscriptions\Plugin\Block\Product\NewProductsWidget"/>
     </type>
+    <type name="Magento\Checkout\Model\CompositeConfigProvider">
+        <arguments>
+            <argument name="configProviders" xsi:type="array">
+                <item name="tnw_subscription_checkout_config_provider" xsi:type="object">TNW\Subscriptions\Model\Checkout\CompositeConfigProvider</item>
+            </argument>
+        </arguments>
+    </type>
 </config>

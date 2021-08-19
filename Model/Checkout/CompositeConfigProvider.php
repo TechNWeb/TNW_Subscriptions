@@ -6,6 +6,7 @@
 namespace TNW\Subscriptions\Model\Checkout;
 
 use Magento\Checkout\Model\ConfigProviderInterface;
+use TNW\Subscriptions\Model\Config;
 
 /**
  * Class CompositeConfigProvider - dataprovider for checkout
@@ -13,18 +14,18 @@ use Magento\Checkout\Model\ConfigProviderInterface;
 class CompositeConfigProvider implements ConfigProviderInterface
 {
     /**
-     * @var ConfigProviderInterface[]
+     * @var Config
      */
-    private $configProviders;
+    private $config;
 
     /**
-     * @param ConfigProviderInterface[] $configProviders
+     * @param Config $config
      * @codeCoverageIgnore
      */
     public function __construct(
-        array $configProviders
+        Config $config
     ) {
-        $this->configProviders = $configProviders;
+        $this->config = $config;
     }
 
     /**
@@ -32,21 +33,10 @@ class CompositeConfigProvider implements ConfigProviderInterface
      */
     public function getConfig()
     {
-        $configs = array_map([$this, 'configByProvider'], $this->configProviders);
-        if (empty($configs)) {
-            return [];
-        }
+        $configs = [
+            'isSubscriptionEnabled' => (bool) $this->config->isSubscriptionsActiveCurrent(),
+        ];
 
-        return array_merge_recursive(...array_values($configs));
-    }
-
-    /**
-     * @param ConfigProviderInterface $provider
-     *
-     * @return array
-     */
-    private function configByProvider(ConfigProviderInterface $provider)
-    {
-        return $provider->getConfig();
+        return $configs;
     }
 }

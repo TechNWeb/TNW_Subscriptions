@@ -89,7 +89,8 @@ class StoreSubscriptionProfileIdsForFormingGrid implements DataPatchInterface
         $this->moduleDataSetup->startSetup();
 
         $connection = $this->moduleDataSetup->getConnection();
-        $select = $connection->select()->from('tnw_subscriptions_subscription_profile_entity')->limit(1);
+        $table = $this->moduleDataSetup->getTable('tnw_subscriptions_subscription_profile_entity');
+        $select = $connection->select()->from($table)->limit(1);
         $isAvailableProfile = $connection->fetchOne($select);
 
         if (!empty($isAvailableProfile)) {
