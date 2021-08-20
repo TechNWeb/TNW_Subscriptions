@@ -58,6 +58,8 @@
                       xsi:type="string">TNW\Subscriptions\Model\ResourceModel\Report\CustomerBillingFrequency\Collection</item>
                 <item name="tnw_report_billing_frequency_customer_listing_data_source"
                       xsi:type="string">TNW\Subscriptions\Model\ResourceModel\Report\BillingFrequencyCustomer\Collection</item>
+                <item name="tnw_billingfrequency_product_listing_data_source"
+                      xsi:type="string">BillingFrequencyProductsCollection</item>
             </argument>
         </arguments>
     </type>
@@ -77,6 +79,14 @@
                 type="Magento\Framework\Api\SearchResults"/>
     <virtualType name="TNW\Subscriptions\Model\ResourceModel\ProductBillingFrequency\Grid\Collection"
                  type="Magento\Framework\View\Element\UiComponent\DataProvider\SearchResult">
+        <arguments>
+            <argument name="mainTable" xsi:type="string">tnw_subscriptions_product_billing_frequency</argument>
+            <argument name="resourceModel"
+                      xsi:type="string">TNW\Subscriptions\Model\ResourceModel\ProductBillingFrequency\Collection</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="BillingFrequencyProductsCollection"
+                 type="TNW\Subscriptions\Ui\DataProvider\BillingFrequency\Linked\Grid\Collection">
         <arguments>
             <argument name="mainTable" xsi:type="string">tnw_subscriptions_product_billing_frequency</argument>
             <argument name="resourceModel"
@@ -203,13 +213,6 @@
         <plugin name="subscriptions_product_mass_delete"
                 type="TNW\Subscriptions\Plugin\Product\MassDelete"
                 sortOrder="60"
-                disabled="false"/>
-    </type>
-
-    <type name="TNW\Subscriptions\Model\BillingFrequency">
-        <plugin name="subscriptions_frequency_save_linked_products"
-                type="TNW\Subscriptions\Plugin\BillingFrequency\SaveLinkedProducts"
-                sortOrder="10"
                 disabled="false"/>
     </type>
 
