@@ -781,4 +781,18 @@ class Config
         }
         return $result;
     }
+
+    /**
+     * @return array
+     */
+    public function getWebsiteIdsSubscriptionsActive()
+    {
+        $result = [];
+        foreach ($this->storeManager->getWebsites() as $website) {
+            if ($this->isSubscriptionsActive($website->getId())) {
+                $result[] = $website->getId();
+            }
+        }
+        return $result;
+    }
 }
