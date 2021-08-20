@@ -1,0 +1,229 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+/**
+ * Copyright © 2018 TechNWeb, Inc. All rights reserved.
+ * See TNW_LICENSE.txt for license details.
+ */
+-->
+<listing xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
+    <argument name="data" xsi:type="array">
+        <item name="js_config" xsi:type="array">
+            <item name="provider" xsi:type="string">tnw_billingfrequency_product_listing.tnw_billingfrequency_product_listing_data_source</item>
+            <item name="deps" xsi:type="string">tnw_billingfrequency_product_listing.tnw_billingfrequency_product_listing_data_source</item>
+        </item>
+        <item name="spinner" xsi:type="string">bf_products_columns</item>
+    </argument>
+    <dataSource name="tnw_billingfrequency_product_listing_data_source" component="Magento_Ui/js/grid/provider">
+        <argument name="data" xsi:type="array">
+            <item name="js_config" xsi:type="array">
+                <item name="deleteRecordUrl" xsi:type="url" path="tnw_subscriptions/productbillingfrequency/delete"/>
+            </item>
+        </argument>
+        <settings>
+            <updateUrl path="mui/index/render"/>
+            <storageConfig>
+                <param name="cacheRequests" xsi:type="boolean">false</param>
+                <param name="indexField" xsi:type="string">id</param>
+            </storageConfig>
+            <filterUrlParams>
+                <param name="billing_frequency_id">*</param>
+            </filterUrlParams>
+        </settings>
+        <dataProvider name="tnw_billingfrequency_product_listing_data_source"
+                      class="TNW\Subscriptions\Ui\DataProvider\BillingFrequency\Linked\LinkedProductsProvider">
+            <settings>
+                <requestFieldName>id</requestFieldName>
+                <primaryFieldName>id</primaryFieldName>
+            </settings>
+        </dataProvider>
+    </dataSource>
+    <listingToolbar name="listing_top">
+        <paging name="listing_paging"/>
+        <filters name="listing_filters"/>
+        <massaction name="listing_massaction">
+            <settings>
+                <indexField>id</indexField>
+                <selectProvider>tnw_billingfrequency_product_listing.tnw_billingfrequency_product_listing.bf_products_columns.ids</selectProvider>
+            </settings>
+            <action name="edit">
+                <settings>
+                    <callback>
+                        <target>editSelected</target>
+                        <provider>tnw_billingfrequency_product_listing.tnw_billingfrequency_product_listing.bf_products_columns_editor</provider>
+                    </callback>
+                    <type>edit</type>
+                    <label translate="true">Edit</label>
+                </settings>
+            </action>
+        </massaction>
+    </listingToolbar>
+    <columns name="bf_products_columns">
+        <settings>
+            <editorConfig>
+                <param name="clientConfig" xsi:type="array">
+                    <item name="saveUrl" xsi:type="url" path="tnw_subscriptions/productbillingfrequency/inlineedit"/>
+                    <item name="validateBeforeSave" xsi:type="boolean">false</item>
+                </param>
+                <param name="indexField" xsi:type="string">id</param>
+                <param name="enabled" xsi:type="boolean">true</param>
+                <param name="bulkEnabled" xsi:type="boolean">true</param>
+                <param name="selectProvider" xsi:type="string">tnw_billingfrequency_product_listing.tnw_billingfrequency_product_listing.bf_products_columns.ids</param>
+                <param name="templates" xsi:type="array">
+                    <item name="record" xsi:type="array">
+                        <item name="component" xsi:type="string">TNW_Subscriptions/js/grid/editing/linked-product-record</item>
+                    </item>
+                </param>
+            </editorConfig>
+        </settings>
+        <selectionsColumn name="ids" sortOrder="1">
+            <settings>
+                <indexField>id</indexField>
+            </settings>
+        </selectionsColumn>
+        <column name="id" sortOrder="10">
+            <settings>
+                <label translate="true">ID</label>
+            </settings>
+        </column>
+        <column name="thumbnail" class="Magento\Catalog\Ui\Component\Listing\Columns\Thumbnail"
+                component="Magento_Ui/js/grid/columns/thumbnail" sortOrder="20">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="align" xsi:type="string">left</item>
+                </item>
+            </argument>
+            <settings>
+                <altField>name</altField>
+                <hasPreview>1</hasPreview>
+                <label translate="true">Image</label>
+                <sortable>false</sortable>
+            </settings>
+        </column>
+        <column name="magento_product_id" sortOrder="30">
+            <settings>
+                <label translate="true">Product</label>
+                <visible>false</visible>
+            </settings>
+        </column>
+        <column name="product_name" component="Magento_Ui/js/grid/columns/link" sortOrder="40">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="link" xsi:type="string">thumbnail_link</item>
+                </item>
+            </argument>
+            <settings>
+                <filter>text</filter>
+                <label translate="true">Name</label>
+            </settings>
+        </column>
+        <column name="sku" sortOrder="50">
+            <settings>
+                <filter>text</filter>
+                <label translate="true">SKU</label>
+            </settings>
+        </column>
+        <column name="price" sortOrder="60">
+            <settings>
+                <bodyTmpl>TNW_Subscriptions/grid/cells/text-with-additions</bodyTmpl>
+                <label translate="true">Price</label>
+                <filter>textRange</filter>
+                <editor>
+                    <editorType>price</editorType>
+                    <validation>
+                        <rule name="required-entry" xsi:type="boolean">true</rule>
+                        <rule name="validate-zero-or-greater" xsi:type="boolean">true</rule>
+                    </validation>
+                </editor>
+            </settings>
+        </column>
+        <column name="initial_fee" sortOrder="70">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="tooltipTpl" xsi:type="string">ui/form/element/helper/tooltip</item>
+                    <item name="tooltip" xsi:type="array">
+                        <item name="description" xsi:type="string">Fee charged once upon creation of the subscription. Leave blank if subscription has no initial fee.</item>
+                    </item>
+                </item>
+            </argument>
+            <settings>
+                <resizeDefaultWidth>150</resizeDefaultWidth>
+                <headerTmpl>TNW_Subscriptions/grid/header/text-with-tooltip</headerTmpl>
+                <bodyTmpl>TNW_Subscriptions/grid/cells/text-with-additions</bodyTmpl>
+                <label translate="true">Initial Fee</label>
+                <filter>textRange</filter>
+                <editor>
+                    <editorType>text</editorType>
+                    <validation>
+                        <rule name="required-entry" xsi:type="boolean">true</rule>
+                        <rule name="validate-zero-or-greater" xsi:type="boolean">true</rule>
+                    </validation>
+                </editor>
+            </settings>
+        </column>
+        <column name="original_price" class="Magento\Catalog\Ui\Component\Listing\Columns\Price" sortOrder="80">
+            <settings>
+                <label translate="true">Reg. Price</label>
+                <filter>textRange</filter>
+            </settings>
+        </column>
+        <column name="status" component="Magento_Ui/js/grid/columns/select" sortOrder="90">
+            <settings>
+                <label translate="true">Status</label>
+                <filter>select</filter>
+                <dataType>select</dataType>
+                <options>
+                    <option name="disabled" xsi:type="array">
+                        <item name="value" xsi:type="string">0</item>
+                        <item name="label" xsi:type="string" translate="true">Disabled</item>
+                    </option>
+                    <option name="enabled" xsi:type="array">
+                        <item name="value" xsi:type="string">1</item>
+                        <item name="label" xsi:type="string" translate="true">Enabled</item>
+                    </option>
+                </options>
+            </settings>
+        </column>
+        <column name="preset_qty" sortOrder="100">
+            <settings>
+                <label translate="true">Preset Qty</label>
+                <filter>textRange</filter>
+                <sortable>false</sortable>
+                <editor>
+                    <editorType>preset_qty</editorType>
+                    <validation>
+                        <rule name="required-entry" xsi:type="boolean">true</rule>
+                        <rule name="integer" xsi:type="boolean">true</rule>
+                    </validation>
+                </editor>
+            </settings>
+        </column>
+        <column name="is_disabled" component="Magento_Ui/js/grid/columns/select" sortOrder="110">
+            <settings>
+                <filter>select</filter>
+                <dataType>select</dataType>
+                <label translate="true">Is Disabled</label>
+                <options>
+                    <option name="active" xsi:type="array">
+                        <item name="value" xsi:type="string">0</item>
+                        <item name="label" xsi:type="string" translate="true">No</item>
+                    </option>
+                    <option name="disabled" xsi:type="array">
+                        <item name="value" xsi:type="string">1</item>
+                        <item name="label" xsi:type="string" translate="true">Yes</item>
+                    </option>
+                </options>
+            </settings>
+        </column>
+        <actionsColumn name="actions" sortOrder="500"
+                       class="TNW\Subscriptions\Ui\Component\Listing\Column\ProductBillingFrequency\Actions"
+                       component="TNW_Subscriptions/js/grid/linked-product-actions">
+            <settings>
+                <label>Actions</label>
+                <indexField>id</indexField>
+                <resizeEnabled>false</resizeEnabled>
+                <resizeDefaultWidth>107</resizeDefaultWidth>
+            </settings>
+        </actionsColumn>
+    </columns>
+</listing>

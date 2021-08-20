@@ -61,7 +61,9 @@ class AvailableSubscriptionProfileGrid
             ProfileStatus::STATUS_ACTIVE,
             ProfileStatus::STATUS_TRIAL,
             ProfileStatus::STATUS_HOLDED,
-            ProfileStatus::STATUS_PAST_DUE
+            ProfileStatus::STATUS_PAST_DUE,
+            ProfileStatus::STATUS_SUSPENDED,
+            ProfileStatus::STATUS_PENDING
         ];
         $ids = [];
         $billingFrequencies = false;
