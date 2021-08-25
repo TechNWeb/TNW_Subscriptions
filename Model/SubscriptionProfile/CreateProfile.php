@@ -35,6 +35,7 @@ use Magento\InventorySalesApi\Api\GetProductSalableQtyInterface;
 use Magento\InventorySalesApi\Api\StockResolverInterface;
 use Magento\Store\Model\StoreManagerInterface;
 use Magento\Framework\Message\ManagerInterface as MessageManager;
+use Magento\Sales\Model\Order\Email\Sender\OrderSender;
 
 /**
  * Class for creating subscription profile.
@@ -174,6 +175,11 @@ class CreateProfile extends BaseCreate
     private $messageManager;
 
     /**
+     * @var OrderSender
+     */
+    private $orderSender;
+
+    /**
      * CreateProfile constructor.
      * @param Context $context
      * @param QuoteSessionInterface $session
@@ -197,6 +203,7 @@ class CreateProfile extends BaseCreate
      * @param StockResolverInterface $stock
      * @param StoreManagerInterface $storeManager
      * @param MessageManager $messageManager
+     * @param OrderSender $orderSender
      */
     public function __construct(
         Context $context,
@@ -220,7 +227,8 @@ class CreateProfile extends BaseCreate
         GetProductSalableQtyInterface  $getProductSalableQty,
         StockResolverInterface $stock,
         StoreManagerInterface $storeManager,
-        MessageManager $messageManager
+        MessageManager $messageManager,
+        OrderSender $orderSender
     ) {
         $this->addressRepository = $addressRepository;
         $this->addressCreator = $addressCreator;
@@ -242,7 +250,7 @@ class CreateProfile extends BaseCreate
         $this->stock = $stock;
         $this->storeManager = $storeManager;
         $this->messageManager = $messageManager;
-
+        $this->orderSender = $orderSender;
 
         parent::__construct($context, $session);
     }
@@ -715,6 +723,7 @@ class CreateProfile extends BaseCreate
             $this->quoteGenerator->generateProfileQuotes($profile, 1);
 
             $profiles[] = $profile;
+            $this->orderSender->send($order);
             //TODO add here email sending
         }
 
