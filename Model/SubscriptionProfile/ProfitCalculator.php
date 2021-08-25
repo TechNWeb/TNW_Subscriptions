@@ -241,8 +241,8 @@ class ProfitCalculator
                 case self::REMAINING:
                     $lastInvoiceItem = array_pop($invoiceItems);
                     if ($lastInvoiceItem) {
-                    $profitOfLastItem = ($lastInvoiceItem['base_price'] - $lastInvoiceItem['base_cost'])
-                        * $lastInvoiceItem['qty'];
+                        $profitOfLastItem = ($lastInvoiceItem['base_price'] - $lastInvoiceItem['base_cost'])
+                            * $lastInvoiceItem['qty'];
                     } else {
                         $profitOfLastItem = 0;
                     }
