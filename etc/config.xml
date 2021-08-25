@@ -73,11 +73,6 @@
                 <out_of_stock>tnw_subscriptions_profile_notification_out_of_stock_setting_out_of_stock</out_of_stock>
                 <out_of_stock_copy_method>bcc</out_of_stock_copy_method>
             </out_of_stock_setting>
-            <confirmation_order_setting>
-                <confirmation_order_enable>1</confirmation_order_enable>
-                <confirmation_order>tnw_subscriptions_profile_notification_confirmation_order_setting_confirmation_order</confirmation_order>
-                <confirmation_order_copy_method>bcc</confirmation_order_copy_method>
-            </confirmation_order_setting>
         </tnw_subscriptions_profile_notification>
         <tnw_subscriptions_product>
             <general>

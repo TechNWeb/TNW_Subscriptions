@@ -153,8 +153,6 @@
                 type="Magento\Framework\Api\SearchResults"/>
     <preference for="Magento\Catalog\Pricing\Render"
                 type="TNW\Subscriptions\Pricing\Render\FinalPrice" />
-    <preference for="Magento\Sales\Model\Order\Email\Container\OrderIdentity"
-                type="TNW\Subscriptions\Model\Order\Email\Container\OrderIdentity" />
     <preference for="TNW\Subscriptions\Api\Data\QuoteItemExtensionAttributesInterface"
                 type="TNW\Subscriptions\Model\Sales\ExtensionAttributes\QuoteItem" />
     <preference for="TNW\Subscriptions\Api\Data\CreditmemoItemExtensionAttributesInterface"
