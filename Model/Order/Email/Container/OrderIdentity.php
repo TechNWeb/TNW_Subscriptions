@@ -7,6 +7,7 @@
 namespace TNW\Subscriptions\Model\Order\Email\Container;
 
 use Magento\Sales\Model\Order\Email\Container\OrderIdentity as OrderEmailIdentity;
+use TNW\Subscriptions\Model\EmailNotifier;
 
 /**
  * Class OrderIdentity - for emails
@@ -46,7 +47,11 @@ class OrderIdentity extends OrderEmailIdentity
             self::XML_TNW_SUBSCRIPTIONS_EMAIL_ENABLED,
             \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
             $this->getStore()->getStoreId()
-        );
+        ) && $this->scopeConfig->isSetFlag(
+                EmailNotifier::XML_PATH_MODULE_ENABLE,
+                \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
+                $this->getStore()->getStoreId()
+            );
     }
 
     /**

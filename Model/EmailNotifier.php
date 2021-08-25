@@ -12,6 +12,8 @@ use TNW\Subscriptions\Model\Source\ProfileStatus;
  */
 class EmailNotifier
 {
+    const XML_PATH_MODULE_ENABLE = 'tnw_subscriptions_general/general/active';
+
     const XML_PATH_EMAIL_IDENTITY = 'tnw_subscriptions_profile_options/emails/email_identity';
 
     const XML_PATH_RENEWAL_NOTIFICATION_PERIOD = 'tnw_subscriptions_profile_notification/notifications/renewals';
@@ -153,7 +155,12 @@ class EmailNotifier
                 \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
                 $storeId
             );
-            if ($enableEmailNotification == 1) {
+            $moduleEnable = $this->scopeConfig->getValue(
+                self::XML_PATH_MODULE_ENABLE,
+                \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
+                $storeId
+            );
+            if ($enableEmailNotification == 1 && $moduleEnable == 1) {
                 $copyTo = $this->getEmailCopyTo(self::XML_PATH_STATUS_CHANGE_COPY_TO, $storeId);
                 $copyMethod = $this->getCopyMethod(self::XML_PATH_STATUS_CHANGE_COPY_METHOD, $storeId);
                 $this->sendNotificationEmail(
@@ -204,7 +211,12 @@ class EmailNotifier
                     \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
                     $storeId
                 );
-                if ($enableEmailNotification == 1) {
+                $moduleEnable = $this->scopeConfig->getValue(
+                    self::XML_PATH_MODULE_ENABLE,
+                    \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
+                    $storeId
+                );
+                if ($enableEmailNotification == 1 && $moduleEnable == 1) {
                     $copyTo = $this->getEmailCopyTo(self::XML_PATH_COMMENT_ADDED_COPY_TO, $storeId);
                     $copyMethod = $this->getCopyMethod(self::XML_PATH_COMMENT_ADDED_COPY_METHOD, $storeId);
                     $this->sendNotificationEmail(
@@ -246,7 +258,12 @@ class EmailNotifier
                 \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
                 $storeId
             );
-            if ($enableEmailNotification == 1) {
+            $moduleEnable = $this->scopeConfig->getValue(
+                self::XML_PATH_MODULE_ENABLE,
+                \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
+                $storeId
+            );
+            if ($enableEmailNotification == 1 && $moduleEnable == 1) {
                 $copyTo = $this->getEmailCopyTo(self::XML_PATH_CARD_EXPIRE_COPY_TO, $storeId);
                 $copyMethod = $this->getCopyMethod(self::XML_PATH_CARD_EXPIRE_COPY_METHOD, $storeId);
                 $this->sendNotificationEmail(
@@ -286,7 +303,12 @@ class EmailNotifier
                 \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
                 $storeId
             );
-            if ($enableEmailNotification == 1) {
+            $moduleEnable = $this->scopeConfig->getValue(
+                self::XML_PATH_MODULE_ENABLE,
+                \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
+                $storeId
+            );
+            if ($enableEmailNotification == 1 && $moduleEnable == 1) {
                 $copyTo = $this->getEmailCopyTo(self::XML_PATH_PAYMENT_FAILED_COPY_TO, $storeId);
                 $copyMethod = $this->getCopyMethod(self::XML_PATH_PAYMENT_FAILED_COPY_METHOD, $storeId);
                 $this->sendNotificationEmail(
@@ -331,7 +353,12 @@ class EmailNotifier
                 \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
                 $storeId
             );
-            if ($enableEmailNotification == 1) {
+            $moduleEnable = $this->scopeConfig->getValue(
+                self::XML_PATH_MODULE_ENABLE,
+                \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
+                $storeId
+            );
+            if ($enableEmailNotification == 1 && $moduleEnable == 1) {
                 $copyTo = $this->getEmailCopyTo(self::XML_PATH_OUT_OF_STOCK_COPY_TO, $storeId);
                 $copyMethod = $this->getCopyMethod(self::XML_PATH_OUT_OF_STOCK_COPY_METHOD, $storeId);
                 $this->sendNotificationEmail(
@@ -393,9 +420,14 @@ class EmailNotifier
                     \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
                     $storeId
                 );
+                $moduleEnable = $this->scopeConfig->getValue(
+                    self::XML_PATH_MODULE_ENABLE,
+                    \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
+                    $storeId
+                );
                 if ($subscriptionProfile->getStatus() == ProfileStatus::STATUS_PAST_DUE
                     || $subscriptionProfile->getStatus() == ProfileStatus::STATUS_ACTIVE
-                    && $enableEmailNotification == 1) {
+                    && $enableEmailNotification == 1 && $moduleEnable == 1) {
                     $copyTo = $this->getEmailCopyTo(self::XML_PATH_PAYMENT_RENEWAL_COPY_TO, $storeId);
                     $copyMethod = $this->getCopyMethod(self::XML_PATH_PAYMENT_RENEWAL_COPY_METHOD, $storeId);
                     $this->sendNotificationEmail(
