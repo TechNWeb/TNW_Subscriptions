@@ -11,13 +11,14 @@ use Magento\Catalog\Model\ResourceModel\Product\CollectionFactory;
 use Magento\Catalog\Ui\DataProvider\Product\Related\AbstractDataProvider;
 use Magento\Framework\App\Request\DataPersistorInterface;
 use Magento\Framework\App\RequestInterface;
+use Magento\Framework\Exception\LocalizedException;
 use Magento\Store\Api\StoreRepositoryInterface;
 use TNW\Subscriptions\Api\Data\ProductBillingFrequencyInterface;
 use TNW\Subscriptions\Model\Config\Source\PurchaseType;
 use TNW\Subscriptions\Model\Product\Attribute;
 
 /**
- * Class LinkedDataProvider - dataprovider
+ * Data Provider of products, available for link
  * @method \Magento\Catalog\Model\ResourceModel\Product\Collection getCollection()
  */
 class LinkedDataProvider extends AbstractDataProvider
@@ -85,6 +86,10 @@ class LinkedDataProvider extends AbstractDataProvider
         return 'linked';
     }
 
+    /**
+     * Prepare select for collection
+     * @throws LocalizedException
+     */
     public function prepareCollection()
     {
         $collection = $this->getCollection();
@@ -134,7 +139,7 @@ class LinkedDataProvider extends AbstractDataProvider
 
     /**
      * @param \Magento\Catalog\Model\ResourceModel\Product\Collection $collection
-     * @throws \Magento\Framework\Exception\LocalizedException
+     * @throws LocalizedException
      */
     private function joinTables(\Magento\Catalog\Model\ResourceModel\Product\Collection $collection)
     {

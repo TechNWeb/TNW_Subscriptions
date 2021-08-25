@@ -1,9 +1,15 @@
 <?php
-
+/**
+ * Copyright © 2018 TechNWeb, Inc. All rights reserved.
+ * See TNW_LICENSE.txt for license details.
+ */
 namespace TNW\Subscriptions\Ui\Component\Listing\Column\ProductBillingFrequency;
 
 use Magento\Ui\Component\Listing\Columns\Column;
 
+/**
+ * Actions column actions for linked products grid
+ */
 class Actions extends Column
 {
     /**

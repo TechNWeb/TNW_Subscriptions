@@ -1,5 +1,8 @@
 <?php
-
+/**
+ * Copyright © 2018 TechNWeb, Inc. All rights reserved.
+ * See TNW_LICENSE.txt for license details.
+ */
 namespace TNW\Subscriptions\Controller\Adminhtml\ProductBillingFrequency;
 
 use Magento\AsynchronousOperations\Api\Data\OperationInterface;
@@ -131,7 +134,7 @@ class AddLinkedProducts extends Action implements HttpPostActionInterface
 
     /**
      * Get product ids for bulk linking
-     * @return array|int[]|null[]
+     * @return int[]
      * @throws LocalizedException
      */
     public function getAffectedProductIds()
@@ -147,6 +150,7 @@ class AddLinkedProducts extends Action implements HttpPostActionInterface
     }
 
     /**
+     * Split ids in chunks and schedule bulk link
      * @param $productIds
      * @param $frequencyId
      * @throws LocalizedException
@@ -176,6 +180,7 @@ class AddLinkedProducts extends Action implements HttpPostActionInterface
     }
 
     /**
+     * Prepare operation object for chunk
      * @param $bulkUuid
      * @param $productIds
      * @param $frequencyId
