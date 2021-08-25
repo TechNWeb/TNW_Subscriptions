@@ -240,8 +240,12 @@ class ProfitCalculator
                     break;
                 case self::REMAINING:
                     $lastInvoiceItem = array_pop($invoiceItems);
+                    if ($lastInvoiceItem) {
                     $profitOfLastItem = ($lastInvoiceItem['base_price'] - $lastInvoiceItem['base_cost'])
                         * $lastInvoiceItem['qty'];
+                    } else {
+                        $profitOfLastItem = 0;
+                    }
 
                     if ($profile->getTerm() == 1) {
                         if ($profile->getUnit() == 3) {
