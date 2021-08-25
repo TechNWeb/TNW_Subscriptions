@@ -88,7 +88,7 @@ class CancelButtonPopup extends AbstractDataProvider
     public function getMeta()
     {
         $profileId = $this->dataPersistor->get('subscription_id');
-        $message = $this->getConfigValue($profileId) ? '' : __('Notification is disable in config.');
+        $message = $this->getConfigValue($profileId) ? '' : __('Notifications are disabled in the config.');
         return [
             'general' => [
                 'children' => [

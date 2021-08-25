@@ -71,7 +71,7 @@ class ChangeHistory extends BaseFormModifier
             $profile->getWebsiteId()
         );
 
-        $message = $enableCommentAdd ? '' : __('Notification is disable in config.');
+        $message = $enableCommentAdd ? '' : __('Notifications are disabled in the config.');
         $meta[static::GROUP_CHANGE_HISTORY] = [
             'children' => [
                 'change_history_listing' => [
