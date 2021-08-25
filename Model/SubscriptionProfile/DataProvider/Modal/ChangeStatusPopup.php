@@ -119,7 +119,7 @@ class ChangeStatusPopup extends AbstractDataProvider
     {
         $websiteId = $this->profileManager->loadProfile($profileId)->getWebsiteId();
         return $this->scopeConfig->getValue(
-            EmailNotifier::XML_PATH_ENABLE_STATUS_CHANGE,
+            EmailNotifier::XML_PATH_ENABLE_COMMENT_ADDED,
             \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
             $websiteId
         );
