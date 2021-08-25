@@ -1,7 +1,13 @@
 <?xml version="1.0"?>
+<!--
+/**
+* Copyright © 2018 TechNWeb, Inc. All rights reserved.
+* See TNW_LICENSE.txt for license details.
+*/
+-->
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xsi:noNamespaceSchemaLocation="urn:magento:framework-message-queue:etc/consumer.xsd">
+        xsi:noNamespaceSchemaLocation="urn:magento:framework-message-queue:etc/publisher.xsd">
     <publisher topic="tnw.products.link">
-        <connection name="db" exchange="magento-db" />
+        <connection name="amqp" exchange="tnw.products"/>
     </publisher>
 </config>
