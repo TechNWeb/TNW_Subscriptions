@@ -888,8 +888,10 @@ class SubscriptionProfile extends AbstractExtensibleModel implements Subscriptio
                         break;
                     case $currentDate['1'] == $ccExpMonth && $currentDate['0'] == $ccExpYear:
                     case $currentDate['1'] < $ccExpMonth && $currentDate['0'] < $ccExpYear:
+                    case $currentDate['1'] < $ccExpMonth && $currentDate['0'] == $ccExpYear:
                     case $currentDate['1'] > $ccExpMonth && $currentDate['0'] < $ccExpYear:
                     case $currentDate['1'] == $ccExpMonth && $currentDate['0'] < $ccExpYear:
+                    case $currentDate['1'] > $ccExpMonth && $currentDate['0'] == $ccExpYear:
                         $result = 0;
                         break;
                 }
