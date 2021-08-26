@@ -5,11 +5,10 @@
  */
 namespace TNW\Subscriptions\Model;
 
+use Magento\Framework\Api\SearchCriteriaInterface;
 use TNW\Subscriptions\Api\ProductSubscriptionProfileRepositoryInterface;
 use TNW\Subscriptions\Api\Data\ProductSubscriptionProfileSearchResultsInterfaceFactory;
 use TNW\Subscriptions\Api\Data\ProductSubscriptionProfileInterface;
-use TNW\Subscriptions\Api\Data\ProductSubscriptionProfileInterfaceFactory;
-use Magento\Framework\Api\DataObjectHelper;
 use Magento\Framework\Api\SortOrder;
 use Magento\Framework\Exception\CouldNotDeleteException;
 use Magento\Framework\Exception\NoSuchEntityException;
@@ -44,45 +43,28 @@ class ProductSubscriptionProfileRepository implements ProductSubscriptionProfile
     private $searchResultsFactory;
 
     /**
-     * @var DataObjectHelper
-     */
-    private $dataObjectHelper;
-
-    /**
-     * @var ProductSubscriptionProfileInterfaceFactory
-     */
-    private $dataProductSubscriptionProfileFactory;
-
-    /**
      * @param ResourceProductSubscriptionProfile $resource
      * @param ProductSubscriptionProfileFactory $productSubscriptionProfileFactory
-     * @param ProductSubscriptionProfileInterfaceFactory $dataProductSubscriptionProfileFactory
      * @param ProductSubscriptionProfileCollectionFactory $productSubscriptionProfileCollectionFactory
      * @param ProductSubscriptionProfileSearchResultsInterfaceFactory $searchResultsFactory
-     * @param DataObjectHelper $dataObjectHelper
      */
     public function __construct(
         ResourceProductSubscriptionProfile $resource,
         ProductSubscriptionProfileFactory $productSubscriptionProfileFactory,
-        ProductSubscriptionProfileInterfaceFactory $dataProductSubscriptionProfileFactory,
         ProductSubscriptionProfileCollectionFactory $productSubscriptionProfileCollectionFactory,
-        ProductSubscriptionProfileSearchResultsInterfaceFactory $searchResultsFactory,
-        DataObjectHelper $dataObjectHelper
+        ProductSubscriptionProfileSearchResultsInterfaceFactory $searchResultsFactory
     ) {
         $this->resource = $resource;
         $this->productSubscriptionProfileFactory = $productSubscriptionProfileFactory;
         $this->productSubscriptionProfileCollectionFactory = $productSubscriptionProfileCollectionFactory;
         $this->searchResultsFactory = $searchResultsFactory;
-        $this->dataObjectHelper = $dataObjectHelper;
-        $this->dataProductSubscriptionProfileFactory = $dataProductSubscriptionProfileFactory;
     }
 
     /**
      * @inheritdoc
      */
-    public function save(
-        \TNW\Subscriptions\Api\Data\ProductSubscriptionProfileInterface $productSubscriptionProfile
-    ) {
+    public function save(ProductSubscriptionProfileInterface $productSubscriptionProfile)
+    {
         try {
             $this->resource->save($productSubscriptionProfile);
         } catch (\Exception $exception) {
@@ -116,9 +98,8 @@ class ProductSubscriptionProfileRepository implements ProductSubscriptionProfile
     /**
      * @inheritdoc
      */
-    public function getList(
-        \Magento\Framework\Api\SearchCriteriaInterface $criteria
-    ) {
+    public function getList(SearchCriteriaInterface $criteria)
+    {
         $collection = $this->productSubscriptionProfileCollectionFactory->create();
         $collection->addAttributeToSelect('*');
 
@@ -127,6 +108,22 @@ class ProductSubscriptionProfileRepository implements ProductSubscriptionProfile
                 if ($filter->getField() === 'store_id') {
                     $collection->addStoreFilter($filter->getValue(), false);
                     continue;
+                }
+                if ($filter->getField() === 'billing_frequency_id') {
+                    $collection->joinTable(
+                        ['profile_bf' => $collection->getTable(SubscriptionProfile::SUBSCRIPTION_PROFILE_ENTITY)],
+                        'entity_id = subscription_profile_id',
+                        ['billing_frequency_id' => 'billing_frequency_id']
+                    );
+                    $collection->addFilterToMap('billing_frequency_id', 'profile_bf.billing_frequency_id');
+                }
+                if ($filter->getField() === 'profile_status') {
+                    $collection->joinTable(
+                        ['profile_st' => $collection->getTable(SubscriptionProfile::SUBSCRIPTION_PROFILE_ENTITY)],
+                        'entity_id = subscription_profile_id',
+                        ['profile_status' => 'status']
+                    );
+                    $collection->addFilterToMap('profile_status', 'profile_st.status');
                 }
                 $condition = $filter->getConditionType() ?: 'eq';
                 $collection->addFieldToFilter($filter->getField(), [$condition => $filter->getValue()]);
@@ -164,9 +161,8 @@ class ProductSubscriptionProfileRepository implements ProductSubscriptionProfile
     /**
      * @inheritdoc
      */
-    public function delete(
-        \TNW\Subscriptions\Api\Data\ProductSubscriptionProfileInterface $productSubscriptionProfile
-    ) {
+    public function delete(ProductSubscriptionProfileInterface $productSubscriptionProfile)
+    {
         try {
             $this->resource->delete($productSubscriptionProfile);
         } catch (\Exception $exception) {
@@ -192,9 +188,8 @@ class ProductSubscriptionProfileRepository implements ProductSubscriptionProfile
      * @param ProductSubscriptionProfileInterface $productSubscriptionProfileData
      * @return void
      */
-    private function addChildren(
-        ProductSubscriptionProfileInterface $productSubscriptionProfileData
-    ) {
+    private function addChildren(ProductSubscriptionProfileInterface $productSubscriptionProfileData)
+    {
         $collection = $this->productSubscriptionProfileCollectionFactory->create();
         /** @var ProductSubscriptionProfileInterface[] $items */
         $items = $collection->addFieldToFilter(

@@ -11,7 +11,9 @@ var config = {
             tnwSubscribeShipmentDetails: 'TNW_Subscriptions/js/subscription-profile/shipment-details',
             tnwSubscribeBilling: 'TNW_Subscriptions/js/subscription-profile/billing',
             tnwSubscribeListButtons: 'TNW_Subscriptions/js/product/list/subscribe-list-buttons',
-            calendar: 'mage/calendar'
+            calendar: 'mage/calendar',
+            'PayPal_Braintree/template/payment/form.html':
+                'TNW_Subscriptions/template/payment/form.html'
         }
     },
     config: {
@@ -48,6 +50,9 @@ var config = {
             },
             'Magento_Catalog/js/product/addtocart-button' : {
                 'TNW_Subscriptions/js/product/addtocart-button-mixin' : true
+            },
+            'PayPal_Braintree/js/view/payment/method-renderer/hosted-fields' : {
+                'TNW_Subscriptions/js/payment/method-render/hosted-fields-mixin' : true
             }
         }
     }

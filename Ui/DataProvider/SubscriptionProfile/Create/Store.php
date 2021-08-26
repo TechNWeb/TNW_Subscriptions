@@ -7,6 +7,7 @@ namespace TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create;
 
 use Magento\Framework\Data\OptionSourceInterface;
 use Magento\Store\Model\StoreManagerInterface;
+use TNW\Subscriptions\Model\Config;
 
 /**
  * Class Store - dataProvider
@@ -17,13 +18,19 @@ class Store implements OptionSourceInterface
     protected $storeManager;
 
     /**
+     * @var Config
+     */
+    private $config;
+
+    /**
      * DataProvider constructor.
      *
      * @param StoreManagerInterface $storeManager
      */
-    public function __construct(StoreManagerInterface $storeManager)
+    public function __construct(StoreManagerInterface $storeManager, Config $config)
     {
         $this->storeManager = $storeManager;
+        $this->config = $config;
     }
 
     /**
@@ -47,6 +54,9 @@ class Store implements OptionSourceInterface
 
         /** @var \Magento\Store\Model\Website $website */
         foreach ($websiteCollection as $website) {
+            if (!$this->config->isSubscriptionsActive($website->getId())) {
+                continue;
+            }
             /** @var \Magento\Store\Model\Group $group */
             foreach ($groupCollection as $group) {
                 if ($group->getWebsiteId() == $website->getId()) {

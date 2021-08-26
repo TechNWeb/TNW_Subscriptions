@@ -1,0 +1,20 @@
+<!--
+/**
+ * Copyright © 2018 TechNWeb, Inc. All rights reserved.
+ * See TNW_LICENSE.txt for license details.
+ */
+-->
+
+<th class="data-grid-th" click="sort"
+    css="
+        '_with-tooltip': tooltip,
+        _sortable: sortable,
+        _draggable: draggable,
+        _ascend: sorting === 'asc',
+        _descend: sorting === 'desc'"
+    data-bind="style : { width: resizeDefaultWidth + 'px' }">
+    <div class="wrapper">
+        <span class="data-grid-cell-content" translate="label"/>
+        <render args="tooltipTpl" if="$data.tooltip"/>
+    </div>
+</th>

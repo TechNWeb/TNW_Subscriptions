@@ -1,0 +1,42 @@
+.admin__field-control .admin__control-addon .custom-add-after-label {
+    padding-right: 5px
+}
+th.tnw_price_column {
+    width: 10%;
+}
+
+.control-table-text .icon-checkmark:before {
+    content: '\e62d';
+    font-family: 'Admin Icons';
+    font-size: 1.6rem;
+}
+.admin__field-complex-elements {
+    .admin__field-tooltip {
+        width: auto;
+    }
+}
+
+.admin__data-grid-wrap {
+    overflow-x: unset;
+    .data-grid-th {
+        &._with-tooltip {
+            >.wrapper {
+                display: flex;
+                justify-content: space-between;
+            }
+            .data-grid-cell-content {
+                width: auto;
+            }
+            .admin__field-tooltip {
+                width: auto;
+                margin-top: 0;
+                .admin__field-tooltip-action:before {
+                    color: #eee;
+                }
+                .admin__field-tooltip-content {
+                    color: #41362f;
+                }
+            }
+        }
+    }
+}

@@ -22,8 +22,8 @@
         <argument name="dataProvider" xsi:type="configurableObject">
             <argument name="class" xsi:type="string">TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Modal\CancelButtonPopup</argument>
             <argument name="name" xsi:type="string">tnw_subscriptionprofile_cancel_button_popup_form_data_source</argument>
-            <argument name="primaryFieldName" xsi:type="string">cancel_button_popup</argument>
-            <argument name="requestFieldName" xsi:type="string">cancel_button_popup</argument>
+            <argument name="primaryFieldName" xsi:type="string">tnw_subscriptionprofile_cancel_button_popup_form</argument>
+            <argument name="requestFieldName" xsi:type="string">namespace</argument>
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="submit_url" path="tnw_subscriptions/subscriptionprofile/cancelsubscription" xsi:type="url"/>
@@ -90,6 +90,10 @@
             </argument>
             <settings>
                 <labelVisible>false</labelVisible>
+                <additionalInfoVisible>false</additionalInfoVisible>
+                <imports>
+                    <link name="disabled">${ $.provider}:data.disableCheckbox</link>
+                </imports>
             </settings>
             <formElements>
                 <checkbox>

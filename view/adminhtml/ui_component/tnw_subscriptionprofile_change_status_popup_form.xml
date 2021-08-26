@@ -111,6 +111,9 @@
             </argument>
             <settings>
                 <labelVisible>false</labelVisible>
+                <imports>
+                    <link name="disabled">${ $.provider}:data.disableCheckbox</link>
+                </imports>
             </settings>
             <formElements>
                 <checkbox>
