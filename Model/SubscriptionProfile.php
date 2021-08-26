@@ -884,6 +884,7 @@ class SubscriptionProfile extends AbstractExtensibleModel implements Subscriptio
                 $currentDate = explode('-', $finalDate);
                 switch ($currentDate) {
                     case $currentDate['1'] > $ccExpMonth && $currentDate['0'] > $ccExpYear:
+                    case $currentDate['1'] > $ccExpMonth && $currentDate['0'] == $ccExpYear:
                         $result = 1;
                         break;
                     case $currentDate['1'] == $ccExpMonth && $currentDate['0'] == $ccExpYear:
@@ -891,7 +892,6 @@ class SubscriptionProfile extends AbstractExtensibleModel implements Subscriptio
                     case $currentDate['1'] < $ccExpMonth && $currentDate['0'] == $ccExpYear:
                     case $currentDate['1'] > $ccExpMonth && $currentDate['0'] < $ccExpYear:
                     case $currentDate['1'] == $ccExpMonth && $currentDate['0'] < $ccExpYear:
-                    case $currentDate['1'] > $ccExpMonth && $currentDate['0'] == $ccExpYear:
                         $result = 0;
                         break;
                 }
