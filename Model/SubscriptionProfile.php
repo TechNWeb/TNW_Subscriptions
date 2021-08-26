@@ -915,7 +915,7 @@ class SubscriptionProfile extends AbstractExtensibleModel implements Subscriptio
         if ($term == '1') {
             return null;
         }
-        $total = $billingFrequency->getFrequency() * $totalBillingCycles;
+        $total = $billingFrequency->getFrequency() * ($totalBillingCycles - 1);
         switch ($billingFrequency->getUnit()) {
             case BillingFrequencyUnitType::DAYS:
                 $billingCycles = "+" . $total . " days";

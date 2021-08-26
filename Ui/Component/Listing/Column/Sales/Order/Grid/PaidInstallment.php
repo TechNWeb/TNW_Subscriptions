@@ -32,6 +32,7 @@ class PaidInstallment extends Column
                             && $options[1] != 0
                             && $options[1] != -1
                             && $options[1] != 1
+                            && isset($item['subscription_final_installment_date'])
                         ) {
                             $item['subscription_paid_installment'] = $options[0] . ' / ' . $options[1];
                         } else {
