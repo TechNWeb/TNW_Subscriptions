@@ -48,6 +48,7 @@ class Delete extends Action implements HttpPostActionInterface
         ProfileStatus::STATUS_ACTIVE,
         ProfileStatus::STATUS_TRIAL,
         ProfileStatus::STATUS_HOLDED,
+        ProfileStatus::STATUS_SUSPENDED,
         ProfileStatus::STATUS_PAST_DUE
     ];
 

@@ -32,6 +32,10 @@
                     <item name="update_url" path="mui/index/render" xsi:type="url"/>
                     <item name="filter_url_params" xsi:type="array">
                         <item name="entity_id" xsi:type="string">*</item>
+                        <item name="billing_frequency_id" xsi:type="string">*</item>
+                        <item name="status" xsi:type="string">*</item>
+                        <item name="product_id" xsi:type="string">*</item>
+                        <item name="child_sku" xsi:type="string">*</item>
                     </item>
                     <item name="storageConfig" xsi:type="array">
                         <item name="indexField" xsi:type="string">entity_id</item>

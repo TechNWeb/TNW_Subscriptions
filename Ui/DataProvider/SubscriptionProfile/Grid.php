@@ -97,7 +97,7 @@ class Grid extends DataProvider
                     $paramName,
                     $paramValue
                 );
-                if ($paramName === 'entity_id') {
+                if ($paramName === 'status') {
                     $filter = $this->filterBuilder->setField($paramName)
                         ->setValue(explode(',', $paramValue))->setConditionType('in')->create();
                 } else {
