@@ -55,7 +55,7 @@ class FirstInstallment extends Column
     {
         if (isset($dataSource['data']['items'])) {
             foreach ($dataSource['data']['items'] as & $item) {
-                if ($item['subscription_first_installment_date']) {
+                if (!empty($item['subscription_first_installment_date'])) {
                     $item['subscription_first_installment_date'] =
                         $this->timezone->formatDate(
                             $item['subscription_first_installment_date'],
