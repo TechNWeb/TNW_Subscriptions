@@ -18,6 +18,7 @@ define([
          */
         setConfig: function (config) {
             this.config = config;
+            this.config.totalAmount = parseFloat(config.totalAmount).toFixed(2);
             this.config.thresholdAmount = parseFloat(config.thresholdAmount);
         },
 
@@ -29,7 +30,7 @@ define([
         validate: function (context) {
             var clientInstance = context.braintreeClientInstance,
                 state = $.Deferred(),
-                totalAmount = parseFloat('0').toFixed(2),
+                totalAmount = this.config.totalAmount,
                 countryId = $('#country').val();
 
             if (countryId && !this.isCountryAvailable(countryId)) {

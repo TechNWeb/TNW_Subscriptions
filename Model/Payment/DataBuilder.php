@@ -23,6 +23,8 @@ class DataBuilder
      */
     protected $subscriptionConfig;
 
+    protected $is3DSecure = false;
+
     /**
      * DataBuilder constructor.
      * @param SubscriptionConfig $subscriptionConfig
@@ -45,7 +47,7 @@ class DataBuilder
      */
     public function getAmount($order)
     {
-        if ($this->subscriptionConfig->isStaticTrialAuth($order->getStoreId())) {
+        if ($this->subscriptionConfig->isStaticTrialAuth($order->getStoreId()) && !$this->is3DSecure) {
             $result = $this->subscriptionConfig->getStaticAuthAmount($order->getStoreId());
         } else {
             $subscriptionItems = [];
@@ -58,14 +60,18 @@ class DataBuilder
             if ($subscriptionItems) {
                 $this->manager->populateProfileData($order, $subscriptionItems);
             }
-            $profile = $this->manager->getProfile();
-            $products = $profile->getProfileProducts();
-            $amount = 0;
-            foreach ($products as $product) {
-                $amount += (float) $product->getPrice();
-            }
-            $result = $amount;
+            $result = $this->getAmountByProfile($this->manager->getProfile());
         }
         return $result;
+    }
+
+    public function getAmountByProfile($profile)
+    {
+        $products = $profile->getProfileProducts();
+        $amount = 0;
+        foreach ($products as $product) {
+            $amount += (float) $product->getPrice();
+        }
+        return $amount;
     }
 }

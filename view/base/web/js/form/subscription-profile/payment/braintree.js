@@ -94,6 +94,7 @@ define([
                     verify3DSecure.setConfig({
                         'braintree' : self.braintree,
                         'useCvvVault' : self.useCvvVault,
+                        'totalAmount' : self.totalAmount,
                         'thresholdAmount' : self.thresholdAmount,
                         'specificCountries' : self.specificCountries
                     });
