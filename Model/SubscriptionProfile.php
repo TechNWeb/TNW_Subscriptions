@@ -876,7 +876,7 @@ class SubscriptionProfile extends AbstractExtensibleModel implements Subscriptio
     {
         $result = null;
         $paymentInfo = $subscriptionProfile->getPayment()->getPaymentAdditionalInfo();
-        if (isset($paymentInfo)) {
+        if (isset($paymentInfo) && isset($finalDate)) {
             $getExpireDate = $this->serializer->unserialize($paymentInfo);
             if (isset($getExpireDate['cc_exp_month']) && isset($getExpireDate['cc_exp_year'])) {
                 $ccExpMonth = (int)$getExpireDate['cc_exp_month'];
@@ -913,17 +913,18 @@ class SubscriptionProfile extends AbstractExtensibleModel implements Subscriptio
         if ($term == '1') {
             return null;
         }
+        $total = $billingFrequency->getFrequency() * $totalBillingCycles;
         switch ($billingFrequency->getUnit()) {
             case BillingFrequencyUnitType::DAYS:
-                $billingCycles = "+" . $totalBillingCycles . " days";
+                $billingCycles = "+" . $total . " days";
                 $result = date("Y-m-d", strtotime($billingCycles, strtotime($startDate)));
                 break;
             case BillingFrequencyUnitType::MONTHS:
-                $billingCycles = "+" . $totalBillingCycles . " months";
+                $billingCycles = "+" . $total . " months";
                 $result = date("Y-m-d", strtotime($billingCycles, strtotime($startDate)));
                 break;
             case BillingFrequencyUnitType::YEARS:
-                $billingCycles = "+" . $totalBillingCycles . " years";
+                $billingCycles = "+" . $total . " years";
                 $result = date("Y-m-d", strtotime($billingCycles, strtotime($startDate)));
                 break;
         }
