@@ -6,7 +6,9 @@
 
 namespace TNW\Subscriptions\Model;
 
+use Exception;
 use Magento\Framework\Api\DataObjectHelper;
+use Magento\Framework\Api\SearchCriteriaInterface;
 use Magento\Framework\Api\SortOrder;
 use Magento\Framework\App\ObjectManager;
 use Magento\Framework\Exception\CouldNotDeleteException;
@@ -15,12 +17,15 @@ use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\Reflection\DataObjectProcessor;
 use Magento\Store\Model\StoreManagerInterface;
 use Psr\Log\LoggerInterface;
+use TNW\Subscriptions\Api\Data\SubscriptionProfileOrderInterface;
 use TNW\Subscriptions\Api\Data\SubscriptionProfileOrderInterfaceFactory;
 use TNW\Subscriptions\Api\Data\SubscriptionProfileOrderSearchResultsInterfaceFactory;
 use TNW\Subscriptions\Api\SubscriptionProfileOrderRepositoryInterface;
 use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfileOrder as ResourceSubscriptionProfileOrder;
 use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfileOrder\CollectionFactory
     as SubscriptionProfileOrderCollectionFactory;
+use TNW\Subscriptions\Api\SubscriptionProfileRepositoryInterface;
+use Magento\Framework\Stdlib\DateTime\TimezoneInterface;
 
 /**
  * Class SubscriptionProfileOrderRepository - repository object for subscription profile orders
@@ -73,6 +78,21 @@ class SubscriptionProfileOrderRepository implements SubscriptionProfileOrderRepo
     private $logger;
 
     /**
+     * @var SubscriptionProfileRepositoryInterface
+     */
+    private $profileRepository;
+
+    /**
+     * @var TimezoneInterface
+     */
+    private $timezone;
+
+    /**
+     * @var SubscriptionProfile
+     */
+    private $subscriptionProfile;
+
+    /**
      * @param ResourceSubscriptionProfileOrder $resource
      * @param SubscriptionProfileOrderFactory $subscriptionProfileOrderFactory
      * @param SubscriptionProfileOrderInterfaceFactory $dataSubscriptionProfileOrderFactory
@@ -81,6 +101,10 @@ class SubscriptionProfileOrderRepository implements SubscriptionProfileOrderRepo
      * @param DataObjectHelper $dataObjectHelper
      * @param DataObjectProcessor $dataObjectProcessor
      * @param StoreManagerInterface $storeManager
+     * @param SubscriptionProfileRepositoryInterface $profileRepository
+     * @param TimezoneInterface $timezone
+     * @param SubscriptionProfile $subscriptionProfile
+     * @param LoggerInterface|null $logger
      */
     public function __construct(
         ResourceSubscriptionProfileOrder $resource,
@@ -91,6 +115,9 @@ class SubscriptionProfileOrderRepository implements SubscriptionProfileOrderRepo
         DataObjectHelper $dataObjectHelper,
         DataObjectProcessor $dataObjectProcessor,
         StoreManagerInterface $storeManager,
+        SubscriptionProfileRepositoryInterface $profileRepository,
+        TimezoneInterface $timezone,
+        SubscriptionProfile $subscriptionProfile,
         LoggerInterface $logger = null
     ) {
         $this->resource = $resource;
@@ -101,6 +128,9 @@ class SubscriptionProfileOrderRepository implements SubscriptionProfileOrderRepo
         $this->dataSubscriptionProfileOrderFactory = $dataSubscriptionProfileOrderFactory;
         $this->dataObjectProcessor = $dataObjectProcessor;
         $this->storeManager = $storeManager;
+        $this->profileRepository = $profileRepository;
+        $this->timezone = $timezone;
+        $this->subscriptionProfile = $subscriptionProfile;
         $objectManager = ObjectManager::getInstance();
         $this->logger = $logger ?: $objectManager->get(LoggerInterface::class);
     }
@@ -109,11 +139,11 @@ class SubscriptionProfileOrderRepository implements SubscriptionProfileOrderRepo
      * {@inheritdoc}
      */
     public function save(
-        \TNW\Subscriptions\Api\Data\SubscriptionProfileOrderInterface $subscriptionProfileOrder
+        SubscriptionProfileOrderInterface $subscriptionProfileOrder
     ) {
         try {
             $this->resource->save($subscriptionProfileOrder);
-        } catch (\Exception $exception) {
+        } catch (Exception $exception) {
             throw new CouldNotSaveException(__(
                 'Could not save the subscriptionProfileOrder: %1',
                 $exception->getMessage()
@@ -123,10 +153,29 @@ class SubscriptionProfileOrderRepository implements SubscriptionProfileOrderRepo
         if ($magentoOrderId) {
             try {
                 $profileIds = $this->resource->getProfileIdsByMagentoOrderId((int)$magentoOrderId);
+                $subscriptionProfile = $this->profileRepository->getById(
+                    $subscriptionProfileOrder->getSubscriptionProfileId()
+                );
+                $profileOrders = $this->resource->getProfileOrdersByProfileId(
+                    $subscriptionProfile->getId()
+                );
+                $installRecurringData = $this->subscriptionProfile->getRecurringInstallmentData(
+                    $profileOrders,
+                    $subscriptionProfile
+                );
+
                 if ($profileIds) {
                     $this->resource->populateSalesOrderGridWithProfileIds((int)$magentoOrderId, $profileIds);
+                    $this->resource->populateRecurringInstallmentData(
+                        $magentoOrderId,
+                        $installRecurringData['paidRecurring'],
+                        $installRecurringData['finalRecurring'],
+                        $installRecurringData['firstRecurring'],
+                        $installRecurringData['expirationCc'],
+                        $installRecurringData['staticTotalBillingCycles']
+                    );
                 }
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 $this->logger->warning($e->getMessage());
             }
         }
@@ -153,7 +202,7 @@ class SubscriptionProfileOrderRepository implements SubscriptionProfileOrderRepo
      * {@inheritdoc}
      */
     public function getList(
-        \Magento\Framework\Api\SearchCriteriaInterface $criteria
+        SearchCriteriaInterface $criteria
     ) {
         $searchResults = $this->searchResultsFactory->create();
         $searchResults->setSearchCriteria($criteria);
@@ -189,7 +238,7 @@ class SubscriptionProfileOrderRepository implements SubscriptionProfileOrderRepo
             $this->dataObjectHelper->populateWithArray(
                 $subscriptionProfileOrderData,
                 $subscriptionProfileOrderModel->getData(),
-                \TNW\Subscriptions\Api\Data\SubscriptionProfileOrderInterface::class
+                SubscriptionProfileOrderInterface::class
             );
             $items[] = $subscriptionProfileOrderData;
         }
@@ -201,11 +250,11 @@ class SubscriptionProfileOrderRepository implements SubscriptionProfileOrderRepo
      * {@inheritdoc}
      */
     public function delete(
-        \TNW\Subscriptions\Api\Data\SubscriptionProfileOrderInterface $subscriptionProfileOrder
+        SubscriptionProfileOrderInterface $subscriptionProfileOrder
     ) {
         try {
             $this->resource->delete($subscriptionProfileOrder);
-        } catch (\Exception $exception) {
+        } catch (Exception $exception) {
             throw new CouldNotDeleteException(__(
                 'Could not delete the SubscriptionProfileOrder: %1',
                 $exception->getMessage()

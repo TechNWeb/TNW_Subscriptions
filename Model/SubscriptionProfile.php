@@ -10,6 +10,7 @@ use Magento\Customer\Api\CustomerRepositoryInterface;
 use Magento\Framework\Api\AttributeValueFactory;
 use Magento\Framework\Api\ExtensionAttributesFactory;
 use Magento\Framework\Data\Collection\AbstractDb;
+use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\Model\AbstractExtensibleModel;
 use Magento\Framework\Model\Context as ModelContext;
 use Magento\Framework\Registry;
@@ -18,10 +19,12 @@ use TNW\Subscriptions\Api\Data\SubscriptionProfileAddressInterface;
 use TNW\Subscriptions\Api\Data\SubscriptionProfileInterface;
 use TNW\Subscriptions\Api\Data\SubscriptionProfilePaymentInterface;
 use TNW\Subscriptions\Api\SubscriptionProfileAttributeRepositoryInterface;
+use TNW\Subscriptions\Model\Config\Source\BillingFrequencyUnitType;
 use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfile as Resource;
 use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfile\Payment\Collection as PaymentCollection;
 use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfile\Payment\CollectionFactory as PaymentCollectionFactory;
 use TNW\Subscriptions\Model\Source\ProfileStatus;
+use Magento\Framework\Serialize\Serializer\Json;
 
 /**
  * Subscription Profile model.
@@ -127,6 +130,16 @@ class SubscriptionProfile extends AbstractExtensibleModel implements Subscriptio
     ];
 
     /**
+     * @var Json
+     */
+    private $serializer;
+
+    /**
+     * @var BillingFrequencyRepository
+     */
+    private $billingFrequencyRepository;
+
+    /**
      * SubscriptionProfile constructor.
      * @param ModelContext $context
      * @param Registry $registry
@@ -150,6 +163,8 @@ class SubscriptionProfile extends AbstractExtensibleModel implements Subscriptio
         SubscriptionProfileAttributeRepositoryInterface $metadataService,
         PaymentCollectionFactory $paymentCollectionFactory,
         UserContextInterface $userContext,
+        Json $serializer,
+        BillingFrequencyRepository $billingFrequencyRepository,
         Resource $resource = null,
         AbstractDb $resourceCollection = null,
         array $data = []
@@ -169,6 +184,8 @@ class SubscriptionProfile extends AbstractExtensibleModel implements Subscriptio
         $this->metadataService = $metadataService;
         $this->paymentCollectionFactory = $paymentCollectionFactory;
         $this->userContext = $userContext;
+        $this->serializer = $serializer;
+        $this->billingFrequencyRepository = $billingFrequencyRepository;
     }
 
     /**
@@ -284,7 +301,7 @@ class SubscriptionProfile extends AbstractExtensibleModel implements Subscriptio
 
     /**
      * @inheritdoc
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     * @throws NoSuchEntityException
      */
     public function getWebsite()
     {
@@ -831,5 +848,124 @@ class SubscriptionProfile extends AbstractExtensibleModel implements Subscriptio
     public function setCouponCode($couponCode)
     {
         return $this->setData(self::COUPON_CODE, $couponCode);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getStaticTotalBillingCycles()
+    {
+        return $this->getData(self::STATIC_TOTAL_BILLING_CYCLES);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function setStaticTotalBillingCycles($total)
+    {
+        return $this->setData(self::STATIC_TOTAL_BILLING_CYCLES, $total);
+    }
+
+    /**
+     * Get is expiration date is now
+     *
+     * @param $subscriptionProfile
+     * @return int|null
+     */
+    public function getCcEcpirationStatus($subscriptionProfile, $finalDate)
+    {
+        $result = null;
+        $paymentInfo = $subscriptionProfile->getPayment()->getPaymentAdditionalInfo();
+        if (isset($paymentInfo) && isset($finalDate)) {
+            $getExpireDate = $this->serializer->unserialize($paymentInfo);
+            if (isset($getExpireDate['cc_exp_month']) && isset($getExpireDate['cc_exp_year'])) {
+                $ccExpMonth = (int)$getExpireDate['cc_exp_month'];
+                $ccExpYear = (int)$getExpireDate['cc_exp_year'];
+                $currentDate = explode('-', $finalDate);
+                switch ($currentDate) {
+                    case $currentDate['1'] > $ccExpMonth && $currentDate['0'] > $ccExpYear:
+                    case $currentDate['1'] > $ccExpMonth && $currentDate['0'] == $ccExpYear:
+                        $result = 1;
+                        break;
+                    case $currentDate['1'] == $ccExpMonth && $currentDate['0'] == $ccExpYear:
+                    case $currentDate['1'] < $ccExpMonth && $currentDate['0'] < $ccExpYear:
+                    case $currentDate['1'] < $ccExpMonth && $currentDate['0'] == $ccExpYear:
+                    case $currentDate['1'] > $ccExpMonth && $currentDate['0'] < $ccExpYear:
+                    case $currentDate['1'] == $ccExpMonth && $currentDate['0'] < $ccExpYear:
+                        $result = 0;
+                        break;
+                }
+            }
+        }
+        return $result;
+    }
+
+    /**
+     * Get last day of recurring
+     *
+     * @param $billingFrequency
+     * @param $totalBillingCycles
+     * @param $startDate
+     * @param $term
+     * @return string|null
+     */
+    public function getFinalDate($billingFrequency, $totalBillingCycles, $startDate, $term)
+    {
+        $result = null;
+        if ($term == '1') {
+            return null;
+        }
+        $total = $billingFrequency->getFrequency() * ($totalBillingCycles - 1);
+        switch ($billingFrequency->getUnit()) {
+            case BillingFrequencyUnitType::DAYS:
+                $billingCycles = "+" . $total . " days";
+                $result = date("Y-m-d", strtotime($billingCycles, strtotime($startDate)));
+                break;
+            case BillingFrequencyUnitType::MONTHS:
+                $billingCycles = "+" . $total . " months";
+                $result = date("Y-m-d", strtotime($billingCycles, strtotime($startDate)));
+                break;
+            case BillingFrequencyUnitType::YEARS:
+                $billingCycles = "+" . $total . " years";
+                $result = date("Y-m-d", strtotime($billingCycles, strtotime($startDate)));
+                break;
+        }
+        return $result;
+    }
+
+    /**
+     * Get data for recurring installment columns
+     *
+     * @param $profileOrders
+     * @param $subscriptionProfile
+     * @return array
+     * @throws NoSuchEntityException
+     */
+    public function getRecurringInstallmentData($profileOrders, $subscriptionProfile)
+    {
+        $result = [];
+        $staticTotalBillingCycles = $subscriptionProfile->getStaticTotalBillingCycles();
+        $result['firstRecurring'] = $subscriptionProfile->getStartDate();
+        $startDate = $subscriptionProfile->getCreatedAt();
+        $billingFrequency = $this->billingFrequencyRepository->getById(
+            $subscriptionProfile->getBillingFrequencyId()
+        );
+        $result['finalRecurring'] = $this->getFinalDate(
+            $billingFrequency,
+            $staticTotalBillingCycles,
+            $startDate,
+            $subscriptionProfile->getTerm(),
+        );
+        $result['expirationCc'] = $this->getCcEcpirationStatus($subscriptionProfile, $result['finalRecurring']);
+
+        $result['staticTotalBillingCycles'] = $subscriptionProfile->getStaticTotalBillingCycles();
+
+        if (isset($staticTotalBillingCycles)) {
+            $result['paidRecurring'] = implode(",", [count($profileOrders), $staticTotalBillingCycles]);
+        } else {
+            $result['paidRecurring'] = implode(",", [count($profileOrders)]);
+        }
+
+        return $result;
     }
 }

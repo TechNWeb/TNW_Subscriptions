@@ -8,6 +8,7 @@ namespace TNW\Subscriptions\Model\ResourceModel;
 use Magento\Framework\Exception\LocalizedException;
 use TNW\Subscriptions\Api\Data\SubscriptionProfileOrderInterface;
 use Magento\Framework\Model\ResourceModel\Db\AbstractDb;
+use TNW\Subscriptions\Model\Config\Source\BillingFrequencyUnitType;
 
 /**
  * Resource model for SubscriptionProfileOrder
@@ -82,5 +83,53 @@ class SubscriptionProfileOrder extends AbstractDb
             ['subscription_profile_id' => $profileIds],
             ['entity_id = ?' => $magentoOrderId]
         );
+    }
+
+    /**
+     * Populate Sales Order Grid with Profile Installment data
+     *
+     * @param int $magentoOrderId
+     * @param $paidRecurring
+     * @param $finalRecurring
+     * @param $firstRecurring
+     * @param $expireCc
+     * @param $totalBilling
+     */
+    public function populateRecurringInstallmentData(
+        $magentoOrderId,
+        $paidRecurring,
+        $finalRecurring,
+        $firstRecurring,
+        $expireCc,
+        $totalBilling
+    ) {
+        $connection = $this->getConnection();
+        $connection->update(
+            $this->getTable('sales_order_grid'),
+            [
+                'subscription_paid_installment' => $paidRecurring,
+                'subscription_final_installment_date' => $finalRecurring,
+                'subscription_first_installment_date' => $firstRecurring,
+                'subscription_expire_cc' => $expireCc,
+                'subscription_total_static_billing_cycles' => $totalBilling,
+            ],
+            ['entity_id = ?' => $magentoOrderId]
+        );
+    }
+
+    /**
+     * @param $profileId
+     * @return array
+     * @throws LocalizedException
+     */
+    public function getProfileOrdersByProfileId($profileId)
+    {
+        $connection = $this->getConnection();
+
+        $select = $connection->select()
+            ->from($this->getMainTable(), ['*'])
+            ->order($this->getIdFieldName() . ' DESC')
+            ->where('subscription_profile_id = ?', $profileId);
+        return $connection->fetchAll($select);
     }
 }
