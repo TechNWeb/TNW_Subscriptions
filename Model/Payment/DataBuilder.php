@@ -67,10 +67,12 @@ class DataBuilder
 
     public function getAmountByProfile($profile)
     {
-        $products = $profile->getProfileProducts();
         $amount = 0;
-        foreach ($products as $product) {
-            $amount += (float) $product->getPrice();
+        if ($profile) {
+            $products = $profile->getProfileProducts();
+            foreach ($products as $product) {
+                $amount += (float)$product->getPrice();
+            }
         }
         return $amount;
     }
