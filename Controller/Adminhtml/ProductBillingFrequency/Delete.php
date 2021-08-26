@@ -1,5 +1,8 @@
 <?php
-
+/**
+ * Copyright © 2018 TechNWeb, Inc. All rights reserved.
+ * See TNW_LICENSE.txt for license details.
+ */
 namespace TNW\Subscriptions\Controller\Adminhtml\ProductBillingFrequency;
 
 use Magento\Backend\App\Action;
@@ -11,7 +14,6 @@ use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\UrlInterface;
 use TNW\Subscriptions\Api\ProductBillingFrequencyRepositoryInterface;
 use TNW\Subscriptions\Api\ProductSubscriptionProfileRepositoryInterface;
-use TNW\Subscriptions\Api\SubscriptionProfileRepositoryInterface;
 use TNW\Subscriptions\Model\Source\ProfileStatus;
 
 /**
@@ -46,6 +48,7 @@ class Delete extends Action implements HttpPostActionInterface
         ProfileStatus::STATUS_ACTIVE,
         ProfileStatus::STATUS_TRIAL,
         ProfileStatus::STATUS_HOLDED,
+        ProfileStatus::STATUS_SUSPENDED,
         ProfileStatus::STATUS_PAST_DUE
     ];
 
@@ -53,11 +56,6 @@ class Delete extends Action implements HttpPostActionInterface
      * @var ProductSubscriptionProfileRepositoryInterface
      */
     private $productSubscriptionProfileRepository;
-
-    /**
-     * @var SubscriptionProfileRepositoryInterface
-     */
-    private $subscriptionProfileRepository;
 
     /**
      * @var SearchCriteriaBuilder
@@ -73,7 +71,6 @@ class Delete extends Action implements HttpPostActionInterface
         ProductBillingFrequencyRepositoryInterface $productBillingFrequencyRepository,
         UrlInterface $urlBuilder,
         ProductSubscriptionProfileRepositoryInterface $productSubscriptionProfileRepository,
-        SubscriptionProfileRepositoryInterface $subscriptionProfileRepository,
         SearchCriteriaBuilder $criteriaBuilder
     ) {
         parent::__construct($context);
@@ -81,7 +78,6 @@ class Delete extends Action implements HttpPostActionInterface
         $this->productBillingFrequencyRepository = $productBillingFrequencyRepository;
         $this->urlBuilder = $urlBuilder;
         $this->productSubscriptionProfileRepository = $productSubscriptionProfileRepository;
-        $this->subscriptionProfileRepository = $subscriptionProfileRepository;
         $this->criteriaBuilder = $criteriaBuilder;
     }
 

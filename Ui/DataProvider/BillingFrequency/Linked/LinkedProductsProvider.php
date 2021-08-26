@@ -1,5 +1,8 @@
 <?php
-
+/**
+ * Copyright © 2018 TechNWeb, Inc. All rights reserved.
+ * See TNW_LICENSE.txt for license details.
+ */
 namespace TNW\Subscriptions\Ui\DataProvider\BillingFrequency\Linked;
 
 use Magento\Eav\Api\AttributeRepositoryInterface;
@@ -65,6 +68,9 @@ class LinkedProductsProvider extends DataProvider
         $this->request = $request;
     }
 
+    /**
+     * @inheritDoc
+     */
     public function getMeta()
     {
         $meta = parent::getMeta();
@@ -98,6 +104,9 @@ class LinkedProductsProvider extends DataProvider
         );
     }
 
+    /**
+     * @inheritDoc
+     */
     public function getSearchResult()
     {
         /** @var SearchResult $result */
