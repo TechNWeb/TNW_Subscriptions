@@ -7,6 +7,7 @@ namespace TNW\Subscriptions\Model\Payment;
 
 use TNW\Subscriptions\Model\Config as SubscriptionConfig;
 use TNW\Subscriptions\Model\SubscriptionProfile\Manager;
+use Magento\Quote\Model\Quote;
 
 /**
  * Class DataBuilder - base payment data builder
@@ -23,6 +24,9 @@ class DataBuilder
      */
     protected $subscriptionConfig;
 
+    /**
+     * @var bool
+     */
     protected $is3DSecure = false;
 
     /**
@@ -39,11 +43,11 @@ class DataBuilder
     }
 
     /**
-     * @param \Magento\Quote\Model\Quote $order
-     * @return array
+     * @param $order
+     * @return float|int|mixed
      * @throws \Magento\Framework\Exception\LocalizedException
      * @throws \Magento\Framework\Exception\NoSuchEntityException
-     * @throws \Zend_Json_Exception
+     * @throws \TNW\Subscriptions\Model\SubscriptionProfile\Engine\InvalidEngineException
      */
     public function getAmount($order)
     {
@@ -60,19 +64,32 @@ class DataBuilder
             if ($subscriptionItems) {
                 $this->manager->populateProfileData($order, $subscriptionItems);
             }
-            $result = $this->getAmountByProfile($this->manager->getProfile());
+            if ($order instanceof Quote) {
+                $result = $this->getAmountByProfile($this->manager->getProfile(), $order);
+            } else {
+                $result = $this->getAmountByProfile($this->manager->getProfile());
+            }
         }
         return $result;
     }
 
-    public function getAmountByProfile($profile)
+    /**
+     * @param $profile
+     * @param null $quote
+     * @return float|int
+     * @throws \Magento\Framework\Exception\LocalizedException
+     * @throws \TNW\Subscriptions\Model\SubscriptionProfile\Engine\InvalidEngineException
+     */
+    public function getAmountByProfile($profile, $quote = null)
     {
         $amount = 0;
         if ($profile) {
-            $products = $profile->getProfileProducts();
-            foreach ($products as $product) {
-                $amount += (float)$product->getPrice();
+            if ($quote && !$quote->getPayment()->getMethod()) {
+                $tempQuote = $quote;
+            } else {
+                $tempQuote = $this->manager->getTempQuote($profile);
             }
+            $amount = $tempQuote->getGrandTotal();
         }
         return $amount;
     }

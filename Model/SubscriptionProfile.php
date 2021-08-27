@@ -547,6 +547,15 @@ class SubscriptionProfile extends AbstractExtensibleModel implements Subscriptio
      */
     public function setProducts(array $products)
     {
+        if ($this->getProducts()) {
+            foreach ($this->getProducts() as $product) {
+                foreach ($products as $newProduct) {
+                    if ($newProduct->getMagentoProductId() == $product->getMagentoProductId()) {
+                        $newProduct->setEntityId($product->getEntityId());
+                    }
+                }
+            }
+        }
         return $this->setData(self::PROFILE_PRODUCTS, $products);
     }
 
