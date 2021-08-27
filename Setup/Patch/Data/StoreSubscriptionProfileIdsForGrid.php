@@ -40,7 +40,7 @@ class StoreSubscriptionProfileIdsForGrid implements DataPatchInterface
     private $availableSubscriptionProfileGrid;
 
     /**
-     * StoreSubscriptionProfileIdsForFormingGrid constructor.
+     * StoreSubscriptionProfileIdsForGrid constructor.
      *
      * @param ModuleDataSetupInterface $moduleDataSetup
      * @param SubscriptionProfileRepositoryInterface $subscriptionProfileRepository
