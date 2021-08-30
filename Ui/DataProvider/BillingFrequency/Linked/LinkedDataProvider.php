@@ -16,6 +16,7 @@ use Magento\Store\Api\StoreRepositoryInterface;
 use TNW\Subscriptions\Api\Data\ProductBillingFrequencyInterface;
 use TNW\Subscriptions\Model\Config\Source\PurchaseType;
 use TNW\Subscriptions\Model\Product\Attribute;
+use TNW\Subscriptions\Model\Config;
 
 /**
  * Data Provider of products, available for link
@@ -31,6 +32,11 @@ class LinkedDataProvider extends AbstractDataProvider
     private $dataPersistor;
 
     /**
+     * @var Config
+     */
+    private $config;
+
+    /**
      * @param string $name
      * @param string $primaryFieldName
      * @param string $requestFieldName
@@ -40,6 +46,7 @@ class LinkedDataProvider extends AbstractDataProvider
      * @param StoreRepositoryInterface $storeRepository
      * @param ProductLinkRepositoryInterface $productLinkRepository
      * @param DataPersistorInterface $dataPersistor
+     * @param Config $config
      * @param array $addFieldStrategies
      * @param array $addFilterStrategies
      * @param array $meta
@@ -55,12 +62,14 @@ class LinkedDataProvider extends AbstractDataProvider
         StoreRepositoryInterface $storeRepository,
         ProductLinkRepositoryInterface $productLinkRepository,
         DataPersistorInterface $dataPersistor,
+        Config $config,
         array $addFieldStrategies,
         array $addFilterStrategies,
         array $meta = [],
         array $data = []
     ) {
         $this->dataPersistor = $dataPersistor;
+        $this->config = $config;
 
         parent::__construct(
             $name,
@@ -117,6 +126,9 @@ class LinkedDataProvider extends AbstractDataProvider
                 'tnw_b_f.'. ProductBillingFrequencyInterface::BILLING_FREQUENCY_ID . ' IS NULL'
             );
         }
+
+        $websiteIds = $this->config->getWebsiteIdsSubscriptionsActive();
+        $collection->addWebsiteFilter($websiteIds);
     }
 
     /**
