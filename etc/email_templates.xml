@@ -4,6 +4,7 @@
     <template id="tnw_subscriptions_profile_notification_send_comment_setting_comment_added" label="Subscription Comment Add" file="comment_add.html" type="html" module="TNW_Subscriptions" area="frontend"/>
     <template id="tnw_subscriptions_profile_notification_card_expire_setting_card_expire" label="Subscription Card Expire" file="card_expire.html" type="html" module="TNW_Subscriptions" area="frontend"/>
     <template id="tnw_subscriptions_profile_notification_payment_failed_setting_payment_failed" label="Subscription Payment Failed" file="payment_failed.html" type="html" module="TNW_Subscriptions" area="frontend"/>
+    <template id="tnw_subscriptions_profile_notification_payment_failed_setting_payment_verification_failed" label="Subscription Payment Verification Failed" file="payment_verification_failed.html" type="html" module="TNW_Subscriptions" area="frontend"/>
     <template id="tnw_subscriptions_profile_notification_renewal_setting_renewal" label="Subscription Renewal" file="renewal.html" type="html" module="TNW_Subscriptions" area="frontend"/>
     <template id="tnw_subscriptions_profile_notification_out_of_stock_setting_out_of_stock" label="Subscription Out Of Stock" file="stock.html" type="html" module="TNW_Subscriptions" area="frontend"/>
     <template id="tnw_subscriptions_profile_notification_confirmation_order_setting_confirmation_order" label="Success Order" file="confirmation_order.html" type="html" module="TNW_Subscriptions" area="frontend"/>

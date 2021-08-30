@@ -118,11 +118,16 @@ class ProfileProcessor
                 $this->queueManager->makeCompleted($queueIds, $e->getMessage());
                 $orderProcessHasError = false;
             } catch (\Magento\Payment\Gateway\Command\CommandException $e) {
+                //TODO: add payment error processor for each payment engine
                 $this->context->messageError($e->getMessage());
-                $this->queueManager->makeError($queueIds, $e->getMessage(), true);
+                if ($e->getCode() == 2099) {
+                    $this->queueManager->makeVerification($queueIds, $e->getMessage(), false);
+                } else {
+                    $this->queueManager->makeError($queueIds, $e->getMessage(), true);
+                }
                 $orderProcessHasError = false;
             } catch (\Exception $e) {
-                $this->context->messageError('Error on processing profile: %s', $e);
+                $this->context->messageError('Error on proc       essing profile: %s', $e);
                 $this->queueManager->makeError($queueIds, $e->getMessage());
                 $orderProcessHasError = false;
             } finally {

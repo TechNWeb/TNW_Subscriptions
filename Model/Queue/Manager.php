@@ -19,6 +19,7 @@ use TNW\Subscriptions\Model\SubscriptionProfile;
 use TNW\Subscriptions\Model\SubscriptionProfileOrder\Manager as RelationManager;
 use TNW\Subscriptions\Model\SubscriptionProfileRepository;
 use TNW\Subscriptions\Model\EmailNotifierFactory;
+use TNW\Subscriptions\Model\SubscriptionProfile\ReBillManager;
 
 /**
  * Class Manager - queue manager model
@@ -119,25 +120,8 @@ class Manager
      */
     private $orderSender;
 
-    /**
-     * Manager constructor.
-     * @param CollectionFactory $collectionFactory
-     * @param Config $config
-     * @param SubscriptionProfile\Manager $profileManager
-     * @param RelationManager $relationManager
-     * @param CartRepositoryInterface $cartRepository
-     * @param SubscriptionProfileRepository $profileRepository
-     * @param SubscriptionProfile\Status\HistoryManager $statusHistoryManager
-     * @param SubscriptionProfile\MessageHistoryLogger $messageHistoryLogger
-     * @param ProfileStatus $profileStatus
-     * @param \TNW\Subscriptions\Model\ResourceModel\Queue $resourceQueue
-     * @param \Magento\Framework\Stdlib\DateTime\TimezoneInterface $timezone
-     * @param \Magento\Quote\Model\QuoteFactory $quoteFactory
-     * @param \TNW\Subscriptions\Model\ResourceModel\SalesItemRelation $relationResource
-     * @param EmailNotifierFactory $emailNotifierFactory
-     * @param BillingCyclesManagerFactory $billingCyclesManagerFactory
-     * @param \Magento\Sales\Model\Order\Email\Sender\OrderSender $orderSender
-     */
+    private $reBillManager;
+
     public function __construct(
         CollectionFactory $collectionFactory,
         Config $config,
@@ -154,8 +138,10 @@ class Manager
         \TNW\Subscriptions\Model\ResourceModel\SalesItemRelation $relationResource,
         EmailNotifierFactory $emailNotifierFactory,
         BillingCyclesManagerFactory $billingCyclesManagerFactory,
-        \Magento\Sales\Model\Order\Email\Sender\OrderSender $orderSender
+        \Magento\Sales\Model\Order\Email\Sender\OrderSender $orderSender,
+        ReBillManager $reBillManager
     ) {
+        $this->reBillManager = $reBillManager;
         $this->orderSender = $orderSender;
         $this->billingCyclesManagerFactory = $billingCyclesManagerFactory;
         $this->emailNotifierFactory = $emailNotifierFactory;
@@ -325,6 +311,19 @@ class Manager
     public function makeError($ids, $message, $isPaymentError = false)
     {
         $this->resourceQueue->updateStatus($ids, QueueStatus::QUEUE_STATUS_ERROR, $message, $isPaymentError);
+    }
+
+    /**
+     * Changes status to reuquired verification and sets error message for queue items.
+     *
+     * @param array|int $ids
+     * @param string $message
+     * @param bool $isPaymentError
+     * @throws \Magento\Framework\Exception\LocalizedException
+     */
+    public function makeVerification($ids, $message, $isPaymentError = false)
+    {
+        $this->resourceQueue->updateStatus($ids, QueueStatus::QUEUE_STATUS_VERIFICATION, $message, $isPaymentError);
     }
 
     /**
@@ -549,6 +548,9 @@ class Manager
                     $this->profileRepository->save($profile);
                 }
             } catch (\Exception $e) {
+                if ($e instanceof \Magento\Payment\Gateway\Command\CommandException && $e->getCode() == 2099) {
+                    $reBill = $this->reBillManager->createReBillByFailedGroupQueue($groupQueue);
+                }
                 foreach ($groupQueue as $queue) {
                     $profile = $this->profileRepository->getById($queue->getData('subscription_profile_id'));
 
@@ -571,10 +573,13 @@ class Manager
                         );
                     }
                     if ($e instanceof \Magento\Payment\Gateway\Command\CommandException) {
-                        $this->emailNotifierFactory->create()->paymentFailed($profile);
+                        if (isset($reBill)) {
+                            $this->emailNotifierFactory->create()->paymentVerificationFailed($profile, $reBill);
+                        } else {
+                            $this->emailNotifierFactory->create()->paymentFailed($profile);
+                        }
                     }
                 }
-
                 throw $e;
             }
         } else {
