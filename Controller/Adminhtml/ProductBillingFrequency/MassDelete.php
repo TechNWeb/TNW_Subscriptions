@@ -89,7 +89,7 @@ class MassDelete extends Action implements HttpPostActionInterface
                 'in'
             )->addFilter(
                 ProductBillingFrequencyInterface::SUBSCRIPTION_PROFILE_ID_FOR_GRID,
-                true,
+                '[]',
                 'null'
             )->create();
             $productBillingFrequencies = $this->productBillingFrequencyRepository->getList($searchCriteria);
