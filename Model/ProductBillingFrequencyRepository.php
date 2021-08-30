@@ -188,6 +188,21 @@ class ProductBillingFrequencyRepository implements ProductBillingFrequencyReposi
                     $collection->addStoreFilter($filter->getValue(), false);
                     continue;
                 }
+                if ($filter->getField() === ProductBillingFrequencyInterface::SUBSCRIPTION_PROFILE_ID_FOR_GRID
+                    && $filter->getConditionType() === 'null'
+                ) {
+                    $collection->addFieldToFilter(
+                        [
+                            $filter->getField(),
+                            $filter->getField(),
+                        ],
+                        [
+                            ['null' => true],
+                            ['eq' => $filter->getValue()]
+                        ]
+                    );
+                    continue;
+                }
                 $condition = $filter->getConditionType() ?: 'eq';
                 $collection->addFieldToFilter($filter->getField(), [$condition => $filter->getValue()]);
             }
