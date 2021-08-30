@@ -890,6 +890,11 @@ class UpgradeSchema implements UpgradeSchemaInterface
             );
     }
 
+    /**
+     * Remove Customer address FK
+     *
+     * @param SchemaSetupInterface $setup
+     */
     private function removeCustomerAddressFK(SchemaSetupInterface $setup)
     {
         $addressTable = $setup->getTable(

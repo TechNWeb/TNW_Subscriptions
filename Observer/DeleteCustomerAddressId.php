@@ -8,8 +8,9 @@ use Magento\Framework\Api\SearchCriteriaBuilder;
 use Psr\Log\LoggerInterface;
 
 /**
+ * Delete customer_address_id from tnw_subscriptions_subscription_profile_address for correct process profile
+ *
  * Class DeleteCustomerAddressId
- * @package TNW\Subscriptions\Observer
  */
 class DeleteCustomerAddressId implements ObserverInterface
 {
@@ -38,8 +39,7 @@ class DeleteCustomerAddressId implements ObserverInterface
         SubscriptionProfileAddressRepositoryInterface $subscriptionProfileAddressRepository,
         SearchCriteriaBuilder $searchCriteriaBuilder,
         LoggerInterface $logger
-    )
-    {
+    ) {
         $this->subscriptionProfileAddressRepository = $subscriptionProfileAddressRepository;
         $this->searchCriteriaBuilder = $searchCriteriaBuilder;
         $this->logger = $logger;
