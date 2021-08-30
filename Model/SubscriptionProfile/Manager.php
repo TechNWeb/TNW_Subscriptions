@@ -525,6 +525,25 @@ class Manager
         return $quote;
     }
 
+    public function getTempQuoteByProfileIds(array $profileIDs)
+    {
+        $this->tempQuote = true;
+        $quote = $this->quoteFactory->create(['data' => ['is_active' => false]]);
+        foreach ($profileIDs as $key => $profileId) {
+            $collectTotals = false;
+            $profile = $this->subscriptionProfileRepository->getById($profileId);
+            if ($key === array_key_first($profileIDs)) {
+                $this->assignCustomerToQuote($quote, $profile);
+            }
+            if ($key === array_key_last($profileIDs)) {
+                $collectTotals = true;
+            }
+            $this->populateQuoteData($quote, $profile, $collectTotals, true);
+        }
+        $this->tempQuote = false;
+        return $quote;
+    }
+
     /**
      * Sets to profile status "Holded".
      */
