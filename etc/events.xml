@@ -78,4 +78,7 @@
     <event name="admin_system_config_save">
         <observer name="tnw_subscription_enable" instance="TNW\Subscriptions\Observer\EnableDisableModule"/>
     </event>
+    <event name="customer_address_delete_commit_after">
+        <observer name="tnw_subscription_delete_address" instance="TNW\Subscriptions\Observer\DeleteCustomerAddressId"/>
+    </event>
 </config>
