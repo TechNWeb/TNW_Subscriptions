@@ -41,7 +41,7 @@
     <listingToolbar name="listing_top">
         <paging name="listing_paging"/>
         <filters name="listing_filters"/>
-        <massaction name="listing_massaction">
+        <massaction name="listing_massaction" component="TNW_Subscriptions/js/grid/linked-product-massactions">
             <settings>
                 <indexField>id</indexField>
                 <selectProvider>tnw_billingfrequency_product_listing.tnw_billingfrequency_product_listing.bf_products_columns.ids</selectProvider>
@@ -54,6 +54,21 @@
                     </callback>
                     <type>edit</type>
                     <label translate="true">Edit</label>
+                </settings>
+            </action>
+            <action name="delete">
+                <settings>
+                    <label translate="true">Unlink</label>
+                    <url path="tnw_subscriptions/productbillingfrequency/massdelete"/>
+                    <callback>
+                        <target>deleteLinkedProducts</target>
+                        <provider>tnw_billingfrequency_product_listing.tnw_billingfrequency_product_listing.listing_top.listing_massaction</provider>
+                    </callback>
+                    <type>delete</type>
+                    <confirm>
+                        <title translate="true">Unlink</title>
+                        <message translate="true">Are you sure you want to unlink selected products?</message>
+                    </confirm>
                 </settings>
             </action>
         </massaction>
