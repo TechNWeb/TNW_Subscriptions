@@ -6,7 +6,7 @@
 namespace TNW\Subscriptions\Controller\Subscription\Queue;
 
 use Magento\Customer\Controller\AbstractAccount;
-use Magento\Framework\App\Action\HttpGetActionInterface;
+use Magento\Framework\App\Action\HttpPostActionInterface;
 use Magento\Framework\App\Action\Context;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\View\Result\PageFactory;
@@ -14,9 +14,9 @@ use TNW\Subscriptions\Model\SubscriptionProfile\ReBillRepository;
 use Magento\Customer\Model\Session as CustomerSession;
 
 /**
- * Class Process - used to populate the re-bill from
+ * Class Process - used to submit the re-bill from
  */
-class Process extends AbstractAccount implements HttpGetActionInterface
+class ProcessPost extends AbstractAccount implements HttpPostActionInterface
 {
     /**
      * @var PageFactory
