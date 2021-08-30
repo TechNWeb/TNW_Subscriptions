@@ -150,7 +150,7 @@ class UpgradeSchema implements UpgradeSchemaInterface
             $this->addCustomerProductsHistoryTable($setup);
         }
 
-        if (version_compare($context->getVersion(), '2.3.31', '<')) {
+        if (version_compare($context->getVersion(), '2.3.37', '<')) {
             $this->addColumnForSubscriptionGrid($setup);
         }
 
