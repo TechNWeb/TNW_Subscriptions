@@ -150,11 +150,8 @@ class UpgradeSchema implements UpgradeSchemaInterface
             $this->addCustomerProductsHistoryTable($setup);
         }
 
-        if (version_compare($context->getVersion(), '2.3.37', '<')) {
-            $this->addColumnForSubscriptionGrid($setup);
-        }
-
         if (version_compare($context->getVersion(), '2.3.36', '<')) {
+            $this->addColumnForSubscriptionGrid($setup);
             $this->addRecurringInstallmentDates($setup);
             $setup->getConnection()->addColumn(
                 $setup->getTable('tnw_subscriptions_subscription_profile_entity'),
