@@ -525,6 +525,13 @@ class Manager
         return $quote;
     }
 
+    /**
+     * @param array $profileIDs
+     * @return mixed
+     * @throws Engine\InvalidEngineException
+     * @throws LocalizedException
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     */
     public function getTempQuoteByProfileIds(array $profileIDs)
     {
         $this->tempQuote = true;
