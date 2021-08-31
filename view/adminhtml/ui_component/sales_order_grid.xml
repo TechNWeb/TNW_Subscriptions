@@ -13,8 +13,49 @@
                     <item name="bodyTmpl" xsi:type="string">ui/grid/cells/html</item>
                     <item name="filter" xsi:type="string">text</item>
                     <item name="label" xsi:type="string" translate="true">Subscription Profiles</item>
+                    <item name="draggable" xsi:type="boolean">true</item>
                 </item>
             </argument>
         </actionsColumn>
+        <column name="subscription_paid_installment" class="TNW\Subscriptions\Ui\Component\Listing\Column\Sales\Order\Grid\PaidInstallment">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="bodyTmpl" xsi:type="string">ui/grid/cells/html</item>
+                    <item name="filter" xsi:type="string">text</item>
+                    <item name="label" xsi:type="string" translate="true">Recurring Paid Installment</item>
+                    <item name="draggable" xsi:type="boolean">true</item>
+                </item>
+            </argument>
+        </column>
+        <column name="subscription_final_installment_date" class="TNW\Subscriptions\Ui\Component\Listing\Column\Sales\Order\Grid\FinalInstallment">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="bodyTmpl" xsi:type="string">ui/grid/cells/html</item>
+                    <item name="filter" xsi:type="string">text</item>
+                    <item name="label" xsi:type="string" translate="true">Recurring Final Installment Date</item>
+                    <item name="draggable" xsi:type="boolean">true</item>
+                </item>
+            </argument>
+        </column>
+        <column name="subscription_first_installment_date" class="TNW\Subscriptions\Ui\Component\Listing\Column\Sales\Order\Grid\FirstInstallment">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="bodyTmpl" xsi:type="string">ui/grid/cells/html</item>
+                    <item name="filter" xsi:type="string">text</item>
+                    <item name="label" xsi:type="string" translate="true">Recurring 1st Installment Date</item>
+                    <item name="draggable" xsi:type="boolean">true</item>
+                </item>
+            </argument>
+        </column>
+        <column name="subscription_expire_cc" class="TNW\Subscriptions\Ui\Component\Listing\Column\Sales\Order\Grid\ExpireCc">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="bodyTmpl" xsi:type="string">ui/grid/cells/html</item>
+                    <item name="filter" xsi:type="string">text</item>
+                    <item name="label" xsi:type="string" translate="true">Will CC Expire?</item>
+                    <item name="draggable" xsi:type="boolean">true</item>
+                </item>
+            </argument>
+        </column>
     </columns>
 </listing>

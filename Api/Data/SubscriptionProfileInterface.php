@@ -47,6 +47,7 @@ interface SubscriptionProfileInterface extends CustomAttributesDataInterface
     const ORIGINAL_START_DATE = 'original_start_date';
     const BILLING_CYCLES_TO_SKIP = 'billing_cycles_to_skip';
     const COUPON_CODE = 'coupon_code';
+    const STATIC_TOTAL_BILLING_CYCLES = 'subscription_total_static_billing_cycles';
     /**#@-*/
 
     /**#@+
@@ -521,4 +522,15 @@ interface SubscriptionProfileInterface extends CustomAttributesDataInterface
      * @return $this
      */
     public function setCouponCode($couponCode);
+
+    /**
+     * @return string|null
+     */
+    public function getStaticTotalBillingCycles();
+
+    /**
+     * @param string $total
+     * @return $this
+     */
+    public function setStaticTotalBillingCycles($total);
 }

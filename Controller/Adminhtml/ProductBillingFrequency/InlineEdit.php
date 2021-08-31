@@ -1,17 +1,22 @@
 <?php
-
+/**
+ * Copyright © 2018 TechNWeb, Inc. All rights reserved.
+ * See TNW_LICENSE.txt for license details.
+ */
 namespace TNW\Subscriptions\Controller\Adminhtml\ProductBillingFrequency;
 
 use Magento\Backend\App\Action;
 use Magento\Backend\App\Action\Context;
 use Magento\Framework\Api\SearchCriteriaBuilder;
 use Magento\Framework\App\Action\HttpPostActionInterface;
-use Magento\Framework\Controller\Result\Json;
 use Magento\Framework\Controller\Result\JsonFactory;
 use Magento\Framework\Exception\LocalizedException;
 use TNW\Subscriptions\Api\Data\ProductBillingFrequencyInterface;
 use TNW\Subscriptions\Api\ProductBillingFrequencyRepositoryInterface;
 
+/**
+ * Action for inline grid editing of linked products to billing frequency
+ */
 class InlineEdit extends Action implements HttpPostActionInterface
 {
     /**
@@ -34,6 +39,13 @@ class InlineEdit extends Action implements HttpPostActionInterface
      */
     private $searchCriteriaBuilder;
 
+    /**
+     * InlineEdit constructor.
+     * @param Context $context
+     * @param JsonFactory $jsonFactory
+     * @param ProductBillingFrequencyRepositoryInterface $productBillingFrequencyRepository
+     * @param SearchCriteriaBuilder $searchCriteriaBuilder
+     */
     public function __construct(
         Context $context,
         JsonFactory $jsonFactory,

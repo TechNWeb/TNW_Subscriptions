@@ -9,8 +9,12 @@ use Magento\Catalog\Model\ResourceModel\Product\CollectionFactory;
 use Magento\Catalog\Ui\DataProvider\Product\ProductDataProvider;
 use Magento\CatalogInventory\Api\StockItemCriteriaInterfaceFactory;
 use Magento\CatalogInventory\Api\StockItemRepositoryInterface;
+use Magento\Framework\Exception\NoSuchEntityException;
 use TNW\Subscriptions\Api\Data\BillingFrequencyInterface;
 use TNW\Subscriptions\Api\Data\ProductBillingFrequencyInterface;
+use TNW\Subscriptions\Model\QuoteSessionInterface;
+use Magento\Store\Model\StoreManagerInterface;
+use Psr\Log\LoggerInterface;
 
 /**
  * Data provider for "Add product" modal product grid.
@@ -51,6 +55,18 @@ class Grid extends ProductDataProvider
     private $filterBuilder;
 
     /**
+     * @var QuoteSessionInterface
+     */
+    private $session;
+
+    /**
+     * @var StoreManagerInterface
+     */
+    private $storeManager;
+
+    private $logger;
+
+    /**
      * @param string $name
      * @param string $primaryFieldName
      * @param string $requestFieldName
@@ -73,6 +89,9 @@ class Grid extends ProductDataProvider
         StockItemRepositoryInterface $stockItemRepository,
         \Magento\Framework\App\RequestInterface $request,
         \Magento\Framework\Api\FilterBuilder $filterBuilder,
+        QuoteSessionInterface $session,
+        StoreManagerInterface $storeManager,
+        LoggerInterface $logger,
         $addFieldStrategies = [],
         $addFilterStrategies = [],
         array $meta = [],
@@ -95,6 +114,9 @@ class Grid extends ProductDataProvider
         $this->request = $request;
         $this->filterBuilder = $filterBuilder;
         $this->prepareUpdateUrl();
+        $this->session = $session;
+        $this->storeManager = $storeManager;
+        $this->logger = $logger;
     }
 
     /**
@@ -244,6 +266,14 @@ class Grid extends ProductDataProvider
     private function getStockItems()
     {
         $collection = $this->getCollection();
+        if ($storeId = $this->session->getStoreId()) {
+            try {
+                $websiteId = $this->storeManager->getStore($storeId)->getWebsiteId();
+                $collection->addWebsiteFilter($websiteId);
+            } catch (NoSuchEntityException $exception) {
+                $this->logger->error($exception->getMessage());
+            }
+        }
         $productIds = $collection->getAllIds();
         if (empty($productIds)) {
             return [];

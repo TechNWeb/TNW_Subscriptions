@@ -1,10 +1,16 @@
 <?xml version="1.0"?>
+<!--
+/**
+* Copyright © 2018 TechNWeb, Inc. All rights reserved.
+* See TNW_LICENSE.txt for license details.
+*/
+-->
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:noNamespaceSchemaLocation="urn:magento:framework-message-queue:etc/topology.xsd">
-    <exchange name="magento-db" type="topic" connection="db">
-        <binding id="processAddProductsToLinkQueueBinding"
+    <exchange name="tnw.products" type="topic" connection="amqp">
+        <binding id="TnwLinkProductsToBillingFrequency"
                  topic="tnw.products.link"
                  destinationType="queue"
-                 destination="tnw.products.link"/>
+                 destination="tnw_products_link"/>
     </exchange>
 </config>

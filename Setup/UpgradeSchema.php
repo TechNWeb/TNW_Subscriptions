@@ -150,8 +150,20 @@ class UpgradeSchema implements UpgradeSchemaInterface
             $this->addCustomerProductsHistoryTable($setup);
         }
 
-        if (version_compare($context->getVersion(), '2.3.31', '<')) {
+        if (version_compare($context->getVersion(), '2.3.36', '<')) {
             $this->addColumnForSubscriptionGrid($setup);
+            $this->addRecurringInstallmentDates($setup);
+            $setup->getConnection()->addColumn(
+                $setup->getTable('tnw_subscriptions_subscription_profile_entity'),
+                'subscription_total_static_billing_cycles',
+                [
+                    'type' => Table::TYPE_TEXT,
+                    'length' => 255,
+                    'nullable' => true,
+                    'default' => null,
+                    'comment' => 'Static total billing cycles ',
+                ]
+            );
         }
 
         $setup->endSetup();
@@ -914,5 +926,66 @@ class UpgradeSchema implements UpgradeSchemaInterface
                     'comment' => 'Store Subscription profiles id for grid on remove BF'
                 ]
             );
+    }
+
+    /**
+     * @param SchemaSetupInterface $setup
+     */
+    private function addRecurringInstallmentDates(SchemaSetupInterface $setup)
+    {
+        $table = $setup->getTable('sales_order_grid');
+        $setup->getConnection()->addColumn(
+            $table,
+            'subscription_paid_installment',
+            [
+                'type' => Table::TYPE_TEXT,
+                'length' => 255,
+                'nullable' => true,
+                'default' => null,
+                'comment' => 'Recurring Paid Installment',
+            ]
+        );
+        $setup->getConnection()->addColumn(
+            $table,
+            'subscription_final_installment_date',
+            [
+                'type' => Table::TYPE_DATETIME,
+                'nullable' => true,
+                'default' => null,
+                'comment' => 'Recurring Final Installment Date',
+            ]
+        );
+        $setup->getConnection()->addColumn(
+            $table,
+            'subscription_first_installment_date',
+            [
+                'type' => Table::TYPE_DATETIME,
+                'nullable' => true,
+                'default' => null,
+                'comment' => 'Recurring 1st Installment Date',
+            ]
+        );
+        $setup->getConnection()->addColumn(
+            $table,
+            'subscription_expire_cc',
+            [
+                'type' => Table::TYPE_TEXT,
+                'length' => 255,
+                'nullable' => true,
+                'default' => null,
+                'comment' => 'Will cc expire',
+            ]
+        );
+        $setup->getConnection()->addColumn(
+            $table,
+            'subscription_total_static_billing_cycles',
+            [
+                'type' => Table::TYPE_TEXT,
+                'length' => 255,
+                'nullable' => true,
+                'default' => null,
+                'comment' => 'Static total billing cycles',
+            ]
+        );
     }
 }

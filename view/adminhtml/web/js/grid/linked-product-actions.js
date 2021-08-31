@@ -1,3 +1,7 @@
+/**
+ * Copyright © 2018 TechNWeb, Inc. All rights reserved.
+ * See TNW_LICENSE.txt for license details.
+ */
 define([
     'Magento_Ui/js/grid/columns/actions',
     'underscore',
@@ -48,7 +52,7 @@ define([
                             ? $t('Cannot unlink product from Billing frequency. '
                                 + 'Some <a href="%1" target="_blank">subscription profiles</a> use it.')
                             .replace('%1', data.grid_url)
-                            : data.messages.join('<br>')
+                            : data.messages.join(' ')
                     alert({
                         title: $t('Cannot unlink product'),
                         content: content
@@ -57,7 +61,9 @@ define([
                     self.source().reload()
                 }
             }).fail(function () {
-                alert($t('Something went wrong...'))
+                alert({
+                    content: $t('Something went wrong.')
+                })
             })
         }
     })

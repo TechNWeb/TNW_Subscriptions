@@ -15,9 +15,9 @@ use TNW\Subscriptions\Model\ProductBillingFrequency\AvailableSubscriptionProfile
 /**
  * Add Subscription Id to product billing frequency table for generate grid on remove BF from product
  *
- * Class StoreSubscriptionProfileIdsForFormingGrid
+ * Class StoreSubscriptionProfileIdsForGrid
  */
-class StoreSubscriptionProfileIdsForFormingGrid implements DataPatchInterface
+class StoreSubscriptionProfileIdsForGrid implements DataPatchInterface
 {
     /**
      * @var ModuleDataSetupInterface $moduleDataSetup
@@ -40,7 +40,7 @@ class StoreSubscriptionProfileIdsForFormingGrid implements DataPatchInterface
     private $availableSubscriptionProfileGrid;
 
     /**
-     * StoreSubscriptionProfileIdsForFormingGrid constructor.
+     * StoreSubscriptionProfileIdsForGrid constructor.
      *
      * @param ModuleDataSetupInterface $moduleDataSetup
      * @param SubscriptionProfileRepositoryInterface $subscriptionProfileRepository
@@ -81,7 +81,7 @@ class StoreSubscriptionProfileIdsForFormingGrid implements DataPatchInterface
     }
 
     /**
-     * @return StoreSubscriptionProfileIdsForFormingGrid|void
+     * @return StoreSubscriptionProfileIdsForGrid|void
      * @throws LocalizedException
      */
     public function apply()

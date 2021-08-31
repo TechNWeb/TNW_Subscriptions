@@ -10,10 +10,11 @@ define([
     'uiRegistry'
 ], function (MassActions, $, alert, $t, registry) {
     return MassActions.extend({
-        addLinkedProducts: function (action, data) {
+        deleteLinkedProducts: function (action, data) {
             var itemsType = data.excludeMode ? 'excluded' : 'selected',
                 selections = {},
-                billingFrequencyId = registry.get('index = billingfrequency_form_data_source').get('data.id');
+                billingFrequencyId = registry.get('index = billingfrequency_form_data_source').get('data.id'),
+                self = this;
 
             selections[itemsType] = data[itemsType];
 
@@ -21,7 +22,7 @@ define([
                 selections[itemsType] = false;
             }
 
-            _.extend(selections, { frequency_id : billingFrequencyId }, data.params || {});
+            _.extend(selections, { billing_frequency_id : billingFrequencyId }, data.params || {});
 
             $.post(
                 {
@@ -29,10 +30,9 @@ define([
                     data: selections
                 }
             ).done(function (data) {
-                registry.get('ns = tnw_billingfrequency_form, index = modal').closeModal()
                 $('body').notification('clear').notification('add', {
                     error: data.error,
-                    message: data.messages.join('<br>'),
+                    message: data.messages.join(' '),
 
                     /**
                      * Inserts message on page
@@ -43,12 +43,12 @@ define([
                     }
                 });
             }).fail(function () {
-                alert($t('Something went wrong.'))
+                alert({
+                    content: $t('Something went wrong.')
+                })
+            }).always(function () {
+                self.source.reload();
             });
-        },
-
-        triggerAdd: function () {
-            this.applyAction('add')
         }
     })
 })

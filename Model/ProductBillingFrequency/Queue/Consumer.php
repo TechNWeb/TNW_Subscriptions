@@ -1,5 +1,8 @@
 <?php
-
+/**
+ * Copyright © 2018 TechNWeb, Inc. All rights reserved.
+ * See TNW_LICENSE.txt for license details.
+ */
 namespace TNW\Subscriptions\Model\ProductBillingFrequency\Queue;
 
 use Magento\AsynchronousOperations\Api\Data\OperationInterface;
@@ -111,6 +114,7 @@ class Consumer
     }
 
     /**
+     * Process link product operation
      * @param OperationInterface $operation
      * @return void
      * @throws \Exception
@@ -199,6 +203,7 @@ class Consumer
     }
 
     /**
+     * Prepare new linked product object
      * @param $productId
      * @param $frequencyId
      * @return ProductBillingFrequency
@@ -216,6 +221,7 @@ class Consumer
     }
 
     /**
+     * Get default product prices array indexed by product id
      * @param $data array
      * @return array
      */
@@ -234,6 +240,7 @@ class Consumer
     }
 
     /**
+     * Get calculated subscription price
      * @param $product ProductInterface
      * @return float|int
      */
