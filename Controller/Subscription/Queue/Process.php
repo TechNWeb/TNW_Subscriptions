@@ -58,6 +58,7 @@ class Process extends AbstractAccount implements HttpGetActionInterface
     public function execute()
     {
         $token = $this->getRequest()->getParam('token');
+        $resultPage = $this->resultPageFactory->create();
         try {
             $reBill = $this->reBillRepository->getByToken($token);
             if (!$reBill->getId() || $this->customerSession->getCustomerId() != $reBill->getCustomerId()) {
@@ -65,8 +66,8 @@ class Process extends AbstractAccount implements HttpGetActionInterface
             }
         } catch (\Exception $e) {
             $this->messageManager->addError('The provided Link is expired or invalid.');
+            $resultPage->getLayout()->getBlock('process_form')->setData('error', true);
         }
-        $resultPage = $this->resultPageFactory->create();
         $resultPage->getConfig()->getTitle()->set('Verify and Re-Bill');
         return $resultPage;
     }

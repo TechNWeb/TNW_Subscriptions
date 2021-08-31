@@ -21,7 +21,7 @@ class ReBill extends AbstractDb
     {
         $this->_init(
             'tnw_subscriptions_rebill_profiles',
-            'entity_id'
+            'id'
         );
     }
 }

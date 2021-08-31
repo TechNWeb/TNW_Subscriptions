@@ -106,7 +106,7 @@ class ReBillRepository implements ReBillRepositoryInterface
         $this->resourceModel->load($reBill, $reBillToken, 'token');
         if (!$reBill->getId()) {
             throw new NoSuchEntityException(__(
-                'Subscriotion ReBill with token "%1" does not exist.',
+                'Subscription ReBill with token "%1" does not exist.',
                 $reBillToken
             ));
         }

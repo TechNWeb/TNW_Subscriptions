@@ -68,7 +68,6 @@ class ThreeDSecureDetailsHandler
                 'liability_shift_possible',
                 $info->liabilityShifted ? 1 : 0
             );
-            $this->paymentTokenRepository->save($payment->getExtensionAttributes()->getVaultPaymentToken());
         }
     }
 }
