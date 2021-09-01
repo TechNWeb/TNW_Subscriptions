@@ -118,6 +118,38 @@ class SubscriptionProfileOrder extends AbstractDb
     }
 
     /**
+     * Populate Sales Order table with Profile Installment data
+     *
+     * @param int $magentoOrderId
+     * @param $paidRecurring
+     * @param $finalRecurring
+     * @param $firstRecurring
+     * @param $expireCc
+     * @param $totalBilling
+     */
+    public function populateRecurringInstallmentDataSalesOrder(
+        $magentoOrderId,
+        $paidRecurring,
+        $finalRecurring,
+        $firstRecurring,
+        $expireCc,
+        $totalBilling
+    ) {
+        $connection = $this->getConnection();
+        $connection->update(
+            $this->getTable('sales_order'),
+            [
+                'subscription_paid_installment' => $paidRecurring,
+                'subscription_final_installment_date' => $finalRecurring,
+                'subscription_first_installment_date' => $firstRecurring,
+                'subscription_expire_cc' => $expireCc,
+                'subscription_total_static_billing_cycles' => $totalBilling,
+            ],
+            ['entity_id = ?' => $magentoOrderId]
+        );
+    }
+
+    /**
      * @param $profileId
      * @return array
      * @throws LocalizedException
