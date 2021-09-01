@@ -31,9 +31,10 @@ define([
             var clientInstance = context.braintreeClientInstance,
                 state = $.Deferred(),
                 totalAmount = this.config.totalAmount,
+                thresholdAmount = this.config.thresholdAmount,
                 countryId = $('#country').val();
 
-            if (countryId && !this.isCountryAvailable(countryId)) {
+            if ((countryId && !this.isCountryAvailable(countryId)) || totalAmount < thresholdAmount) {
                 state.resolve();
                 return state.promise();
             }

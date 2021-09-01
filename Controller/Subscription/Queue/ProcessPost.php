@@ -8,8 +8,8 @@ namespace TNW\Subscriptions\Controller\Subscription\Queue;
 use Magento\Customer\Controller\AbstractAccount;
 use Magento\Framework\App\Action\HttpPostActionInterface;
 use Magento\Framework\App\Action\Context;
-use Magento\Framework\Exception\LocalizedException;
-use Magento\Framework\View\Result\PageFactory;
+use Magento\Framework\Controller\Result\JsonFactory;
+use Magento\Framework\Message\ManagerInterface;
 use TNW\Subscriptions\Model\SubscriptionProfile\ReBillRepository;
 use Magento\Customer\Model\Session as CustomerSession;
 
@@ -18,11 +18,6 @@ use Magento\Customer\Model\Session as CustomerSession;
  */
 class ProcessPost extends AbstractAccount implements HttpPostActionInterface
 {
-    /**
-     * @var PageFactory
-     */
-    private $resultPageFactory;
-
     /**
      * @var ReBillRepository
      */
@@ -34,40 +29,57 @@ class ProcessPost extends AbstractAccount implements HttpPostActionInterface
     private $customerSession;
 
     /**
+     * @var JsonFactory
+     */
+    private $jsonFactory;
+
+    /**
      * Process constructor.
      * @param Context $context
-     * @param PageFactory $resultPageFactory
+     * @param JsonFactory $jsonFactory
      * @param ReBillRepository $reBillRepository
      * @param CustomerSession $customerSession
+     * @param ManagerInterface $messageManager
      */
     public function __construct(
         Context $context,
-        PageFactory $resultPageFactory,
+        JsonFactory $jsonFactory,
         ReBillRepository $reBillRepository,
-        CustomerSession $customerSession
+        CustomerSession $customerSession,
+        ManagerInterface $messageManager
     ) {
         $this->customerSession = $customerSession;
         $this->reBillRepository = $reBillRepository;
-        $this->resultPageFactory = $resultPageFactory;
+        $this->jsonFactory = $jsonFactory;
+        $this->messageManager = $messageManager;
         parent::__construct($context);
     }
 
     /**
-     * @return \Magento\Framework\View\Result\Page
+     * @inheritDoc
      */
     public function execute()
     {
-        $token = $this->getRequest()->getParam('token');
-        try {
-            $reBill = $this->reBillRepository->getByToken($token);
-            if (!$reBill->getId() || $this->customerSession->getCustomerId() != $reBill->getCustomerId()) {
-                throw new LocalizedException(__('Not Valid Data to process.'));
+        $resultJson = $this->jsonFactory->create();
+        $error = false;
+        $messages = [];
+
+        $nonce = $this->getRequest()->getParam('paymentMethodNonce');
+
+        $messages[] = __('The order was successfully re-billed.');
+
+        foreach ($messages as $message) {
+            if ($error) {
+                $this->messageManager->addErrorMessage($message);
+            } else {
+                $this->messageManager->addSuccessMessage($message);
             }
-        } catch (\Exception $e) {
-            $this->messageManager->addError('The provided Link is expired or invalid.');
         }
-        $resultPage = $this->resultPageFactory->create();
-        $resultPage->getConfig()->getTitle()->set('Verify and Re-Bill');
-        return $resultPage;
+        return $resultJson->setData(
+            [
+                'messages' => $messages,
+                'error' => $error
+            ]
+        );
     }
 }

@@ -12,6 +12,7 @@ use Magento\Framework\Exception\InputException;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\Module\Manager as ModuleManager;
 use Magento\Framework\ObjectManagerInterface;
+use Magento\Framework\Pricing\PriceCurrencyInterface;
 use Magento\Framework\Serialize\SerializerInterface;
 use Magento\Framework\UrlInterface;
 use Magento\Framework\View\Element\Block\ArgumentInterface;
@@ -21,12 +22,12 @@ use Magento\Store\Model\ScopeInterface;
 use Magento\Store\Model\StoreManagerInterface;
 use Magento\Vault\Api\PaymentTokenManagementInterface;
 use PayPal\Braintree\Gateway\Request\PaymentDataBuilder;
+use Psr\Log\LoggerInterface;
 use TNW\Subscriptions\Api\Data\ReBillInterface;
 use TNW\Subscriptions\Api\Data\SubscriptionProfileInterface;
 use TNW\Subscriptions\Api\SubscriptionProfileRepositoryInterface;
 use TNW\Subscriptions\Api\UrlBuilderInterface as SubscriptionUrlBuilderInterface;
 use TNW\Subscriptions\Model\Payment\Braintree\AdapterFactory;
-use TNW\Subscriptions\Model\Payment\DataBuilder;
 use TNW\Subscriptions\Model\SubscriptionProfile\Manager;
 use TNW\Subscriptions\Model\SubscriptionProfile\ReBillRepository;
 
@@ -106,27 +107,29 @@ class QueueProcess implements ArgumentInterface
     private $paymentTokenManagement;
 
     /**
-     * @var ModuleManager
-     */
-    private $moduleManager;
-
-    /**
-     * @var DataBuilder
-     */
-    private $dataBuilder;
-
-    /**
      * @var mixed
      */
     private $braintreeConfig;
+
     /**
      * @var AdapterFactory
      */
     private $braintreeAdapterFactory;
+
     /**
      * @var UrlInterface
      */
     private $url;
+
+    /**
+     * @var PriceCurrencyInterface
+     */
+    private $priceCurrency;
+
+    /**
+     * @var LoggerInterface
+     */
+    private $logger;
 
     /**
      * QueueProcess constructor.
@@ -143,9 +146,10 @@ class QueueProcess implements ArgumentInterface
      * @param StoreManagerInterface $storeManager
      * @param PaymentTokenManagementInterface $paymentTokenManagement
      * @param ModuleManager $moduleManager
-     * @param DataBuilder $dataBuilder
      * @param AdapterFactory $braintreeAdapterFactory
+     * @param PriceCurrencyInterface $priceCurrency
      * @param ObjectManagerInterface $objectManager
+     * @param LoggerInterface $logger
      */
     public function __construct(
         RequestInterface $request,
@@ -161,9 +165,10 @@ class QueueProcess implements ArgumentInterface
         StoreManagerInterface $storeManager,
         PaymentTokenManagementInterface $paymentTokenManagement,
         ModuleManager $moduleManager,
-        DataBuilder $dataBuilder,
         AdapterFactory $braintreeAdapterFactory,
-        ObjectManagerInterface $objectManager
+        PriceCurrencyInterface $priceCurrency,
+        ObjectManagerInterface $objectManager,
+        LoggerInterface $logger
     ) {
         $this->request = $request;
         $this->serializer = $serializer;
@@ -176,20 +181,20 @@ class QueueProcess implements ArgumentInterface
         $this->scopeConfig = $scopeConfig;
         $this->storeManager = $storeManager;
         $this->paymentTokenManagement = $paymentTokenManagement;
-        $this->moduleManager = $moduleManager;
-        $this->dataBuilder = $dataBuilder;
         $this->braintreeAdapterFactory = $braintreeAdapterFactory;
+        $this->url = $url;
+        $this->priceCurrency = $priceCurrency;
+        $this->logger = $logger;
         if ($moduleManager->isEnabled("PayPal_Braintree")) {
             $this->braintreeConfig = $objectManager->get(\PayPal\Braintree\Gateway\Config\Config::class);
         }
-        $this->url = $url;
     }
 
     /**
      * Get token from request
      * @return string
      */
-    public function getToken()
+    private function getToken()
     {
         return $this->request->getParam('token');
     }
@@ -197,26 +202,31 @@ class QueueProcess implements ArgumentInterface
     /**
      * Get Json config for queue-process component
      * @return bool|string
-     * @throws InputException
-     * @throws NoSuchEntityException
      */
     public function getJsConfig()
     {
         if ($this->getProfile()->getPayment()->getEngineCode() === 'braintree_cc_vault') {
-            return $this->serializer->serialize(
-                [
-                    'component' => 'TNW_Subscriptions/js/components/rebill/queue-process-braintree',
-                    'config' => [
-                        'nonceUrl' => $this->getNonceRetrieveUrl(),
-                        'clientToken' => $this->getBraintreeClientToken(),
-                        'three_d_enabled' => $this->braintreeConfig->isVerify3DSecure(),
-                        'thresholdAmount' => $this->braintreeConfig->getThresholdAmount(),
-                        'totalAmount' => $this->getTempQuote()->getGrandTotal(),
-                        'specificCountries' => $this->braintreeConfig->get3DSecureSpecificCountries(),
-                        'useCvvVault' => $this->braintreeConfig->isCvvEnabledVault(),
+            try {
+                return $this->serializer->serialize(
+                    [
+                        'component' => 'TNW_Subscriptions/js/components/rebill/queue-process-braintree',
+                        'config' => [
+                            'nonceUrl' => $this->getBraintreeNonceRetrieveUrl(),
+                            'clientToken' => $this->getBraintreeClientToken(),
+                            'three_d_enabled' => $this->braintreeConfig->isVerify3DSecure(),
+                            'thresholdAmount' => 0,
+                            'totalAmount' => $this->getTempQuote()->getGrandTotal(),
+                            'publicHash' => $this->getVaultedCardPublicHash(),
+                            'specificCountries' => [],
+                            'useCvvVault' => $this->braintreeConfig->isCvvEnabledVault(),
+                            'processUrl' => $this->getProcessUrl()
+                        ]
                     ]
-                ]
-            );
+                );
+            } catch (\Exception $e) {
+                $this->logger->critical($e);
+                return '{}';
+            }
         }
         return '{}';
     }
@@ -225,12 +235,13 @@ class QueueProcess implements ArgumentInterface
      * Get rebill object
      * @return ReBillInterface|bool
      */
-    public function getRebill()
+    private function getRebill()
     {
         if (!$this->rebill) {
             try {
                 $this->rebill = $this->reBillRepository->getByToken($this->getToken());
             } catch (NoSuchEntityException $e) {
+                $this->logger->critical($e);
                 return false;
             }
         }
@@ -252,14 +263,19 @@ class QueueProcess implements ArgumentInterface
     }
 
     /**
-     * @return Quote
+     * @return Quote|bool
      */
     private function getTempQuote()
     {
         if (!$this->tempQuote) {
-            $this->tempQuote = $this->profileManager->getTempQuoteByProfileIds(
-                $this->getRebill()->getSubscriptionProfiles()
-            );
+            try {
+                $this->tempQuote = $this->profileManager->getTempQuoteByProfileIds(
+                    $this->getRebill()->getSubscriptionProfiles()
+                );
+            } catch (\Exception $e) {
+                $this->logger->critical($e);
+                return false;
+            }
         }
         return $this->tempQuote;
     }
@@ -293,29 +309,31 @@ class QueueProcess implements ArgumentInterface
     }
 
     /**
-     * @return SubscriptionProfileInterface
-     * @throws NoSuchEntityException
+     * @return SubscriptionProfileInterface|bool
      */
-    public function getProfile()
+    private function getProfile()
     {
         if (!$this->profile) {
-            $this->profile = $this->profileRepository->getById($this->getRebill()->getSubscriptionProfiles()[0]);
+            try {
+                $this->profile = $this->profileRepository->getById($this->getRebill()->getSubscriptionProfiles()[0]);
+            } catch (NoSuchEntityException $e) {
+                $this->logger->critical($e);
+                return false;
+            }
         }
         return $this->profile;
     }
 
     /**
      * @return array
-     * @throws NoSuchEntityException
      */
-    public function getPaymentDetails()
+    private function getPaymentDetails()
     {
         return $this->getProfile()->getPayment()->getDecodedPaymentAdditionalInfo();
     }
 
     /**
      * @return string
-     * @throws NoSuchEntityException
      */
     public function getVaultCardDescription()
     {
@@ -368,8 +386,57 @@ class QueueProcess implements ArgumentInterface
     /**
      * @return string
      */
-    private function getNonceRetrieveUrl()
+    private function getBraintreeNonceRetrieveUrl()
     {
         return $this->url->getUrl('braintree/payment/getnonce', ['_secure' => true]);
+    }
+
+    /**
+     * @return string
+     */
+    private function getProcessUrl()
+    {
+        return $this->url->getUrl('tnw_subscriptions/subscription_queue/processPost', ['_secure' => true]);
+    }
+
+    /**
+     * @return string|null
+     */
+    private function getVaultedCardPublicHash()
+    {
+        return $this->paymentTokenManagement->getByGatewayToken(
+            $this->getProfile()->getPayment()->getPaymentToken(),
+            $this->getPaymentMethodCode(),
+            $this->getProfile()->getCustomerId()
+        )->getPublicHash();
+    }
+
+    /**
+     * @return string
+     */
+    private function getPaymentMethodCode()
+    {
+        return str_replace(['_cc_vault', '_vault'], '', $this->getProfile()->getPayment()->getEngineCode());
+    }
+
+    /**
+     * @return string
+     */
+    public function getGrandTotal()
+    {
+        return $this->priceCurrency->format(
+            $this->getTempQuote()->getGrandTotal(),
+            true,
+            PriceCurrencyInterface::DEFAULT_PRECISION,
+            $this->getTempQuote()->getStore()
+        );
+    }
+
+    /**
+     * @return bool
+     */
+    public function isDataValid()
+    {
+        return $this->getRebill() && $this->getTempQuote() && $this->getProfile();
     }
 }
