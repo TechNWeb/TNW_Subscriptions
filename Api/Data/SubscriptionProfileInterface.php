@@ -48,6 +48,7 @@ interface SubscriptionProfileInterface extends CustomAttributesDataInterface
     const BILLING_CYCLES_TO_SKIP = 'billing_cycles_to_skip';
     const COUPON_CODE = 'coupon_code';
     const STATIC_TOTAL_BILLING_CYCLES = 'subscription_total_static_billing_cycles';
+    const TOTAL_PROFIT = 'total_profit';
     /**#@-*/
 
     /**#@+
@@ -533,4 +534,19 @@ interface SubscriptionProfileInterface extends CustomAttributesDataInterface
      * @return $this
      */
     public function setStaticTotalBillingCycles($total);
+
+    /**
+     * Get profit for profile
+     *
+     * @return string|null
+     */
+    public function getTotalProfit($id);
+
+    /**
+     * Set profit for profile
+     *
+     * @param string $profit
+     * @return $this
+     */
+    public function setTotalProfit($profit);
 }

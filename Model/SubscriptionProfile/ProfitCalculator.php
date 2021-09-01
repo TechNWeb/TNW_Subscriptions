@@ -54,6 +54,11 @@ class ProfitCalculator
     private $currency;
 
     /**
+     * @var SubscriptionProfile
+     */
+    private $subscriptionProfile;
+
+    /**
      * ProfitCalculator constructor.
      *
      * @param ProductBillingFrequencyRepositoryInterface $recurringOptionRepository
@@ -63,11 +68,13 @@ class ProfitCalculator
     public function __construct(
         ProductBillingFrequencyRepositoryInterface $recurringOptionRepository,
         SearchCriteriaBuilder $searchCriteriaBuilder,
-        Currency $currency
+        Currency $currency,
+        SubscriptionProfile $subscriptionProfile
     ) {
         $this->recurringOptionRepository = $recurringOptionRepository;
         $this->searchCriteriaBuilder = $searchCriteriaBuilder;
         $this->currency = $currency;
+        $this->subscriptionProfile = $subscriptionProfile;
     }
 
     /**
