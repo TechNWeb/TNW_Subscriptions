@@ -47,11 +47,13 @@ class Attributes extends AbstractModifier
     public function modifyMeta(array $meta)
     {
         $path = $this->arrayManager->findPath('billing_cycle', $meta, null, 'children');
-        $meta = $this->arrayManager->set(
-            "{$path}/arguments/data/config/visible",
-            $meta,
-            false
-        );
+        if ($path) {
+            $meta = $this->arrayManager->set(
+                "{$path}/arguments/data/config/visible",
+                $meta,
+                false
+            );
+        }
         return $meta;
     }
 }
