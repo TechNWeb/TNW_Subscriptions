@@ -85,6 +85,7 @@ class ProcessPost extends AbstractAccount implements HttpPostActionInterface
                     'payment_method_nonce' => $this->getRequest()->getParam('paymentMethodNonce'),
                 ]
             );
+            $this->reBillRepository->delete($reBill);
             $messages[] = __('The order was successfully re-billed.');
         } catch (\Exception $e) {
             $error = true;
