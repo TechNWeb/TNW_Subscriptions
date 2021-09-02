@@ -143,6 +143,39 @@ class ProfileProcessor
     }
 
     /**
+     * @param $queueIds
+     * @param $customPaymentData
+     * @throws \Magento\Framework\Exception\CouldNotSaveException
+     * @throws \Magento\Framework\Exception\LocalizedException
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     * @throws \Magento\Payment\Gateway\Command\CommandException
+     */
+    public function processByQueueIds($queueIds, $customPaymentData)
+    {
+        $collectionToday = $this->queueManager->getCollectionByQueueIds($queueIds);
+        $profileIds = array_map([$this, 'profileIdByQueue'], $collectionToday->getItems());
+        $this->profileRepository->setAutomatedProcessFlag(true);
+        $activeQueueList = array_filter($collectionToday->getItems(), [$this, 'filterQueue']);
+        $this->queueManager->setCustomerGroupQueuePaymentData($customPaymentData);
+        foreach ($this->groupedQueue($activeQueueList) as $queues) {
+            $queueIds = array_map([$this, 'queueIdByQueue'], $queues);
+            $this->queueManager->makeRunning($queueIds);
+            try {
+                $this->queueManager->placeOrderByGroupQueue($queues);
+                $this->queueManager->makeCompleted($queueIds);
+            } catch (\TNW\Subscriptions\Exception\ProfileProductsUnsaleableException $e) {
+                $this->context->messageError($e->getMessage());
+                $this->queueManager->makeVerification($queueIds, $e->getMessage());
+            } catch (\Magento\Payment\Gateway\Command\CommandException $e) {
+                $this->context->messageError($e->getMessage());
+                $this->queueManager->makeVerification($queueIds, $e->getMessage());
+                throw $e;
+            }
+        }
+        $this->updateProfilesStatuses($profileIds);
+    }
+
+    /**
      * @param \TNW\Subscriptions\Model\Queue $queue
      *
      * @return bool

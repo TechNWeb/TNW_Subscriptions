@@ -12,6 +12,8 @@ use Magento\Framework\Controller\Result\JsonFactory;
 use Magento\Framework\Message\ManagerInterface;
 use TNW\Subscriptions\Model\SubscriptionProfile\ReBillRepository;
 use Magento\Customer\Model\Session as CustomerSession;
+use TNW\Subscriptions\Cron\ProfileProcessor;
+use Magento\Framework\Exception\LocalizedException;
 
 /**
  * Class Process - used to submit the re-bill from
@@ -34,20 +36,28 @@ class ProcessPost extends AbstractAccount implements HttpPostActionInterface
     private $jsonFactory;
 
     /**
-     * Process constructor.
+     * @var ProfileProcessor
+     */
+    private $profileProcessor;
+
+    /**
+     * ProcessPost constructor.
      * @param Context $context
      * @param JsonFactory $jsonFactory
      * @param ReBillRepository $reBillRepository
      * @param CustomerSession $customerSession
      * @param ManagerInterface $messageManager
+     * @param ProfileProcessor $profileProcessor
      */
     public function __construct(
         Context $context,
         JsonFactory $jsonFactory,
         ReBillRepository $reBillRepository,
         CustomerSession $customerSession,
-        ManagerInterface $messageManager
+        ManagerInterface $messageManager,
+        ProfileProcessor $profileProcessor
     ) {
+        $this->profileProcessor = $profileProcessor;
         $this->customerSession = $customerSession;
         $this->reBillRepository = $reBillRepository;
         $this->jsonFactory = $jsonFactory;
@@ -63,11 +73,23 @@ class ProcessPost extends AbstractAccount implements HttpPostActionInterface
         $resultJson = $this->jsonFactory->create();
         $error = false;
         $messages = [];
-
-        $nonce = $this->getRequest()->getParam('paymentMethodNonce');
-
-        $messages[] = __('The order was successfully re-billed.');
-
+        $token = $this->getRequest()->getParam('token');
+        try {
+            $reBill = $this->reBillRepository->getByToken($token);
+            if (!$reBill->getId() || $this->customerSession->getCustomerId() != $reBill->getCustomerId()) {
+                throw new LocalizedException(__('Not Valid Data to process.'));
+            }
+            $this->profileProcessor->processByQueueIds(
+                [$reBill->getQueues()],
+                [
+                    'payment_method_nonce' => $this->getRequest()->getParam('paymentMethodNonce'),
+                ]
+            );
+            $messages[] = __('The order was successfully re-billed.');
+        } catch (\Exception $e) {
+            $error = true;
+            $message[] = $e->getMessage();
+        }
         foreach ($messages as $message) {
             if ($error) {
                 $this->messageManager->addErrorMessage($message);

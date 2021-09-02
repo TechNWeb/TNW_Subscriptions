@@ -219,7 +219,8 @@ class QueueProcess implements ArgumentInterface
                             'publicHash' => $this->getVaultedCardPublicHash(),
                             'specificCountries' => [],
                             'useCvvVault' => $this->braintreeConfig->isCvvEnabledVault(),
-                            'processUrl' => $this->getProcessUrl()
+                            'processUrl' => $this->getProcessUrl(),
+                            'token' => $this->getToken()
                         ]
                     ]
                 );

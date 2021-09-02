@@ -260,6 +260,11 @@ class Manager
     private $profileResource;
 
     /**
+     * @var array
+     */
+    private $customPaymentData = [];
+
+    /**
      * Manager constructor.
      * @param EnginePool $enginePool
      * @param SubscriptionProfileRepository $subscriptionProfileRepository
@@ -986,6 +991,16 @@ class Manager
     }
 
     /**
+     * @param $paymentData
+     * @return $this
+     */
+    public function setCustomPaymentData($paymentData)
+    {
+        $this->customPaymentData = $paymentData;
+        return $this;
+    }
+
+    /**
      * @param Quote $quote
      * @param SubscriptionProfileInterface $profile
      * @param bool $collectQuoteTotals
@@ -1082,9 +1097,14 @@ class Manager
 
                 if (!$this->tempQuote) {
                     //Set payment method
+                    if (!$this->customPaymentData) {
+                        $paymentAdditionalInfo = $this->getEngine()->getPaymentAdditionalInfo($profile);
+                    } else {
+                        $paymentAdditionalInfo = $this->customPaymentData;
+                    }
                     $quote->getPayment()
                         ->importData($this->getEngine()->getPaymentInfo($profile))
-                        ->setAdditionalInformation($this->getEngine()->getPaymentAdditionalInfo($profile));
+                        ->setAdditionalInformation($paymentAdditionalInfo);
 
                     if ($isReBill && method_exists($this->getEngine(), 'setPaymentExtensionAttributes')) {
                         $this->getEngine()->setPaymentExtensionAttributes($quote->getPayment(), $profile);

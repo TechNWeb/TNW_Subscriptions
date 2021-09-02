@@ -120,8 +120,31 @@ class Manager
      */
     private $orderSender;
 
+    /**
+     * @var ReBillManager
+     */
     private $reBillManager;
 
+    /**
+     * Manager constructor.
+     * @param CollectionFactory $collectionFactory
+     * @param Config $config
+     * @param SubscriptionProfile\Manager $profileManager
+     * @param RelationManager $relationManager
+     * @param CartRepositoryInterface $cartRepository
+     * @param SubscriptionProfileRepository $profileRepository
+     * @param SubscriptionProfile\Status\HistoryManager $statusHistoryManager
+     * @param SubscriptionProfile\MessageHistoryLogger $messageHistoryLogger
+     * @param ProfileStatus $profileStatus
+     * @param \TNW\Subscriptions\Model\ResourceModel\Queue $resourceQueue
+     * @param \Magento\Framework\Stdlib\DateTime\TimezoneInterface $timezone
+     * @param \Magento\Quote\Model\QuoteFactory $quoteFactory
+     * @param \TNW\Subscriptions\Model\ResourceModel\SalesItemRelation $relationResource
+     * @param EmailNotifierFactory $emailNotifierFactory
+     * @param BillingCyclesManagerFactory $billingCyclesManagerFactory
+     * @param \Magento\Sales\Model\Order\Email\Sender\OrderSender $orderSender
+     * @param ReBillManager $reBillManager
+     */
     public function __construct(
         CollectionFactory $collectionFactory,
         Config $config,
@@ -259,6 +282,21 @@ class Manager
     }
 
     /**
+     * @param $queuIds
+     * @return Collection
+     */
+    public function getCollectionByQueueIds($queuIds)
+    {
+        $collection = $this->getBaseCollection();
+        $connection = $collection->getConnection();
+        $collection->getSelect()
+            ->where($connection->prepareSqlCondition('main_table.id', array("in" => array($queuIds))))
+            ->order('relation.scheduled_at ASC')
+            ->group(['main_table.profile_order_id']);
+        return $collection;
+    }
+
+    /**
      * Inserts into queue new items.
      *
      * @param array $relationIds - ids from "tnw_subscriptions_subscription_profile_order" table
@@ -375,6 +413,16 @@ class Manager
         return $this->timezone->date()
             ->modify(sprintf('-%d day', $this->config->getAttemptInterval()))->setTime(23, 59, 59)
             ->format(\Magento\Framework\Stdlib\DateTime::DATETIME_PHP_FORMAT);
+    }
+
+    /**
+     * @param $data
+     * @return $this
+     */
+    public function setCustomerGroupQueuePaymentData($data)
+    {
+        $this->profileManager->setCustomPaymentData($data);
+        return $this;
     }
 
     /**

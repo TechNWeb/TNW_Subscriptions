@@ -20,7 +20,8 @@ define([
             clientToken: null,
             paymentMethodNonce: null,
             braintreeClientInstance: null,
-            processUrl: null
+            processUrl: null,
+            token: null
         },
 
         initialize: function () {
@@ -56,7 +57,8 @@ define([
             .done(function (nonce) {
                 $.post(self.processUrl, {
                     formKey: $('input[name=form_key]').val(),
-                    paymentMethodNonce: nonce
+                    paymentMethodNonce: nonce,
+                    token: self.token
                 }).done(function (response) {
                     if (!response.error) {
                         $('.tnw-queue-process-wrapper').remove();

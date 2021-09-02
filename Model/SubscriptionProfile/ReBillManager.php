@@ -56,15 +56,6 @@ class ReBillManager
     }
 
     /**
-     * @param $requestData
-     * @throws \Exception
-     */
-    public function processReBillByRequestData($requestData)
-    {
-        throw new \Exception('Not Implemented');
-    }
-
-    /**
      * @param $groupQueue
      * @return mixed|\TNW\Subscriptions\Api\Data\ReBillInterface
      * @throws \Magento\Framework\Exception\NoSuchEntityException
