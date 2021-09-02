@@ -90,7 +90,6 @@
             </argument>
             <settings>
                 <labelVisible>false</labelVisible>
-                <additionalInfoVisible>false</additionalInfoVisible>
                 <imports>
                     <link name="disabled">${ $.provider}:data.disableCheckbox</link>
                 </imports>
