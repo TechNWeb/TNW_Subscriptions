@@ -15,7 +15,7 @@ class SubscriptionProfileProfit extends AbstractDb
     {
         $this->_init(
             'tnw_subscriptions_profile_profit',
-            'profile_id'
+            'entity_id'
         );
     }
 
@@ -34,7 +34,13 @@ class SubscriptionProfileProfit extends AbstractDb
             ->order($this->getIdFieldName() . ' DESC')
             ->where('profile_id = ?', $id)
             ->where('profit_type =?', $profitType);
-        return $connection->fetchAll($select);
+        $result = $connection->fetchRow($select);
+        if (is_array($result)) {
+            $finalResult = $result['total_profit'];
+        } else {
+            $finalResult = $result;
+        }
+        return $finalResult;
     }
 
     /**

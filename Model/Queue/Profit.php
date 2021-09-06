@@ -154,7 +154,7 @@ class Profit
                     $initialFeeAdded = true;
                     $profit += $recurringOption['initial_fee'];
                 }
-                $profit += ($item['base_price'] - $item['base_cost']) * $item['qty'];
+                $profit += ($item['base_cost'] - $item['base_price']) * $item['qty'];
             }
         }
 
@@ -172,7 +172,7 @@ class Profit
 
         $lastInvoiceItem = array_pop($invoiceItems);
         if ($lastInvoiceItem) {
-            $profitOfLastItem = ($lastInvoiceItem['base_price'] - $lastInvoiceItem['base_cost'])
+            $profitOfLastItem = ($lastInvoiceItem['base_cost'] - $lastInvoiceItem['base_price'])
                 * $lastInvoiceItem['qty'];
         } else {
             $profitOfLastItem = 0;
