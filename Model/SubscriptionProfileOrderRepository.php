@@ -174,6 +174,14 @@ class SubscriptionProfileOrderRepository implements SubscriptionProfileOrderRepo
                         $installRecurringData['expirationCc'],
                         $installRecurringData['staticTotalBillingCycles']
                     );
+                    $this->resource->populateRecurringInstallmentDataSalesOrder(
+                        $magentoOrderId,
+                        $installRecurringData['paidRecurring'],
+                        $installRecurringData['finalRecurring'],
+                        $installRecurringData['firstRecurring'],
+                        $installRecurringData['expirationCc'],
+                        $installRecurringData['staticTotalBillingCycles']
+                    );
                 }
             } catch (Exception $e) {
                 $this->logger->warning($e->getMessage());

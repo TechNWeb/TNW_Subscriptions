@@ -169,6 +169,10 @@ class UpgradeSchema implements UpgradeSchemaInterface
             );
         }
 
+        if (version_compare($context->getVersion(), '2.3.37', '<')) {
+            $this->addRecurringInstallmentDatesSalesOrder($setup);
+        }
+
         $setup->endSetup();
     }
 
@@ -958,6 +962,67 @@ class UpgradeSchema implements UpgradeSchemaInterface
     private function addRecurringInstallmentDates(SchemaSetupInterface $setup)
     {
         $table = $setup->getTable('sales_order_grid');
+        $setup->getConnection()->addColumn(
+            $table,
+            'subscription_paid_installment',
+            [
+                'type' => Table::TYPE_TEXT,
+                'length' => 255,
+                'nullable' => true,
+                'default' => null,
+                'comment' => 'Recurring Paid Installment',
+            ]
+        );
+        $setup->getConnection()->addColumn(
+            $table,
+            'subscription_final_installment_date',
+            [
+                'type' => Table::TYPE_DATETIME,
+                'nullable' => true,
+                'default' => null,
+                'comment' => 'Recurring Final Installment Date',
+            ]
+        );
+        $setup->getConnection()->addColumn(
+            $table,
+            'subscription_first_installment_date',
+            [
+                'type' => Table::TYPE_DATETIME,
+                'nullable' => true,
+                'default' => null,
+                'comment' => 'Recurring 1st Installment Date',
+            ]
+        );
+        $setup->getConnection()->addColumn(
+            $table,
+            'subscription_expire_cc',
+            [
+                'type' => Table::TYPE_TEXT,
+                'length' => 255,
+                'nullable' => true,
+                'default' => null,
+                'comment' => 'Will cc expire',
+            ]
+        );
+        $setup->getConnection()->addColumn(
+            $table,
+            'subscription_total_static_billing_cycles',
+            [
+                'type' => Table::TYPE_TEXT,
+                'length' => 255,
+                'nullable' => true,
+                'default' => null,
+                'comment' => 'Static total billing cycles',
+            ]
+        );
+    }
+
+    /**
+     * @param SchemaSetupInterface $setup
+     */
+    private function addRecurringInstallmentDatesSalesOrder(SchemaSetupInterface $setup)
+    {
+        $table = $setup->getTable('sales_order');
         $setup->getConnection()->addColumn(
             $table,
             'subscription_paid_installment',
