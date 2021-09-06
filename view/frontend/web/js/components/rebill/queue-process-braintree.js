@@ -62,8 +62,9 @@ define([
                 }).done(function (response) {
                     if (!response.error) {
                         $('.tnw-queue-process-wrapper').remove();
+                    } else if (response.error && !response.messages.length) {
+                        self.processErrors($t('Something went wrong.'))
                     }
-                    // self.processMessages(response.messages.join(), response.error ? 'error' : 'success')
                 }).fail(function () {
                     self.processErrors($t('Something went wrong.'))
                 }).always(function () {
