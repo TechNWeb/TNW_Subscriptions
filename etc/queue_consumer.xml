@@ -12,7 +12,7 @@
               connection="amqp"
               consumerInstance="Magento\Framework\MessageQueue\Consumer"
               handler="TNW\Subscriptions\Model\ProductBillingFrequency\Queue\Consumer::process"/>
-    <consumer name="tnw.profile.profit"
+    <consumer name="TnwProfileProfit"
               queue="tnw.profile.profit"
               connection="db"
               maxMessages="5000"

@@ -2,6 +2,8 @@
 
 namespace TNW\Subscriptions\Model\Queue;
 
+use Magento\Framework\Exception\LocalizedException;
+use Magento\Framework\Exception\NoSuchEntityException;
 use Psr\Log\LoggerInterface;
 use TNW\Subscriptions\Api\Data\ProductBillingFrequencyInterface;
 use TNW\Subscriptions\Api\Data\ProductSubscriptionProfileInterface;
@@ -10,6 +12,9 @@ use Magento\AsynchronousOperations\Api\Data\OperationInterface;
 use Magento\Framework\Serialize\Serializer\Json as Serializer;
 use TNW\Subscriptions\Api\SubscriptionProfileRepositoryInterface;
 use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfileProfit;
+use Magento\Framework\Api\SearchCriteriaBuilder;
+use TNW\Subscriptions\Api\ProductBillingFrequencyRepositoryInterface;
+use TNW\Subscriptions\Model\SubscriptionProfile\ProfitCalculator;
 
 class Profit
 {
@@ -18,32 +23,63 @@ class Profit
      */
     private $logger;
 
+    /**
+     * @var ProductBillingFrequencyRepositoryInterface
+     */
+    private $recurringOptionRepository;
+
+    /**
+     * @var SearchCriteriaBuilder
+     */
+    private $searchCriteriaBuilder;
+
+    /**
+     * @var SubscriptionProfileProfit
+     */
+    private $subscriptionProfileProfit;
+
+    /**
+     * @var SubscriptionProfileRepositoryInterface
+     */
+    private $profileRepository;
+
+    /**
+     * @var Serializer
+     */
+    private $jsonHelper;
+
     public function __construct(
         LoggerInterface $logger,
         Serializer $jsonHelper,
         SubscriptionProfileRepositoryInterface $profileRepository,
-        SubscriptionProfileProfit $subscriptionProfileProfit
+        SubscriptionProfileProfit $subscriptionProfileProfit,
+        SearchCriteriaBuilder $searchCriteriaBuilder,
+        ProductBillingFrequencyRepositoryInterface $recurringOptionRepository
     ) {
         $this->logger = $logger;
         $this->jsonHelper = $jsonHelper;
         $this->profileRepository = $profileRepository;
         $this->subscriptionProfileProfit = $subscriptionProfileProfit;
+        $this->searchCriteriaBuilder = $searchCriteriaBuilder;
+        $this->recurringOptionRepository = $recurringOptionRepository;
     }
 
 
     /**
      * @param OperationInterface $operation
      * @return void
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     * @throws NoSuchEntityException
+     * @throws LocalizedException
      */
     public function processOperation(OperationInterface $operation)
     {
-        $serializedData = $operation->getResultSerializedData();
-        $message = null;
+        $serializedData = $operation->getSerializedData();
         $unserializedData = $this->jsonHelper->unserialize($serializedData);
-        foreach ($unserializedData as $key => $value) {
-            $profile = $this->profileRepository->getById($value);
-            $this->calculateProfitAndSave($profile);
+        foreach ($unserializedData as $unserialized) {
+            foreach ($unserialized as $key => $value) {
+                $profile = $this->profileRepository->getById($value);
+                $this->calculateProfitAndSave($profile);
+            }
         }
     }
 
@@ -57,6 +93,7 @@ class Profit
     /**
      * @param $profile
      * @return float|int|mixed|null
+     * @throws LocalizedException
      */
     public function calculateProfitAndSave($profile)
     {
@@ -121,32 +158,45 @@ class Profit
             }
         }
 
-        switch ($profitType) {
-            case self::AS_OF_TODAY:
-                break;
-            case self::REMAINING:
-                $lastInvoiceItem = array_pop($invoiceItems);
-                if ($lastInvoiceItem) {
-                    $profitOfLastItem = ($lastInvoiceItem['base_price'] - $lastInvoiceItem['base_cost'])
-                        * $lastInvoiceItem['qty'];
-                } else {
-                    $profitOfLastItem = 0;
-                }
+        try {
+            $data = [
+                'profile_id' => $profile->getId(),
+                'profit_type' => ProfitCalculator::AS_OF_TODAY,
+                'total_profit' => $profit
+            ];
+            $this->subscriptionProfileProfit->setTotalProfit($data);
+        } catch (LocalizedException $e) {
+            $this->subscriptionProfileProfit->updateTotalProfit($data);
+        }
 
-                if ($profile->getTerm() == 1) {
-                    if ($profile->getUnit() == 3) {
-                        $profit = $profitOfLastItem * 365 / $profile->getFrequency();
-                        break;
-                    } else {
-                        $profit = $profitOfLastItem * 12 / $profile->getFrequency();
-                        break;
-                    }
-                } else {
-                    $profit += $profitOfLastItem * $profile->getTotalBillingCycles();
-                    return $profit;
-                }
-            default:
-                return null;
+
+        $lastInvoiceItem = array_pop($invoiceItems);
+        if ($lastInvoiceItem) {
+            $profitOfLastItem = ($lastInvoiceItem['base_price'] - $lastInvoiceItem['base_cost'])
+                * $lastInvoiceItem['qty'];
+        } else {
+            $profitOfLastItem = 0;
+        }
+
+        if ($profile->getTerm() == 1) {
+            if ($profile->getUnit() == 3) {
+                $profit = $profitOfLastItem * 365 / $profile->getFrequency();
+            } else {
+                $profit = $profitOfLastItem * 12 / $profile->getFrequency();
+            }
+        } else {
+            $profit += $profitOfLastItem * $profile->getTotalBillingCycles();
+        }
+
+        try {
+            $data = [
+                'profile_id' => $profile->getId(),
+                'profit_type' => ProfitCalculator::REMAINING,
+                'total_profit' => $profit
+            ];
+            $this->subscriptionProfileProfit->setTotalProfit($data);
+        } catch (LocalizedException $e) {
+            $this->subscriptionProfileProfit->updateTotalProfit($data);
         }
 
         return $profit;
@@ -167,5 +217,15 @@ class Profit
         );
 
         return \reset($filteredRecurringOptions);
+    }
+
+    /**
+     * @param ProductSubscriptionProfileInterface $item
+     *
+     * @return null|string
+     */
+    private function profileItemProductId(ProductSubscriptionProfileInterface $item)
+    {
+        return $item->getMagentoProductId();
     }
 }

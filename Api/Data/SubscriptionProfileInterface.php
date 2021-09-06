@@ -540,7 +540,7 @@ interface SubscriptionProfileInterface extends CustomAttributesDataInterface
      *
      * @return string|null
      */
-    public function getTotalProfit($id);
+    public function getTotalProfit($id, $profitType);
 
     /**
      * Set profit for profile

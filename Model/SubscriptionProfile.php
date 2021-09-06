@@ -1008,9 +1008,9 @@ class SubscriptionProfile extends AbstractExtensibleModel implements Subscriptio
     /**
      * @inheritdoc
      */
-    public function getTotalProfit($id)
+    public function getTotalProfit($id, $profitType)
     {
-        return $this->profileProfit->getTotalProfitById($id);
+        return $this->profileProfit->getTotalProfitById($id, $profitType);
     }
 
     public function setTotalProfit($profit)

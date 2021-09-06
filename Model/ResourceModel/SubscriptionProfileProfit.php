@@ -21,17 +21,19 @@ class SubscriptionProfileProfit extends AbstractDb
 
     /**
      * @param $id
+     * @param $profitType
      * @return array
      * @throws LocalizedException
      */
-    public function getTotalProfitById($id)
+    public function getTotalProfitById($id, $profitType)
     {
         $connection = $this->getConnection();
 
         $select = $connection->select()
             ->from($this->getMainTable(), ['*'])
             ->order($this->getIdFieldName() . ' DESC')
-            ->where('profile_id = ?', $id);
+            ->where('profile_id = ?', $id)
+            ->where('profit_type =?', $profitType);
         return $connection->fetchAll($select);
     }
 
@@ -43,27 +45,33 @@ class SubscriptionProfileProfit extends AbstractDb
     {
         $connection = $this->getConnection();
 
-        $connection->insert($this->getMainTable(), [
-            'entity_id' => $data['profile_id'],
-            'profit_type' => $data['profit_type'],
-            'total_profit' => $data['total_profit']
-        ]);
+        if (isset($data)) {
+            $connection->insert($this->getMainTable(), [
+                'profile_id' => $data['profile_id'],
+                'profit_type' => $data['profit_type'],
+                'total_profit' => $data['total_profit']
+            ]);
+        }
     }
 
     /**
-     * @param $id
-     * @param $totalProfit
+     * @param $data
      * @throws LocalizedException
      */
-    public function updateTotalProfit($id, $totalProfit)
+    public function updateTotalProfit($data)
     {
         $connection = $this->getConnection();
-        $connection->update(
-            $this->getTable($this->getMainTable()),
-            [
-                'total_profit' => $totalProfit,
-            ],
-            ['profile_id = ?' => $id]
-        );
+        if (isset($data)) {
+            $connection->update(
+                $this->getTable($this->getMainTable()),
+                [
+                    'total_profit' => $data['total_profit'],
+                ],
+                [
+                    'profile_id = ?' => $data['profile_id'],
+                    'profit_type' => $data['profit_type']
+                ]
+            );
+        }
     }
 }

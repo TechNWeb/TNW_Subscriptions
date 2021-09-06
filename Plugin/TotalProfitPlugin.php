@@ -67,7 +67,7 @@ class TotalProfitPlugin
         $result,
         $object
     ) {
-        if ($object->getState() === 'complete') {
+        if ($object->hasInvoices()) {
             $profileIds = $this->profileOrderManager->getProfileIdsByOrder($object->getEntityId());
             $this->profitManager->setProfilesToCalculateProfit($profileIds);
         }
