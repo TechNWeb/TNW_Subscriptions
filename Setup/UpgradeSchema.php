@@ -169,6 +169,9 @@ class UpgradeSchema implements UpgradeSchemaInterface
         if (version_compare($context->getVersion(), '2.2.81', '<')) {
             $this->addColumnForSubscriptionGrid($setup);
         }
+        if (version_compare($context->getVersion(), '2.2.81', '<')) {
+            $this->removeCustomerAddressFK($setup);
+        }
 
         $setup->endSetup();
     }
@@ -885,5 +888,28 @@ class UpgradeSchema implements UpgradeSchemaInterface
                     'comment' => 'Store Subscription profiles id for grid on remove BF'
                 ]
             );
+    }
+
+    /**
+     * Remove Customer address FK
+     *
+     * @param SchemaSetupInterface $setup
+     */
+    private function removeCustomerAddressFK(SchemaSetupInterface $setup)
+    {
+        $addressTable = $setup->getTable(
+            Address::SUBSCRIPTION_PROFILE_ADDRESS_TABLE
+        );
+        $this->deleteForeignKeys(
+            $setup,
+            [
+                $addressTable => $setup->getConnection()->getForeignKeyName(
+                    $addressTable,
+                    'customer_address_id',
+                    'customer_address_entity',
+                    'entity_id'
+                )
+            ]
+        );
     }
 }
