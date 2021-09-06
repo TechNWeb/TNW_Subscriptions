@@ -169,17 +169,22 @@ class Braintree extends Base
             $paymentMethodNonce = $requestData['payment'][self::CODE]['nonce'];
             $paymentCode = self::CODE;
         } else {
-            $subject = [
-                'public_hash' => $requestData['payment'][$this->getVaultPaymentCode()]['additional']['publicHash'],
-                'customer_id' => $this->getProfile()->getCustomerId(),
-                'store_id' => $this->getProfile()->getCustomer()->getStoreId(),
-            ];
-            try {
-                $result = $this->command->execute($subject)->get();
-                $paymentMethodNonce = $result['paymentMethodNonce'];
+            if (isset($requestData['payment'][$this->getVaultPaymentCode()]['nonce'])) {
+                $paymentMethodNonce = $requestData['payment'][$this->getVaultPaymentCode()]['nonce'];
                 $paymentCode = $this->getVaultPaymentCode();
-            } catch (\Exception $e) {
-                throw new \Magento\Framework\Exception\LocalizedException(__('Sorry, but something went wrong'));
+            } else {
+                $subject = [
+                    'public_hash' => $requestData['payment'][$this->getVaultPaymentCode()]['additional']['publicHash'],
+                    'customer_id' => $this->getProfile()->getCustomerId(),
+                    'store_id' => $this->getProfile()->getCustomer()->getStoreId(),
+                ];
+                try {
+                    $result = $this->command->execute($subject)->get();
+                    $paymentMethodNonce = $result['paymentMethodNonce'];
+                    $paymentCode = $this->getVaultPaymentCode();
+                } catch (\Exception $e) {
+                    throw new \Magento\Framework\Exception\LocalizedException(__('Sorry, but something went wrong'));
+                }
             }
         }
         $requestData['payment'][$paymentCode]['additional']

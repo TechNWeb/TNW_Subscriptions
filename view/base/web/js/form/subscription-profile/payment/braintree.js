@@ -9,8 +9,9 @@ define([
     'uiRegistry',
     'PayPal_Braintree/js/validator',
     'underscore',
+    'TNW_Subscriptions/js/form/subscription-profile/payment/braintree-3d-secure',
     'Magento_Ui/js/lib/spinner'
-], function ($, $t, PaymentBase, registry, validator, _) {
+], function ($, $t, PaymentBase, registry, validator, _, verify3DSecure) {
     'use strict';
 
     return PaymentBase.extend({
@@ -20,8 +21,10 @@ define([
                 client: null,
                 hostedFields: null
             },
-            braintreeClient: null,
+            nonceUrl: null,
+            braintreeClientInstance: null,
             hostedFieldsInstance: null,
+            paymentMethodNonce: null,
             grandTotal: null,
             selectedCardType: null,
             selector: 'co-transparent-form-braintree',
@@ -49,7 +52,6 @@ define([
                     'selectedCardType'
                 ]);
 
-            validator.setConfig(this);
             return this;
         },
 
@@ -59,7 +61,7 @@ define([
          * @param {boolean} checkBoxChecked
          * @return void
          */
-        changeVisibility: function(checkBoxChecked) {
+        changeVisibility: function (checkBoxChecked) {
             if (checkBoxChecked && !this.clientToken) {
                 this.processErrors([$t('This payment is not available')]);
                 return;
@@ -68,6 +70,7 @@ define([
             if (checkBoxChecked && !this.scriptLoaded()) {
                 this.loadScript();
             }
+            validator.setConfig(this);
         },
 
         /**
@@ -75,20 +78,67 @@ define([
          * @return void
          */
         beforeSubmit: function () {
-            var self = this;
-
-            if (!this.validateHostedFields()) return;
+            var self = this,
+                form = registry.get('index = ' + self.options.formName);
 
             $('body').trigger('processStart');
+
+            if (this.index === 'braintree_cc_vault') {
+                if (this.three_d_enabled) {
+                    $.getJSON(self.nonceUrl, {
+                        'public_hash': self.source.get(self.dataScope + '.additional.publicHash')
+                    }).done(function (response) {
+                        self.paymentMethodNonce = response.paymentMethodNonce;
+                        self.validate3DSecure()
+                    })
+                    return
+                }
+                registry.get('index = '+this.options.formName).triggerSave([]);
+                return
+            }
+
+            if (this.index === 'braintree' && !this.validateHostedFields()) {
+                return
+            }
+
             this.hostedFieldsInstance.tokenize(function (tokenizeErr, payload) {
                 if (tokenizeErr) {
                     self.processErrors([tokenizeErr.message]);
                     $('body').trigger('processStop');
                     return false;
                 }
-                var form = registry.get('index = '+self.options.formName);
-                form.source.data.payment.braintree.nonce = payload.nonce;
+                self.paymentMethodNonce = payload.nonce;
+                if (self.three_d_enabled) {
+                    self.validate3DSecure();
+                } else {
+                    form.source.data.payment.braintree.nonce = payload.nonce;
+                    form.triggerSave([]);
+                }
+            });
+        },
+
+        validate3DSecure: function () {
+            var self = this,
+                form = registry.get('index = ' + self.options.formName);
+
+            verify3DSecure.setConfig({
+                'braintree' : self.braintree,
+                'useCvvVault' : self.useCvvVault,
+                'totalAmount' : self.totalAmount,
+                'thresholdAmount' : self.thresholdAmount,
+                'specificCountries' : self.specificCountries
+            });
+            $.when(verify3DSecure.validate(self))
+            .done(function (nonce) {
+                self.paymentMethodNonce = form.source.data.payment[self.index].nonce = nonce
+                    ? nonce
+                    : self.paymentMethodNonce;
                 form.triggerSave([]);
+            })
+            .fail(function (errorMessage) {
+                self.processErrors([errorMessage]);
+                $('body').trigger('processStop');
+                return false;
             });
         },
 
@@ -96,7 +146,7 @@ define([
          * Validate Braintree hosted fields via SDK state api
          * @returns {boolean}
          */
-        validateHostedFields: function() {
+        validateHostedFields: function () {
             var self = this,
                 state = this.hostedFieldsInstance.getState(),
                 formValid = Object.keys(state.fields).every(function (key) {
@@ -148,10 +198,16 @@ define([
                     client: clientInstance,
                     fields: self.getHostedFields()
                 };
-                return self.braintree.hostedFields.create(options);
+                self.braintreeClientInstance = clientInstance;
+                if (self.index === 'braintree') {
+                    return self.braintree.hostedFields.create(options);
+                }
+                return false;
             }).then(function (hostedFieldsInstance) {
-                self.hostedFieldsInstance = hostedFieldsInstance;
-                self.fieldEventHandler(hostedFieldsInstance);
+                if (hostedFieldsInstance) {
+                    self.hostedFieldsInstance = hostedFieldsInstance;
+                    self.fieldEventHandler(hostedFieldsInstance);
+                }
                 $('body').trigger('processStop');
             }).catch(function () {
                 $('body').trigger('processStop');
@@ -165,21 +221,20 @@ define([
          */
         getHostedFields: function () {
             var self = this,
-
                 fields = {
-                number: {
-                    selector: self.getSelector('cc-number'),
-                    placeholder: $t('Credit card number')
-                },
-                expirationMonth: {
-                    selector: self.getSelector('cc-month'),
-                    placeholder: $t('MM')
-                },
-                expirationYear: {
-                    selector: self.getSelector('cc-year'),
-                    placeholder: $t('YY')
-                },
-            };
+                    number: {
+                        selector: self.getSelector('cc-number'),
+                        placeholder: $t('Credit card number')
+                    },
+                    expirationMonth: {
+                        selector: self.getSelector('cc-month'),
+                        placeholder: $t('MM')
+                    },
+                    expirationYear: {
+                        selector: self.getSelector('cc-year'),
+                        placeholder: $t('YY')
+                    },
+                };
             if (this.useCvv) {
                 fields.cvv = {
                     selector: self.getSelector('cc-cvv'),
