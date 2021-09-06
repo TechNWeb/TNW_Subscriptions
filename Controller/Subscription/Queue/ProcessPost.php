@@ -89,7 +89,7 @@ class ProcessPost extends AbstractAccount implements HttpPostActionInterface
             $messages[] = __('The order was successfully re-billed.');
         } catch (\Exception $e) {
             $error = true;
-            $message[] = $e->getMessage();
+            $messages[] = $e->getMessage();
         }
         foreach ($messages as $message) {
             if ($error) {
