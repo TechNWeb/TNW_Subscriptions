@@ -621,7 +621,7 @@ class Manager
                         );
                     }
                     if ($e instanceof \Magento\Payment\Gateway\Command\CommandException) {
-                        if (isset($reBill)) {
+                        if (isset($reBill) && $reBill->getId()) {
                             $this->emailNotifierFactory->create()->paymentVerificationFailed($profile, $reBill);
                         } else {
                             $this->emailNotifierFactory->create()->paymentFailed($profile);
