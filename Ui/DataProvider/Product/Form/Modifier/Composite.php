@@ -73,7 +73,10 @@ class Composite extends AbstractModifier
      */
     public function modifyMeta(array $meta)
     {
-        if ($this->config->isSubscriptionsActive() && $this->isSupportProductType()) {
+        if ($this->config->isSubscriptionsActive()
+            && $this->isSupportProductType()
+            && isset($meta['subscription-options']['arguments'])
+        ) {
             $meta = $this->updateSubscriptionsTab($meta);
             foreach ($this->modifiers as $bundleClass) {
                 /** @var ModifierInterface $bundleModifier */

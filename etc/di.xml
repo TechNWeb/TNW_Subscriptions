@@ -962,6 +962,18 @@
     <type name="PayPal\Braintree\Gateway\Request\PaymentDataBuilder">
         <plugin name="tnw_subscription" type="TNW\Subscriptions\Plugin\Braintree\Gateway\Request\PaymentDataBuilder" />
     </type>
+    <type name="PayPal\Braintree\Gateway\Request\TransactionSourceDataBuilder">
+        <plugin name="tnw_subscription" type="TNW\Subscriptions\Plugin\Braintree\Gateway\Request\TransactionSourceDataBuilder" />
+    </type>
+    <type name="PayPal\Braintree\Gateway\Response\VaultDetailsHandler">
+        <plugin name="tnw_subscription" type="TNW\Subscriptions\Plugin\Braintree\Gateway\Response\VaultDetailsHandler" />
+    </type>
+    <type name="PayPal\Braintree\Gateway\Response\ThreeDSecureDetailsHandler">
+        <plugin name="tnw_subscription" type="TNW\Subscriptions\Plugin\Braintree\Gateway\Response\ThreeDSecureDetailsHandler" />
+    </type>
+    <type name="PayPal\Braintree\Gateway\Response\PaymentDetailsHandler">
+        <plugin name="tnw_subscription" type="TNW\Subscriptions\Plugin\Braintree\Gateway\Response\PaymentDetailsHandler" />
+    </type>
     <type name="Magento\Checkout\Model\PaymentInformationManagement">
         <plugin name="subscription_payment" type="TNW\Subscriptions\Plugin\Checkout\Model\PaymentInformationManagement" />
     </type>

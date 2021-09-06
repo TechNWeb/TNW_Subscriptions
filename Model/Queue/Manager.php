@@ -446,6 +446,7 @@ class Manager
         }
         if ($quote->getAllVisibleItems()) {
             $this->cartRepository->save($quote);
+            $quote->getPayment()->setAdditionalInformation('is_rebill', true);
             try {
                 /** @var \Magento\Sales\Model\Order $order */
                 $order = $this->profileManager

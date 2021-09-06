@@ -5,13 +5,24 @@
  */
 namespace TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Payment\Form\Modifier;
 
+use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\DataObject;
+use Magento\Framework\Exception\InputException;
+use Magento\Framework\Exception\NoSuchEntityException;
+use Magento\Framework\Module\Manager;
+use Magento\Framework\ObjectManagerInterface;
+use Magento\Framework\Session\SessionManagerInterface;
+use Magento\Framework\UrlInterface;
 use Magento\Payment\Model\CcConfig;
 use Magento\Quote\Api\CartRepositoryInterface;
 use Magento\Ui\Component\Form\Element\Checkbox;
 use Magento\Ui\Component\Form\Field;
+use Magento\Vault\Api\PaymentTokenManagementInterface;
 use Magento\Vault\Model\Ui\VaultConfigProvider;
+use PayPal\Braintree\Gateway\Request\PaymentDataBuilder;
 use TNW\Subscriptions\Model\Config;
+use TNW\Subscriptions\Model\Payment\Braintree\AdapterFactory;
+use TNW\Subscriptions\Model\Payment\DataBuilder;
 use TNW\Subscriptions\Model\QuoteSessionInterface;
 use TNW\Subscriptions\Model\SubscriptionProfileOrder\Manager as OrderRelationManager;
 use TNW\Subscriptions\Model\SubscriptionProfileRepository;
@@ -62,17 +73,17 @@ class Vault extends Base
     private $vaultConfigProvider;
 
     /**
-     * @var \Magento\Framework\App\Config\ScopeConfigInterface
+     * @var ScopeConfigInterface
      */
     private $scopeConfig;
 
     /**
-     * @var \Magento\Framework\Session\SessionManagerInterface
+     * @var SessionManagerInterface
      */
     private $sessionManager;
 
     /**
-     * @var \Magento\Vault\Api\PaymentTokenManagementInterface
+     * @var PaymentTokenManagementInterface
      */
     private $paymentTokenManagement;
 
@@ -82,8 +93,28 @@ class Vault extends Base
     private $currentProfilePublicHash = [];
 
     /**
+     * @var mixed
+     */
+    private $braintreeConfig;
+
+    /**
+     * @var DataBuilder
+     */
+    private $dataBuilder;
+
+    /**
+     * @var AdapterFactory
+     */
+    private $braintreeAdapterFactory;
+
+    /**
+     * @var UrlInterface
+     */
+    private $urlBuilder;
+
+    /**
      * Vault constructor.
-     * @param \Magento\Framework\ObjectManagerInterface $objectManager
+     * @param ObjectManagerInterface $objectManager
      * @param CcConfig $ccConfig
      * @param VaultConfigProvider $vaultConfigProvider
      * @param Config $config
@@ -91,13 +122,17 @@ class Vault extends Base
      * @param SubscriptionProfileRepository $profileRepository
      * @param OrderRelationManager $relationManager
      * @param CartRepositoryInterface $cartRepository
-     * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
-     * @param \Magento\Framework\Session\SessionManagerInterface $sessionManager
-     * @param \Magento\Vault\Api\PaymentTokenManagementInterface $paymentTokenManagement
+     * @param ScopeConfigInterface $scopeConfig
+     * @param SessionManagerInterface $sessionManager
+     * @param PaymentTokenManagementInterface $paymentTokenManagement
+     * @param Manager $moduleManager
+     * @param DataBuilder $dataBuilder
+     * @param AdapterFactory $braintreeAdapterFactory
+     * @param UrlInterface $urlBuilder
      * @param string $tokensConfigClass
      */
     public function __construct(
-        \Magento\Framework\ObjectManagerInterface $objectManager,
+        ObjectManagerInterface $objectManager,
         CcConfig $ccConfig,
         VaultConfigProvider $vaultConfigProvider,
         Config $config,
@@ -105,9 +140,13 @@ class Vault extends Base
         SubscriptionProfileRepository $profileRepository,
         OrderRelationManager $relationManager,
         CartRepositoryInterface $cartRepository,
-        \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
-        \Magento\Framework\Session\SessionManagerInterface $sessionManager,
-        \Magento\Vault\Api\PaymentTokenManagementInterface $paymentTokenManagement,
+        ScopeConfigInterface $scopeConfig,
+        SessionManagerInterface $sessionManager,
+        PaymentTokenManagementInterface $paymentTokenManagement,
+        Manager $moduleManager,
+        DataBuilder $dataBuilder,
+        AdapterFactory $braintreeAdapterFactory,
+        UrlInterface $urlBuilder,
         $tokensConfigClass = ''
     ) {
         parent::__construct($config, $session, $profileRepository, $relationManager, $cartRepository);
@@ -123,6 +162,12 @@ class Vault extends Base
         $this->vaultConfigProvider = $vaultConfigProvider;
         $this->scopeConfig = $scopeConfig;
         $this->sessionManager = $sessionManager;
+        if ($moduleManager->isEnabled("PayPal_Braintree")) {
+            $this->braintreeConfig = $objectManager->get(\PayPal\Braintree\Gateway\Config\Config::class);
+        }
+        $this->dataBuilder = $dataBuilder;
+        $this->braintreeAdapterFactory = $braintreeAdapterFactory;
+        $this->urlBuilder = $urlBuilder;
     }
 
     /**
@@ -293,6 +338,24 @@ class Vault extends Base
      */
     protected function getAdditionalConfig()
     {
+        if ($this->getPaymentCode() === 'braintree_cc_vault') {
+            return [
+                'component' => 'TNW_Subscriptions/js/form/subscription-profile/payment/braintree',
+                'options' => [
+                    'formName' => $this->getPaymentFormName(),
+                ],
+                'imports' => [
+                    'changeVisibility' => "{$this->getFieldsetName()}.method:checked",
+                ],
+                'nonceUrl' => $this->getNonceRetrieveUrl(),
+                'clientToken' => $this->getClientToken(),
+                'three_d_enabled' => $this->braintreeConfig->isVerify3DSecure(),
+                'thresholdAmount' => $this->braintreeConfig->getThresholdAmount(),
+                'totalAmount' => $this->dataBuilder->getAmountByProfile($this->getProfile()),
+                'specificCountries' => $this->braintreeConfig->get3DSecureSpecificCountries(),
+                'useCvvVault' => $this->braintreeConfig->isCvvEnabledVault(),
+            ];
+        }
         return [
             'component' => 'TNW_Subscriptions/js/form/subscription-profile/payment/base',
             'options' => [
@@ -333,5 +396,36 @@ class Vault extends Base
     private function getPaymentMethodCodeByVaultCode($vaultCode)
     {
         return str_replace(['_cc_vault', '_vault'], '', $vaultCode);
+    }
+
+    /**
+     * Generate a new client token if necessary
+     * @return string
+     * @throws InputException
+     * @throws NoSuchEntityException
+     */
+    public function getClientToken()
+    {
+        if (empty($this->clientToken)) {
+            $params = [];
+
+            $merchantAccountId = $this->braintreeConfig->getMerchantAccountId();
+            if (!empty($merchantAccountId)) {
+                $params[PaymentDataBuilder::MERCHANT_ACCOUNT_ID] = $merchantAccountId;
+            }
+
+            $this->clientToken = $this->braintreeAdapterFactory->create()->generate($params);
+        }
+
+        return $this->clientToken;
+    }
+
+    /**
+     * Get url to retrieve payment method nonce
+     * @return string
+     */
+    private function getNonceRetrieveUrl()
+    {
+        return $this->urlBuilder->getUrl('braintree/payment/getnonce', ['_secure' => true]);
     }
 }

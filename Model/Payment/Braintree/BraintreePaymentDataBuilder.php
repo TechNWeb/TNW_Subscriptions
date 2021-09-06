@@ -241,6 +241,9 @@ class BraintreePaymentDataBuilder extends \TNW\Subscriptions\Model\Payment\DataB
      */
     public function build($order, $paymentData)
     {
+        if ($this->is3DSecureEnabled($order)) {
+            $this->is3DSecure = true;
+        }
         $amount = ['amount' => $this->getAmount($order)];
         $billingAddress = $order->getBillingAddress();
         $channel = $this->config->getValue('channel');
@@ -306,7 +309,7 @@ class BraintreePaymentDataBuilder extends \TNW\Subscriptions\Model\Payment\DataB
         $amount = $this->formatPrice($this->subjectReader->readAmount($amount));
 
         if ($this->is3DSecureEnabled($order, $amount)) {
-            $result['options'][self::CODE_3DSECURE] = ['required' => true];
+            $result['options']['threeDSecure'] = ['required' => true];
         }
 
         if (!$this->braintreeConfig->hasFraudProtection($order->getStoreId())) {
@@ -335,11 +338,14 @@ class BraintreePaymentDataBuilder extends \TNW\Subscriptions\Model\Payment\DataB
      * @param $amount
      * @return bool
      */
-    private function is3DSecureEnabled($order, $amount)
+    private function is3DSecureEnabled($order, $amount = null)
     {
         $storeId = $order->getStoreId();
         if (!$this->braintreeConfig->isVerify3DSecure($storeId)
-            || $amount < $this->braintreeConfig->getThresholdAmount($storeId)
+            || (
+                $amount !== null
+                && $amount < $this->braintreeConfig->getThresholdAmount($storeId)
+            )
         ) {
             return false;
         }

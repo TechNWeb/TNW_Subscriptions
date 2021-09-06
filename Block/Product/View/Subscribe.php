@@ -260,10 +260,11 @@ class Subscribe extends View
      */
     public function isSubscribeAvailable()
     {
-        if ($this->getProduct()->getTypeId() === TypeBundle::TYPE_CODE) {
+        $typeId = $this->getProduct()->getTypeId();
+        if ($typeId === TypeBundle::TYPE_CODE) {
             return false;
         }
-        if (empty($this->getProductBillingFrequencies())) {
+        if (empty($this->getProductBillingFrequencies()) && $typeId !== Grouped::TYPE_CODE) {
             return false;
         }
         $websiteId = $this->getProduct()->getStore()->getWebsiteId()
@@ -720,7 +721,7 @@ class Subscribe extends View
             case \Magento\Catalog\Model\Product\Type::TYPE_VIRTUAL:
             case Type::TYPE_DOWNLOADABLE:
                 break;
-            case \Magento\GroupedProduct\Model\Product\Type\Grouped::TYPE_CODE:
+            case Grouped::TYPE_CODE:
                 $childProducts = $this->subscriptionTypeResolver
                     ->resolve($type)->getChildProducts($this->getProduct());
                 $childArray = [];

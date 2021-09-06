@@ -14,6 +14,7 @@ use TNW\Subscriptions\Model\SubscriptionProfileOrder\Manager as OrderRelationMan
 use TNW\Subscriptions\Model\SubscriptionProfileRepository;
 use Magento\Framework\Module\Manager;
 use Magento\Framework\ObjectManagerInterface;
+use TNW\Subscriptions\Model\Payment\DataBuilder;
 
 /**
  * Braintree payment methods form modifier.
@@ -45,18 +46,8 @@ class Braintree extends Base
      */
     private $clientToken = '';
 
-    /**
-     * Braintree constructor.
-     * @param \TNW\Subscriptions\Model\Config $config
-     * @param QuoteSessionInterface $session
-     * @param SubscriptionProfileRepository $profileRepository
-     * @param OrderRelationManager $relationManager
-     * @param \Magento\Quote\Api\CartRepositoryInterface $cartRepository
-     * @param Manager $moduleManager
-     * @param ObjectManagerInterface $objectManager
-     * @param Config $paymentConfig
-     * @param AdapterFactory $braintreeAdapterFactory
-     */
+    private $dataBuilder;
+
     public function __construct(
         \TNW\Subscriptions\Model\Config $config,
         QuoteSessionInterface $session,
@@ -66,7 +57,8 @@ class Braintree extends Base
         Manager $moduleManager,
         ObjectManagerInterface $objectManager,
         Config $paymentConfig,
-        AdapterFactory $braintreeAdapterFactory
+        AdapterFactory $braintreeAdapterFactory,
+        DataBuilder $dataBuilder
     ) {
         parent::__construct($config, $session, $profileRepository, $relationManager, $cartRepository);
         if ($moduleManager->isEnabled("PayPal_Braintree")) {
@@ -74,6 +66,7 @@ class Braintree extends Base
         }
         $this->braintreeAdapterFactory = $braintreeAdapterFactory;
         $this->paymentConfig = $paymentConfig;
+        $this->dataBuilder = $dataBuilder;
     }
 
     /**
@@ -241,7 +234,12 @@ class Braintree extends Base
             'dataContainer' => $this->getPaymentCode() . '-transparent-iframe',
             'code' => $this->getPaymentCode(),
             'clientToken' => $this->getClientToken(),
+            'three_d_enabled' => $this->braintreeConfig->isVerify3DSecure(),
+            'thresholdAmount' => $this->braintreeConfig->getThresholdAmount(),
+            'totalAmount' => $this->dataBuilder->getAmountByProfile($this->getProfile()),
+            'specificCountries' => $this->braintreeConfig->get3DSecureSpecificCountries(),
             'useCvv' => $this->hasVerification(),
+            'useCvvVault' => $this->braintreeConfig->isCvvEnabledVault(),
             'availableCardTypes' => $this->braintreeConfig->getAvailableCardTypes(),
             'ccTypesMapper' => $this->braintreeConfig->getCcTypesMapper(),
             'options' => [
