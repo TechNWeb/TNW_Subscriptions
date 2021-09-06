@@ -169,7 +169,7 @@ class UpgradeSchema implements UpgradeSchemaInterface
         if (version_compare($context->getVersion(), '2.2.81', '<')) {
             $this->addColumnForSubscriptionGrid($setup);
         }
-        if (version_compare($context->getVersion(), '2.2.81', '<')) {
+        if (version_compare($context->getVersion(), '2.2.82', '<')) {
             $this->removeCustomerAddressFK($setup);
         }
 
