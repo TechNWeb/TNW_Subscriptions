@@ -149,9 +149,6 @@ class UpgradeSchema implements UpgradeSchemaInterface
         if (version_compare($context->getVersion(), '2.3.28', '<')) {
             $this->addCustomerProductsHistoryTable($setup);
         }
-        if (version_compare($context->getVersion(), '2.3.32', '<')) {
-            $this->addVaultThreeDSecureFields($setup);
-        }
 
         if (version_compare($context->getVersion(), '2.3.36', '<')) {
             $this->addColumnForSubscriptionGrid($setup);
@@ -171,6 +168,11 @@ class UpgradeSchema implements UpgradeSchemaInterface
 
         if (version_compare($context->getVersion(), '2.3.37', '<')) {
             $this->addRecurringInstallmentDatesSalesOrder($setup);
+        }
+
+        if (version_compare($context->getVersion(), '2.3.36', '<')) {
+            $this->addVaultThreeDSecureFields($setup);
+            $this->addRebillTable($setup);
         }
 
         $setup->endSetup();
@@ -240,6 +242,49 @@ class UpgradeSchema implements UpgradeSchemaInterface
                 'default' => '0',
                 'comment' => 'Is Liability Shifted'
             ]);
+    }
+
+    /**
+     * @param SchemaSetupInterface $setup
+     * @throws \Zend_Db_Exception
+     */
+    private function addRebillTable(SchemaSetupInterface $setup)
+    {
+        $table = $setup->getConnection()
+            ->newTable($setup->getTable('tnw_subscriptions_rebill_profiles'))
+            ->addColumn(
+                'id',
+                Table::TYPE_INTEGER,
+                null,
+                ['identity' => true, 'nullable' => false, 'primary' => true, 'unsigned' => true],
+                'Entity ID'
+            )->addColumn(
+                'customer_id',
+                Table::TYPE_INTEGER,
+                null,
+                ['nullable' => false],
+                'Customer id whose message it is'
+            )->addColumn(
+                'subscription_profiles',
+                Table::TYPE_TEXT,
+                256,
+                ['nullable' => false],
+                'Subscription Profiles To Process'
+            )->addColumn(
+                'queues',
+                Table::TYPE_TEXT,
+                256,
+                ['nullable' => false],
+                'Subscription Queues To Verify'
+            )->addColumn(
+                'token',
+                Table::TYPE_TEXT,
+                256,
+                ['nullable' => false],
+                'Token'
+            );
+
+        $setup->getConnection()->createTable($table);
     }
 
     /**

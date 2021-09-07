@@ -61,6 +61,7 @@
             <payment_failed_setting>
                 <payment_failed_enable>1</payment_failed_enable>
                 <payment_failed>tnw_subscriptions_profile_notification_payment_failed_setting_payment_failed</payment_failed>
+                <payment_verification_failed>tnw_subscriptions_profile_notification_payment_failed_setting_payment_verification_failed</payment_verification_failed>
                 <payment_failed_copy_method>bcc</payment_failed_copy_method>
             </payment_failed_setting>
             <renewal_setting>

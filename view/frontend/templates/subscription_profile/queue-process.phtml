@@ -1,0 +1,87 @@
+<?php
+/**
+ * Copyright © 2018 TechNWeb, Inc. All rights reserved.
+ * See TNW_LICENSE.txt for license details.
+ */
+?>
+<?php
+/**
+ * @var \Magento\Framework\View\Element\Template $block
+ * @var \TNW\Subscriptions\ViewModel\Subscription\QueueProcess $viewModel
+ * @var \Magento\Framework\Escaper $escaper
+ */
+$viewModel = $block->getViewModel();
+?>
+<?php if (!$block->getError() && $viewModel->isDataValid()): ?>
+<div class="tnw-queue-process-wrapper">
+    <div class="block profiles">
+        <div class="block-title">
+            <strong><?= $escaper->escapeHtml(__('Subscription profiles to be re-billed:')) ?></strong>
+        </div>
+        <div class="profile-links">
+            <?= /** @noEscape  */ $viewModel->getProfileLinks() ?>
+        </div>
+    </div>
+    <div class="block totals">
+        <div class="block-title">
+            <strong><?= $escaper->escapeHtml(__('Order Total')) ?></strong>
+        </div>
+        <div class="grandtotal">
+            <strong><?= /** @noEscape  */ $viewModel->getGrandTotal() ?></strong>
+        </div>
+    </div>
+    <?php if (!$viewModel->isQuoteVirtual()): ?>
+    <div class="shipping">
+        <div class="block shipping-address">
+            <div class="block-title">
+                <strong><?= $escaper->escapeHtml(__('Shipping Address'))?></strong>
+            </div>
+            <div class="shipping-address">
+                <?= $viewModel->getAddressHtml('shipping') ?>
+            </div>
+        </div>
+        <div class="block shipping-method">
+            <div class="block-title">
+                <strong><?= $escaper->escapeHtml(__('Shipping Method'))?></strong>
+            </div>
+            <div class="shipping-method">
+                <?= $viewModel->getShippingMethodHtml() ?>
+            </div>
+        </div>
+    </div>
+    <?php endif; ?>
+    <div class="billing">
+        <div class="block billing-address">
+            <div class="block-title">
+                <strong><?= $escaper->escapeHtml(__('Billing Address'))?></strong>
+            </div>
+            <div class="billing-address">
+                <?= $viewModel->getAddressHtml('billing') ?>
+            </div>
+        </div>
+        <div class="block payment-method">
+            <div class="block-title">
+                <strong><?= $escaper->escapeHtml($viewModel->getPaymentMethodTitle()) ?></strong>
+            </div>
+            <div class="payment-method">
+                <?= $escaper->escapeHtml($viewModel->getVaultCardDescription()) ?>
+            </div>
+        </div>
+    </div>
+
+    <div id="tnw-queue-process-form" data-bind="scope: 'tnwQueueProcess'">
+        <!-- ko template: getTemplate() --><!-- /ko -->
+    </div>
+    <script type="text/x-magento-init">
+    {
+        "*": {
+            "Magento_Ui/js/core/app": {
+                "components": {
+                    "tnwQueueProcess": <?= /** @noEscape  */ $viewModel->getJsConfig() ?>
+                }
+            }
+        }
+    }
+    </script>
+</div>
+<?php endif; ?>

@@ -19,6 +19,7 @@ use TNW\Subscriptions\Model\SubscriptionProfile;
 use TNW\Subscriptions\Model\SubscriptionProfileOrder\Manager as RelationManager;
 use TNW\Subscriptions\Model\SubscriptionProfileRepository;
 use TNW\Subscriptions\Model\EmailNotifierFactory;
+use TNW\Subscriptions\Model\SubscriptionProfile\ReBillManager;
 
 /**
  * Class Manager - queue manager model
@@ -120,6 +121,11 @@ class Manager
     private $orderSender;
 
     /**
+     * @var ReBillManager
+     */
+    private $reBillManager;
+
+    /**
      * Manager constructor.
      * @param CollectionFactory $collectionFactory
      * @param Config $config
@@ -137,6 +143,7 @@ class Manager
      * @param EmailNotifierFactory $emailNotifierFactory
      * @param BillingCyclesManagerFactory $billingCyclesManagerFactory
      * @param \Magento\Sales\Model\Order\Email\Sender\OrderSender $orderSender
+     * @param ReBillManager $reBillManager
      */
     public function __construct(
         CollectionFactory $collectionFactory,
@@ -154,8 +161,10 @@ class Manager
         \TNW\Subscriptions\Model\ResourceModel\SalesItemRelation $relationResource,
         EmailNotifierFactory $emailNotifierFactory,
         BillingCyclesManagerFactory $billingCyclesManagerFactory,
-        \Magento\Sales\Model\Order\Email\Sender\OrderSender $orderSender
+        \Magento\Sales\Model\Order\Email\Sender\OrderSender $orderSender,
+        ReBillManager $reBillManager
     ) {
+        $this->reBillManager = $reBillManager;
         $this->orderSender = $orderSender;
         $this->billingCyclesManagerFactory = $billingCyclesManagerFactory;
         $this->emailNotifierFactory = $emailNotifierFactory;
@@ -273,6 +282,21 @@ class Manager
     }
 
     /**
+     * @param $queuIds
+     * @return Collection
+     */
+    public function getCollectionByQueueIds($queuIds)
+    {
+        $collection = $this->getBaseCollection();
+        $connection = $collection->getConnection();
+        $collection->getSelect()
+            ->where($connection->prepareSqlCondition('main_table.id', array("in" => array($queuIds))))
+            ->order('relation.scheduled_at ASC')
+            ->group(['main_table.profile_order_id']);
+        return $collection;
+    }
+
+    /**
      * Inserts into queue new items.
      *
      * @param array $relationIds - ids from "tnw_subscriptions_subscription_profile_order" table
@@ -328,6 +352,19 @@ class Manager
     }
 
     /**
+     * Changes status to reuquired verification and sets error message for queue items.
+     *
+     * @param array|int $ids
+     * @param string $message
+     * @param bool $isPaymentError
+     * @throws \Magento\Framework\Exception\LocalizedException
+     */
+    public function makeVerification($ids, $message, $isPaymentError = false)
+    {
+        $this->resourceQueue->updateStatus($ids, QueueStatus::QUEUE_STATUS_VERIFICATION, $message, $isPaymentError);
+    }
+
+    /**
      * Changes status to pending and sets error message for queue items.
      *
      * @param array|int $ids
@@ -376,6 +413,16 @@ class Manager
         return $this->timezone->date()
             ->modify(sprintf('-%d day', $this->config->getAttemptInterval()))->setTime(23, 59, 59)
             ->format(\Magento\Framework\Stdlib\DateTime::DATETIME_PHP_FORMAT);
+    }
+
+    /**
+     * @param $data
+     * @return $this
+     */
+    public function setCustomerGroupQueuePaymentData($data)
+    {
+        $this->profileManager->setCustomPaymentData($data);
+        return $this;
     }
 
     /**
@@ -549,6 +596,9 @@ class Manager
                     $this->profileRepository->save($profile);
                 }
             } catch (\Exception $e) {
+                if ($e instanceof \Magento\Payment\Gateway\Command\CommandException && $e->getCode() == 2099) {
+                    $reBill = $this->reBillManager->createReBillByFailedGroupQueue($groupQueue);
+                }
                 foreach ($groupQueue as $queue) {
                     $profile = $this->profileRepository->getById($queue->getData('subscription_profile_id'));
 
@@ -571,10 +621,13 @@ class Manager
                         );
                     }
                     if ($e instanceof \Magento\Payment\Gateway\Command\CommandException) {
-                        $this->emailNotifierFactory->create()->paymentFailed($profile);
+                        if (isset($reBill) && $reBill->getId()) {
+                            $this->emailNotifierFactory->create()->paymentVerificationFailed($profile, $reBill);
+                        } else {
+                            $this->emailNotifierFactory->create()->paymentFailed($profile);
+                        }
                     }
                 }
-
                 throw $e;
             }
         } else {

@@ -65,7 +65,10 @@
     </type>
 
     <preference for="TNW\Subscriptions\Model\QuoteSessionInterface" type="TNW\Subscriptions\Model\Session\Quote" />
-
+    <preference for="TNW\Subscriptions\Api\Data\ReBillInterface"
+                type="TNW\Subscriptions\Model\SubscriptionProfile\ReBill" />
+    <preference for="TNW\Subscriptions\Api\ReBillRepositoryInterface"
+                type="TNW\Subscriptions\Model\SubscriptionProfile\ReBillRepository" />
     <preference for="CyberSource\SecureAcceptance\Gateway\Request\Soap\DecisionManagerMddBuilder"
                 type="TNW\Subscriptions\Model\Payment\Cybersource\Gateway\Request\Soap\DecisionManagerMddBuilder" />
     <preference for="CyberSource\SecureAcceptance\Plugin\Model\Method\VaultPlugin"
@@ -199,6 +202,21 @@
                 sortOrder="50"
                 disabled="false"/>
     </type>
+
+    <type name="PayPal\Braintree\Gateway\Command\GatewayCommand">
+        <plugin name="process_command_error"
+                type="TNW\Subscriptions\Plugin\Braintree\Gateway\Command\GatewayCommand"
+                sortOrder="50"
+                disabled="false"/>
+    </type>
+    <type name="PayPal\Braintree\Gateway\Http\Client\TransactionSale">
+        <plugin name="process_command_error"
+                type="TNW\Subscriptions\Plugin\Braintree\Gateway\Http\Client\TransactionSale"
+                sortOrder="50"
+                disabled="false"/>
+    </type>
+
+    <type name="TNW\Subscriptions\Model\Payment\RequestState" shared="true" />
 
     <type name="Magento\Tax\Model\Sales\Total\Quote\Tax">
         <plugin name="cybersouce_tax_collector"

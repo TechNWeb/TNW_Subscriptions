@@ -27,6 +27,8 @@ class EmailNotifier
     const XML_PATH_COMMENT_ADDED_TEMPLATE = 'tnw_subscriptions_profile_notification/send_comment_setting/comment_added';
     const XML_PATH_CARD_EXPIRE = 'tnw_subscriptions_profile_notification/card_expire_setting/card_expire';
     const XML_PATH_PAYMENT_FAILED = 'tnw_subscriptions_profile_notification/payment_failed_setting/payment_failed';
+    const XML_PATH_PAYMENT_VERIFICATION_FAILED =
+        'tnw_subscriptions_profile_notification/payment_failed_setting/payment_verification_failed';
     const XML_PATH_OUT_OF_STOCK = 'tnw_subscriptions_profile_notification/out_of_stock_setting/out_of_stock';
     const XML_PATH_RENEWAL = 'tnw_subscriptions_profile_notification/renewal_setting/renewal';
 
@@ -326,6 +328,57 @@ class EmailNotifier
                             \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
                             $storeId
                         )
+                    ],
+                    [
+                        'email' => $customerEmail,
+                        'name' => $customerName
+                    ],
+                    $copyTo,
+                    $copyMethod
+                );
+            }
+        }
+    }
+
+    /**
+     * @param $subscriptionProfile
+     * @param $reBill
+     * @throws \Magento\Framework\Exception\LocalizedException
+     * @throws \Magento\Framework\Exception\MailException
+     */
+    public function paymentVerificationFailed($subscriptionProfile, $reBill)
+    {
+        if ($this->checkEmailTemplateSetting(self::XML_PATH_PAYMENT_FAILED)) {
+            list($storeId, $customerEmail, $customerName) = $this->getCustomerVars($subscriptionProfile);
+            $enableEmailNotification = $this->scopeConfig->getValue(
+                self::XML_PATH_ENABLE_PAYMENT_FAILED,
+                \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
+                $storeId
+            );
+            $moduleEnable = $this->scopeConfig->getValue(
+                self::XML_PATH_MODULE_ENABLE,
+                \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
+                $storeId
+            );
+            if ($enableEmailNotification == 1 && $moduleEnable == 1) {
+                $copyTo = $this->getEmailCopyTo(self::XML_PATH_PAYMENT_FAILED_COPY_TO, $storeId);
+                $copyMethod = $this->getCopyMethod(self::XML_PATH_PAYMENT_FAILED_COPY_METHOD, $storeId);
+                $this->sendNotificationEmail(
+                    $this->scopeConfig->getValue(
+                        self::XML_PATH_PAYMENT_VERIFICATION_FAILED,
+                        \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
+                        $storeId
+                    ),
+                    $storeId,
+                    [
+                        'subscription' => $subscriptionProfile,
+                        'customerName' => $customerName,
+                        'attempt_interval' => $this->scopeConfig->getValue(
+                            'tnw_subscriptions_profile_options/past_due_profile_options/attempt_interval',
+                            \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
+                            $storeId
+                        ),
+                        'verification_token' => $reBill->getToken()
                     ],
                     [
                         'email' => $customerEmail,
