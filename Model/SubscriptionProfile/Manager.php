@@ -260,6 +260,11 @@ class Manager
     private $profileResource;
 
     /**
+     * @var array
+     */
+    private $customPaymentData = [];
+
+    /**
      * Manager constructor.
      * @param EnginePool $enginePool
      * @param SubscriptionProfileRepository $subscriptionProfileRepository
@@ -521,6 +526,32 @@ class Manager
         $quote = $this->quoteFactory->create(['data' => ['is_active' => false]]);
         $this->assignCustomerToQuote($quote, $profile);
         $this->populateQuoteData($quote, $profile, true, true);
+        $this->tempQuote = false;
+        return $quote;
+    }
+
+    /**
+     * @param array $profileIDs
+     * @return mixed
+     * @throws Engine\InvalidEngineException
+     * @throws LocalizedException
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     */
+    public function getTempQuoteByProfileIds(array $profileIDs)
+    {
+        $this->tempQuote = true;
+        $quote = $this->quoteFactory->create(['data' => ['is_active' => false]]);
+        foreach ($profileIDs as $key => $profileId) {
+            $collectTotals = false;
+            $profile = $this->subscriptionProfileRepository->getById($profileId);
+            if ($key === array_key_first($profileIDs)) {
+                $this->assignCustomerToQuote($quote, $profile);
+            }
+            if ($key === array_key_last($profileIDs)) {
+                $collectTotals = true;
+            }
+            $this->populateQuoteData($quote, $profile, $collectTotals, true);
+        }
         $this->tempQuote = false;
         return $quote;
     }
@@ -960,6 +991,16 @@ class Manager
     }
 
     /**
+     * @param $paymentData
+     * @return $this
+     */
+    public function setCustomPaymentData($paymentData)
+    {
+        $this->customPaymentData = $paymentData;
+        return $this;
+    }
+
+    /**
      * @param Quote $quote
      * @param SubscriptionProfileInterface $profile
      * @param bool $collectQuoteTotals
@@ -1056,9 +1097,14 @@ class Manager
 
                 if (!$this->tempQuote) {
                     //Set payment method
+                    if (!$this->customPaymentData) {
+                        $paymentAdditionalInfo = $this->getEngine()->getPaymentAdditionalInfo($profile);
+                    } else {
+                        $paymentAdditionalInfo = $this->customPaymentData;
+                    }
                     $quote->getPayment()
                         ->importData($this->getEngine()->getPaymentInfo($profile))
-                        ->setAdditionalInformation($this->getEngine()->getPaymentAdditionalInfo($profile));
+                        ->setAdditionalInformation($paymentAdditionalInfo);
 
                     if ($isReBill && method_exists($this->getEngine(), 'setPaymentExtensionAttributes')) {
                         $this->getEngine()->setPaymentExtensionAttributes($quote->getPayment(), $profile);
