@@ -852,11 +852,12 @@ class Manager
      * @param Quote $quote
      * @param $quoteItems
      * @param null $date
+     * @param bool $paymentChange
      * @return $this
      * @throws LocalizedException
      * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
-    public function populateProfileData(Quote $quote, $quoteItems, $date = null)
+    public function populateProfileData(Quote $quote, $quoteItems, $date = null, $paymentChange = false)
     {
         $request = $this->getUniqueBuyRequest($quoteItems);
         if (empty($request)) {
@@ -865,7 +866,7 @@ class Manager
 
         $frequency = $this->frequencyRepository->getById($request['billing_frequency']);
         $startDate = $this->getFullStartDate($request['start_on'], $date);
-
+        $totalBillingCycles = !$request['term'] ? $paymentChange ? $request['period'] : $request['period'] - 1 : 0;
         $this->getProfile()
             ->setCustomerId($quote->getCustomerId())
             ->setWebsiteId($quote->getStore()->getWebsiteId())
@@ -875,7 +876,7 @@ class Manager
             ->setProfileCurrencyCode($quote->getQuoteCurrencyCode())
             ->setTerm($request['term'])
             ->setStaticTotalBillingCycles(!$request['term'] ? $request['period'] : 0)
-            ->setTotalBillingCycles(!$request['term'] ? $request['period'] - 1 : 0)
+            ->setTotalBillingCycles($totalBillingCycles)
             ->setStartDate($startDate)
             ->setOriginalStartDate($startDate)
             ->setBillingFrequencyId($frequency->getId())
