@@ -154,25 +154,28 @@ class Profit
                     $initialFeeAdded = true;
                     $profit += $recurringOption['initial_fee'];
                 }
-                $profit += ($item['base_cost'] - $item['base_price']) * $item['qty'];
+                $profit += ($item['base_price'] - $item['base_cost']) * $item['qty'];
             }
         }
 
-        try {
-            $data = [
-                'profile_id' => $profile->getId(),
-                'profit_type' => ProfitCalculator::AS_OF_TODAY,
-                'total_profit' => $profit
-            ];
+        $data = [
+            'profile_id' => $profile->getId(),
+            'profit_type' => ProfitCalculator::AS_OF_TODAY,
+            'total_profit' => $profit
+        ];
+
+        if ($this->subscriptionProfileProfit->getTotalProfitById($profile->getId(),
+                ProfitCalculator::AS_OF_TODAY
+            ) == null
+        ) {
             $this->subscriptionProfileProfit->setTotalProfit($data);
-        } catch (LocalizedException $e) {
+        } else {
             $this->subscriptionProfileProfit->updateTotalProfit($data);
         }
 
-
         $lastInvoiceItem = array_pop($invoiceItems);
         if ($lastInvoiceItem) {
-            $profitOfLastItem = ($lastInvoiceItem['base_cost'] - $lastInvoiceItem['base_price'])
+            $profitOfLastItem = ($item['base_price'] - $item['base_cost'])
                 * $lastInvoiceItem['qty'];
         } else {
             $profitOfLastItem = 0;
@@ -188,14 +191,18 @@ class Profit
             $profit += $profitOfLastItem * $profile->getTotalBillingCycles();
         }
 
-        try {
-            $data = [
-                'profile_id' => $profile->getId(),
-                'profit_type' => ProfitCalculator::REMAINING,
-                'total_profit' => $profit
-            ];
+        $data = [
+            'profile_id' => $profile->getId(),
+            'profit_type' => ProfitCalculator::REMAINING,
+            'total_profit' => $profit
+        ];
+
+        if ($this->subscriptionProfileProfit->getTotalProfitById($profile->getId(),
+                ProfitCalculator::REMAINING
+            ) == null
+        ) {
             $this->subscriptionProfileProfit->setTotalProfit($data);
-        } catch (LocalizedException $e) {
+        } else {
             $this->subscriptionProfileProfit->updateTotalProfit($data);
         }
 

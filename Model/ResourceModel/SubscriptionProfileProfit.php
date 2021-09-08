@@ -75,7 +75,7 @@ class SubscriptionProfileProfit extends AbstractDb
                 ],
                 [
                     'profile_id = ?' => $data['profile_id'],
-                    'profit_type' => $data['profit_type']
+                    'profit_type = ?' => $data['profit_type']
                 ]
             );
         }

@@ -7,6 +7,7 @@ namespace TNW\Subscriptions\Model\SubscriptionProfile;
 
 use Magento\Directory\Model\Currency;
 use Magento\Framework\Api\SearchCriteriaBuilder;
+use Magento\Framework\Exception\LocalizedException;
 use TNW\Subscriptions\Api\Data\ProductSubscriptionProfileInterface;
 use TNW\Subscriptions\Api\Data\ProductBillingFrequencyInterface;
 use TNW\Subscriptions\Api\ProductBillingFrequencyRepositoryInterface;
@@ -58,6 +59,7 @@ class ProfitCalculator
      * @param ProductBillingFrequencyRepositoryInterface $recurringOptionRepository
      * @param SearchCriteriaBuilder $searchCriteriaBuilder
      * @param Currency $currency
+     * @param SubscriptionProfile $subscriptionProfile
      */
     public function __construct(
         ProductBillingFrequencyRepositoryInterface $recurringOptionRepository,
@@ -68,6 +70,7 @@ class ProfitCalculator
         $this->recurringOptionRepository = $recurringOptionRepository;
         $this->searchCriteriaBuilder = $searchCriteriaBuilder;
         $this->currency = $currency;
+        $this->subscriptionProfile = $subscriptionProfile;
     }
 
     /**
@@ -77,7 +80,7 @@ class ProfitCalculator
      * @param SubscriptionProfile $subscriptionProfile
      *
      * @return float|int
-     * @throws \Magento\Framework\Exception\LocalizedException
+     * @throws LocalizedException
      */
     public function getTotalProfit(SubscriptionProfile $subscriptionProfile)
     {
@@ -91,7 +94,7 @@ class ProfitCalculator
      * @param bool $addContainer
      *
      * @return string
-     * @throws \Magento\Framework\Exception\LocalizedException
+     * @throws LocalizedException
      */
     public function getRenderedTotalProfit(SubscriptionProfile $subscriptionProfile, $addContainer = true)
     {
@@ -110,7 +113,7 @@ class ProfitCalculator
      * @param SubscriptionProfile $subscriptionProfile
      *
      * @return float|int
-     * @throws \Magento\Framework\Exception\LocalizedException
+     * @throws LocalizedException
      */
     public function getAsOfTodayProfit(SubscriptionProfile $subscriptionProfile)
     {
@@ -129,7 +132,7 @@ class ProfitCalculator
      * @param bool $includeContainer
      *
      * @return string
-     * @throws \Magento\Framework\Exception\LocalizedException
+     * @throws LocalizedException
      */
     public function getRenderedAsOfTodayProfit(SubscriptionProfile $subscriptionProfile, $includeContainer = true)
     {
@@ -144,7 +147,7 @@ class ProfitCalculator
      * @param SubscriptionProfile $subscriptionProfile
      *
      * @return float|int
-     * @throws \Magento\Framework\Exception\LocalizedException
+     * @throws LocalizedException
      */
     public function getRemainingProfit(SubscriptionProfile $subscriptionProfile)
     {
@@ -163,7 +166,7 @@ class ProfitCalculator
      * @param bool $includeContainer
      *
      * @return float|int
-     * @throws \Magento\Framework\Exception\LocalizedException
+     * @throws LocalizedException
      */
     public function getRenderedRemainingProfit(SubscriptionProfile $subscriptionProfile, $includeContainer = true)
     {
@@ -182,34 +185,6 @@ class ProfitCalculator
     private function getProfit(SubscriptionProfile $profile, $profitType)
     {
         return $this->subscriptionProfile->getTotalProfit($profile->getEntityId(), $profitType);
-    }
-
-    /**
-     * @param $recurringOptions
-     * @param $productId
-     *
-     * @return ProductBillingFrequencyInterface|false
-     */
-    private function searchRecurringOption($recurringOptions, $productId)
-    {
-        $filteredRecurringOptions = array_filter(
-            $recurringOptions,
-            function (ProductBillingFrequencyInterface $frequency) use ($productId) {
-                return (int)$frequency->getMagentoProductId() === (int)$productId;
-            }
-        );
-
-        return \reset($filteredRecurringOptions);
-    }
-
-    /**
-     * @param ProductSubscriptionProfileInterface $item
-     *
-     * @return null|string
-     */
-    private function profileItemProductId(ProductSubscriptionProfileInterface $item)
-    {
-        return $item->getMagentoProductId();
     }
 
     /**
