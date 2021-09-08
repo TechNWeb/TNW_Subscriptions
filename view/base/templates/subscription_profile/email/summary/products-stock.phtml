@@ -9,7 +9,7 @@
     <?php foreach ($block->getSubscriptionsWithStock() as $key => $profiles): ?>
         <?php if ($key === 'in_stock' && $profiles): ?>
             <h3><?= $escaper->escapeHtml(__('Products')) ?></h3>
-        <?php elseif($key === 'out_stock' && $profiles): ?>
+        <?php elseif ($key === 'out_stock' && $profiles): ?>
             <h3><?= $escaper->escapeHtml(__('Out of stock')) ?></h3>
             <p>
                 <?= $escaper->escapeHtml(

@@ -37,7 +37,6 @@ class IgnoreConfigurationForAdmin
      * @param  $result
      * @param  $moduleName
      * @return false|mixed
-     * @throws LocalizedException
      */
     public function afterIsEnabled(ConfigInterface $config, $result, $moduleName)
     {

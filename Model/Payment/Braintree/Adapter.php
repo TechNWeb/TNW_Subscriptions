@@ -459,7 +459,7 @@ class Adapter
     public function getValueByWebsiteId($field, $websiteId, $environmentIdentifier)
     {
         if ($environmentIdentifier === Environment::ENVIRONMENT_SANDBOX) {
-           $result = $this->scopeConfig->getValue(
+            $result = $this->scopeConfig->getValue(
                 'payment/braintree/sandbox_' . $field,
                 ScopeInterface::SCOPE_WEBSITES,
                 $this->getWebsite($websiteId)->getCode()

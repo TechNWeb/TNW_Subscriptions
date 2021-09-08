@@ -9,7 +9,7 @@
 /** @var $block \Magento\Sales\Block\Order\Email\Items */
 ?>
 <?php $_order = $block->getOrder() ?>
-<?php if ($_order) : ?>
+<?php if ($_order): ?>
     <?php $_items = $_order->getAllItems(); ?>
     <table class="email-items">
         <thead>
@@ -25,8 +25,8 @@
             </th>
         </tr>
         </thead>
-        <?php foreach ($_items as $_item) : ?>
-            <?php if (!$_item->getParentItem()) : ?>
+        <?php foreach ($_items as $_item): ?>
+            <?php if (!$_item->getParentItem()): ?>
                 <tbody>
                 <?= $block->getItemHtml($_item) ?>
                 </tbody>
@@ -39,10 +39,10 @@
     <?php if ($this->helper(\Magento\GiftMessage\Helper\Message::class)
             ->isMessagesAllowed('order', $_order, $_order->getStore())
         && $_order->getGiftMessageId()
-    ) : ?>
+    ): ?>
         <?php $_giftMessage = $this->helper(\Magento\GiftMessage\Helper\Message::class)
             ->getGiftMessage($_order->getGiftMessageId()); ?>
-        <?php if ($_giftMessage) : ?>
+        <?php if ($_giftMessage): ?>
             <br />
             <table class="message-gift">
                 <tr>
