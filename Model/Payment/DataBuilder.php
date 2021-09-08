@@ -62,7 +62,7 @@ class DataBuilder
                 }
             }
             if ($subscriptionItems) {
-                $this->manager->populateProfileData($order, $subscriptionItems);
+                $this->manager->populateProfileData($order, $subscriptionItems, null, $this->is3DSecure);
             }
             if ($order instanceof Quote) {
                 $result = $this->getAmountByProfile($this->manager->getProfile(), $order);
