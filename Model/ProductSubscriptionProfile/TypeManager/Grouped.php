@@ -1,11 +1,17 @@
 <?php
-
+/**
+ * Copyright © 2018 TechNWeb, Inc. All rights reserved.
+ * See TNW_LICENSE.txt for license details.
+ */
 namespace TNW\Subscriptions\Model\ProductSubscriptionProfile\TypeManager;
 
 use Magento\Framework\Pricing\SaleableInterface;
 use TNW\Subscriptions\Model\Config\Source\PurchaseType;
 use TNW\Subscriptions\Model\Product\Attribute;
 
+/**
+ * Class Grouped - group product manager
+ */
 class Grouped extends Base
 {
     /**
@@ -14,8 +20,14 @@ class Grouped extends Base
     public function modifyBuyRequests(array $products)
     {
         // TODO: Implement modifyBuyRequests() method.
+        return $this;
     }
 
+    /**
+     * @param SaleableInterface $product
+     * @param array|null $arguments
+     * @return \Magento\Framework\DataObject
+     */
     public function getProductDataObject(SaleableInterface $product, array $arguments = null)
     {
         $data = parent::getProductDataObject($product, $arguments);
@@ -37,6 +49,10 @@ class Grouped extends Base
         return $data;
     }
 
+    /**
+     * @param SaleableInterface $product
+     * @return \Magento\Catalog\Api\Data\ProductInterface[]
+     */
     public function getChildProducts(SaleableInterface $product)
     {
         $childrenIds = $product->getTypeInstance()->getChildrenIds($product->getId());

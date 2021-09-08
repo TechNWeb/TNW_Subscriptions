@@ -290,7 +290,7 @@ class Manager
         $collection = $this->getBaseCollection();
         $connection = $collection->getConnection();
         $collection->getSelect()
-            ->where($connection->prepareSqlCondition('main_table.id', array("in" => array($queuIds))))
+            ->where($connection->prepareSqlCondition('main_table.id', ["in" => [$queuIds]]))
             ->order('relation.scheduled_at ASC')
             ->group(['main_table.profile_order_id']);
         return $collection;

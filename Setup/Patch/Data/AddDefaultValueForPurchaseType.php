@@ -70,8 +70,7 @@ class AddDefaultValueForPurchaseType implements DataPatchInterface
         ProductAttributeRepositoryInterface $attributeRepository,
         ModuleDataSetupInterface $setup,
         EavSetupFactory $eavSetupFactory
-    )
-    {
+    ) {
         $this->productCollection = $productCollection;
         $this->storeManager = $storeManager;
         $this->productAction = $productAction;

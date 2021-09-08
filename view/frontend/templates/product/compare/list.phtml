@@ -150,7 +150,7 @@ $_subscriptionBlock = $block->getChildBlock('helper.compare.products.list');
                                             default :?>
                                                 <?php if (is_string($block->getProductAttributeValue($item, $attribute))): ?>
                                                     <?= /* @noEscape */ $helper->productAttribute($item, $block->getProductAttributeValue($item, $attribute), $attribute->getAttributeCode()) ?>
-                                                <?php else : ?>
+                                                <?php else: ?>
                                                     <?=  $escaper->escapeHtml($helper->productAttribute($item, $block->getProductAttributeValue($item, $attribute), $attribute->getAttributeCode())) ?>
                                                 <?php endif; ?>
                                                 <?php break;
