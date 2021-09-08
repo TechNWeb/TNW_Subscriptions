@@ -5,6 +5,8 @@
  */
 namespace TNW\Subscriptions\Model\SubscriptionProfile;
 
+use Magento\Catalog\Model\Product\Type;
+use Magento\ConfigurableProduct\Model\Product\Type\Configurable;
 use Magento\Framework\Api\DataObjectHelper;
 use Magento\Framework\Api\SearchCriteriaBuilder;
 use Magento\Framework\Api\SimpleDataObjectConverter;
@@ -1711,16 +1713,20 @@ class Manager
     /**
      * Check products type in subscription
      *
-     * @param $quoteItems
+     * @param array $quoteItems
      * @return bool
      */
     public function isQuoteHasVirtualProducts(array $quoteItems)
     {
         foreach ($quoteItems as $item) {
-            if (!$item->getIsVirtual() && $item->getProductType() != 'virtual') {
+            if ($item->getProductType() == Configurable::TYPE_CODE) {
+                foreach ($item->getChildren() as $child) {
+                    if ($child->getProductType() != Type::TYPE_VIRTUAL) {
+                        return false;
+                    }
+                }
+            } elseif (!$item->getIsVirtual() && $item->getProductType() != Type::TYPE_VIRTUAL) {
                 return false;
-            } else {
-                continue;
             }
         }
         return true;
