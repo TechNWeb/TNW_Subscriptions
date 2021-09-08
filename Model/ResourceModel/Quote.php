@@ -46,6 +46,7 @@ class Quote extends \Magento\Quote\Model\ResourceModel\Quote
         $data = $connection->fetchRow($select);
         if ($data) {
             $quote->setData($data);
+            $quote->setOrigData();
         }
 
         $this->_afterLoad($quote);
