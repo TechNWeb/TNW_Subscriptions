@@ -92,7 +92,8 @@ class ReBillManager
      */
     public function generateTokenByRebill($reBill)
     {
-        return md5(
+        return hash(
+            'md5',
             $reBill->getData('queues') . $reBill->getData('subscription_profiles') . $reBill->getCustomerId()
         );
     }

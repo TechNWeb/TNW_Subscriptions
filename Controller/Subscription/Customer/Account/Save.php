@@ -257,7 +257,6 @@ class Save extends Action\Action
         return $result;
     }
 
-
     /**
      * Returns request same model.
      *

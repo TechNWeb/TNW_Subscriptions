@@ -39,8 +39,7 @@ class OrdersHistory extends BaseFormModifier
         UrlInterface $urlBuilder,
         Registry $registry,
         ScopeConfigInterface $scopeConfig
-    )
-    {
+    ) {
         $this->scopeConfig = $scopeConfig;
         parent::__construct($urlBuilder, $registry);
     }

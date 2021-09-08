@@ -5,6 +5,8 @@
  */
 namespace TNW\Subscriptions\Model\SubscriptionProfile;
 
+use Magento\Catalog\Model\Product\Type;
+use Magento\ConfigurableProduct\Model\Product\Type\Configurable;
 use Magento\Framework\Api\DataObjectHelper;
 use Magento\Framework\Api\SearchCriteriaBuilder;
 use Magento\Framework\Api\SimpleDataObjectConverter;
@@ -852,11 +854,12 @@ class Manager
      * @param Quote $quote
      * @param $quoteItems
      * @param null $date
+     * @param bool $paymentChange
      * @return $this
      * @throws LocalizedException
      * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
-    public function populateProfileData(Quote $quote, $quoteItems, $date = null)
+    public function populateProfileData(Quote $quote, $quoteItems, $date = null, $paymentChange = false)
     {
         $request = $this->getUniqueBuyRequest($quoteItems);
         if (empty($request)) {
@@ -865,7 +868,7 @@ class Manager
 
         $frequency = $this->frequencyRepository->getById($request['billing_frequency']);
         $startDate = $this->getFullStartDate($request['start_on'], $date);
-
+        $totalBillingCycles = !$request['term'] ? $paymentChange ? $request['period'] : $request['period'] - 1 : 0;
         $this->getProfile()
             ->setCustomerId($quote->getCustomerId())
             ->setWebsiteId($quote->getStore()->getWebsiteId())
@@ -875,7 +878,7 @@ class Manager
             ->setProfileCurrencyCode($quote->getQuoteCurrencyCode())
             ->setTerm($request['term'])
             ->setStaticTotalBillingCycles(!$request['term'] ? $request['period'] : 0)
-            ->setTotalBillingCycles(!$request['term'] ? $request['period'] - 1 : 0)
+            ->setTotalBillingCycles($totalBillingCycles)
             ->setStartDate($startDate)
             ->setOriginalStartDate($startDate)
             ->setBillingFrequencyId($frequency->getId())
@@ -1711,16 +1714,20 @@ class Manager
     /**
      * Check products type in subscription
      *
-     * @param $quoteItems
+     * @param array $quoteItems
      * @return bool
      */
     public function isQuoteHasVirtualProducts(array $quoteItems)
     {
         foreach ($quoteItems as $item) {
-            if (!$item->getIsVirtual() && $item->getProductType() != 'virtual') {
+            if ($item->getProductType() == Configurable::TYPE_CODE) {
+                foreach ($item->getChildren() as $child) {
+                    if ($child->getProductType() != Type::TYPE_VIRTUAL) {
+                        return false;
+                    }
+                }
+            } elseif (!$item->getIsVirtual() && $item->getProductType() != Type::TYPE_VIRTUAL) {
                 return false;
-            } else {
-                continue;
             }
         }
         return true;
