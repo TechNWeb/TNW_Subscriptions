@@ -55,6 +55,21 @@ class Profit
      */
     private $jsonHelper;
 
+    /**
+     * @var SubscriptionProfile
+     */
+    private $subscriptionProfileResource;
+
+    /**
+     * Profit constructor.
+     * @param LoggerInterface $logger
+     * @param Serializer $jsonHelper
+     * @param SubscriptionProfileRepositoryInterface $profileRepository
+     * @param SubscriptionProfileProfit $subscriptionProfileProfit
+     * @param SearchCriteriaBuilder $searchCriteriaBuilder
+     * @param ProductBillingFrequencyRepositoryInterface $recurringOptionRepository
+     * @param SubscriptionProfile $subscriptionProfileResource
+     */
     public function __construct(
         LoggerInterface $logger,
         Serializer $jsonHelper,
