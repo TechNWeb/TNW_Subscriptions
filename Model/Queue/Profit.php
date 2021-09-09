@@ -152,7 +152,7 @@ class Profit
                 continue;
             }
 
-            $invoiceItems = $this->subscriptionProfileResource->getProfileInvogit icedOrders($profile);
+            $invoiceItems = $this->subscriptionProfileResource->getProfileInvoicedOrders($profile);
             $initialFeeAdded = false;
             foreach ($invoiceItems as $item) {
                 if (!$initialFeeAdded && isset($recurringOption['initial_fee']) && $recurringOption['initial_fee']) {
