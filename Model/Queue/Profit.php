@@ -106,6 +106,11 @@ class Profit
         }
     }
 
+    /**
+     * @param OperationListInterface $operationList
+     * @throws LocalizedException
+     * @throws NoSuchEntityException
+     */
     public function processOperations(OperationListInterface $operationList)
     {
         foreach ($operationList->getItems() as $operation) {
@@ -139,8 +144,8 @@ class Profit
         foreach ($profile->getVisibleProducts() as $profileProduct) {
             $children = $profileProduct->getChildren();
 
-            if (!empty($children) &&
-                $this->searchRecurringOption($recurringOptions, \reset($children)->getMagentoProductId())
+            if (!empty($children)
+                && $this->searchRecurringOption($recurringOptions, \reset($children)->getMagentoProductId())
             ) {
                 $profileProduct = \reset($children);
             }
@@ -226,7 +231,7 @@ class Profit
         $filteredRecurringOptions = array_filter(
             $recurringOptions,
             function (ProductBillingFrequencyInterface $frequency) use ($productId) {
-                return (int) $frequency->getMagentoProductId() === (int)$productId;
+                return (int) $frequency->getMagentoProductId() === (int) $productId;
             }
         );
 
