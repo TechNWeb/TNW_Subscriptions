@@ -7,12 +7,7 @@ namespace TNW\Subscriptions\Plugin;
 
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Sales\Model\ResourceModel\Order;
-use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfileProfit;
-use TNW\Subscriptions\Model\SubscriptionProfile;
-use TNW\Subscriptions\Model\SubscriptionProfile\ProfitCalculator;
-use TNW\Subscriptions\Model\SubscriptionProfile\Manager;
 use TNW\Subscriptions\Model\SubscriptionProfileOrder\Manager as ProfileOrderManager;
-use TNW\Subscriptions\Model\Queue\Profit;
 use TNW\Subscriptions\Model\Queue\ProfitManager;
 
 /**
