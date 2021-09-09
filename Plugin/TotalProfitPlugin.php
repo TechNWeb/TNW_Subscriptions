@@ -30,7 +30,12 @@ class TotalProfitPlugin
      * @var ProfitManager
      */
     private $profitManager;
-
+    
+    /**
+     * TotalProfitPlugin constructor.
+     * @param ProfileOrderManager $profileOrderManager
+     * @param ProfitManager $profitManager
+     */
     public function __construct(
         ProfileOrderManager $profileOrderManager,
         ProfitManager $profitManager
