@@ -1156,5 +1156,4 @@ class UpgradeSchema implements UpgradeSchemaInterface
 
         $setup->getConnection()->createTable($table);
     }
-
 }
