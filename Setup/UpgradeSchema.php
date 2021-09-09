@@ -175,6 +175,10 @@ class UpgradeSchema implements UpgradeSchemaInterface
             $this->addRebillTable($setup);
         }
 
+        if (version_compare($context->getVersion(), '2.3.38', '<')) {
+            $this->addSubscriptionProfileProfitTable($setup);
+        }
+
         $setup->endSetup();
     }
 
@@ -1122,4 +1126,35 @@ class UpgradeSchema implements UpgradeSchemaInterface
             ]
         );
     }
+
+    /**
+     * @param SchemaSetupInterface $setup
+     * @throws \Zend_Db_Exception
+     */
+    private function addSubscriptionProfileProfitTable(SchemaSetupInterface $setup)
+    {
+        $table = $setup->getConnection()
+            ->newTable($setup->getTable('tnw_subscriptions_profile_profit'))
+            ->addColumn('entity_id', Table::TYPE_INTEGER, null, [
+                'identity' => true,
+                'nullable' => false,
+                'primary' => true,
+                'unsigned' => true
+            ], 'Entity ID')
+            ->addColumn('profile_id', Table::TYPE_INTEGER, null, [
+                'nullable' => true,
+                'default' => null
+            ], 'Subscription profile ID')
+            ->addColumn('profit_type', Table::TYPE_TEXT, '255', [
+                'nullable' => true,
+                'default' => null
+            ], 'Profit type')
+            ->addColumn('total_profit', Table::TYPE_DECIMAL, '12,4', [
+                'nullable' => true,
+                'default' => '0.0000'
+            ], 'Total profit');
+
+        $setup->getConnection()->createTable($table);
+    }
+
 }
