@@ -7,6 +7,7 @@ namespace TNW\Subscriptions\Model\ResourceModel;
 
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Model\ResourceModel\Db\AbstractDb;
+    
 /**
  * Class SubscriptionProfileProfit resource for profile profit
  */
