@@ -122,8 +122,6 @@ class Profit
     {
         $profit = 0;
 
-        $connection = $this->subscriptionProfileResource->getConnection();
-
         $searchCriteria = $this->searchCriteriaBuilder
             ->addFilter(
                 ProductBillingFrequencyInterface::MAGENTO_PRODUCT_ID,
@@ -153,27 +151,8 @@ class Profit
             if (empty($recurringOption)) {
                 continue;
             }
-            $select = $connection->select()
-                ->from(
-                    ['invoiceItem' => $this->subscriptionProfileResource->getTable('sales_invoice_item')]
-                )
-                ->joinInner(
-                    ['salesRelative' => $this->subscriptionProfileResource->getTable(
-                        'tnw_subscriptions_profile_item_sales_item'
-                    )],
-                    'invoiceItem.order_item_id = salesRelative.order_item_id',
-                    []
-                )
-                ->joinInner(
-                    ['profileItem' => $this->subscriptionProfileResource->getTable(
-                        'tnw_subscriptions_product_subscription_profile_entity'
-                    )],
-                    'salesRelative.profile_item_id = profileItem.entity_id',
-                    []
-                )
-                ->where('profileItem.subscription_profile_id = ?', $profile->getId());
 
-            $invoiceItems = $connection->fetchAll($select);
+            $invoiceItems = $this->subscriptionProfileResource->getProfileInvogit icedOrders($profile);
             $initialFeeAdded = false;
             foreach ($invoiceItems as $item) {
                 if (!$initialFeeAdded && isset($recurringOption['initial_fee']) && $recurringOption['initial_fee']) {
