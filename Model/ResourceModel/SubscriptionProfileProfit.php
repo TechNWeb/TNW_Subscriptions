@@ -13,7 +13,6 @@ use Magento\Framework\Model\ResourceModel\Db\AbstractDb;
  */
 class SubscriptionProfileProfit extends AbstractDb
 {
-
     /**
      * Initialization
      */
