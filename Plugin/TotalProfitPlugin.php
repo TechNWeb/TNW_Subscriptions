@@ -1,5 +1,8 @@
 <?php
-
+/**
+ * Copyright © 2018 TechNWeb, Inc. All rights reserved.
+ * See TNW_LICENSE.txt for license details.
+ */
 namespace TNW\Subscriptions\Plugin;
 
 use Magento\Framework\Exception\LocalizedException;
@@ -12,46 +15,27 @@ use TNW\Subscriptions\Model\SubscriptionProfileOrder\Manager as ProfileOrderMana
 use TNW\Subscriptions\Model\Queue\Profit;
 use TNW\Subscriptions\Model\Queue\ProfitManager;
 
+/**
+ * Class TotalProfitPlugin sets profile ids to calculate profit
+ * after order is invoiced
+ */
 class TotalProfitPlugin
 {
-    /**
-     * @var SubscriptionProfileProfit
-     */
-    private $profileProfit;
-
-    /**
-     * @var SubscriptionProfile
-     */
-    private $subscriptionProfile;
-
-    /**
-     * @var Manager
-     */
-    private $manager;
-
     /**
      * @var ProfileOrderManager
      */
     private $profileOrderManager;
 
     /**
-     * @var Profit
+     * @var ProfitManager
      */
-    private $profit;
+    private $profitManager;
 
     public function __construct(
-        SubscriptionProfileProfit $profileProfit,
-        SubscriptionProfile $subscriptionProfile,
-        Manager $manager,
         ProfileOrderManager $profileOrderManager,
-        Profit $profit,
         ProfitManager $profitManager
     ) {
-        $this->profileProfit = $profileProfit;
-        $this->subscriptionProfile = $subscriptionProfile;
-        $this->manager = $manager;
         $this->profileOrderManager = $profileOrderManager;
-        $this->profit = $profit;
         $this->profitManager = $profitManager;
     }
 

@@ -1,5 +1,8 @@
 <?php
-
+/**
+ * Copyright © 2018 TechNWeb, Inc. All rights reserved.
+ * See TNW_LICENSE.txt for license details.
+ */
 namespace TNW\Subscriptions\Model\Queue;
 
 use Magento\Framework\Exception\LocalizedException;
@@ -15,7 +18,11 @@ use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfileProfit;
 use Magento\Framework\Api\SearchCriteriaBuilder;
 use TNW\Subscriptions\Api\ProductBillingFrequencyRepositoryInterface;
 use TNW\Subscriptions\Model\SubscriptionProfile\ProfitCalculator;
+use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfile;
 
+/**
+ * Class Profit - calculates profit and set it in table
+ */
 class Profit
 {
     /**
@@ -48,13 +55,29 @@ class Profit
      */
     private $jsonHelper;
 
+    /**
+     * @var SubscriptionProfile
+     */
+    private $subscriptionProfileResource;
+
+    /**
+     * Profit constructor.
+     * @param LoggerInterface $logger
+     * @param Serializer $jsonHelper
+     * @param SubscriptionProfileRepositoryInterface $profileRepository
+     * @param SubscriptionProfileProfit $subscriptionProfileProfit
+     * @param SearchCriteriaBuilder $searchCriteriaBuilder
+     * @param ProductBillingFrequencyRepositoryInterface $recurringOptionRepository
+     * @param SubscriptionProfile $subscriptionProfileResource
+     */
     public function __construct(
         LoggerInterface $logger,
         Serializer $jsonHelper,
         SubscriptionProfileRepositoryInterface $profileRepository,
         SubscriptionProfileProfit $subscriptionProfileProfit,
         SearchCriteriaBuilder $searchCriteriaBuilder,
-        ProductBillingFrequencyRepositoryInterface $recurringOptionRepository
+        ProductBillingFrequencyRepositoryInterface $recurringOptionRepository,
+        SubscriptionProfile $subscriptionProfileResource
     ) {
         $this->logger = $logger;
         $this->jsonHelper = $jsonHelper;
@@ -62,8 +85,8 @@ class Profit
         $this->subscriptionProfileProfit = $subscriptionProfileProfit;
         $this->searchCriteriaBuilder = $searchCriteriaBuilder;
         $this->recurringOptionRepository = $recurringOptionRepository;
+        $this->subscriptionProfileResource = $subscriptionProfileResource;
     }
-
 
     /**
      * @param OperationInterface $operation
@@ -99,8 +122,7 @@ class Profit
     {
         $profit = 0;
 
-        $resource = $profile->getResource();
-        $connection = $resource->getConnection();
+        $connection = $this->subscriptionProfileResource->getConnection();
 
         $searchCriteria = $this->searchCriteriaBuilder
             ->addFilter(
@@ -133,15 +155,19 @@ class Profit
             }
             $select = $connection->select()
                 ->from(
-                    ['invoiceItem' => $resource->getTable('sales_invoice_item')]
+                    ['invoiceItem' => $this->subscriptionProfileResource->getTable('sales_invoice_item')]
                 )
                 ->joinInner(
-                    ['salesRelative' => $resource->getTable('tnw_subscriptions_profile_item_sales_item')],
+                    ['salesRelative' => $this->subscriptionProfileResource->getTable(
+                        'tnw_subscriptions_profile_item_sales_item'
+                    )],
                     'invoiceItem.order_item_id = salesRelative.order_item_id',
                     []
                 )
                 ->joinInner(
-                    ['profileItem' => $resource->getTable('tnw_subscriptions_product_subscription_profile_entity')],
+                    ['profileItem' => $this->subscriptionProfileResource->getTable(
+                        'tnw_subscriptions_product_subscription_profile_entity'
+                    )],
                     'salesRelative.profile_item_id = profileItem.entity_id',
                     []
                 )
@@ -219,7 +245,7 @@ class Profit
         $filteredRecurringOptions = array_filter(
             $recurringOptions,
             function (ProductBillingFrequencyInterface $frequency) use ($productId) {
-                return (int)$frequency->getMagentoProductId() === (int)$productId;
+                return (int) $frequency->getMagentoProductId() === (int)$productId;
             }
         );
 

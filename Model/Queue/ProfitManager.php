@@ -1,5 +1,8 @@
 <?php
-
+/**
+ * Copyright © 2018 TechNWeb, Inc. All rights reserved.
+ * See TNW_LICENSE.txt for license details.
+ */
 namespace TNW\Subscriptions\Model\Queue;
 
 use Magento\Framework\Bulk\OperationInterface;
@@ -64,6 +67,10 @@ class ProfitManager
      * @param PublisherInterface $publisher
      * @param IdentityGeneratorInterface $identityGenerator
      * @param Json $serializer
+     * @param JsonFactory $jsonFactory
+     * @param BulkManagementInterface $bulkManagement
+     * @param UserContextInterface $userContext
+     * @param OperationInterfaceFactory $operationFactory
      */
     public function __construct(
         PublisherInterface $publisher,
