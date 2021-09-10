@@ -18,7 +18,6 @@ use Magento\SalesRule\Model\Coupon;
 use Magento\SalesRule\Model\ResourceModel\Rule as RuleResource;
 use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Modal\Context as FormContext;
 use TNW\Subscriptions\Model\SubscriptionProfile\Manager as ProfileManager;
-use TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Form\Modifier\SummaryInsertForm;
 
 /**
  * Block for view used coupon code information in emails

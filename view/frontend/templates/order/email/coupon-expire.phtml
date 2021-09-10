@@ -1,32 +1,28 @@
 <?php
 /**
+ * Copyright © 2018 TechNWeb, Inc. All rights reserved.
+ * See TNW_LICENSE.txt for license details.
+ */
+/**
  * @var $block \TNW\Subscriptions\Block\Subscription\Billing\EmailCouponInformation
  * @var $escaper \Magento\Framework\Escaper
  */
 ?>
-
-<? if ($block->getCouponCode()): ?>
-    <? if (!$block->isCouponValid()): ?>
-        <table style="width: 100%">
+<?php if ($block->getCouponCode()): ?>
+    <?php if (!$block->isCouponValid()): ?>
+        <table class="tnw-message-coupon-wrapper">
             <tbody>
             <tr>
-                <td class="message-coupon-error" style="
-                    margin: 0 0 10px;
-                    padding: 12px 20px 12px 25px;
-                    display: block;
-                    font-size: 1.3rem;
-                    background: #fae5e5;
-                    color: #e02b27;
-                    position: relative;
-                    width: 100%;
-                    box-sizing: border-box;
-                    text-align: center;
-                    ">
-                    <?= __('Applied coupon "%1" is not eligible for this order and was skipped.', $block->getCouponCode()); ?>
+                <td class="tnw-message-coupon-error">
+                    <?= $escaper->escapeHtml(
+                        __(
+                            'Applied coupon "%1" is not eligible for this order and was skipped.',
+                            $block->getCouponCode()
+                        )
+                    ); ?>
                 </td>
             </tr>
             </tbody>
         </table>
-    <? endif; ?>
-<? endif; ?>
-
+    <?php endif; ?>
+<?php endif; ?>
