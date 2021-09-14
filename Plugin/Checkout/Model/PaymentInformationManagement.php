@@ -56,21 +56,20 @@ class PaymentInformationManagement
         AddressInterface $billingAddress
     ) {
         $quote = $this->quoteRepository->get($cartId);
-        // TODO: Hard use Vault
         $additionalData = $paymentMethod->getAdditionalData();
         if ($quote->getData('is_tnw_subscription')) {
             $additionalData['is_active_payment_token_enabler'] = 1;
             $paymentMethod->setAdditionalData($additionalData);
-        }
 
-        if ($quote->getBaseGrandTotal() < 0.0001
-        ) {
-            $this->vaultPaymentAuthorization->processPreAuthForTrial(
-                $paymentMethod->getData(),
-                $this->quoteRepository->get($cartId)
-            );
-            $this->quoteRepository->get($cartId)->setSubscriptionPaymentDataSet(true);
-            $paymentMethod->setMethod('free');
+            if ($quote->getBaseGrandTotal() < 0.0001
+            ) {
+                $this->vaultPaymentAuthorization->processPreAuthForTrial(
+                    $paymentMethod->getData(),
+                    $this->quoteRepository->get($cartId)
+                );
+                $this->quoteRepository->get($cartId)->setSubscriptionPaymentDataSet(true);
+                $paymentMethod->setMethod('free');
+            }
         }
 
         return [$cartId, $paymentMethod, $billingAddress];
