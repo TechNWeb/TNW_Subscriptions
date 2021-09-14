@@ -5,29 +5,36 @@
  */
 namespace TNW\Subscriptions\Plugin\Checkout\Model;
 
+use Magento\Framework\Exception\NoSuchEntityException;
+use Magento\Payment\Gateway\Command\CommandException;
+use Magento\Quote\Api\CartRepositoryInterface;
+use Magento\Quote\Api\Data\AddressInterface;
+use Magento\Quote\Api\Data\PaymentInterface;
+use TNW\Subscriptions\Model\Payment\VaultPaymentAuthorization;
+
 /**
  * Class PaymentInformationManagement - plugin to before process payment info
  */
 class PaymentInformationManagement
 {
     /**
-     * @var \Magento\Quote\Api\CartRepositoryInterface
+     * @var CartRepositoryInterface
      */
     protected $quoteRepository;
 
     /**
-     * @var \TNW\Subscriptions\Model\Payment\VaultPaymentAuthorization
+     * @var VaultPaymentAuthorization
      */
     protected $vaultPaymentAuthorization;
 
     /**
      * PaymentInformationManagement constructor.
-     * @param \Magento\Quote\Api\CartRepositoryInterface $quoteRepository
-     * @param \TNW\Subscriptions\Model\Payment\VaultPaymentAuthorization $vaultPaymentAuthorization
+     * @param CartRepositoryInterface $quoteRepository
+     * @param VaultPaymentAuthorization $vaultPaymentAuthorization
      */
     public function __construct(
-        \Magento\Quote\Api\CartRepositoryInterface $quoteRepository,
-        \TNW\Subscriptions\Model\Payment\VaultPaymentAuthorization $vaultPaymentAuthorization
+        CartRepositoryInterface $quoteRepository,
+        VaultPaymentAuthorization $vaultPaymentAuthorization
     ) {
         $this->vaultPaymentAuthorization = $vaultPaymentAuthorization;
         $this->quoteRepository = $quoteRepository;
@@ -36,24 +43,27 @@ class PaymentInformationManagement
     /**
      * @param $subject
      * @param $cartId
-     * @param \Magento\Quote\Api\Data\PaymentInterface $paymentMethod
-     * @param \Magento\Quote\Api\Data\AddressInterface $billingAddress
+     * @param PaymentInterface $paymentMethod
+     * @param AddressInterface $billingAddress
      * @return array
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
-     * @throws \Magento\Payment\Gateway\Command\CommandException
+     * @throws NoSuchEntityException
+     * @throws CommandException
      */
     public function beforeSavePaymentInformationAndPlaceOrder(
         $subject,
         $cartId,
-        \Magento\Quote\Api\Data\PaymentInterface $paymentMethod,
-        \Magento\Quote\Api\Data\AddressInterface $billingAddress
+        PaymentInterface $paymentMethod,
+        AddressInterface $billingAddress
     ) {
+        $quote = $this->quoteRepository->get($cartId);
         // TODO: Hard use Vault
         $additionalData = $paymentMethod->getAdditionalData();
-        $additionalData['is_active_payment_token_enabler'] = 1;
-        $paymentMethod->setAdditionalData($additionalData);
+        if ($quote->getData('is_tnw_subscription')) {
+            $additionalData['is_active_payment_token_enabler'] = 1;
+            $paymentMethod->setAdditionalData($additionalData);
+        }
 
-        if ($this->quoteRepository->get($cartId)->getBaseGrandTotal() < 0.0001
+        if ($quote->getBaseGrandTotal() < 0.0001
         ) {
             $this->vaultPaymentAuthorization->processPreAuthForTrial(
                 $paymentMethod->getData(),
