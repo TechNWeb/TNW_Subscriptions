@@ -175,7 +175,7 @@ class UpgradeSchema implements UpgradeSchemaInterface
             $this->addRebillTable($setup);
         }
 
-        if (version_compare($context->getVersion(), '2.3.38', '<')) {
+        if (version_compare($context->getVersion(), '2.3.40', '<')) {
             $this->addSubscriptionProfileProfitTable($setup);
         }
 
