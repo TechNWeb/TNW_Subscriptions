@@ -7,6 +7,7 @@ namespace TNW\Subscriptions\Model\Queue;
 
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Exception\NoSuchEntityException;
+use Magento\Framework\Exception\TemporaryStateExceptionInterface;
 use Psr\Log\LoggerInterface;
 use TNW\Subscriptions\Api\Data\ProductBillingFrequencyInterface;
 use TNW\Subscriptions\Api\Data\ProductSubscriptionProfileInterface;
@@ -19,6 +20,7 @@ use Magento\Framework\Api\SearchCriteriaBuilder;
 use TNW\Subscriptions\Api\ProductBillingFrequencyRepositoryInterface;
 use TNW\Subscriptions\Model\SubscriptionProfile\ProfitCalculator;
 use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfile;
+use Magento\Framework\EntityManager\EntityManager;
 
 /**
  * Class Profit - calculates profit and set it in table
@@ -61,6 +63,11 @@ class Profit
     private $subscriptionProfileResource;
 
     /**
+     * @var EntityManager
+     */
+    private $entityManager;
+
+    /**
      * Profit constructor.
      * @param LoggerInterface $logger
      * @param Serializer $jsonHelper
@@ -77,7 +84,8 @@ class Profit
         SubscriptionProfileProfit $subscriptionProfileProfit,
         SearchCriteriaBuilder $searchCriteriaBuilder,
         ProductBillingFrequencyRepositoryInterface $recurringOptionRepository,
-        SubscriptionProfile $subscriptionProfileResource
+        SubscriptionProfile $subscriptionProfileResource,
+        EntityManager $entityManager
     ) {
         $this->logger = $logger;
         $this->jsonHelper = $jsonHelper;
@@ -86,24 +94,49 @@ class Profit
         $this->searchCriteriaBuilder = $searchCriteriaBuilder;
         $this->recurringOptionRepository = $recurringOptionRepository;
         $this->subscriptionProfileResource = $subscriptionProfileResource;
+        $this->entityManager = $entityManager;
     }
 
     /**
      * @param OperationInterface $operation
      * @return void
-     * @throws NoSuchEntityException
-     * @throws LocalizedException
+     * @throws \Exception
      */
     public function processOperation(OperationInterface $operation)
     {
-        $serializedData = $operation->getSerializedData();
-        $unserializedData = $this->jsonHelper->unserialize($serializedData);
-        foreach ($unserializedData as $unserialized) {
-            foreach ($unserialized as $key => $value) {
-                $profile = $this->profileRepository->getById($value);
-                $this->calculateProfitAndSave($profile);
+        try {
+            $serializedData = $operation->getSerializedData();
+            $unserializedData = $this->jsonHelper->unserialize($serializedData);
+            foreach ($unserializedData as $unserialized) {
+                foreach ($unserialized as $key => $value) {
+                    $profile = $this->profileRepository->getById($value);
+                    $this->calculateProfitAndSave($profile);
+                }
             }
+        } catch (NoSuchEntityException $e) {
+            $this->logger->critical($e->getMessage());
+            $status = ($e instanceof TemporaryStateExceptionInterface)
+                ? OperationInterface::STATUS_TYPE_RETRIABLY_FAILED
+                : OperationInterface::STATUS_TYPE_NOT_RETRIABLY_FAILED;
+            $errorCode = $e->getCode();
+            $message = $e->getMessage();
+        } catch (LocalizedException $e) {
+            $this->logger->critical($e->getMessage());
+            $status = OperationInterface::STATUS_TYPE_NOT_RETRIABLY_FAILED;
+            $errorCode = $e->getCode();
+            $message = $e->getMessage();
+        } catch (\Exception $e) {
+            $this->logger->critical($e->getMessage());
+            $status = OperationInterface::STATUS_TYPE_NOT_RETRIABLY_FAILED;
+            $errorCode = $e->getCode();
+            $message = __('Sorry, something went wrong during product attributes update. Please see log for details.');
         }
+
+        $operation->setStatus($status ?? OperationInterface::STATUS_TYPE_COMPLETE)
+            ->setErrorCode($errorCode ?? null)
+            ->setResultMessage($message ?? null);
+
+        $this->entityManager->save($operation);
     }
 
     /**
