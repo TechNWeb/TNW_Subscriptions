@@ -12,6 +12,7 @@ use Magento\Quote\Model\Quote;
 use Magento\Quote\Model\ResourceModel\Quote\Collection as QuoteCollection;
 use TNW\Subscriptions\Model\SubscriptionProfile;
 use TNW\Subscriptions\Model\SubscriptionProfileOrder;
+use Magento\Framework\Pricing\PriceCurrencyInterface;
 
 /**
  * Subscription Overview Next Payment block
@@ -43,6 +44,11 @@ class NextPayment extends Template
     private $grandTotal;
 
     /**
+     * @var PriceCurrencyInterface
+     */
+    private $priceFormatter;
+
+    /**
      * @param Context $context
      * @param QuoteCollection $quoteCollection
      * @param PriceHelper $priceHelper
@@ -52,10 +58,12 @@ class NextPayment extends Template
         Context $context,
         QuoteCollection $quoteCollection,
         PriceHelper $priceHelper,
+        PriceCurrencyInterface $priceFormatter,
         array $data = []
     ) {
         $this->quoteCollection = $quoteCollection;
         $this->priceHelper = $priceHelper;
+        $this->priceFormatter = $priceFormatter;
         parent::__construct($context, $data);
     }
 
@@ -140,7 +148,13 @@ class NextPayment extends Template
             return '--';
         } else {
             $grandTotal -= $this->getShippingCost();
-            return $this->priceHelper->currency($grandTotal, true, false);
+            return $this->priceFormatter->format(
+                $grandTotal,
+                false,
+                null,
+                null,
+                $this->getSubscriptionProfile()->getProfileCurrencyCode()
+            );
         }
     }
 

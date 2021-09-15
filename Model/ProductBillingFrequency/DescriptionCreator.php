@@ -41,6 +41,11 @@ class DescriptionCreator
     private $serializer;
 
     /**
+     * @var PriceCurrencyInterface
+     */
+    private $priceCurrency;
+
+    /**
      * DescriptionCreator constructor.
      * @param Context $context
      * @param BillingFrequencyRepository $frequencyRepository
@@ -53,13 +58,15 @@ class DescriptionCreator
         BillingFrequencyRepository $frequencyRepository,
         BillingFrequencyUnitType $frequencyUnitType,
         TrialLengthUnitType $trialLengthUnitType,
-        SerializerInterface $serializer
+        SerializerInterface $serializer,
+        PriceCurrencyInterface $priceCurrency
     ) {
         $this->context = $context;
         $this->frequencyRepository = $frequencyRepository;
         $this->frequencyUnitType = $frequencyUnitType;
         $this->trialLengthUnitType = $trialLengthUnitType;
         $this->serializer = $serializer;
+        $this->priceCurrency = $priceCurrency;
     }
 
     /**
@@ -97,9 +104,15 @@ class DescriptionCreator
     {
         $isTrial = $subscriptionData[CreateProfile::UNIQUE]['is_trial'];
         $formattedTotalPrice = ($subscriptionData[CreateProfile::NON_UNIQUE]['totalPrice'])
-            ? $this->formatPrice($subscriptionData[CreateProfile::NON_UNIQUE]['totalPrice'])
+            ? $this->formatPrice(
+                $subscriptionData[CreateProfile::NON_UNIQUE]['totalPrice'],
+                $subscriptionData[CreateProfile::NON_UNIQUE]['storeId']
+            )
             : __('Free');
-        $formattedPrice = $this->formatPrice($subscriptionData[CreateProfile::NON_UNIQUE]['price']);
+        $formattedPrice = $this->formatPrice(
+            $subscriptionData[CreateProfile::NON_UNIQUE]['price'],
+            $subscriptionData[CreateProfile::NON_UNIQUE]['storeId']
+        );
         $frequencyUnit = isset($subscriptionData[CreateProfile::UNIQUE]['billing_frequency']) ?
             $this->getFrequencyWithUnit($subscriptionData[CreateProfile::UNIQUE]['billing_frequency']) : false;
         $startDate = isset($subscriptionData[CreateProfile::UNIQUE]['start_on']) ?
@@ -383,9 +396,14 @@ class DescriptionCreator
      * @param $price
      * @return float
      */
-    public function formatPrice($price)
+    public function formatPrice($price, $storeId = null)
     {
-        return $this->context->getPriceCurrency()->format(
+        if ($storeId) {
+            $storeCurrency = $this->priceCurrency->getCurrency($storeId);
+        } else {
+            $storeCurrency = $this->context->getPriceCurrency();
+        }
+        return $storeCurrency->format(
             $price,
             false,
             PriceCurrencyInterface::DEFAULT_PRECISION

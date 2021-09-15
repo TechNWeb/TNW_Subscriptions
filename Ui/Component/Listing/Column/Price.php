@@ -1,27 +1,25 @@
 <?php
-/**
- * Copyright © 2018 TechNWeb, Inc. All rights reserved.
- * See TNW_LICENSE.txt for license details.
- */
-namespace TNW\Subscriptions\Ui\Component\Listing\Column\SubscriptionProfile;
 
+namespace TNW\Subscriptions\Ui\Component\Listing\Column;
+
+use Magento\Directory\Model\Currency;
 use Magento\Framework\Pricing\PriceCurrencyInterface;
 use Magento\Framework\View\Element\UiComponent\ContextInterface;
 use Magento\Framework\View\Element\UiComponentFactory;
 use Magento\Ui\Component\Listing\Columns\Column;
 use TNW\Subscriptions\Api\Data\SubscriptionProfileInterface;
 
-/**
- * Class Total Price column
- */
-class Total extends Column
+class Price extends Column
 {
     /**
-     * Convert price value helper
-     *
      * @var PriceCurrencyInterface
      */
-    private $priceFormatter;
+    protected $priceFormatter;
+
+    /**
+     * @var Currency
+     */
+    private $currency;
 
     /**
      * Constructor
@@ -31,15 +29,19 @@ class Total extends Column
      * @param PriceCurrencyInterface $priceFormatter
      * @param array $components
      * @param array $data
+     * @param Currency $currency
      */
     public function __construct(
         ContextInterface $context,
         UiComponentFactory $uiComponentFactory,
         PriceCurrencyInterface $priceFormatter,
         array $components = [],
-        array $data = []
+        array $data = [],
+        Currency $currency = null
     ) {
         $this->priceFormatter = $priceFormatter;
+        $this->currency = $currency ?: \Magento\Framework\App\ObjectManager::getInstance()
+            ->create(Currency::class);
         parent::__construct($context, $uiComponentFactory, $components, $data);
     }
 
@@ -72,4 +74,5 @@ class Total extends Column
 
         return $dataSource;
     }
+
 }

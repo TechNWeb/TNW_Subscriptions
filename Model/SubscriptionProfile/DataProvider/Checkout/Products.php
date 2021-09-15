@@ -21,7 +21,7 @@ use TNW\Subscriptions\Model\SubscriptionProfile\Create;
 use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Modal\Context as FormContext;
 use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Modal\ModifyForm;
 use TNW\Subscriptions\Model\ProductSubscriptionProfile\ProductTypeManagerResolver;
-
+use TNW\Subscriptions\Api\SubscriptionProfileRepositoryInterface;
 /**
  * DataProvider to show products on subscription checkout.
  */
@@ -69,6 +69,7 @@ class Products extends ModifyForm
      * @param DescriptionCreator $descriptionCreator
      * @param Registry $registry
      * @param ProductTypeManagerResolver $productTypeResolver
+     * @param SubscriptionProfileRepositoryInterface $profileRepository
      * @param StockRegistryInterface $stockRegistry
      * @param string $scope
      * @param array $meta
@@ -85,6 +86,7 @@ class Products extends ModifyForm
         DescriptionCreator $descriptionCreator,
         Registry $registry,
         ProductTypeManagerResolver $productTypeResolver,
+        SubscriptionProfileRepositoryInterface $profileRepository,
         StockRegistryInterface $stockRegistry,
         $scope = '',
         array $meta = [],
@@ -103,6 +105,7 @@ class Products extends ModifyForm
             $registry,
             $productTypeResolver,
             $stockRegistry,
+            $profileRepository,
             $scope,
             $meta,
             $data

@@ -16,6 +16,7 @@ use Magento\Ui\Component\Modal;
 use Magento\Ui\DataProvider\Modifier\ModifierInterface;
 use Magento\Ui\DataProvider\Modifier\PoolInterface;
 use TNW\Subscriptions\Api\Data\SubscriptionProfileInterface;
+use TNW\Subscriptions\Api\SubscriptionProfileRepositoryInterface;
 use TNW\Subscriptions\Model\Context;
 use TNW\Subscriptions\Model\Product\Attribute;
 use TNW\Subscriptions\Model\ProductBillingFrequency\PriceCalculator;
@@ -101,6 +102,7 @@ class SummaryProductsForm extends ModifyForm
      * @param UrlInterface $urlBuilder
      * @param ProductTypeManagerResolver $productTypeResolver
      * @param StockRegistryInterface $stockRegistry
+     * @param SubscriptionProfileRepositoryInterface $profileRepository
      * @param string $scope
      * @param array $meta
      * @param array $data
@@ -118,6 +120,7 @@ class SummaryProductsForm extends ModifyForm
         UrlInterface $urlBuilder,
         ProductTypeManagerResolver $productTypeResolver,
         StockRegistryInterface $stockRegistry,
+        SubscriptionProfileRepositoryInterface $profileRepository,
         $scope = '',
         array $meta = [],
         array $data = []
@@ -135,6 +138,7 @@ class SummaryProductsForm extends ModifyForm
             $registry,
             $productTypeResolver,
             $stockRegistry,
+            $profileRepository,
             $scope,
             $meta,
             $data
@@ -628,7 +632,7 @@ class SummaryProductsForm extends ModifyForm
                         'parentFormName' => $this->currentFormName,
                         'parentForm' => $this->getCurrentFormName(),
                         'priceFormat' => $this->getPriceFormatData(),
-                        'currencySymbol' => $this->getCurrentCurrencySymbol(),
+                        'currencySymbol' => $this->getCurrencySymbolForProfile($this->profileManager->getProfile()->getId()),
                     ]
                 ]
             ]

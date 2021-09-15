@@ -68,7 +68,8 @@ class Collection extends SearchResult
                 'trial_start_date',
                 'start_date',
                 'created_at',
-                'customer_id'
+                'customer_id',
+                'profile_currency_code'
             ]
         );
 

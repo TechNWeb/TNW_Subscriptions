@@ -23,6 +23,7 @@ use TNW\Subscriptions\Model\Source\ProfileStatus;
 use TNW\Subscriptions\Model\SubscriptionProfile\Create;
 use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product;
 use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product as ProductDataProvider;
+use TNW\Subscriptions\Api\SubscriptionProfileRepositoryInterface;
 
 /**
  * Class ModifyForm - form modification modal
@@ -115,6 +116,7 @@ class ModifyForm extends Form
      * @param Registry $registry
      * @param ProductTypeManagerResolver $productTypeResolver
      * @param StockRegistryInterface $stockRegistry
+     * @param SubscriptionProfileRepositoryInterface $profileRepository
      * @param string $scope
      * @param array $meta
      * @param array $data
@@ -130,6 +132,7 @@ class ModifyForm extends Form
         Registry $registry,
         ProductTypeManagerResolver $productTypeResolver,
         StockRegistryInterface $stockRegistry,
+        SubscriptionProfileRepositoryInterface $profileRepository,
         $scope = '',
         array $meta = [],
         array $data = []
@@ -145,6 +148,7 @@ class ModifyForm extends Form
             $formContext,
             $pool,
             $productTypeResolver,
+            $profileRepository,
             $scope,
             $meta,
             $data
