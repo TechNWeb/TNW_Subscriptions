@@ -9,8 +9,7 @@
         xsi:noNamespaceSchemaLocation="urn:magento:framework-message-queue:etc/consumer.xsd">
     <consumer name="TnwProfileProfit"
               queue="tnw.profile.profit"
-              connection="db"
-              maxMessages="5000"
+              connection="amqp"
               consumerInstance="Magento\Framework\MessageQueue\Consumer"
               handler="TNW\Subscriptions\Model\Queue\Profit::processOperation"/>
 </config>

@@ -173,7 +173,7 @@ class UpgradeSchema implements UpgradeSchemaInterface
             $this->removeCustomerAddressFK($setup);
         }
 
-        if (version_compare($context->getVersion(), '2.2.83', '<')) {
+        if (version_compare($context->getVersion(), '2.2.84', '<')) {
             $this->addSubscriptionProfileProfitTable($setup);
         }
 
@@ -264,8 +264,7 @@ class UpgradeSchema implements UpgradeSchemaInterface
      */
     private function addInvoicedAndRefundedInitialFeeColumnsToOrderItemExtAtrTable(
         SchemaSetupInterface $setup
-    )
-    {
+    ) {
         $table = $setup->getTable('tnw_subscriptions_order_item_extension_entity');
 
         $setup->getConnection()
@@ -477,7 +476,10 @@ class UpgradeSchema implements UpgradeSchemaInterface
             )
             ->addForeignKey(
                 $setup->getFkName('tnw_subscriptions_message', 'website_id', 'store_website', 'website_id'),
-                'website_id', $setup->getTable('store_website'), 'website_id', Table::ACTION_CASCADE
+                'website_id',
+                $setup->getTable('store_website'),
+                'website_id',
+                Table::ACTION_CASCADE
             );
 
         $setup->getConnection()->createTable($table);
@@ -714,7 +716,6 @@ class UpgradeSchema implements UpgradeSchemaInterface
         ];
 
         foreach ($nextPaymentAttributes as $nextPaymentAttribute) {
-
             $setup->getConnection()
                 ->addColumn($setup->getTable(SubscriptionProfile::SUBSCRIPTION_PROFILE_ENTITY), $nextPaymentAttribute, [
                     'type' => Table::TYPE_DECIMAL,
@@ -733,14 +734,17 @@ class UpgradeSchema implements UpgradeSchemaInterface
     private function addCheckSendMailColumn(SchemaSetupInterface $setup)
     {
         $setup->getConnection()
-            ->addColumn($setup->getTable(SubscriptionProfilePaymentInterface::SUBSCRIPTIONS_PROFILE_PAYMENT_TABLE),
-                'sent_mail', [
+            ->addColumn(
+                $setup->getTable(SubscriptionProfilePaymentInterface::SUBSCRIPTIONS_PROFILE_PAYMENT_TABLE),
+                'sent_mail',
+                [
                 'type' => Table::TYPE_BOOLEAN,
                 'nullable' => false,
                 'default' => 0,
                 'comment' => 'sent_mail'
 
-            ]);
+            ]
+            );
     }
 
     /**
@@ -801,7 +805,8 @@ class UpgradeSchema implements UpgradeSchemaInterface
      *
      * @param SchemaSetupInterface $setup
      */
-    private function addOriginalStartDateColumnToSubscriptionProfile(SchemaSetupInterface $setup) {
+    private function addOriginalStartDateColumnToSubscriptionProfile(SchemaSetupInterface $setup)
+    {
         $table = $setup->getTable(SubscriptionProfile::SUBSCRIPTION_PROFILE_ENTITY);
         $connection = $setup->getConnection();
         $connection->addColumn(
