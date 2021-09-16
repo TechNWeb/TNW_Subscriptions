@@ -16,6 +16,8 @@ use Magento\Framework\Model\Context as ModelContext;
 use Magento\Framework\Registry;
 use Magento\Store\Api\WebsiteRepositoryInterface;
 use TNW\Subscriptions\Api\Data\SubscriptionProfileAddressInterface;
+use TNW\Subscriptions\Api\Data\ProductBillingFrequencyInterface;
+use TNW\Subscriptions\Api\Data\ProductSubscriptionProfileInterface;
 use TNW\Subscriptions\Api\Data\SubscriptionProfileInterface;
 use TNW\Subscriptions\Api\Data\SubscriptionProfilePaymentInterface;
 use TNW\Subscriptions\Api\SubscriptionProfileAttributeRepositoryInterface;
@@ -23,6 +25,10 @@ use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfile as Resource;
 use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfile\Payment\Collection as PaymentCollection;
 use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfile\Payment\CollectionFactory as PaymentCollectionFactory;
 use TNW\Subscriptions\Model\Source\ProfileStatus;
+use Magento\Framework\Api\SearchCriteriaBuilder;
+use TNW\Subscriptions\Api\ProductBillingFrequencyRepositoryInterface;
+use TNW\Subscriptions\Model\SubscriptionProfile\ProfitCalculator;
+use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfileProfit;
 
 /**
  * Subscription Profile model.
@@ -127,6 +133,21 @@ class SubscriptionProfile extends AbstractExtensibleModel implements Subscriptio
     ];
 
     /**
+     * @var SearchCriteriaBuilder
+     */
+    private $searchCriteriaBuilder;
+
+    /**
+     * @var ProductBillingFrequencyRepositoryInterface
+     */
+    private $frequencyRepository;
+
+    /**
+     * @var SubscriptionProfileProfit
+     */
+    private $profileProfit;
+
+    /**
      * SubscriptionProfile constructor.
      * @param ModelContext $context
      * @param Registry $registry
@@ -150,6 +171,9 @@ class SubscriptionProfile extends AbstractExtensibleModel implements Subscriptio
         SubscriptionProfileAttributeRepositoryInterface $metadataService,
         PaymentCollectionFactory $paymentCollectionFactory,
         UserContextInterface $userContext,
+        SearchCriteriaBuilder $searchCriteriaBuilder,
+        ProductBillingFrequencyRepositoryInterface $frequencyRepository,
+        SubscriptionProfileProfit $profileProfit,
         Resource $resource = null,
         AbstractDb $resourceCollection = null,
         array $data = []
@@ -169,7 +193,9 @@ class SubscriptionProfile extends AbstractExtensibleModel implements Subscriptio
         $this->metadataService = $metadataService;
         $this->paymentCollectionFactory = $paymentCollectionFactory;
         $this->userContext = $userContext;
-
+        $this->searchCriteriaBuilder = $searchCriteriaBuilder;
+        $this->frequencyRepository = $frequencyRepository;
+        $this->profileProfit = $profileProfit;
     }
 
 
@@ -793,5 +819,21 @@ class SubscriptionProfile extends AbstractExtensibleModel implements Subscriptio
     public function setOriginalStartDate($originalStartDate)
     {
         return $this->setData(self::ORIGINAL_START_DATE, $originalStartDate);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getTotalProfit($id, $profitType)
+    {
+        return $this->profileProfit->getTotalProfitById($id, $profitType);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function setTotalProfit($profit)
+    {
+        return $this->profileProfit->setTotalProfit($profit);
     }
 }

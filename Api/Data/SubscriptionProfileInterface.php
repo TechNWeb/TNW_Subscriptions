@@ -46,6 +46,7 @@ interface SubscriptionProfileInterface extends CustomAttributesDataInterface
     const NEED_RECOLLECT = 'need_recollect';
     const CANCEL_BEFORE_NEXT_CYCLE = 'cancel_before_next_cycle';
     const ORIGINAL_START_DATE = 'original_start_date';
+    const TOTAL_PROFIT = 'total_profit';
     /**#@-*/
 
     /**#@+
@@ -492,4 +493,19 @@ interface SubscriptionProfileInterface extends CustomAttributesDataInterface
      * @return $this
      */
     public function setPayment(SubscriptionProfilePaymentInterface $payment);
+
+    /**
+     * Get profit for profile
+     *
+     * @return string|null
+     */
+    public function getTotalProfit($id, $profitType);
+
+    /**
+     * Set profit for profile
+     *
+     * @param string $profit
+     * @return $this
+     */
+    public function setTotalProfit($profit);
 }
