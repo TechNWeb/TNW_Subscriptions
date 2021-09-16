@@ -201,21 +201,7 @@ class Profit
             }
         }
 
-        $data = [
-            'profile_id' => $profile->getId(),
-            'profit_type' => ProfitCalculator::AS_OF_TODAY,
-            'total_profit' => $profit
-        ];
-
-        if ($this->subscriptionProfileProfit->getTotalProfitById(
-            $profile->getId(),
-            ProfitCalculator::AS_OF_TODAY
-        ) == null
-        ) {
-            $this->subscriptionProfileProfit->setTotalProfit($data);
-        } else {
-            $this->subscriptionProfileProfit->updateTotalProfit($data);
-        }
+        $this->setProfitData($profile, $profit, ProfitCalculator::AS_OF_TODAY);
 
         $lastInvoiceItem = array_pop($invoiceItems);
         if ($lastInvoiceItem) {
@@ -235,21 +221,7 @@ class Profit
             $profit += $profitOfLastItem * $profile->getTotalBillingCycles();
         }
 
-        $data = [
-            'profile_id' => $profile->getId(),
-            'profit_type' => ProfitCalculator::REMAINING,
-            'total_profit' => $profit
-        ];
-
-        if ($this->subscriptionProfileProfit->getTotalProfitById(
-            $profile->getId(),
-            ProfitCalculator::REMAINING
-        ) == null
-        ) {
-            $this->subscriptionProfileProfit->setTotalProfit($data);
-        } else {
-            $this->subscriptionProfileProfit->updateTotalProfit($data);
-        }
+        $this->setProfitData($profile, $profit, ProfitCalculator::REMAINING);
 
         return $profit;
     }
@@ -279,5 +251,35 @@ class Profit
     private function profileItemProductId(ProductSubscriptionProfileInterface $item)
     {
         return $item->getMagentoProductId();
+    }
+
+    /**
+     * Save or update profit data
+     *
+     * @param $profile
+     * @param $profit
+     * @param $profitType
+     */
+    private function setProfitData($profile, $profit, $profitType)
+    {
+        try {
+            $data = [
+                'profile_id' => $profile->getId(),
+                'profit_type' => $profitType,
+                'total_profit' => $profit
+            ];
+
+            if ($this->subscriptionProfileProfit->getTotalProfitById(
+                $profile->getId(),
+                ProfitCalculator::AS_OF_TODAY
+            ) == null
+            ) {
+                $this->subscriptionProfileProfit->setTotalProfit($data);
+            } else {
+                $this->subscriptionProfileProfit->updateTotalProfit($data);
+            }
+        } catch (LocalizedException $e) {
+            $this->logger->error($e->getMessage());
+        }
     }
 }

@@ -7,7 +7,7 @@ namespace TNW\Subscriptions\Model\ResourceModel;
 
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Model\ResourceModel\Db\AbstractDb;
-    
+
 /**
  * Class SubscriptionProfileProfit resource for profile profit
  */
@@ -57,11 +57,7 @@ class SubscriptionProfileProfit extends AbstractDb
         $connection = $this->getConnection();
 
         if (isset($data)) {
-            $connection->insert($this->getMainTable(), [
-                'profile_id' => $data['profile_id'],
-                'profit_type' => $data['profit_type'],
-                'total_profit' => $data['total_profit']
-            ]);
+            $connection->insert($this->getMainTable(), $data);
         }
     }
 
