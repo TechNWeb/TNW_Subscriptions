@@ -129,7 +129,7 @@ class LinkedProductsProvider extends DataProvider
 
         $result->getSelect()->joinLeft(
             ['product' => $result->getTable('catalog_product_entity')],
-            'main_table.magento_product_id = product.' . $column,
+            'main_table.magento_product_id = product.entity_id',
             ['sku', 'entity_id']
         );
 
@@ -147,7 +147,7 @@ class LinkedProductsProvider extends DataProvider
             $tableName = $attributeName . 'table';
             $result->getSelect()->joinLeft(
                 [$tableName => $attribute->getBackendTable()],
-                $tableName . '.' . $column . ' = main_table.magento_product_id'
+                $tableName . '.' . $column . ' = product.' . $column
                 . ' AND ' . $tableName . '.attribute_id =' . $attribute->getAttributeId(),
                 [$attributeAlias => $tableName . '.value']
             );
