@@ -271,7 +271,7 @@ class Profit
 
             if ($this->subscriptionProfileProfit->getTotalProfitById(
                 $profile->getId(),
-                ProfitCalculator::AS_OF_TODAY
+                $profitType
             ) == null
             ) {
                 $this->subscriptionProfileProfit->setTotalProfit($data);
