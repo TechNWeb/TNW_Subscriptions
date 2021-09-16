@@ -7,6 +7,7 @@ namespace TNW\Subscriptions\Model\SubscriptionProfile;
 
 use Magento\Directory\Model\Currency;
 use Magento\Framework\Api\SearchCriteriaBuilder;
+use Magento\Framework\Exception\LocalizedException;
 use TNW\Subscriptions\Api\Data\ProductSubscriptionProfileInterface;
 use TNW\Subscriptions\Api\Data\ProductBillingFrequencyInterface;
 use TNW\Subscriptions\Api\ProductBillingFrequencyRepositoryInterface;
@@ -48,20 +49,28 @@ class ProfitCalculator
     private $currency;
 
     /**
+     * @var SubscriptionProfile
+     */
+    private $subscriptionProfile;
+
+    /**
      * ProfitCalculator constructor.
      *
      * @param ProductBillingFrequencyRepositoryInterface $recurringOptionRepository
      * @param SearchCriteriaBuilder $searchCriteriaBuilder
      * @param Currency $currency
+     * @param SubscriptionProfile $subscriptionProfile
      */
     public function __construct(
         ProductBillingFrequencyRepositoryInterface $recurringOptionRepository,
         SearchCriteriaBuilder $searchCriteriaBuilder,
-        Currency $currency
+        Currency $currency,
+        SubscriptionProfile $subscriptionProfile
     ) {
         $this->recurringOptionRepository = $recurringOptionRepository;
         $this->searchCriteriaBuilder = $searchCriteriaBuilder;
         $this->currency = $currency;
+        $this->subscriptionProfile = $subscriptionProfile;
     }
 
     /**
@@ -71,7 +80,7 @@ class ProfitCalculator
      * @param SubscriptionProfile $subscriptionProfile
      *
      * @return float|int
-     * @throws \Magento\Framework\Exception\LocalizedException
+     * @throws LocalizedException
      */
     public function getTotalProfit(SubscriptionProfile $subscriptionProfile)
     {
@@ -85,7 +94,7 @@ class ProfitCalculator
      * @param bool $addContainer
      *
      * @return string
-     * @throws \Magento\Framework\Exception\LocalizedException
+     * @throws LocalizedException
      */
     public function getRenderedTotalProfit(SubscriptionProfile $subscriptionProfile, $addContainer = true)
     {
@@ -104,7 +113,7 @@ class ProfitCalculator
      * @param SubscriptionProfile $subscriptionProfile
      *
      * @return float|int
-     * @throws \Magento\Framework\Exception\LocalizedException
+     * @throws LocalizedException
      */
     public function getAsOfTodayProfit(SubscriptionProfile $subscriptionProfile)
     {
@@ -123,7 +132,7 @@ class ProfitCalculator
      * @param bool $includeContainer
      *
      * @return string
-     * @throws \Magento\Framework\Exception\LocalizedException
+     * @throws LocalizedException
      */
     public function getRenderedAsOfTodayProfit(SubscriptionProfile $subscriptionProfile, $includeContainer = true)
     {
@@ -138,7 +147,7 @@ class ProfitCalculator
      * @param SubscriptionProfile $subscriptionProfile
      *
      * @return float|int
-     * @throws \Magento\Framework\Exception\LocalizedException
+     * @throws LocalizedException
      */
     public function getRemainingProfit(SubscriptionProfile $subscriptionProfile)
     {
@@ -157,7 +166,7 @@ class ProfitCalculator
      * @param bool $includeContainer
      *
      * @return float|int
-     * @throws \Magento\Framework\Exception\LocalizedException
+     * @throws LocalizedException
      */
     public function getRenderedRemainingProfit(SubscriptionProfile $subscriptionProfile, $includeContainer = true)
     {
@@ -175,125 +184,7 @@ class ProfitCalculator
      */
     private function getProfit(SubscriptionProfile $profile, $profitType)
     {
-        $profit = 0;
-
-        $resource = $profile->getResource();
-        $connection = $resource->getConnection();
-
-        $searchCriteria = $this->searchCriteriaBuilder
-            ->addFilter(
-                ProductBillingFrequencyInterface::MAGENTO_PRODUCT_ID,
-                array_map([$this, 'profileItemProductId'], $profile->getProducts()),
-                'in'
-            )
-            ->addFilter(ProductBillingFrequencyInterface::BILLING_FREQUENCY_ID, $profile->getBillingFrequencyId())
-            ->create();
-
-        $recurringOptions = $this->recurringOptionRepository
-            ->getList($searchCriteria)
-            ->getItems();
-
-        /** @var ProductSubscriptionProfileInterface $profileProduct */
-        foreach ($profile->getVisibleProducts() as $profileProduct) {
-            $children = $profileProduct->getChildren();
-
-            if (!empty($children) &&
-                $this->searchRecurringOption($recurringOptions, \reset($children)->getMagentoProductId())
-            ) {
-                $profileProduct = \reset($children);
-            }
-
-            $product = $profileProduct->getMagentoProduct();
-            $recurringOption = $this->searchRecurringOption($recurringOptions, $product->getId());
-
-            if (empty($recurringOption)) {
-                continue;
-            }
-            $select = $connection->select()
-                ->from(
-                    ['invoiceItem' => $resource->getTable('sales_invoice_item')]
-                )
-                ->joinInner(
-                    ['salesRelative' => $resource->getTable('tnw_subscriptions_profile_item_sales_item')],
-                    'invoiceItem.order_item_id = salesRelative.order_item_id',
-                    []
-                )
-                ->joinInner(
-                    ['profileItem' => $resource->getTable('tnw_subscriptions_product_subscription_profile_entity')],
-                    'salesRelative.profile_item_id = profileItem.entity_id',
-                    []
-                )
-                ->where('profileItem.subscription_profile_id = ?', $profile->getId());
-
-            $invoiceItems = $connection->fetchAll($select);
-            $initialFeeAdded = false;
-            foreach ($invoiceItems as $item) {
-                if (!$initialFeeAdded && isset($recurringOption['initial_fee']) && $recurringOption['initial_fee']) {
-                    $initialFeeAdded = true;
-                    $profit += $recurringOption['initial_fee'];
-                }
-                $profit += ($item['base_price'] - $item['base_cost']) * $item['qty'];
-            }
-
-            switch ($profitType) {
-                case self::AS_OF_TODAY:
-                    break;
-                case self::REMAINING:
-                    $lastInvoiceItem = array_pop($invoiceItems);
-                    if ($lastInvoiceItem) {
-                        $profitOfLastItem = ($lastInvoiceItem['base_price'] - $lastInvoiceItem['base_cost'])
-                            * $lastInvoiceItem['qty'];
-                    } else {
-                        $profitOfLastItem = 0;
-                    }
-
-                    if ($profile->getTerm() == 1) {
-                        if ($profile->getUnit() == 3) {
-                            $profit = $profitOfLastItem * 365 / $profile->getFrequency();
-                            break;
-                        } else {
-                            $profit = $profitOfLastItem * 12 / $profile->getFrequency();
-                            break;
-                        }
-                    } else {
-                        $profit += $profitOfLastItem * $profile->getTotalBillingCycles();
-                        return $profit;
-                        break;
-                    }
-                default:
-                    return null;
-                    break;
-            }
-        }
-        return $profit;
-    }
-
-    /**
-     * @param $recurringOptions
-     * @param $productId
-     *
-     * @return ProductBillingFrequencyInterface|false
-     */
-    private function searchRecurringOption($recurringOptions, $productId)
-    {
-        $filteredRecurringOptions = array_filter(
-            $recurringOptions,
-            function (ProductBillingFrequencyInterface $frequency) use ($productId) {
-                return (int)$frequency->getMagentoProductId() === (int)$productId;
-            }
-        );
-
-        return \reset($filteredRecurringOptions);
-    }
-
-    /**
-     * @param ProductSubscriptionProfileInterface $item
-     *
-     * @return null|string
-     */
-    private function profileItemProductId(ProductSubscriptionProfileInterface $item)
-    {
-        return $item->getMagentoProductId();
+        return $this->subscriptionProfile->getTotalProfit($profile->getEntityId(), $profitType);
     }
 
     /**

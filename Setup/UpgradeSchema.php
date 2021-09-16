@@ -173,6 +173,10 @@ class UpgradeSchema implements UpgradeSchemaInterface
             $this->removeCustomerAddressFK($setup);
         }
 
+        if (version_compare($context->getVersion(), '2.2.84', '<')) {
+            $this->addSubscriptionProfileProfitTable($setup);
+        }
+
         $setup->endSetup();
     }
 
@@ -260,8 +264,7 @@ class UpgradeSchema implements UpgradeSchemaInterface
      */
     private function addInvoicedAndRefundedInitialFeeColumnsToOrderItemExtAtrTable(
         SchemaSetupInterface $setup
-    )
-    {
+    ) {
         $table = $setup->getTable('tnw_subscriptions_order_item_extension_entity');
 
         $setup->getConnection()
@@ -473,7 +476,10 @@ class UpgradeSchema implements UpgradeSchemaInterface
             )
             ->addForeignKey(
                 $setup->getFkName('tnw_subscriptions_message', 'website_id', 'store_website', 'website_id'),
-                'website_id', $setup->getTable('store_website'), 'website_id', Table::ACTION_CASCADE
+                'website_id',
+                $setup->getTable('store_website'),
+                'website_id',
+                Table::ACTION_CASCADE
             );
 
         $setup->getConnection()->createTable($table);
@@ -710,7 +716,6 @@ class UpgradeSchema implements UpgradeSchemaInterface
         ];
 
         foreach ($nextPaymentAttributes as $nextPaymentAttribute) {
-
             $setup->getConnection()
                 ->addColumn($setup->getTable(SubscriptionProfile::SUBSCRIPTION_PROFILE_ENTITY), $nextPaymentAttribute, [
                     'type' => Table::TYPE_DECIMAL,
@@ -729,14 +734,17 @@ class UpgradeSchema implements UpgradeSchemaInterface
     private function addCheckSendMailColumn(SchemaSetupInterface $setup)
     {
         $setup->getConnection()
-            ->addColumn($setup->getTable(SubscriptionProfilePaymentInterface::SUBSCRIPTIONS_PROFILE_PAYMENT_TABLE),
-                'sent_mail', [
+            ->addColumn(
+                $setup->getTable(SubscriptionProfilePaymentInterface::SUBSCRIPTIONS_PROFILE_PAYMENT_TABLE),
+                'sent_mail',
+                [
                 'type' => Table::TYPE_BOOLEAN,
                 'nullable' => false,
                 'default' => 0,
                 'comment' => 'sent_mail'
 
-            ]);
+            ]
+            );
     }
 
     /**
@@ -797,7 +805,8 @@ class UpgradeSchema implements UpgradeSchemaInterface
      *
      * @param SchemaSetupInterface $setup
      */
-    private function addOriginalStartDateColumnToSubscriptionProfile(SchemaSetupInterface $setup) {
+    private function addOriginalStartDateColumnToSubscriptionProfile(SchemaSetupInterface $setup)
+    {
         $table = $setup->getTable(SubscriptionProfile::SUBSCRIPTION_PROFILE_ENTITY);
         $connection = $setup->getConnection();
         $connection->addColumn(
@@ -911,5 +920,35 @@ class UpgradeSchema implements UpgradeSchemaInterface
                 )
             ]
         );
+    }
+
+    /**
+     * @param SchemaSetupInterface $setup
+     * @throws \Zend_Db_Exception
+     */
+    private function addSubscriptionProfileProfitTable(SchemaSetupInterface $setup)
+    {
+        $table = $setup->getConnection()
+            ->newTable($setup->getTable('tnw_subscriptions_profile_profit'))
+            ->addColumn('entity_id', Table::TYPE_INTEGER, null, [
+                'identity' => true,
+                'nullable' => false,
+                'primary' => true,
+                'unsigned' => true
+            ], 'Entity ID')
+            ->addColumn('profile_id', Table::TYPE_INTEGER, null, [
+                'nullable' => true,
+                'default' => null
+            ], 'Subscription profile ID')
+            ->addColumn('profit_type', Table::TYPE_TEXT, '255', [
+                'nullable' => true,
+                'default' => null
+            ], 'Profit type')
+            ->addColumn('total_profit', Table::TYPE_DECIMAL, '12,4', [
+                'nullable' => true,
+                'default' => '0.0000'
+            ], 'Total profit');
+
+        $setup->getConnection()->createTable($table);
     }
 }

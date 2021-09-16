@@ -1421,4 +1421,8 @@
         <plugin name="tnw-include-required-static-assets"
                 type="TNW\Subscriptions\Plugin\IncludeRequiredStaticAssets"/>
     </type>
+    <type name="Magento\Sales\Model\ResourceModel\Order">
+        <plugin name="tnw_total_profit_plugin"
+                type="TNW\Subscriptions\Plugin\TotalProfitPlugin"/>
+    </type>
 </config>
