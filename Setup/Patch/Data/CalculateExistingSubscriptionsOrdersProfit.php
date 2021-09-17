@@ -37,7 +37,7 @@ class CalculateExistingSubscriptionsOrdersProfit implements DataPatchInterface
      * @var SubscriptionProfileRepository
      */
     private $profileRepository;
-    
+
     /**
      * @param ModuleDataSetupInterface $moduleDataSetup
      * @param Profit $profileProfit
@@ -63,9 +63,10 @@ class CalculateExistingSubscriptionsOrdersProfit implements DataPatchInterface
     {
         $this->moduleDataSetup->startSetup();
         $connection = $this->moduleDataSetup->getConnection();
+        $table = $this->moduleDataSetup->getTable('tnw_subscriptions_subscription_profile_entity');
 
         $selectAllProfiles = $connection->select()
-            ->from('tnw_subscriptions_subscription_profile_entity', ['*']);
+            ->from($table, ['*']);
         $profileIds = $connection->fetchCol($selectAllProfiles);
 
         foreach ($profileIds as $profileId) {
