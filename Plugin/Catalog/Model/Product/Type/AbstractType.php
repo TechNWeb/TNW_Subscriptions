@@ -46,7 +46,7 @@ class AbstractType
         if (isset($buyRequest['subscribe_active']) && $buyRequest['subscribe_active']) {
             if (isset($buyRequest['subscribe_qty'])) {
                 $buyRequest['qty'] = \Zend_Filter::filterStatic(
-                    $buyRequest['subscribe_qty'],
+                    (string) $buyRequest['subscribe_qty'],
                     'LocalizedToNormalized',
                     [['locale' => $this->localeResolver->getLocale()]]
                 );
