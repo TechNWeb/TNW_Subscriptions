@@ -11,6 +11,11 @@ namespace TNW\Subscriptions\Model\ResourceModel\ProductBillingFrequency;
 class Collection extends \Magento\Framework\Model\ResourceModel\Db\Collection\AbstractCollection
 {
     /**
+     * @var string
+     */
+    protected $_idFieldName = 'id';
+
+    /**
      * Define resource model
      *
      * @return void
