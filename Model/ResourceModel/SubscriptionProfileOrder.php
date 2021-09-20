@@ -164,4 +164,25 @@ class SubscriptionProfileOrder extends AbstractDb
             ->where('subscription_profile_id = ?', $profileId);
         return $connection->fetchAll($select);
     }
+
+    /**
+     * @param $orderId
+     * @return mixed
+     */
+    public function getInstallmentDataByOrderId($orderId)
+    {
+        $connection = $this->getConnection();
+
+        $select = $connection->select()
+            ->from($this->getTable('sales_order'), [
+                'subscription_paid_installment',
+                'subscription_final_installment_date',
+                'subscription_first_installment_date',
+                'subscription_expire_cc',
+                'subscription_total_static_billing_cycles'
+            ])
+            ->where('entity_id = ?', $orderId);
+
+        return $connection->fetchRow($select);
+    }
 }
