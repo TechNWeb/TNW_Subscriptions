@@ -515,4 +515,8 @@
                 sortOrder="100"
                 disabled="false"/>
     </type>
+    <type name="Magento\Framework\App\Config\ScopeConfigInterface">
+        <plugin name="tnw_prevent_disable_output_in_admin"
+                type="TNW\Subscriptions\Plugin\Config\PreventDisableOutput"/>
+    </type>
 </config>

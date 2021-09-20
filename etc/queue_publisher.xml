@@ -10,4 +10,7 @@
     <publisher topic="tnw.products.link">
         <connection name="amqp" exchange="tnw.products"/>
     </publisher>
+    <publisher topic="tnw.profile.profit">
+        <connection name="amqp" exchange="tnw.profit" />
+    </publisher>
 </config>

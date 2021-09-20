@@ -246,4 +246,34 @@ class SubscriptionProfile extends AbstractEntity
             ['entity_id = ?' => $profileId]
         );
     }
+
+    /**
+     * @param $profile
+     * @return array
+     */
+    public function getProfileInvoicedOrders($profile)
+    {
+        $connection = $this->getConnection();
+        $select = $connection->select()
+            ->from(
+                ['invoiceItem' => $this->getTable('sales_invoice_item')]
+            )
+            ->joinInner(
+                ['salesRelative' => $this->getTable(
+                    'tnw_subscriptions_profile_item_sales_item'
+                )],
+                'invoiceItem.order_item_id = salesRelative.order_item_id',
+                []
+            )
+            ->joinInner(
+                ['profileItem' => $this->getTable(
+                    'tnw_subscriptions_product_subscription_profile_entity'
+                )],
+                'salesRelative.profile_item_id = profileItem.entity_id',
+                []
+            )
+            ->where('profileItem.subscription_profile_id = ?', $profile->getId());
+
+        return $connection->fetchAll($select);
+    }
 }

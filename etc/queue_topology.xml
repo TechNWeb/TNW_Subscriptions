@@ -13,4 +13,10 @@
                  destinationType="queue"
                  destination="tnw_products_link"/>
     </exchange>
+    <exchange name="tnw.profit" type="topic" connection="amqp">
+        <binding id="processProfitBinding"
+                 topic="tnw.profile.profit"
+                 destinationType="queue"
+                 destination="tnw.profile.profit"/>
+    </exchange>
 </config>

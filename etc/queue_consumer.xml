@@ -12,4 +12,9 @@
               connection="amqp"
               consumerInstance="Magento\Framework\MessageQueue\Consumer"
               handler="TNW\Subscriptions\Model\ProductBillingFrequency\Queue\Consumer::process"/>
+    <consumer name="TnwProfileProfit"
+              queue="tnw.profile.profit"
+              connection="amqp"
+              consumerInstance="Magento\Framework\MessageQueue\Consumer"
+              handler="TNW\Subscriptions\Model\Queue\Profit::processOperation"/>
 </config>

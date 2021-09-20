@@ -15,6 +15,8 @@ use Magento\Framework\Model\AbstractExtensibleModel;
 use Magento\Framework\Model\Context as ModelContext;
 use Magento\Framework\Registry;
 use Magento\Store\Api\WebsiteRepositoryInterface;
+use TNW\Subscriptions\Api\Data\ProductBillingFrequencyInterface;
+use TNW\Subscriptions\Api\Data\ProductSubscriptionProfileInterface;
 use TNW\Subscriptions\Api\Data\SubscriptionProfileAddressInterface;
 use TNW\Subscriptions\Api\Data\SubscriptionProfileInterface;
 use TNW\Subscriptions\Api\Data\SubscriptionProfilePaymentInterface;
@@ -25,6 +27,10 @@ use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfile\Payment\Collection
 use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfile\Payment\CollectionFactory as PaymentCollectionFactory;
 use TNW\Subscriptions\Model\Source\ProfileStatus;
 use Magento\Framework\Serialize\Serializer\Json;
+use Magento\Framework\Api\SearchCriteriaBuilder;
+use TNW\Subscriptions\Api\ProductBillingFrequencyRepositoryInterface;
+use TNW\Subscriptions\Model\SubscriptionProfile\ProfitCalculator;
+use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfileProfit;
 
 /**
  * Subscription Profile model.
@@ -140,6 +146,21 @@ class SubscriptionProfile extends AbstractExtensibleModel implements Subscriptio
     private $billingFrequencyRepository;
 
     /**
+     * @var SearchCriteriaBuilder
+     */
+    private $searchCriteriaBuilder;
+
+    /**
+     * @var ProductBillingFrequencyRepositoryInterface
+     */
+    private $frequencyRepository;
+
+    /**
+     * @var SubscriptionProfileProfit
+     */
+    private $profileProfit;
+
+    /**
      * SubscriptionProfile constructor.
      * @param ModelContext $context
      * @param Registry $registry
@@ -165,6 +186,9 @@ class SubscriptionProfile extends AbstractExtensibleModel implements Subscriptio
         UserContextInterface $userContext,
         Json $serializer,
         BillingFrequencyRepository $billingFrequencyRepository,
+        SearchCriteriaBuilder $searchCriteriaBuilder,
+        ProductBillingFrequencyRepositoryInterface $frequencyRepository,
+        SubscriptionProfileProfit $profileProfit,
         Resource $resource = null,
         AbstractDb $resourceCollection = null,
         array $data = []
@@ -186,6 +210,9 @@ class SubscriptionProfile extends AbstractExtensibleModel implements Subscriptio
         $this->userContext = $userContext;
         $this->serializer = $serializer;
         $this->billingFrequencyRepository = $billingFrequencyRepository;
+        $this->searchCriteriaBuilder = $searchCriteriaBuilder;
+        $this->frequencyRepository = $frequencyRepository;
+        $this->profileProfit = $profileProfit;
     }
 
     /**
@@ -976,5 +1003,21 @@ class SubscriptionProfile extends AbstractExtensibleModel implements Subscriptio
         }
 
         return $result;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getTotalProfit($id, $profitType)
+    {
+        return $this->profileProfit->getTotalProfitById($id, $profitType);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function setTotalProfit($profit)
+    {
+        return $this->profileProfit->setTotalProfit($profit);
     }
 }
