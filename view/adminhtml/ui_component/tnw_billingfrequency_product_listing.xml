@@ -189,7 +189,7 @@
                 <dataType>select</dataType>
                 <options>
                     <option name="disabled" xsi:type="array">
-                        <item name="value" xsi:type="string">0</item>
+                        <item name="value" xsi:type="string">2</item>
                         <item name="label" xsi:type="string" translate="true">Disabled</item>
                     </option>
                     <option name="enabled" xsi:type="array">

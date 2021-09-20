@@ -11,6 +11,7 @@ use Magento\Authorization\Model\UserContextInterface;
 use Magento\Backend\App\Action;
 use Magento\Backend\App\Action\Context;
 use Magento\Catalog\Api\Data\ProductInterface;
+use Magento\Catalog\Model\ResourceModel\Product\CollectionFactory;
 use Magento\Framework\App\Action\HttpPostActionInterface;
 use Magento\Framework\Bulk\BulkManagementInterface;
 use Magento\Framework\Bulk\OperationInterface as BulkOperationInterface;
@@ -76,6 +77,11 @@ class AddLinkedProducts extends Action implements HttpPostActionInterface
     private $userContext;
 
     /**
+     * @var CollectionFactory
+     */
+    private $collectionFactory;
+
+    /**
      * AddLinkedProducts constructor.
      * @param Context $context
      * @param Filter $filter
@@ -85,6 +91,7 @@ class AddLinkedProducts extends Action implements HttpPostActionInterface
      * @param IdentityGeneratorInterface $identityService
      * @param SerializerInterface $serializer
      * @param UserContextInterface $userContext
+     * @param CollectionFactory $collectionFactory
      */
     public function __construct(
         Context $context,
@@ -94,7 +101,8 @@ class AddLinkedProducts extends Action implements HttpPostActionInterface
         OperationInterfaceFactory $operationFactory,
         IdentityGeneratorInterface $identityService,
         SerializerInterface $serializer,
-        UserContextInterface $userContext
+        UserContextInterface $userContext,
+        CollectionFactory $collectionFactory
     ) {
         parent::__construct($context);
         $this->filter = $filter;
@@ -104,6 +112,7 @@ class AddLinkedProducts extends Action implements HttpPostActionInterface
         $this->identityService = $identityService;
         $this->serializer = $serializer;
         $this->userContext = $userContext;
+        $this->collectionFactory = $collectionFactory;
     }
 
     /**
@@ -139,14 +148,11 @@ class AddLinkedProducts extends Action implements HttpPostActionInterface
      */
     public function getAffectedProductIds()
     {
-        $this->filter->applySelectionOnTargetProvider();
-        $component = $this->filter->getComponent();
-        $dataProvider = $component->getContext()->getDataProvider();
-        $dataProvider->setLimit(0, false);
-        $searchResult = $dataProvider->getSearchResult();
+        $this->filter->getComponent()->getContext()->getDataProvider()->prepareCollection();
+        $collection = $this->filter->getCollection($this->collectionFactory->create());
         return array_map(function (ProductInterface $item) {
             return $item->getId();
-        }, $searchResult->getItems());
+        }, $collection->getItems());
     }
 
     /**

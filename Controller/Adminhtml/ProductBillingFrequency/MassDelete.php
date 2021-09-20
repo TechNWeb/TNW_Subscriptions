@@ -7,7 +7,6 @@ namespace TNW\Subscriptions\Controller\Adminhtml\ProductBillingFrequency;
 
 use Magento\Backend\App\Action;
 use Magento\Backend\App\Action\Context;
-use Magento\Framework\Api\Search\DocumentInterface;
 use Magento\Framework\Api\SearchCriteriaBuilder;
 use Magento\Framework\App\Action\HttpPostActionInterface;
 use Magento\Framework\Controller\Result\JsonFactory;
@@ -15,6 +14,7 @@ use Magento\Framework\Exception\LocalizedException;
 use Magento\Ui\Component\MassAction\Filter;
 use TNW\Subscriptions\Api\Data\ProductBillingFrequencyInterface;
 use TNW\Subscriptions\Api\ProductBillingFrequencyRepositoryInterface;
+use TNW\Subscriptions\Model\ResourceModel\ProductBillingFrequency\CollectionFactory;
 
 /**
  * MassDelete action for linked products of billing frequency
@@ -46,6 +46,11 @@ class MassDelete extends Action implements HttpPostActionInterface
     private $filter;
 
     /**
+     * @var CollectionFactory
+     */
+    private $collectionFactory;
+
+    /**
      * @inheritDoc
      */
     public function __construct(
@@ -53,13 +58,15 @@ class MassDelete extends Action implements HttpPostActionInterface
         JsonFactory $jsonFactory,
         ProductBillingFrequencyRepositoryInterface $productBillingFrequencyRepository,
         SearchCriteriaBuilder $criteriaBuilder,
-        Filter $filter
+        Filter $filter,
+        CollectionFactory $collectionFactory
     ) {
         parent::__construct($context);
         $this->jsonFactory = $jsonFactory;
         $this->productBillingFrequencyRepository = $productBillingFrequencyRepository;
         $this->criteriaBuilder = $criteriaBuilder;
         $this->filter = $filter;
+        $this->collectionFactory = $collectionFactory;
     }
 
     /**
@@ -125,13 +132,9 @@ class MassDelete extends Action implements HttpPostActionInterface
      */
     public function getAffectedIds()
     {
-        $this->filter->applySelectionOnTargetProvider();
-        $component = $this->filter->getComponent();
-        $dataProvider = $component->getContext()->getDataProvider();
-        $dataProvider->setLimit(0, false);
-        $searchResult = $dataProvider->getSearchResult();
-        return array_map(function (DocumentInterface $item) {
-            return $item->getData('id');
-        }, $searchResult->getItems());
+        $collection = $this->filter->getCollection($this->collectionFactory->create());
+        return array_map(function (ProductBillingFrequencyInterface $item) {
+            return $item->getId();
+        }, $collection->getItems());
     }
 }
