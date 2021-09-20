@@ -49,9 +49,11 @@ class OrderRepositoryPlugin
     {
         $extensionAttributes = $order->getExtensionAttributes();
         $installmentData = $this->subscriptionProfileOrder->getInstallmentDataByOrderId($order->getEntityId());
-        if (isset($installmentData['paid_installment'])) {
+        if (isset($installmentData['subscription_paid_installment'])) {
             $extensionAttributes = $extensionAttributes ? $extensionAttributes : $this->extensionFactory->create();
-            $extensionAttributes->setSubscriptionPaidInstallment($installmentData['subscription_paid_installment']);
+            $extensionAttributes->setSubscriptionPaidInstallment(
+                $installmentData['subscription_paid_installment']
+            );
             $extensionAttributes->setSubscriptionFinalInstallmentDate(
                 $installmentData['subscription_final_installment_date']
             );
