@@ -1470,4 +1470,8 @@
         <plugin name="tnw_total_profit_plugin"
                 type="TNW\Subscriptions\Plugin\TotalProfitPlugin"/>
     </type>
+    <type name="Magento\Sales\Block\Order\Email\Items">
+        <plugin name="tnw_email_items_after"
+                type="TNW\Subscriptions\Plugin\Block\Order\Email\EmailItemsAfter"/>
+    </type>
 </config>
