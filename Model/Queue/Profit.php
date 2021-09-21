@@ -21,6 +21,7 @@ use TNW\Subscriptions\Api\ProductBillingFrequencyRepositoryInterface;
 use TNW\Subscriptions\Model\SubscriptionProfile\ProfitCalculator;
 use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfile;
 use Magento\Framework\EntityManager\EntityManager;
+use TNW\Subscriptions\Model\Source\ProfileStatus;
 
 /**
  * Class Profit - calculates profit and set it in table
@@ -159,7 +160,12 @@ class Profit
     public function calculateProfitAndSave($profile)
     {
         $profit = 0;
-
+        $invoiceItems = [];
+        if ($profile->getStatus() == ProfileStatus::STATUS_CANCELED
+            || $profile->getStatus() == ProfileStatus::STATUS_COMPLETE
+        ) {
+            return $profit;
+        }
         $searchCriteria = $this->searchCriteriaBuilder
             ->addFilter(
                 ProductBillingFrequencyInterface::MAGENTO_PRODUCT_ID,
@@ -203,27 +209,25 @@ class Profit
 
         $this->setProfitData($profile, $profit, ProfitCalculator::AS_OF_TODAY);
 
-        if ($invoiceItems !== null) {
-            $lastInvoiceItem = array_pop($invoiceItems);
-            if ($lastInvoiceItem) {
-                $profitOfLastItem = ($item['base_price'] - $item['base_cost'])
-                    * $lastInvoiceItem['qty'];
-            } else {
-                $profitOfLastItem = 0;
-            }
-
-            if ($profile->getTerm() == 1) {
-                if ($profile->getUnit() == 3) {
-                    $profit = $profitOfLastItem * 365 / $profile->getFrequency();
-                } else {
-                    $profit = $profitOfLastItem * 12 / $profile->getFrequency();
-                }
-            } else {
-                $profit += $profitOfLastItem * $profile->getTotalBillingCycles();
-            }
-
-            $this->setProfitData($profile, $profit, ProfitCalculator::REMAINING);
+        $lastInvoiceItem = array_pop($invoiceItems);
+        if ($lastInvoiceItem) {
+            $profitOfLastItem = ($item['base_price'] - $item['base_cost'])
+                * $lastInvoiceItem['qty'];
+        } else {
+            $profitOfLastItem = 0;
         }
+
+        if ($profile->getTerm() == 1) {
+            if ($profile->getUnit() == 3) {
+                $profit = $profitOfLastItem * 365 / $profile->getFrequency();
+            } else {
+                $profit = $profitOfLastItem * 12 / $profile->getFrequency();
+            }
+        } else {
+            $profit += $profitOfLastItem * $profile->getTotalBillingCycles();
+        }
+
+        $this->setProfitData($profile, $profit, ProfitCalculator::REMAINING);
 
         return $profit;
     }
