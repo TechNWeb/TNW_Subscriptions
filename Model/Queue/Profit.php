@@ -21,6 +21,7 @@ use TNW\Subscriptions\Api\ProductBillingFrequencyRepositoryInterface;
 use TNW\Subscriptions\Model\SubscriptionProfile\ProfitCalculator;
 use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfile;
 use Magento\Framework\EntityManager\EntityManager;
+use TNW\Subscriptions\Model\Source\ProfileStatus;
 
 /**
  * Class Profit - calculates profit and set it in table
@@ -159,7 +160,12 @@ class Profit
     public function calculateProfitAndSave($profile)
     {
         $profit = 0;
-
+        $invoiceItems = [];
+        if ($profile->getStatus() == ProfileStatus::STATUS_CANCELED
+            || $profile->getStatus() == ProfileStatus::STATUS_COMPLETE
+        ) {
+            return $profit;
+        }
         $searchCriteria = $this->searchCriteriaBuilder
             ->addFilter(
                 ProductBillingFrequencyInterface::MAGENTO_PRODUCT_ID,
