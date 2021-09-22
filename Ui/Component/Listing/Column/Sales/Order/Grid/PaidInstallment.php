@@ -8,6 +8,7 @@ namespace TNW\Subscriptions\Ui\Component\Listing\Column\Sales\Order\Grid;
 use Magento\Framework\View\Element\UiComponent\ContextInterface;
 use Magento\Framework\View\Element\UiComponentFactory;
 use Magento\Ui\Component\Listing\Columns\Column;
+use Magento\Framework\Serialize\SerializerInterface;
 
 /**
  * Class PaidInstallment - showing how many paid subscriptions
@@ -15,6 +16,22 @@ use Magento\Ui\Component\Listing\Columns\Column;
  */
 class PaidInstallment extends Column
 {
+    /**
+     * @var SerializerInterface
+     */
+    private $serializer;
+
+    public function __construct(
+        ContextInterface $context,
+        UiComponentFactory $uiComponentFactory,
+        SerializerInterface $serializer,
+        array $components = [],
+        array $data = []
+    ) {
+        $this->serializer = $serializer;
+        parent::__construct($context, $uiComponentFactory, $components, $data);
+    }
+
     /**
      * Add paid installment to subscriptions profile page.
      *
@@ -26,12 +43,23 @@ class PaidInstallment extends Column
         if (isset($dataSource['data']['items'])) {
             foreach ($dataSource['data']['items'] as & $item) {
                 if (!empty($item['subscription_paid_installment'])) {
-                    $options = explode(",", $item['subscription_paid_installment']);
-                    if (isset($options)) {
-                        if (count($options) > 1
-                            && $options[1] != 0
-                            && $options[1] != -1
-                            && $options[1] != 1
+                    if (strpos($item['subscription_paid_installment'], '[') !== false) {
+                        $options = $this->serializer->unserialize($item['subscription_paid_installment']);
+                        $result = [];
+                        foreach ($options as $option) {
+                            $option = explode(',', $option);
+                            if ($this->checkForInfiniteSubscription($option)
+                                && isset($item['subscription_final_installment_date'])
+                            ) {
+                                $result[] = $option[0] . ' / ' . $option[1];
+                            } else {
+                                $result[] = $option[0] . ' / ∞';
+                            }
+                        }
+                        $item['subscription_paid_installment'] = implode(', ', $result);
+                    } else {
+                        $options = explode(',', $item['subscription_paid_installment']);
+                        if ($this->checkForInfiniteSubscription($options)
                             && isset($item['subscription_final_installment_date'])
                         ) {
                             $item['subscription_paid_installment'] = $options[0] . ' / ' . $options[1];
@@ -44,5 +72,19 @@ class PaidInstallment extends Column
         }
 
         return $dataSource;
+    }
+
+    /**
+     * @param $options
+     * @return bool
+     */
+    public function checkForInfiniteSubscription($options)
+    {
+        if (isset($options)) {
+            return count($options) > 1
+                && $options[1] != 0
+                && $options[1] != -1
+                && $options[1] != 1;
+        }
     }
 }

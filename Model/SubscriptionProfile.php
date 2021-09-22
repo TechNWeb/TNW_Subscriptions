@@ -31,6 +31,7 @@ use Magento\Framework\Api\SearchCriteriaBuilder;
 use TNW\Subscriptions\Api\ProductBillingFrequencyRepositoryInterface;
 use TNW\Subscriptions\Model\SubscriptionProfile\ProfitCalculator;
 use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfileProfit;
+use TNW\Subscriptions\Api\SubscriptionProfileRepositoryInterface;
 
 /**
  * Subscription Profile model.
@@ -161,6 +162,11 @@ class SubscriptionProfile extends AbstractExtensibleModel implements Subscriptio
     private $profileProfit;
 
     /**
+     * @var SubscriptionProfileRepositoryInterface
+     */
+    private $profileRepository;
+
+    /**
      * SubscriptionProfile constructor.
      * @param ModelContext $context
      * @param Registry $registry
@@ -189,6 +195,7 @@ class SubscriptionProfile extends AbstractExtensibleModel implements Subscriptio
         SearchCriteriaBuilder $searchCriteriaBuilder,
         ProductBillingFrequencyRepositoryInterface $frequencyRepository,
         SubscriptionProfileProfit $profileProfit,
+        SubscriptionProfileRepositoryInterface $profileRepository,
         Resource $resource = null,
         AbstractDb $resourceCollection = null,
         array $data = []
@@ -213,6 +220,7 @@ class SubscriptionProfile extends AbstractExtensibleModel implements Subscriptio
         $this->searchCriteriaBuilder = $searchCriteriaBuilder;
         $this->frequencyRepository = $frequencyRepository;
         $this->profileProfit = $profileProfit;
+        $this->profileRepository = $profileRepository;
     }
 
     /**
@@ -977,7 +985,7 @@ class SubscriptionProfile extends AbstractExtensibleModel implements Subscriptio
      * @return array
      * @throws NoSuchEntityException
      */
-    public function getRecurringInstallmentData($profileOrders, $subscriptionProfile)
+    public function getRecurringInstallmentData($profileOrders, $subscriptionProfile, $profileIds)
     {
         $result = [];
         $staticTotalBillingCycles = $subscriptionProfile->getStaticTotalBillingCycles();
@@ -996,10 +1004,25 @@ class SubscriptionProfile extends AbstractExtensibleModel implements Subscriptio
 
         $result['staticTotalBillingCycles'] = $subscriptionProfile->getStaticTotalBillingCycles();
 
-        if (isset($staticTotalBillingCycles)) {
-            $result['paidRecurring'] = implode(",", [count($profileOrders), $staticTotalBillingCycles]);
+        if (strpos($profileIds, ',') !== false) {
+            $profileIds = explode(',', $profileIds);
+            $paid = [];
+            foreach ($profileIds as $profileId) {
+                $profile = $this->profileRepository->getById($profileId);
+                $static = $profile->getStaticTotalBillingCycles();
+                if (isset($static)) {
+                    $paid[] = implode(",", [count($profileOrders), $static]);
+                } else {
+                    $paid[] = implode(",", [count($profileOrders)]);
+                }
+            }
+            $result['paidRecurring'] = $this->serializer->serialize($paid);
         } else {
-            $result['paidRecurring'] = implode(",", [count($profileOrders)]);
+            if (isset($staticTotalBillingCycles)) {
+                $result['paidRecurring'] = implode(",", [count($profileOrders), $staticTotalBillingCycles]);
+            } else {
+                $result['paidRecurring'] = implode(",", [count($profileOrders)]);
+            }
         }
 
         return $result;
