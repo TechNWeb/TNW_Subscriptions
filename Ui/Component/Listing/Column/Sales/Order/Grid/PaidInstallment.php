@@ -48,9 +48,10 @@ class PaidInstallment extends Column
                         $result = [];
                         foreach ($options as $option) {
                             $option = explode(',', $option);
-                            if ($this->checkForInfiniteSubscription($option)
-                                && isset($item['subscription_final_installment_date'])
-                            ) {
+                            if ($this->isNotInfiniteSubscription(
+                                $options,
+                                $item['subscription_final_installment_date']
+                            )) {
                                 $result[] = $option[0] . ' / ' . $option[1];
                             } else {
                                 $result[] = $option[0] . ' / ∞';
@@ -59,9 +60,10 @@ class PaidInstallment extends Column
                         $item['subscription_paid_installment'] = implode(', ', $result);
                     } else {
                         $options = explode(',', $item['subscription_paid_installment']);
-                        if ($this->checkForInfiniteSubscription($options)
-                            && isset($item['subscription_final_installment_date'])
-                        ) {
+                        if ($this->isNotInfiniteSubscription(
+                            $options,
+                            $item['subscription_final_installment_date']
+                        )) {
                             $item['subscription_paid_installment'] = $options[0] . ' / ' . $options[1];
                         } else {
                             $item['subscription_paid_installment'] = $options[0] . ' / ∞';
@@ -76,15 +78,17 @@ class PaidInstallment extends Column
 
     /**
      * @param $options
+     * @param $final
      * @return bool
      */
-    public function checkForInfiniteSubscription($options)
+    public function isNotInfiniteSubscription($options, $final)
     {
         if (isset($options)) {
             return count($options) > 1
                 && $options[1] != 0
                 && $options[1] != -1
-                && $options[1] != 1;
+                && $options[1] != 1
+                && isset($final);
         }
     }
 }
