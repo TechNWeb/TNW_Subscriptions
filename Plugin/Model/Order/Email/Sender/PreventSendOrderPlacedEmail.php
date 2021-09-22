@@ -41,9 +41,7 @@ class PreventSendOrderPlacedEmail
                 'subscribe_active',
                 $item->getProductOptions()['info_buyRequest']
             )) {
-                if ($order->getExtensionAttributes()->getSubscriptionPaidInstallment() !== null) {
-                    $isSubscriptionOrder = false;
-                } else {
+                if ($order->getExtensionAttributes()->getSubscriptionPaidInstallment() == null) {
                     $isSubscriptionOrder = true;
                 }
             }

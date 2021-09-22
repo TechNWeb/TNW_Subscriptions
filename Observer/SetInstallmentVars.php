@@ -21,26 +21,20 @@ class SetInstallmentVars implements ObserverInterface
         $transport = $observer->getTransport();
         $paidInstallment = $transport->getOrder()->getExtensionAttributes();
         if ($paidInstallment->getSubscriptionPaidInstallment() !== null) {
-            $transport->setData(
+            $dataToSet = [
                 'subscription_paid_installment',
-                $paidInstallment->getSubscriptionPaidInstallment()
-            );
-            $transport->setData(
                 'subscription_final_installment_date',
-                $paidInstallment->getSubscriptionFinalInstallmentDate()
-            );
-            $transport->setData(
                 'subscription_first_installment_date',
-                $paidInstallment->getSubscriptionFirstInstallmentDate()
-            );
-            $transport->setData(
                 'subscription_expire_cc',
-                $paidInstallment->getSubscriptionExpireCc()
-            );
-            $transport->setData(
-                'subscription_total_static_billing_cycles',
-                $paidInstallment->getSubscriptionTotalStaticBillingCycles()
-            );
+                'subscription_total_static_billing_cycles'
+            ];
+
+            foreach ($dataToSet as $requiredData) {
+                $transport->setData(
+                    $requiredData,
+                    $paidInstallment->getData($requiredData)
+                );
+            }
         }
     }
 }
