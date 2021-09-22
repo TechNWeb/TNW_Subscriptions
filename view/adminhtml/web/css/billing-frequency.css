@@ -12,9 +12,6 @@ th.tnw_price_column {
 .admin__field-complex-elements .admin__field-tooltip {
   width: auto;
 }
-.admin__data-grid-wrap {
-  overflow-x: unset;
-}
 .admin__data-grid-wrap .data-grid-th._with-tooltip > .wrapper {
   display: flex;
   justify-content: space-between;
@@ -31,4 +28,7 @@ th.tnw_price_column {
 }
 .admin__data-grid-wrap .data-grid-th._with-tooltip .admin__field-tooltip .admin__field-tooltip-content {
   color: #41362f;
+}
+.tnw_billingfrequency_form_tnw_billingfrequency_form_linked_bf_linked_products_grid .admin__data-grid-wrap {
+  overflow-x: unset;
 }
