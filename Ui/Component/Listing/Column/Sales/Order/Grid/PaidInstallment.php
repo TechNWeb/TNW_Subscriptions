@@ -91,12 +91,10 @@ class PaidInstallment extends Column
      */
     public function isNotInfiniteSubscription($options, $final)
     {
-        if (isset($options)) {
-            return count($options) > 1
-                && $options[1] != 0
-                && $options[1] != -1
-                && $options[1] != 1
-                && $final;
-        }
+        return count($options) > 1
+            && $options[1] != 0
+            && $options[1] != -1
+            && $options[1] != 1
+            && $final;
     }
 }
