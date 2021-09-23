@@ -21,6 +21,14 @@ class PaidInstallment extends Column
      */
     private $serializer;
 
+    /**
+     * PaidInstallment constructor.
+     * @param ContextInterface $context
+     * @param UiComponentFactory $uiComponentFactory
+     * @param SerializerInterface $serializer
+     * @param array $components
+     * @param array $data
+     */
     public function __construct(
         ContextInterface $context,
         UiComponentFactory $uiComponentFactory,
@@ -50,7 +58,7 @@ class PaidInstallment extends Column
                             $option = explode(',', $option);
                             if ($this->isNotInfiniteSubscription(
                                 $options,
-                                $item['subscription_final_installment_date']
+                                isset($item['subscription_final_installment_date'])
                             )) {
                                 $result[] = $option[0] . ' / ' . $option[1];
                             } else {
@@ -62,7 +70,7 @@ class PaidInstallment extends Column
                         $options = explode(',', $item['subscription_paid_installment']);
                         if ($this->isNotInfiniteSubscription(
                             $options,
-                            $item['subscription_final_installment_date']
+                            isset($item['subscription_final_installment_date'])
                         )) {
                             $item['subscription_paid_installment'] = $options[0] . ' / ' . $options[1];
                         } else {
@@ -88,7 +96,7 @@ class PaidInstallment extends Column
                 && $options[1] != 0
                 && $options[1] != -1
                 && $options[1] != 1
-                && isset($final);
+                && $final;
         }
     }
 }

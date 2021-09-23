@@ -982,6 +982,7 @@ class SubscriptionProfile extends AbstractExtensibleModel implements Subscriptio
      *
      * @param $profileOrders
      * @param $subscriptionProfile
+     * @param $profileIds
      * @return array
      * @throws NoSuchEntityException
      */
