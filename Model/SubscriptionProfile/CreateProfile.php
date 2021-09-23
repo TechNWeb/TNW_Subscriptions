@@ -723,8 +723,6 @@ class CreateProfile extends BaseCreate
             $this->quoteGenerator->generateProfileQuotes($profile, 1);
 
             $profiles[] = $profile;
-            $this->orderSender->send($order);
-            //TODO add here email sending
         }
 
         // Save Items Relation
