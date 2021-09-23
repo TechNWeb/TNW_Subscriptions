@@ -37,10 +37,11 @@ class PreventSendOrderPlacedEmail
     {
         $isSubscriptionOrder = false;
         foreach ($order->getItems() as $item) {
+            $buyRequest = $item->getProductOptions()['info_buyRequest'];
             if (array_key_exists(
                 'subscribe_active',
-                $item->getProductOptions()['info_buyRequest']
-            )) {
+                $buyRequest
+            ) && $buyRequest['subscribe_active'] == 1) {
                 if ($order->getExtensionAttributes()->getSubscriptionPaidInstallment() == null) {
                     $isSubscriptionOrder = true;
                 }
