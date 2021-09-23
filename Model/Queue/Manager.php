@@ -466,7 +466,7 @@ class Manager
             $quote->getBillingAddress()->setCustomerId(
                 $profile->getCustomerId()
             );
-            
+
             if ($outOfStockProductData && is_array($outOfStockProductData)) {
                 try {
                     $this->emailNotifierFactory->create()->outOfStockProducts($profile, $outOfStockProductData);
