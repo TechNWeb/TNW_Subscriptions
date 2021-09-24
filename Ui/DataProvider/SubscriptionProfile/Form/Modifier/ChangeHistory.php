@@ -12,6 +12,7 @@ use Magento\Ui\Component\Form;
 use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfile\MessageHistory\CollectionFactory;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use TNW\Subscriptions\Model\EmailNotifier;
+use Magento\Store\Api\WebsiteRepositoryInterface;
 
 /**
  * Data provider for change history.
@@ -39,21 +40,27 @@ class ChangeHistory extends BaseFormModifier
     protected $scopeConfig;
 
     /**
+     * @var WebsiteRepositoryInterface
+     */
+    protected $websiteRepository;
+
+    /**
      * ChangeHistory constructor.
-     *
      * @param UrlInterface $urlBuilder
      * @param Registry $registry
      * @param CollectionFactory $collectionFactory
      * @param ScopeConfigInterface $scopeConfig
+     * @param WebsiteRepositoryInterface $websiteRepository
      */
     public function __construct(
         UrlInterface $urlBuilder,
         Registry $registry,
         CollectionFactory $collectionFactory,
-        ScopeConfigInterface $scopeConfig
+        ScopeConfigInterface $scopeConfig,
+        WebsiteRepositoryInterface $websiteRepository
     ) {
         $this->scopeConfig = $scopeConfig;
-
+        $this->websiteRepository = $websiteRepository;
         $this->collectionFactory = $collectionFactory;
         parent::__construct($urlBuilder, $registry);
     }
@@ -65,11 +72,21 @@ class ChangeHistory extends BaseFormModifier
     {
         $profile = $this->getProfile();
 
-        $enableCommentAdd = $this->scopeConfig->getValue(
-            EmailNotifier::XML_PATH_ENABLE_COMMENT_ADDED,
-            \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
-            $profile->getWebsiteId()
-        );
+        $websiteId = $profile->getWebsiteId();
+        try {
+            $enableCommentAdd = $this->scopeConfig->getValue(
+                EmailNotifier::XML_PATH_ENABLE_COMMENT_ADDED,
+                \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
+                $websiteId
+            );
+        } catch (\Exception $e) {
+            $website = $this->websiteRepository->getById($websiteId);
+            $enableCommentAdd = $this->scopeConfig->getValue(
+                EmailNotifier::XML_PATH_ENABLE_COMMENT_ADDED,
+                \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
+                $website->getStoreId()
+            );
+        }
 
         $message = $enableCommentAdd ? '' : __('Notifications are disabled in the config.');
         $meta[static::GROUP_CHANGE_HISTORY] = [
