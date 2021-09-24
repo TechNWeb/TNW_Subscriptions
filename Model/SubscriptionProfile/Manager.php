@@ -1047,6 +1047,10 @@ class Manager
         //Add products
         foreach ($profile->getVisibleProducts() as $profileProduct) {
             $magentoProduct = $profileProduct->getMagentoProduct();
+            $magentoProduct->getTypeInstance()->setStoreFilter(
+                $profile->getWebsite()->getDefaultStore(),
+                $magentoProduct
+            );
             if ($isReBill) {
                 $profileProduct->setTrialStatus(0);
                 $magentoProduct->setTnwSubscrTrialStatus(0);
