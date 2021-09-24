@@ -15,6 +15,7 @@ use Magento\Framework\Session\SessionManagerInterface;
 use Magento\Framework\UrlInterface;
 use Magento\Payment\Model\CcConfig;
 use Magento\Quote\Api\CartRepositoryInterface;
+use Magento\Store\Model\StoreManagerInterface;
 use Magento\Ui\Component\Form\Element\Checkbox;
 use Magento\Ui\Component\Form\Field;
 use Magento\Vault\Api\PaymentTokenManagementInterface;
@@ -113,6 +114,11 @@ class Vault extends Base
     private $urlBuilder;
 
     /**
+     * @var StoreManagerInterface
+     */
+    private $storeManager;
+
+    /**
      * Vault constructor.
      * @param ObjectManagerInterface $objectManager
      * @param CcConfig $ccConfig
@@ -129,6 +135,7 @@ class Vault extends Base
      * @param DataBuilder $dataBuilder
      * @param AdapterFactory $braintreeAdapterFactory
      * @param UrlInterface $urlBuilder
+     * @param StoreManagerInterface $storeManager
      * @param string $tokensConfigClass
      */
     public function __construct(
@@ -147,6 +154,7 @@ class Vault extends Base
         DataBuilder $dataBuilder,
         AdapterFactory $braintreeAdapterFactory,
         UrlInterface $urlBuilder,
+        StoreManagerInterface $storeManager,
         $tokensConfigClass = ''
     ) {
         parent::__construct($config, $session, $profileRepository, $relationManager, $cartRepository);
@@ -168,6 +176,7 @@ class Vault extends Base
         $this->dataBuilder = $dataBuilder;
         $this->braintreeAdapterFactory = $braintreeAdapterFactory;
         $this->urlBuilder = $urlBuilder;
+        $this->storeManager = $storeManager;
     }
 
     /**
@@ -188,10 +197,15 @@ class Vault extends Base
      */
     public function modifyMeta(array $meta)
     {
+        $storeId = $this->getProfile()
+            ? $this->getProfile()->getCustomer()->getStoreId()
+            : $this->session->getStoreId();
+        $this->storeManager->setCurrentStore($storeId);
+
         foreach ($this->vaultConfigProvider->getConfig()['vault'] as $vaultCode => $enabledConfig) {
             if ($this->config->isPaymentMethodAvailableForSubscription(
                 str_replace(['_cc_vault', '_vault'], '', $vaultCode),
-                $this->session->getStoreId()
+                $storeId
             )
             ) {
                 $this->vaultMethods[] = $vaultCode;
