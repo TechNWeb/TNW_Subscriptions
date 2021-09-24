@@ -148,6 +148,7 @@ class LinkedProductsProvider extends DataProvider
             $result->getSelect()->joinLeft(
                 [$tableName => $attribute->getBackendTable()],
                 $tableName . '.' . $column . ' = product.' . $column
+                . ' AND ' . $tableName . '.store_id = 0'
                 . ' AND ' . $tableName . '.attribute_id =' . $attribute->getAttributeId(),
                 [$attributeAlias => $tableName . '.value']
             );
