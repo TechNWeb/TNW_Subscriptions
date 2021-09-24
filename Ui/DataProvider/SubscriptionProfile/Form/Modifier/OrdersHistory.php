@@ -10,6 +10,7 @@ use Magento\Framework\UrlInterface;
 use Magento\Framework\Registry;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use TNW\Subscriptions\Model\EmailNotifier;
+use Magento\Store\Api\WebsiteRepositoryInterface;
 
 /**
  * Prepare orders history ui layout.
@@ -30,16 +31,24 @@ class OrdersHistory extends BaseFormModifier
     protected $scopeConfig;
 
     /**
+     * @var WebsiteRepositoryInterface
+     */
+    protected $websiteRepository;
+
+    /**
      * OrdersHistory constructor.
      * @param UrlInterface $urlBuilder
      * @param Registry $registry
      * @param ScopeConfigInterface $scopeConfig
+     * @param WebsiteRepositoryInterface $websiteRepository
      */
     public function __construct(
         UrlInterface $urlBuilder,
         Registry $registry,
-        ScopeConfigInterface $scopeConfig
+        ScopeConfigInterface $scopeConfig,
+        WebsiteRepositoryInterface $websiteRepository
     ) {
+        $this->websiteRepository = $websiteRepository;
         $this->scopeConfig = $scopeConfig;
         parent::__construct($urlBuilder, $registry);
     }
@@ -109,11 +118,21 @@ class OrdersHistory extends BaseFormModifier
 
         if ($profile && $profile->getId()) {
             $data[$profile->getId()]['subscription_profile_id'] = $profile->getId();
-            $enableCommentAdd = $this->scopeConfig->getValue(
-                EmailNotifier::XML_PATH_ENABLE_COMMENT_ADDED,
-                \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
-                $profile->getWebsiteId()
-            );
+            $websiteId = $profile->getWebsiteId();
+            try {
+                $enableCommentAdd = $this->scopeConfig->getValue(
+                    EmailNotifier::XML_PATH_ENABLE_COMMENT_ADDED,
+                    \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
+                    $websiteId
+                );
+            } catch (\Exception $e) {
+                $website = $this->websiteRepository->getById($websiteId);
+                $enableCommentAdd = $this->scopeConfig->getValue(
+                    EmailNotifier::XML_PATH_ENABLE_COMMENT_ADDED,
+                    \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
+                    $website->getStoreId()
+                );
+            }
             $data[$profile->getId()]['disableCheckbox'] = $enableCommentAdd ? false : true;
         }
 
