@@ -10,8 +10,10 @@ use Magento\Catalog\Api\ProductRepositoryInterface;
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
 use Magento\Framework\Exception\CouldNotSaveException;
+use Magento\Store\Model\ScopeInterface;
 use Psr\Log\LoggerInterface;
 use Magento\Framework\App\Config\ScopeConfigInterface;
+use TNW\Subscriptions\Model\Product\Attribute;
 
 /**
  * Add default eav attribute value for mass update tnw_purchase_type
@@ -90,79 +92,78 @@ class UpdateExtensionAttributesForMassAction implements ObserverInterface
     public function getAttributeCodeAndValue($storeId)
     {
         $attributes = [
-            'tnw_subscr_start_date' => $this->scopeConfig->getValue(
+            Attribute::SUBSCRIPTION_START_DATE => $this->scopeConfig->getValue(
                 'tnw_subscriptions_product/general/start_date_type',
-                \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
+                ScopeInterface::SCOPE_STORE,
                 $storeId
             ),
-            'tnw_subscr_lock_product_price' => $this->scopeConfig->getValue(
+            Attribute::SUBSCRIPTION_LOCK_PRODUCT_PRICE => $this->scopeConfig->getValue(
                 'tnw_subscriptions_product/general/lock_product_price_status',
-                \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
+                ScopeInterface::SCOPE_STORE,
                 $storeId
             ),
-            'tnw_subscr_unlock_preset_qty' => $this->scopeConfig->getValue(
+            Attribute::SUBSCRIPTION_UNLOCK_PRESET_QTY => $this->scopeConfig->getValue(
                 'tnw_subscriptions_product/general/unlock_preset_qty_status',
-                \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
+                ScopeInterface::SCOPE_STORE,
                 $storeId
             ),
-            'tnw_subscr_savings_calculation' => $this->scopeConfig->getValue(
+            Attribute::SUBSCRIPTION_SAVINGS_CALCULATION => $this->scopeConfig->getValue(
                 'tnw_subscriptions_product/general/savings_calculation',
-                \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
+                ScopeInterface::SCOPE_STORE,
                 $storeId
             ),
-            'tnw_subscr_inf_subscriptions' => $this->scopeConfig->getValue(
+            Attribute::SUBSCRIPTION_INFINITE_SUBSCRIPTIONS => $this->scopeConfig->getValue(
                 'tnw_subscriptions_product/general/infinite_subscriptions',
-                \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
+                ScopeInterface::SCOPE_STORE,
                 $storeId
             ),
-            'tnw_subscr_offer_flat_discount' => $this->scopeConfig->getValue(
+            Attribute::SUBSCRIPTION_OFFER_FLAT_DISCOUNT => $this->scopeConfig->getValue(
                 'tnw_subscriptions_product/discount/offer_flat_discount_status',
-                \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
+                ScopeInterface::SCOPE_STORE,
                 $storeId
             ),
-            'tnw_subscr_trial_status' => $this->scopeConfig->getValue(
+            Attribute::SUBSCRIPTION_TRIAL_STATUS => $this->scopeConfig->getValue(
                 'tnw_subscriptions_product/trial/trial_status',
-                \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
+                ScopeInterface::SCOPE_STORE,
                 $storeId
             )
         ];
 
-
-        if ($attributes['tnw_subscr_offer_flat_discount']) {
-            $attributes['tnw_subscr_discount_amount'] = $this->scopeConfig->getValue(
+        if ($attributes[Attribute::SUBSCRIPTION_OFFER_FLAT_DISCOUNT]) {
+            $attributes[Attribute::SUBSCRIPTION_DISCOUNT_AMOUNT] = $this->scopeConfig->getValue(
                 'tnw_subscriptions_product/discount/discount_amount',
-                \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
+                ScopeInterface::SCOPE_STORE,
                 $storeId
             );
-            $attributes['tnw_subscr_discount_type'] = $this->scopeConfig->getValue(
+            $attributes[Attribute::SUBSCRIPTION_DISCOUNT_TYPE] = $this->scopeConfig->getValue(
                 'tnw_subscriptions_product/discount/discount_type',
-                \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
+                ScopeInterface::SCOPE_STORE,
                 $storeId
             );
         }
 
-        if ($attributes['tnw_subscr_trial_status']) {
-            $attributes['tnw_subscr_trial_price'] = $this->scopeConfig->getValue(
+        if ($attributes[Attribute::SUBSCRIPTION_TRIAL_STATUS]) {
+            $attributes[Attribute::SUBSCRIPTION_TRIAL_PRICE] = $this->scopeConfig->getValue(
                 'tnw_subscriptions_product/trial/trial_price',
-                \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
+                ScopeInterface::SCOPE_STORE,
                 $storeId
             );
-            $attributes['tnw_subscr_trial_start_date'] = $this->scopeConfig->getValue(
+            $attributes[Attribute::SUBSCRIPTION_TRIAL_START_DATE] = $this->scopeConfig->getValue(
                 'tnw_subscriptions_product/trial/trial_start_date_type',
-                \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
+                ScopeInterface::SCOPE_STORE,
                 $storeId
             );
-            $attributes['tnw_subscr_trial_length_unit'] = $this->scopeConfig->getValue(
+            $attributes[Attribute::SUBSCRIPTION_TRIAL_LENGTH_UNIT] = $this->scopeConfig->getValue(
                 'tnw_subscriptions_product/trial/trial_length_unit',
-                \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
+                ScopeInterface::SCOPE_STORE,
                 $storeId
             );
-            $attributes['tnw_subscr_trial_length'] = $this->scopeConfig->getValue(
+            $attributes[Attribute::SUBSCRIPTION_TRIAL_LENGTH] = $this->scopeConfig->getValue(
                 'tnw_subscriptions_product/trial/trial_length',
-                \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
+                ScopeInterface::SCOPE_STORE,
                 $storeId
             );
-            $attributes['tnw_subscr_trial_can_skip'] = 0;
+            $attributes[Attribute::SUBSCRIPTION_TRIAL_CAN_SKIP] = 0;
         }
 
         return $attributes;
