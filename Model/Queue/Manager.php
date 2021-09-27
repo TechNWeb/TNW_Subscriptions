@@ -492,6 +492,15 @@ class Manager
             }
         }
         if ($quote->getAllVisibleItems()) {
+            if ($quote->getIsVirtual() && $quote->getShippingAddress() && !$quote->getShippingAddress()->getId()) {
+                $quote->removeAddress($quote->getShippingAddress()->getId());
+            }
+            if ($quote->getShippingAddress()->getCustomerAddressId()) {
+                $quote->getShippingAddress()->setCustomerAddressId(null);
+            }
+            if ($quote->getBillingAddress()->getCustomerAddressId()) {
+                $quote->getBillingAddress()->setCustomerAddressId(null);
+            }
             $this->cartRepository->save($quote);
             $quote->getPayment()->setAdditionalInformation('is_rebill', true);
             try {
