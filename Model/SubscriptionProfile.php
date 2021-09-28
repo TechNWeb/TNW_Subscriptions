@@ -15,8 +15,6 @@ use Magento\Framework\Model\AbstractExtensibleModel;
 use Magento\Framework\Model\Context as ModelContext;
 use Magento\Framework\Registry;
 use Magento\Store\Api\WebsiteRepositoryInterface;
-use TNW\Subscriptions\Api\Data\ProductBillingFrequencyInterface;
-use TNW\Subscriptions\Api\Data\ProductSubscriptionProfileInterface;
 use TNW\Subscriptions\Api\Data\SubscriptionProfileAddressInterface;
 use TNW\Subscriptions\Api\Data\SubscriptionProfileInterface;
 use TNW\Subscriptions\Api\Data\SubscriptionProfilePaymentInterface;
@@ -29,9 +27,9 @@ use TNW\Subscriptions\Model\Source\ProfileStatus;
 use Magento\Framework\Serialize\Serializer\Json;
 use Magento\Framework\Api\SearchCriteriaBuilder;
 use TNW\Subscriptions\Api\ProductBillingFrequencyRepositoryInterface;
-use TNW\Subscriptions\Model\SubscriptionProfile\ProfitCalculator;
 use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfileProfit;
 use TNW\Subscriptions\Api\SubscriptionProfileRepositoryInterface;
+use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfileOrder;
 
 /**
  * Subscription Profile model.
@@ -147,16 +145,6 @@ class SubscriptionProfile extends AbstractExtensibleModel implements Subscriptio
     private $billingFrequencyRepository;
 
     /**
-     * @var SearchCriteriaBuilder
-     */
-    private $searchCriteriaBuilder;
-
-    /**
-     * @var ProductBillingFrequencyRepositoryInterface
-     */
-    private $frequencyRepository;
-
-    /**
      * @var SubscriptionProfileProfit
      */
     private $profileProfit;
@@ -165,6 +153,11 @@ class SubscriptionProfile extends AbstractExtensibleModel implements Subscriptio
      * @var SubscriptionProfileRepositoryInterface
      */
     private $profileRepository;
+
+    /**
+     * @var SubscriptionProfileOrder
+     */
+    private $subscriptionProfileOrder;
 
     /**
      * SubscriptionProfile constructor.
@@ -192,10 +185,9 @@ class SubscriptionProfile extends AbstractExtensibleModel implements Subscriptio
         UserContextInterface $userContext,
         Json $serializer,
         BillingFrequencyRepository $billingFrequencyRepository,
-        SearchCriteriaBuilder $searchCriteriaBuilder,
-        ProductBillingFrequencyRepositoryInterface $frequencyRepository,
         SubscriptionProfileProfit $profileProfit,
         SubscriptionProfileRepositoryInterface $profileRepository,
+        SubscriptionProfileOrder $subscriptionProfileOrder,
         Resource $resource = null,
         AbstractDb $resourceCollection = null,
         array $data = []
@@ -217,10 +209,9 @@ class SubscriptionProfile extends AbstractExtensibleModel implements Subscriptio
         $this->userContext = $userContext;
         $this->serializer = $serializer;
         $this->billingFrequencyRepository = $billingFrequencyRepository;
-        $this->searchCriteriaBuilder = $searchCriteriaBuilder;
-        $this->frequencyRepository = $frequencyRepository;
         $this->profileProfit = $profileProfit;
         $this->profileRepository = $profileRepository;
+        $this->subscriptionProfileOrder = $subscriptionProfileOrder;
     }
 
     /**
@@ -984,7 +975,6 @@ class SubscriptionProfile extends AbstractExtensibleModel implements Subscriptio
      * @param $subscriptionProfile
      * @param $profileIds
      * @return array
-     * @throws NoSuchEntityException
      */
     public function getRecurringInstallmentData($profileOrders, $subscriptionProfile, $profileIds)
     {
@@ -992,37 +982,55 @@ class SubscriptionProfile extends AbstractExtensibleModel implements Subscriptio
         $staticTotalBillingCycles = $subscriptionProfile->getStaticTotalBillingCycles();
         $result['firstRecurring'] = $subscriptionProfile->getStartDate();
         $startDate = $subscriptionProfile->getCreatedAt();
-        $billingFrequency = $this->billingFrequencyRepository->getById(
-            $subscriptionProfile->getBillingFrequencyId()
-        );
-        $result['finalRecurring'] = $this->getFinalDate(
-            $billingFrequency,
-            $staticTotalBillingCycles,
-            $startDate,
-            $subscriptionProfile->getTerm(),
-        );
+        try {
+            $billingFrequency = $this->billingFrequencyRepository->getById(
+                $subscriptionProfile->getBillingFrequencyId()
+            );
+            $result['finalRecurring'] = $this->getFinalDate(
+                $billingFrequency,
+                $staticTotalBillingCycles,
+                $startDate,
+                $subscriptionProfile->getTerm(),
+            );
+        } catch (NoSuchEntityException $e) {
+            $this->_logger->error($e->getMessage());
+        }
         $result['expirationCc'] = $this->getCcEcpirationStatus($subscriptionProfile, $result['finalRecurring']);
 
         $result['staticTotalBillingCycles'] = $subscriptionProfile->getStaticTotalBillingCycles();
 
-        if (strpos($profileIds, ',') !== false) {
-            $profileIds = explode(',', $profileIds);
-            $paid = [];
-            foreach ($profileIds as $profileId) {
-                $profile = $this->profileRepository->getById($profileId);
-                $static = $profile->getStaticTotalBillingCycles();
-                if (isset($static)) {
-                    $paid[] = implode(",", [count($profileOrders), $static]);
-                } else {
-                    $paid[] = implode(",", [count($profileOrders)]);
+        $profileStatus = $subscriptionProfile->getStatus();
+
+        if (
+            $profileStatus !== ProfileStatus::STATUS_COMPLETE
+            || $profileStatus !== ProfileStatus::STATUS_CANCELED
+        ) {
+            if (strpos($profileIds, ',') !== false) {
+                $profileIds = explode(',', $profileIds);
+                $paid = [];
+                foreach ($profileIds as $profileId) {
+                    try {
+                        $profile = $this->profileRepository->getById($profileId);
+                        $profileOrders = $this->subscriptionProfileOrder->getProfileOrdersByProfileId(
+                            $profile->getId()
+                        );
+                        $static = $profile->getStaticTotalBillingCycles();
+                        if (isset($static)) {
+                            $paid[] = implode(",", [count($profileOrders), $static]);
+                        } else {
+                            $paid[] = implode(",", [count($profileOrders)]);
+                        }
+                    } catch (NoSuchEntityException $e) {
+                        $this->_logger->error($e->getMessage());
+                    }
                 }
-            }
-            $result['paidRecurring'] = $this->serializer->serialize($paid);
-        } else {
-            if (isset($staticTotalBillingCycles)) {
-                $result['paidRecurring'] = implode(",", [count($profileOrders), $staticTotalBillingCycles]);
+                $result['paidRecurring'] = $this->serializer->serialize($paid);
             } else {
-                $result['paidRecurring'] = implode(",", [count($profileOrders)]);
+                if (isset($staticTotalBillingCycles)) {
+                    $result['paidRecurring'] = implode(",", [count($profileOrders), $staticTotalBillingCycles]);
+                } else {
+                    $result['paidRecurring'] = implode(",", [count($profileOrders)]);
+                }
             }
         }
 

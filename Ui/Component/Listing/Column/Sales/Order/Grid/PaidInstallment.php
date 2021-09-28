@@ -16,6 +16,8 @@ use Magento\Framework\Serialize\SerializerInterface;
  */
 class PaidInstallment extends Column
 {
+    const INFINITY_SIGN = '∞';
+
     /**
      * @var SerializerInterface
      */
@@ -56,25 +58,21 @@ class PaidInstallment extends Column
                         $result = [];
                         foreach ($options as $option) {
                             $option = explode(',', $option);
-                            if ($this->isNotInfiniteSubscription(
-                                $options,
-                                isset($item['subscription_final_installment_date'])
-                            )) {
+                            if ($this->isNotInfiniteSubscription($option)
+                            ) {
                                 $result[] = $option[0] . ' / ' . $option[1];
                             } else {
-                                $result[] = $option[0] . ' / ∞';
+                                $result[] = $option[0] . ' / ' . self::INFINITY_SIGN;
                             }
                         }
                         $item['subscription_paid_installment'] = implode(', ', $result);
                     } else {
                         $options = explode(',', $item['subscription_paid_installment']);
-                        if ($this->isNotInfiniteSubscription(
-                            $options,
-                            isset($item['subscription_final_installment_date'])
-                        )) {
+                        if ($this->isNotInfiniteSubscription($options)
+                        ) {
                             $item['subscription_paid_installment'] = $options[0] . ' / ' . $options[1];
                         } else {
-                            $item['subscription_paid_installment'] = $options[0] . ' / ∞';
+                            $item['subscription_paid_installment'] = $options[0] . ' / ' . self::INFINITY_SIGN;
                         }
                     }
                 }
@@ -89,12 +87,11 @@ class PaidInstallment extends Column
      * @param $final
      * @return bool
      */
-    public function isNotInfiniteSubscription($options, $final)
+    public function isNotInfiniteSubscription($options)
     {
         return count($options) > 1
             && $options[1] != 0
             && $options[1] != -1
-            && $options[1] != 1
-            && $final;
+            && $options[1] != 1;
     }
 }
