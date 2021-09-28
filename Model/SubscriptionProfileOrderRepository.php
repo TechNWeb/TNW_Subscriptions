@@ -26,6 +26,9 @@ use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfileOrder\CollectionFac
     as SubscriptionProfileOrderCollectionFactory;
 use TNW\Subscriptions\Api\SubscriptionProfileRepositoryInterface;
 use Magento\Framework\Stdlib\DateTime\TimezoneInterface;
+use Magento\Sales\Model\AdminOrder\EmailSender;
+use Magento\Sales\Api\OrderRepositoryInterface;
+use Magento\Sales\Api\Data\OrderExtensionFactory;
 
 /**
  * Class SubscriptionProfileOrderRepository - repository object for subscription profile orders
@@ -93,6 +96,21 @@ class SubscriptionProfileOrderRepository implements SubscriptionProfileOrderRepo
     private $subscriptionProfile;
 
     /**
+     * @var EmailSender
+     */
+    private $emailSender;
+
+    /**
+     * @var OrderRepositoryInterface
+     */
+    private $orderRepository;
+
+    /**
+     * @var OrderExtensionFactory
+     */
+    private $extensionFactory;
+
+    /**
      * @param ResourceSubscriptionProfileOrder $resource
      * @param SubscriptionProfileOrderFactory $subscriptionProfileOrderFactory
      * @param SubscriptionProfileOrderInterfaceFactory $dataSubscriptionProfileOrderFactory
@@ -118,6 +136,9 @@ class SubscriptionProfileOrderRepository implements SubscriptionProfileOrderRepo
         SubscriptionProfileRepositoryInterface $profileRepository,
         TimezoneInterface $timezone,
         SubscriptionProfile $subscriptionProfile,
+        EmailSender $emailSender,
+        OrderRepositoryInterface $orderRepository,
+        OrderExtensionFactory $extensionFactory,
         LoggerInterface $logger = null
     ) {
         $this->resource = $resource;
@@ -131,6 +152,9 @@ class SubscriptionProfileOrderRepository implements SubscriptionProfileOrderRepo
         $this->profileRepository = $profileRepository;
         $this->timezone = $timezone;
         $this->subscriptionProfile = $subscriptionProfile;
+        $this->emailSender = $emailSender;
+        $this->orderRepository = $orderRepository;
+        $this->extensionFactory = $extensionFactory;
         $objectManager = ObjectManager::getInstance();
         $this->logger = $logger ?: $objectManager->get(LoggerInterface::class);
     }
@@ -182,6 +206,7 @@ class SubscriptionProfileOrderRepository implements SubscriptionProfileOrderRepo
                         $installRecurringData['expirationCc'],
                         $installRecurringData['staticTotalBillingCycles']
                     );
+                    $this->emailSender->send($this->orderRepository->get($magentoOrderId));
                 }
             } catch (Exception $e) {
                 $this->logger->warning($e->getMessage());

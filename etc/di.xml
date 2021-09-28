@@ -1470,4 +1470,16 @@
         <plugin name="tnw_total_profit_plugin"
                 type="TNW\Subscriptions\Plugin\TotalProfitPlugin"/>
     </type>
+    <type name="Magento\Sales\Block\Order\Email\Items">
+        <plugin name="tnw_email_items_after"
+                type="TNW\Subscriptions\Plugin\Block\Order\Email\EmailItemsAfter"/>
+    </type>
+    <type name="Magento\Sales\Model\Order\Email\Sender\OrderSender">
+        <plugin name="tnw_prevent_send_email"
+                type="TNW\Subscriptions\Plugin\Model\Order\Email\Sender\PreventSendOrderPlacedEmail"/>
+    </type>
+    <type name="Magento\Sales\Api\OrderRepositoryInterface">
+        <plugin name="tnw_add_installment_extension_attributes"
+                type="TNW\Subscriptions\Plugin\OrderRepositoryPlugin"/>
+    </type>
 </config>

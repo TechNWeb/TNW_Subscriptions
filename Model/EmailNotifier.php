@@ -564,6 +564,28 @@ class EmailNotifier
     }
 
     /**
+     * @param $subscriptionProfile
+     * @return array
+     */
+    public function getCustomerVars($subscriptionProfile)
+    {
+        $customer = $subscriptionProfile->getCustomer();
+        $order = $this->profileManager->getLastProfileOrder($subscriptionProfile);
+        $storeId = $order->getStoreId();
+        if (!$storeId && $customer) {
+            $storeId = $customer->getStoreId();
+        }
+        if (!$customer) {
+            $customerEmail = $order->getCustomerEmail();
+            $customerName = $order->getCustomerName();
+        } else {
+            $customerEmail = $customer->getEmail();
+            $customerName = $customer->getFirstname() . ' ' . $customer->getLastName();
+        }
+        return [$storeId, $customerEmail, $customerName];
+    }
+
+    /**
      * @param $configPath
      * @return bool
      */
@@ -580,26 +602,6 @@ class EmailNotifier
             return false;
         }
         return true;
-    }
-
-    /**
-     * @param $subscriptionProfile
-     * @return array
-     */
-    private function getCustomerVars($subscriptionProfile)
-    {
-        $customer = $subscriptionProfile->getCustomer();
-        if (!$customer) {
-            $order = $this->profileManager->getLastProfileOrder($subscriptionProfile);
-            $storeId = $order->getStoreId();
-            $customerEmail = $order->getCustomerEmail();
-            $customerName = $order->getCustomerName();
-        } else {
-            $storeId = $customer->getStoreId();
-            $customerEmail = $customer->getEmail();
-            $customerName = $customer->getFirstname() . ' ' . $customer->getLastName();
-        }
-        return [$storeId, $customerEmail, $customerName];
     }
 
     /**

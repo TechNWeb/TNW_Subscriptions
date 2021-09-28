@@ -16,13 +16,13 @@ define([
                 billingFrequencyId = registry.get('index = billingfrequency_form_data_source').get('data.id'),
                 self = this;
 
-            selections[itemsType] = data[itemsType];
+            selections[itemsType] = data[itemsType]
 
             if (!selections[itemsType].length) {
-                selections[itemsType] = false;
+                selections[itemsType] = false
             }
 
-            _.extend(selections, { billing_frequency_id : billingFrequencyId }, data.params || {});
+            _.extend(selections, { billing_frequency_id : billingFrequencyId }, data.params || {})
 
             $.post(
                 {
@@ -39,7 +39,7 @@ define([
                      * @param {String} msg
                      */
                     insertMethod: function (msg) {
-                        $('#anchor-content > .page-main-actions').after(msg);
+                        $('#anchor-content > .page-main-actions').after(msg)
                     }
                 });
             }).fail(function () {
@@ -47,7 +47,8 @@ define([
                     content: $t('Something went wrong.')
                 })
             }).always(function () {
-                self.source.reload();
+                self.source.reload()
+                self.selections().deselectAll()
             });
         }
     })

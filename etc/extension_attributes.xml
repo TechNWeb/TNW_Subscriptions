@@ -28,6 +28,11 @@
                 <field>base_subscription_initial_fee_refunded</field>
             </join>
         </attribute>
+        <attribute code="subscription_paid_installment" type="string" />
+        <attribute code="subscription_final_installment_date" type="string" />
+        <attribute code="subscription_first_installment_date" type="string" />
+        <attribute code="subscription_expire_cc" type="string" />
+        <attribute code="subscription_total_static_billing_cycles" type="string" />
     </extension_attributes>
     <extension_attributes for="Magento\Sales\Api\Data\OrderItemInterface">
         <attribute code="subs_initial_fees" type="TNW\Subscriptions\Api\Data\OrderItemExtensionAttributesInterface">

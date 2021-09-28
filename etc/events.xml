@@ -84,4 +84,7 @@
     <event name="catalog_product_attribute_update_before">
         <observer name="tnw_update_attributes" instance="TNW\Subscriptions\Observer\UpdateExtensionAttributesForMassAction"/>
     </event>
+    <event name="email_order_set_template_vars_before">
+        <observer name="tnw_subscription_installment_data" instance="TNW\Subscriptions\Observer\SetInstallmentVars"/>
+    </event>
 </config>

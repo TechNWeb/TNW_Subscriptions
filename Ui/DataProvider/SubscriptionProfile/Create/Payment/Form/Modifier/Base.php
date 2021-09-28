@@ -444,9 +444,12 @@ class Base implements PaymentModifierInterface
      */
     protected function isPaymentMethodAvailable()
     {
+        $storeId = $this->getProfile()
+            ? $this->getProfile()->getCustomer()->getStoreId()
+            : $this->session->getStoreId();
         return $this->config->isPaymentMethodAvailableForSubscription(
             $this->getPaymentCode(),
-            $this->session->getStoreId()
+            $storeId
         );
     }
 
