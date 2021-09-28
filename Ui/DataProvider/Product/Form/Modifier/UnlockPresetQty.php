@@ -11,6 +11,7 @@ use Magento\ConfigurableProduct\Model\Product\Type\Configurable;
 use Magento\Framework\Stdlib\ArrayManager;
 use TNW\Subscriptions\Model\Config;
 use TNW\Subscriptions\Model\Product\Attribute;
+use Magento\Framework\App\RequestInterface;
 
 /**
  * Data provider for "Unlock preset qty" switcher.
@@ -37,15 +38,26 @@ class UnlockPresetQty extends AbstractModifier
     private $locator;
 
     /**
+     * @var RequestInterface
+     */
+    private $request;
+
+    /**
      * @param Config $config
      * @param ArrayManager $arrayManager
      * @param LocatorInterface $locator
+     * @param RequestInterface $request
      */
-    public function __construct(Config $config, ArrayManager $arrayManager, LocatorInterface $locator)
-    {
+    public function __construct(
+        Config $config,
+        ArrayManager $arrayManager,
+        LocatorInterface $locator,
+        RequestInterface $request
+    ) {
         $this->config = $config;
         $this->arrayManager = $arrayManager;
         $this->locator = $locator;
+        $this->request = $request;
     }
 
     /**
@@ -56,6 +68,7 @@ class UnlockPresetQty extends AbstractModifier
      */
     public function modifyMeta(array $meta)
     {
+        $value = $this->config->getUnlockPresetQtyStatus($this->request->getParam('store'));
         if ($this->locator->getProduct()->getTypeId() === Configurable::TYPE_CODE) {
             $config = [
                 'disabled' => true,
@@ -63,7 +76,6 @@ class UnlockPresetQty extends AbstractModifier
                 'notice' =>  __('Preset qty can be unlocked and set in child product only'),
             ];
         } else {
-            $value = $this->config->getUnlockPresetQtyStatus();
             $config = [
                 'default' => $value ? '1' : '0',
                 'notice' => __('Product quantity is preset for the customer and cannot be changed.'),

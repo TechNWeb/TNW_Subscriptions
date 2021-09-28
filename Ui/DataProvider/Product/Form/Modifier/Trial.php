@@ -10,6 +10,8 @@ use Magento\Framework\Stdlib\ArrayManager;
 use Magento\Store\Model\StoreManagerInterface;
 use TNW\Subscriptions\Model\Context;
 use TNW\Subscriptions\Model\Product\Attribute;
+use Magento\Framework\App\RequestInterface;
+use TNW\Subscriptions\Model\Config;
 
 /**
  * Customize Trial field
@@ -27,19 +29,35 @@ class Trial extends BaseModifier
     protected $locator;
 
     /**
+     * @var Config
+     */
+    private $config;
+
+    /**
+     * @var RequestInterface
+     */
+    private $request;
+
+    /**
      * @param LocatorInterface $locator
      * @param ArrayManager $arrayManager
      * @param StoreManagerInterface $storeManager
      * @param Context $context
+     * @param RequestInterface $request
+     * @param Config $config
      */
     public function __construct(
         LocatorInterface $locator,
         ArrayManager $arrayManager,
         StoreManagerInterface $storeManager,
-        Context $context
+        Context $context,
+        RequestInterface $request,
+        Config $config
     ) {
         $this->locator = $locator;
         $this->arrayManager = $arrayManager;
+        $this->config = $config;
+        $this->request = $request;
         parent::__construct($storeManager, $context);
     }
 
@@ -63,6 +81,7 @@ class Trial extends BaseModifier
         $trialLengthContainerPath = $this->arrayManager->slicePath($trialLengthPath, 0, -2);
         $trialLengthUnitContainerPath = $this->arrayManager->slicePath($trialLengthUnitPath, 0, -2);
 
+        $trialLengthValue = $this->config->getTrialLength($this->request->getParam('store'));
         $meta = $this->arrayManager->merge(
             $trialLengthPath . static::META_CONFIG_PATH,
             $meta,
@@ -77,6 +96,7 @@ class Trial extends BaseModifier
                 'additionalClasses' => 'admin__field-small long_note',
                 'component' => 'TNW_Subscriptions/js/components/tnw-subscr-trial-length',
                 'elementTmpl' => 'TNW_Subscriptions/form/element/render-binding-input',
+                'default' => $trialLengthValue,
             ]
         );
         $meta = $this->arrayManager->merge(
@@ -94,6 +114,8 @@ class Trial extends BaseModifier
                 ],
             ]
         );
+
+        $trialLengthUnitPathValue = $this->config->getTrialLengthUnit($this->request->getParam('store'));
         $meta = $this->arrayManager->merge(
             $trialLengthUnitPath . self::META_CONFIG_PATH,
             $meta,
@@ -104,6 +126,7 @@ class Trial extends BaseModifier
                         'disabled' => false
                     ]
                 ],
+                'default' => $trialLengthUnitPathValue,
             ]
         );
         // Move trial unit to trial length container to make them inline
@@ -115,6 +138,7 @@ class Trial extends BaseModifier
         // Remove trial unit container
         $meta = $this->arrayManager->remove($trialLengthUnitContainerPath, $meta);
 
+        $trialPriceValue = $this->config->getTrialPrice($this->request->getParam('store'));
         $meta = $this->arrayManager->merge(
             $this->arrayManager->findPath(
                 Attribute::SUBSCRIPTION_TRIAL_PRICE,
@@ -140,9 +164,11 @@ class Trial extends BaseModifier
                 'component' => 'TNW_Subscriptions/js/components/tnw-subscr-price',
                 'componentType' => 'field',
                 'priceFormat' => $this->getPriceFormatData(),
+                'default' => $trialPriceValue,
             ]
         );
 
+        $trialStartDateValue = $this->config->getTrialStartDateType($this->request->getParam('store'));
         $meta = $this->arrayManager->merge(
             $this->arrayManager->findPath(
                 Attribute::SUBSCRIPTION_TRIAL_START_DATE,
@@ -162,9 +188,11 @@ class Trial extends BaseModifier
                 ],
                 'component' => 'TNW_Subscriptions/js/components/tnw-subscr-start-date',
                 'componentType' => 'field',
+                'default' => $trialStartDateValue,
             ]
         );
 
+        $startDateValue = $this->config->getStartDateType($this->request->getParam('store'));
         $meta = $this->arrayManager->merge(
             $this->arrayManager->findPath(
                 Attribute::SUBSCRIPTION_START_DATE,
@@ -182,6 +210,7 @@ class Trial extends BaseModifier
                 ],
                 'component' => 'TNW_Subscriptions/js/components/tnw-subscr-start-date',
                 'componentType' => 'field',
+                'default' => $startDateValue,
             ]
         );
 
@@ -204,6 +233,20 @@ class Trial extends BaseModifier
                 ],
                 'component' => 'Magento_Ui/js/form/element/single-checkbox',
                 'componentType' => 'field',
+            ]
+        );
+
+        $trialStatusValue = $this->config->getTrialStatus($this->request->getParam('store'));
+        $meta = $this->arrayManager->merge(
+            $this->arrayManager->findPath(
+                Attribute::SUBSCRIPTION_TRIAL_STATUS,
+                $meta,
+                null,
+                'children'
+            ) . static::META_CONFIG_PATH,
+            $meta,
+            [
+                'default' => $trialStatusValue ? '1' : '0',
             ]
         );
 
