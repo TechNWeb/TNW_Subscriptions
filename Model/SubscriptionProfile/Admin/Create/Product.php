@@ -317,6 +317,7 @@ class Product extends Create
                 ? (float) $this->getPresetCustomPrice()
                 : (float) $currentProductCustomPrice;
             if ($this->config->getPricingStrategy() == PriceStrategy::GRANDFATHERED_PRICE
+                || $this->config->getPricingStrategy() == PriceStrategy::STATIC_PRICE
                 && isset($this->data['custom_price'])
             ) {
                 if (isset($this->data['use_preset_qty'])
@@ -358,7 +359,12 @@ class Product extends Create
             ) {
                 $currentProductCustomPrice = $customProductPrice;
             }
-            $customProductPrice = min($currentProductCustomPrice, $customProductPrice);
+            if (in_array(
+                $this->config->getPricingStrategy(),
+                [PriceStrategy::GRANDFATHERED_PRICE, PriceStrategy::DYNAMIC_PRICE]
+            )) {
+                $customProductPrice = min($currentProductCustomPrice, $customProductPrice);
+            }
 
             $data = [
                 'custom_price' => sprintf('%F', $customProductPrice),
