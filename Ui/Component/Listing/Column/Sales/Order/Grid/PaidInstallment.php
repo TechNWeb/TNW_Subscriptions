@@ -58,8 +58,7 @@ class PaidInstallment extends Column
                         $result = [];
                         foreach ($options as $option) {
                             $option = explode(',', $option);
-                            if ($this->isNotInfiniteSubscription($option)
-                            ) {
+                            if ($this->isNotInfiniteSubscription($option)) {
                                 $result[] = $option[0] . ' / ' . $option[1];
                             } else {
                                 $result[] = $option[0] . ' / ' . self::INFINITY_SIGN;

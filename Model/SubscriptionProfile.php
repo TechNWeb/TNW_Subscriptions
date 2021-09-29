@@ -25,8 +25,6 @@ use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfile\Payment\Collection
 use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfile\Payment\CollectionFactory as PaymentCollectionFactory;
 use TNW\Subscriptions\Model\Source\ProfileStatus;
 use Magento\Framework\Serialize\Serializer\Json;
-use Magento\Framework\Api\SearchCriteriaBuilder;
-use TNW\Subscriptions\Api\ProductBillingFrequencyRepositoryInterface;
 use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfileProfit;
 use TNW\Subscriptions\Api\SubscriptionProfileRepositoryInterface;
 use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfileOrder;
@@ -169,6 +167,12 @@ class SubscriptionProfile extends AbstractExtensibleModel implements Subscriptio
      * @param WebsiteRepositoryInterface $websiteRepository
      * @param SubscriptionProfileAttributeRepositoryInterface $metadataService
      * @param PaymentCollectionFactory $paymentCollectionFactory
+     * @param UserContextInterface $userContext
+     * @param Json $serializer
+     * @param BillingFrequencyRepository $billingFrequencyRepository
+     * @param SubscriptionProfileProfit $profileProfit
+     * @param SubscriptionProfileRepositoryInterface $profileRepository
+     * @param SubscriptionProfileOrder $subscriptionProfileOrder
      * @param Resource|null $resource
      * @param AbstractDb|null $resourceCollection
      * @param array $data
