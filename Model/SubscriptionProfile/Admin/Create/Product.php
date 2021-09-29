@@ -316,8 +316,8 @@ class Product extends Create
             $customProductPrice = $this->getRebillProcessing()
                 ? (float) $this->getPresetCustomPrice()
                 : (float) $currentProductCustomPrice;
-            if ($this->config->getPricingStrategy() == PriceStrategy::GRANDFATHERED_PRICE
-                || $this->config->getPricingStrategy() == PriceStrategy::STATIC_PRICE
+            if (($this->config->getPricingStrategy() == PriceStrategy::GRANDFATHERED_PRICE
+                || $this->config->getPricingStrategy() == PriceStrategy::STATIC_PRICE)
                 && isset($this->data['custom_price'])
             ) {
                 if (isset($this->data['use_preset_qty'])
@@ -332,7 +332,7 @@ class Product extends Create
                     $customProductPrice = (float) $this->data['custom_price'];
                 }
             }
-            if ($this->config->getPricingStrategy() != PriceStrategy::GRANDFATHERED_PRICE
+            if ($this->config->getPricingStrategy() == PriceStrategy::DYNAMIC_PRICE
                 && isset($productData['admin_modification'])
                 && $productData['admin_modification']
             ) {
