@@ -11,6 +11,10 @@ use Magento\Framework\Controller\Result\Redirect;
 use TNW\Subscriptions\Model\Queue;
 use TNW\Subscriptions\Model\Queue\Manager;
 use TNW\Subscriptions\Cron\ProfileProcessor;
+use TNW\Subscriptions\Model\Source\ProfileStatus;
+use TNW\Subscriptions\Model\SubscriptionProfileRepository;
+use TNW\Subscriptions\Exception\ProfileProductsUnsaleableException;
+use Magento\Payment\Gateway\Command\CommandException;
 
 /**
  * Class Process- controller
@@ -32,18 +36,34 @@ class Process extends Action
     private $profileProcessor;
 
     /**
+     * @var SubscriptionProfileRepository
+     */
+    private $profileRepository;
+
+    /**
+     * @var ProfileStatus
+     */
+    private $profileStatus;
+
+    /**
      * Process constructor.
      * @param Context $context
      * @param Manager $queueManager
      * @param ProfileProcessor $profileProcessor
+     * @param SubscriptionProfileRepository $profileRepository
+     * @param ProfileStatus $profileStatus
      */
     public function __construct(
         Context $context,
         Manager $queueManager,
-        ProfileProcessor $profileProcessor
+        ProfileProcessor $profileProcessor,
+        SubscriptionProfileRepository $profileRepository,
+        ProfileStatus $profileStatus
     ) {
         $this->queueManager = $queueManager;
         $this->profileProcessor = $profileProcessor;
+        $this->profileRepository = $profileRepository;
+        $this->profileStatus = $profileStatus;
 
         parent::__construct($context);
     }
@@ -55,7 +75,7 @@ class Process extends Action
     {
         /** @var int $queueId */
         $queueId = (int)$this->getRequest()->getParam('id', 0);
-
+        $acceptableStatuses = [ProfileStatus::STATUS_ACTIVE];
         if ($queueId) {
             try {
                 $collection = $this->queueManager->getBaseCollection();
@@ -63,7 +83,8 @@ class Process extends Action
                 $collection->addFieldToFilter(Queue::ID, $queueId);
                 /** @var Queue $item */
                 $item = $collection->getFirstItem();
-                if ($item && $item->getId()) {
+                $profile = $this->profileRepository->getById($item->getSubscriptionProfileId());
+                if ($item && $item->getId() && in_array($profile->getStatus(), $acceptableStatuses)) {
                     $this->queueManager->makeRunning($queueId);
                     try {
                         $this->queueManager->placeOrderByGroupQueue([$item]);
@@ -75,10 +96,10 @@ class Process extends Action
                             'Record was successfully processed.',
                             'backend'
                         );
-                    } catch (\TNW\Subscriptions\Exception\ProfileProductsUnsaleableException $e) {
+                    } catch (ProfileProductsUnsaleableException $e) {
                         $this->messageManager->addErrorMessage($e->getMessage());
                         $this->queueManager->makeCompleted($item->getId(), $e->getMessage());
-                    } catch (\Magento\Payment\Gateway\Command\CommandException $e) {
+                    } catch (CommandException $e) {
                         $this->queueManager->makeError($item->getId(), $e->getMessage(), true);
                         $this->messageManager->addErrorMessage(
                             $e->getMessage(),
@@ -92,12 +113,23 @@ class Process extends Action
                         );
                     }
                 } else {
+                    $statusLabel = '';
+                    foreach ($this->profileStatus->getAllOptions() as $option) {
+                        if ($option['value'] == $profile->getStatus()) {
+                            $statusLabel = $option['label'];
+                        }
+                    }
+                    $this->queueManager->makeError(
+                        $item->getId(),
+                        'Profile is ' . $statusLabel . ', skipping...'
+                    );
                     $this->messageManager->addErrorMessage('Record can not be processed.', 'backend');
                 }
             } catch (\Exception $e) {
                 $this->messageManager->addErrorMessage($e->getMessage(), 'backend');
             }
         }
+
 
         return $this->resultRedirectFactory
             ->create()
