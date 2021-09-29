@@ -67,8 +67,7 @@ class PaidInstallment extends Column
                         $item['subscription_paid_installment'] = implode(', ', $result);
                     } else {
                         $options = explode(',', $item['subscription_paid_installment']);
-                        if ($this->isNotInfiniteSubscription($options)
-                        ) {
+                        if ($this->isNotInfiniteSubscription($options)) {
                             $item['subscription_paid_installment'] = $options[0] . ' / ' . $options[1];
                         } else {
                             $item['subscription_paid_installment'] = $options[0] . ' / ' . self::INFINITY_SIGN;
