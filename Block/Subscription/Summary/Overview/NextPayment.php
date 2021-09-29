@@ -52,6 +52,7 @@ class NextPayment extends Template
      * @param Context $context
      * @param QuoteCollection $quoteCollection
      * @param PriceHelper $priceHelper
+     * @param PriceCurrencyInterface $priceFormatter
      * @param array $data
      */
     public function __construct(

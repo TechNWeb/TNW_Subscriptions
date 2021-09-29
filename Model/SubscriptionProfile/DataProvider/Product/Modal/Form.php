@@ -548,10 +548,15 @@ class Form extends AbstractDataProvider
         return $this->getCurrentCurrency()->getCurrencySymbol();
     }
 
+    /**
+     * @param $id
+     * @return string
+     * @throws NoSuchEntityException
+     */
     protected function getCurrencySymbolForProfile($id)
     {
         $profile = $this->profileRepository->getById($id);
-        $currency = $this->currentCurrency = $this->formContext->getCurrencyFactory()
+        $currency = $this->formContext->getCurrencyFactory()
             ->create()
             ->load($profile->getProfileCurrencyCode());
 

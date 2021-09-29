@@ -89,6 +89,7 @@ class Payment implements ModifierInterface
      * @param TotalsConverter $totalsConverter
      * @param FormContext $formContext
      * @param Context $context
+     * @param PriceCurrencyInterface $priceCurrency
      */
     public function __construct(
         ScopeConfigInterface $scopeConfig,
@@ -134,7 +135,7 @@ class Payment implements ModifierInterface
                 );
             } else {
                 $data['new_subscription'][$key] =
-                    $this->context->getPriceCurrency()->convertAndFormat((float)$total['value'], false);
+                    $this->context->getPriceCurrency()->convertAndFormat((float) $total['value'], false);
             }
         }
         return $data;

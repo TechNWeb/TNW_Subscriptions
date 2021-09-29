@@ -52,6 +52,7 @@ class DescriptionCreator
      * @param BillingFrequencyUnitType $frequencyUnitType
      * @param TrialLengthUnitType $trialLengthUnitType
      * @param SerializerInterface $serializer
+     * @param PriceCurrencyInterface $priceCurrency
      */
     public function __construct(
         Context $context,
@@ -394,6 +395,7 @@ class DescriptionCreator
      * Return formatted price
      *
      * @param $price
+     * @param null $storeId
      * @return float
      */
     public function formatPrice($price, $storeId = null)
