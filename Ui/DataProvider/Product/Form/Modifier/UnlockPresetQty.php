@@ -11,7 +11,6 @@ use Magento\ConfigurableProduct\Model\Product\Type\Configurable;
 use Magento\Framework\Stdlib\ArrayManager;
 use TNW\Subscriptions\Model\Config;
 use TNW\Subscriptions\Model\Product\Attribute;
-use Magento\Framework\App\RequestInterface;
 
 /**
  * Data provider for "Unlock preset qty" switcher.
@@ -38,26 +37,18 @@ class UnlockPresetQty extends AbstractModifier
     private $locator;
 
     /**
-     * @var RequestInterface
-     */
-    private $request;
-
-    /**
      * @param Config $config
      * @param ArrayManager $arrayManager
      * @param LocatorInterface $locator
-     * @param RequestInterface $request
      */
     public function __construct(
         Config $config,
         ArrayManager $arrayManager,
-        LocatorInterface $locator,
-        RequestInterface $request
+        LocatorInterface $locator
     ) {
         $this->config = $config;
         $this->arrayManager = $arrayManager;
         $this->locator = $locator;
-        $this->request = $request;
     }
 
     /**
@@ -68,7 +59,7 @@ class UnlockPresetQty extends AbstractModifier
      */
     public function modifyMeta(array $meta)
     {
-        $value = $this->config->getUnlockPresetQtyStatus($this->request->getParam('store'));
+        $value = $this->config->getUnlockPresetQtyStatus();
         if ($this->locator->getProduct()->getTypeId() === Configurable::TYPE_CODE) {
             $config = [
                 'disabled' => true,

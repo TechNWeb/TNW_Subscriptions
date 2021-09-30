@@ -9,7 +9,6 @@ use Magento\Catalog\Ui\DataProvider\Product\Form\Modifier\AbstractModifier;
 use Magento\Framework\Stdlib\ArrayManager;
 use TNW\Subscriptions\Model\Config;
 use TNW\Subscriptions\Model\Product\Attribute;
-use Magento\Framework\App\RequestInterface;
 
 /**
  * Data provider for "Infinite subscriptions" switcher.
@@ -31,20 +30,13 @@ class InfiniteSubscriptions extends AbstractModifier
     private $arrayManager;
 
     /**
-     * @var RequestInterface
-     */
-    private $request;
-
-    /**
      * @param Config $config
      * @param ArrayManager $arrayManager
-     * @param RequestInterface $request
      */
-    public function __construct(Config $config, ArrayManager $arrayManager, RequestInterface $request)
+    public function __construct(Config $config, ArrayManager $arrayManager)
     {
         $this->config = $config;
         $this->arrayManager = $arrayManager;
-        $this->request = $request;
     }
 
     /**
@@ -55,7 +47,7 @@ class InfiniteSubscriptions extends AbstractModifier
      */
     public function modifyMeta(array $meta)
     {
-        $value = $this->config->getIsInfiniteSubscriptions($this->request->getParam('store'));
+        $value = $this->config->getIsInfiniteSubscriptions();
         $meta = $this->arrayManager->merge(
             $this->arrayManager->findPath(
                 Attribute::SUBSCRIPTION_INFINITE_SUBSCRIPTIONS,

@@ -10,7 +10,6 @@ use Magento\Framework\Stdlib\ArrayManager;
 use Magento\Store\Model\StoreManagerInterface;
 use TNW\Subscriptions\Model\Context;
 use TNW\Subscriptions\Model\Product\Attribute;
-use Magento\Framework\App\RequestInterface;
 use TNW\Subscriptions\Model\Config;
 
 /**
@@ -34,30 +33,22 @@ class Discount extends BaseModifier
     private $config;
 
     /**
-     * @var RequestInterface
-     */
-    private $request;
-
-    /**
      * @param LocatorInterface $locator
      * @param ArrayManager $arrayManager
      * @param StoreManagerInterface $storeManager
      * @param Context $context
      * @param Config $config
-     * @param RequestInterface $request
      */
     public function __construct(
         LocatorInterface $locator,
         ArrayManager $arrayManager,
         StoreManagerInterface $storeManager,
         Context $context,
-        Config $config,
-        RequestInterface $request
+        Config $config
     ) {
         $this->locator = $locator;
         $this->arrayManager = $arrayManager;
         $this->config = $config;
-        $this->request = $request;
         parent::__construct($storeManager, $context);
     }
 
@@ -81,7 +72,7 @@ class Discount extends BaseModifier
 
         $discountAmountContainerPath = $this->arrayManager->slicePath($discountAmountPath, 0, -2);
         $discountTypeContainerPath = $this->arrayManager->slicePath($discountTypePath, 0, -2);
-        $discountAmountValue = $this->config->getDiscountAmount($this->request->getParam('store'));
+        $discountAmountValue = $this->config->getDiscountAmount();
 
         $meta = $this->arrayManager->merge(
             $discountAmountPath . static::META_CONFIG_PATH,
@@ -117,7 +108,7 @@ class Discount extends BaseModifier
             ]
         );
 
-        $discountTypeValue = $this->config->getDiscountType($this->request->getParam('store'));
+        $discountTypeValue = $this->config->getDiscountType();
         $meta = $this->arrayManager->merge(
             $discountTypePath . self::META_CONFIG_PATH,
             $meta,

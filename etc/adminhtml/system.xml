@@ -416,41 +416,35 @@
 
             <resource>TNW_Subscriptions::config_product</resource>
 
-            <group id="general" translate="label" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="0">
+            <group id="general" translate="label" sortOrder="10" showInDefault="1">
                 <label>General</label>
                 <comment>Default catalog setting for all products. Used when creating or importing new products into the catalog.</comment>
-                <field id="purchase_type" translate="label" type="select" sortOrder="10" showInDefault="1"
-                       showInWebsite="1" showInStore="0">
+                <field id="purchase_type" translate="label" type="select" sortOrder="10" showInDefault="1">
                     <label>Available For</label>
                     <source_model>TNW\Subscriptions\Model\Config\Source\PurchaseType</source_model>
                     <comment>Captures if products should be available for a one-time pruchase, as a subscription, or both.</comment>
                 </field>
-                <field id="start_date_type" translate="label" type="select" sortOrder="20" showInDefault="1"
-                       showInWebsite="1">
+                <field id="start_date_type" translate="label" type="select" sortOrder="20" showInDefault="1">
                     <label>Start Date</label>
                     <source_model>TNW\Subscriptions\Model\Config\Source\StartDateType</source_model>
                     <comment>Default catalog setting to determine when a subscription should start.</comment>
                 </field>
-                <field id="lock_product_price_status" translate="label" type="select" sortOrder="30" showInDefault="1"
-                       showInWebsite="1">
+                <field id="lock_product_price_status" translate="label" type="select" sortOrder="30" showInDefault="1">
                     <label>Lock Product Price</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                     <comment>Default catalog setting to determine if the recurring price will always match the product price.</comment>
                 </field>
-                <field id="unlock_preset_qty_status" translate="label comment" type="select" sortOrder="30" showInDefault="1"
-                       showInWebsite="1">
+                <field id="unlock_preset_qty_status" translate="label comment" type="select" sortOrder="30" showInDefault="1">
                     <label>Unlock Preset Quantity</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                     <comment>Product quantity will be preset for a customer and a customer cannot change product quantity when buying products.</comment>
                 </field>
-                <field id="savings_calculation" translate="label comment" type="select" sortOrder="40" showInDefault="1"
-                       showInWebsite="1">
+                <field id="savings_calculation" translate="label comment" type="select" sortOrder="40" showInDefault="1">
                     <label>Savings Calculation</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                     <comment>Product is a service which customers use on daily basis.</comment>
                 </field>
-                <field id="infinite_subscriptions" translate="label comment" type="select" sortOrder="50" showInDefault="1"
-                       showInWebsite="1">
+                <field id="infinite_subscriptions" translate="label comment" type="select" sortOrder="50" showInDefault="1">
                     <label>Infinite Subscriptions</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                     <comment>Products in the catalog will be configured to renew automatically until the customer cancels the subscription.</comment>
@@ -460,14 +454,12 @@
             <group id="discount" translate="label" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="0">
                 <label>Discount</label>
                 <comment>Default catalog setting for the product to determine if products purchased as part of subscription should be offered with a flat discount.</comment>
-                <field id="offer_flat_discount_status" translate="label" type="select" sortOrder="10" showInDefault="1"
-                       showInWebsite="1">
+                <field id="offer_flat_discount_status" translate="label" type="select" sortOrder="10" showInDefault="1">
                     <label>Offer Flat Discount</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                     <comment>Automatically offer a flat discount when subscribing to products.</comment>
                 </field>
-                <field id="discount_amount" translate="label" type="addon_text" sortOrder="20" showInDefault="1"
-                       showInWebsite="1">
+                <field id="discount_amount" translate="label" type="addon_text" sortOrder="20" showInDefault="1">
                     <label>Discount Amount</label>
                     <frontend_class>validate-number</frontend_class>
                     <frontend_model>TNW\Subscriptions\Block\System\Config\Form\Field\Extension\Currency</frontend_model>
@@ -476,8 +468,7 @@
                         <field id="offer_flat_discount_status">1</field>
                     </depends>
                 </field>
-                <field id="discount_type" translate="label" type="select" sortOrder="30" showInDefault="1"
-                       showInWebsite="1">
+                <field id="discount_type" translate="label" type="select" sortOrder="30" showInDefault="1">
                     <label>Discount Type</label>
                     <source_model>TNW\Subscriptions\Model\Config\Source\DiscountType</source_model>
                     <comment>Type of the flat discount.</comment>
@@ -490,13 +481,11 @@
             <group id="trial" translate="label" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="0">
                 <label>Trial</label>
                 <comment>Default catalog setting for all products to determine if they should all have a trial period.</comment>
-                <field id="trial_status" translate="label" type="select" sortOrder="10" showInDefault="1"
-                       showInWebsite="1">
+                <field id="trial_status" translate="label" type="select" sortOrder="10" showInDefault="1">
                     <label>Is Trial Offered</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                 </field>
-                <field id="trial_length" translate="label" type="text" sortOrder="20" showInDefault="1"
-                       showInWebsite="1">
+                <field id="trial_length" translate="label" type="text" sortOrder="20" showInDefault="1">
                     <label>Trial Length</label>
                     <frontend_class>validate-number</frontend_class>
                     <comment>The trial length is in days by default. The unit may change from days to weeks and so on. See 'Trial Length Unit' configuration value.</comment>
@@ -504,8 +493,7 @@
                         <field id="trial_status">1</field>
                     </depends>
                 </field>
-                <field id="trial_length_unit" translate="label" type="select" sortOrder="30" showInDefault="1"
-                       showInWebsite="1">
+                <field id="trial_length_unit" translate="label" type="select" sortOrder="30" showInDefault="1">
                     <label>Trial Length Unit</label>
                     <source_model>TNW\Subscriptions\Model\Config\Source\TrialLengthUnitType</source_model>
                     <comment>The unit for 'Trial Length' configuration value.</comment>
@@ -513,8 +501,7 @@
                         <field id="trial_status">1</field>
                     </depends>
                 </field>
-                <field id="trial_price" translate="label" type="addon_text" sortOrder="40" showInDefault="1"
-                       showInWebsite="1">
+                <field id="trial_price" translate="label" type="addon_text" sortOrder="40" showInDefault="1">
                     <label>Trial Price</label>
                     <frontend_class>validate-number</frontend_class>
                     <frontend_model>TNW\Subscriptions\Block\System\Config\Form\Field\Extension\Currency</frontend_model>
@@ -523,21 +510,18 @@
                         <field id="trial_status">1</field>
                     </depends>
                 </field>
-                <field id="trial_start_date_type" translate="label" type="select" sortOrder="50" showInDefault="1"
-                       showInWebsite="1">
+                <field id="trial_start_date_type" translate="label" type="select" sortOrder="50" showInDefault="1">
                     <label>Trial Start Date</label>
                     <source_model>TNW\Subscriptions\Model\Config\Source\StartDateType</source_model>
                     <depends>
                         <field id="trial_status">1</field>
                     </depends>
                 </field>
-                <field id="trial_static_auth" translate="label" type="select" sortOrder="10" showInDefault="1"
-                       showInStore="1">
+                <field id="trial_static_auth" translate="label" type="select" sortOrder="10" showInDefault="1">
                     <label>Is Trial Static Pre-Auth</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                 </field>
-                <field id="trial_static_auth_amount" translate="label" type="addon_text" sortOrder="40" showInDefault="1"
-                       showInStore="1">
+                <field id="trial_static_auth_amount" translate="label" type="addon_text" sortOrder="40" showInDefault="1">
                     <label>Trial Pre-Auth Amount</label>
                     <frontend_class>validate-number</frontend_class>
                     <frontend_model>TNW\Subscriptions\Block\System\Config\Form\Field\Extension\Currency</frontend_model>
