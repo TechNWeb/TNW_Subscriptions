@@ -326,13 +326,23 @@ class CreateProfile extends BaseCreate
         $this->setSubQuotes($this->getSession()->getSubQuotes());
         $this->productModifier->setData($productData);
         $product = $this->productModifier->getProduct();
+        $product->getTypeInstance()->setStoreFilter(
+            $this->getSession()->getStore(),
+            $product
+        );
         $quote = $this->getSubQuote();
-        $websiteCode = $this->storeManager->getWebsite()->getCode();
-        $stockId = $this->stock->execute(SalesChannelInterface::TYPE_WEBSITE, $websiteCode)->getStockId();
-        if ($this->getProductSalableQty->execute($product->getSku(), $stockId)
-            < ($productData['subscribe_qty'] ?? $productData['qty'])
-        ) {
-            $this->messageManager->addErrorMessage(__('The requested qty is not available'));
+        if ($product->getExtensionAttributes()->getStockItem()->getManageStock() === '1') {
+            $websiteCode = $this->getSession()->getStore()->getWebsite()->getCode();
+            try {
+                $stockId = $this->stock->execute(SalesChannelInterface::TYPE_WEBSITE, $websiteCode)->getStockId();
+                if ($this->getProductSalableQty->execute($product->getSku(), $stockId)
+                    < ($productData['subscribe_qty'] ?? $productData['qty'])
+                ) {
+                    $this->messageManager->addErrorMessage(__('The requested qty is not available'));
+                }
+            } catch (\Exception $e) {
+                $this->messageManager->addErrorMessage($e->getMessage());
+            }
         }
         if (isset($productData['coupon_code'])) {
             $quote->setCouponCode($productData['coupon_code']);

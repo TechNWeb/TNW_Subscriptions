@@ -99,7 +99,7 @@ class Validator
     }
 
     /**
-     * @param $quote
+     * @param \Magento\Quote\Model\Quote $quote
      * @param $result
      * @return array
      * @throws \Magento\Framework\Exception\LocalizedException
@@ -107,8 +107,13 @@ class Validator
     private function reCalculateQuote($quote, $result)
     {
         if ($this->isBillingFrequencyExists($quote)) {
+            $store = $quote->getStore();
             /** @var Item $item */
             foreach ($quote->getAllVisibleItems() as $item) {
+                $item->getProduct()->getTypeInstance()->setStoreFilter(
+                    $store,
+                    $item->getProduct()
+                );
                 if ($this->productCanBeSubscribed($item)) {
                     $currentRequest = $this->getCurrentBuyRequest($item);
                     list($newRequest, $productsData) = $this->getNewBuyRequest($item, $currentRequest);
