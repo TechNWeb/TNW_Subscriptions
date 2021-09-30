@@ -985,7 +985,7 @@ class SubscriptionProfile extends AbstractExtensibleModel implements Subscriptio
         $result = [];
         $staticTotalBillingCycles = $subscriptionProfile->getStaticTotalBillingCycles();
         $result['firstRecurring'] = $subscriptionProfile->getStartDate();
-        $startDate = $subscriptionProfile->getCreatedAt();
+        $startDate = $subscriptionProfile->getStartDate();
         try {
             $billingFrequency = $this->billingFrequencyRepository->getById(
                 $subscriptionProfile->getBillingFrequencyId()
