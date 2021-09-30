@@ -185,7 +185,8 @@ class SubscriptionProfileOrderRepository implements SubscriptionProfileOrderRepo
                 );
                 $installRecurringData = $this->subscriptionProfile->getRecurringInstallmentData(
                     $profileOrders,
-                    $subscriptionProfile
+                    $subscriptionProfile,
+                    $profileIds
                 );
 
                 if ($profileIds) {

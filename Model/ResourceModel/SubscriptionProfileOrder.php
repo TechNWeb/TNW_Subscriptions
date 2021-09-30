@@ -152,17 +152,23 @@ class SubscriptionProfileOrder extends AbstractDb
     /**
      * @param $profileId
      * @return array
-     * @throws LocalizedException
      */
     public function getProfileOrdersByProfileId($profileId)
     {
         $connection = $this->getConnection();
+        $result = [];
+        try {
+            $select = $connection->select()
+                ->from($this->getMainTable(), ['*'])
+                ->order($this->getIdFieldName() . ' DESC')
+                ->where('subscription_profile_id = ?', $profileId)
+                ->where('magento_order_id IS NOT NULL');
 
-        $select = $connection->select()
-            ->from($this->getMainTable(), ['*'])
-            ->order($this->getIdFieldName() . ' DESC')
-            ->where('subscription_profile_id = ?', $profileId);
-        return $connection->fetchAll($select);
+            $result = $connection->fetchAll($select);
+        } catch (LocalizedException $e) {
+            $this->_logger->error($e->getMessage());
+        }
+        return $result;
     }
 
     /**
