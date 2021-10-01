@@ -75,7 +75,7 @@ class Process extends Action
     {
         /** @var int $queueId */
         $queueId = (int)$this->getRequest()->getParam('id', 0);
-        $acceptableStatuses = [ProfileStatus::STATUS_ACTIVE];
+        $acceptableStatuses = [ProfileStatus::STATUS_ACTIVE, ProfileStatus::STATUS_PAST_DUE];
         if ($queueId) {
             try {
                 $collection = $this->queueManager->getBaseCollection();
