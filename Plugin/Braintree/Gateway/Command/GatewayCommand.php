@@ -51,7 +51,17 @@ class GatewayCommand
                 if ($currentCommandResponse instanceof Error) {
                     /** @var Transaction $transaction */
                     $transaction = $currentCommandResponse->__get('transaction');
-                    $errorCode = $transaction->__get('processorResponseCode');
+                    if (!$transaction) {
+                        //Could not use the cascade call due to object types returned
+                        $errors = $currentCommandResponse->__get('errors');
+                        $errors = $errors->__get('errors');
+                        $errors = $errors->__get('nested');
+                        $errors = $errors['transaction'];
+                        $errors = $errors->__get('errors')[0];
+                        $errorCode = $errors->__get('code');
+                    } else {
+                        $errorCode = $transaction->__get('processorResponseCode');
+                    }
                 }
             }
             if (isset($errorCode)) {
