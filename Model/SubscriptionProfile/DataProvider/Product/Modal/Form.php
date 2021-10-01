@@ -556,11 +556,11 @@ class Form extends AbstractDataProvider
     protected function getCurrencySymbolForProfile($id)
     {
         $profile = $this->profileRepository->getById($id);
-        $currency = $this->formContext->getCurrencyFactory()
+        $this->currentCurrency = $this->formContext->getCurrencyFactory()
             ->create()
             ->load($profile->getProfileCurrencyCode());
 
-        return $currency->getCurrencySymbol();
+        return $this->currentCurrency->getCurrencySymbol();
     }
 
     /**
