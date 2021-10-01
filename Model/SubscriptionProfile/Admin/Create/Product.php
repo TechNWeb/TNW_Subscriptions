@@ -318,8 +318,8 @@ class Product extends Create
             $customProductPrice = $this->getRebillProcessing()
                 ? (float) $this->getPresetCustomPrice()
                 : (float) $currentProductCustomPrice;
-            if (
-                $this->config->getPricingStrategy() == PriceStrategy::GRANDFATHERED_PRICE
+            if (($this->config->getPricingStrategy() == PriceStrategy::GRANDFATHERED_PRICE
+                || $this->config->getPricingStrategy() == PriceStrategy::STATIC_PRICE)
                 && isset($this->data['custom_price'])
             ) {
                 if (
@@ -336,7 +336,7 @@ class Product extends Create
                 }
             }
             if (
-                $this->config->getPricingStrategy() != PriceStrategy::GRANDFATHERED_PRICE
+                $this->config->getPricingStrategy() == PriceStrategy::DYNAMIC_PRICE
                 && isset($productData['admin_modification'])
                 && $productData['admin_modification']
             ) {
@@ -358,9 +358,19 @@ class Product extends Create
                 ['non_unique']
                 ['current_preset_qty_price'];
             }
-            $customProductPrice = min($currentProductCustomPrice, $customProductPrice);
-
-
+            if (isset($productData['modify_profile'])
+                && isset($productData['admin_modification'])
+                && $productData['modify_profile']
+                && $productData['admin_modification']
+            ) {
+                $currentProductCustomPrice = $customProductPrice;
+            }
+            if (in_array(
+                $this->config->getPricingStrategy(),
+                [PriceStrategy::GRANDFATHERED_PRICE, PriceStrategy::DYNAMIC_PRICE]
+            )) {
+                $customProductPrice = min($currentProductCustomPrice, $customProductPrice);
+            }
             $data = [
                 'custom_price' => sprintf('%F', $customProductPrice),
                 static::SUBSCRIPTION_BUY_REQUEST_PARAM_NAME => [

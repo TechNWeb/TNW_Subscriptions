@@ -24,6 +24,11 @@ class PriceStrategy extends AbstractSource
     const DYNAMIC_PRICE = 1;
 
     /**
+     * Static Price
+     */
+    const STATIC_PRICE = 2;
+
+    /**
      * @return array
      */
     public function getAllOptions()
@@ -32,11 +37,15 @@ class PriceStrategy extends AbstractSource
         $optionList = [
             [
                 'value' => self::GRANDFATHERED_PRICE,
-                'label' => __('Grandfathered Price'),
+                'label' => __('Dynamic (best value)'),
             ],
             [
                 'value' => self::DYNAMIC_PRICE,
-                'label' => __('Dynamic (for any quantity changes)'),
+                'label' => __('Dynamic (full)'),
+            ],
+            [
+                'value' => self::STATIC_PRICE,
+                'label' => __('Grandfathered'),
             ],
         ];
 
