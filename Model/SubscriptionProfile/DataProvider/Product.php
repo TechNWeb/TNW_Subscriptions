@@ -229,6 +229,7 @@ class Product extends AbstractDataProvider
             $fullSubscriptionData[Create::NON_UNIQUE]['totalPrice'] = $subQuote->getSubtotal() + $initialFee;
             $fullSubscriptionData[Create::NON_UNIQUE]['initialFee'] = $initialFee > 0;
             $fullSubscriptionData[Create::NON_UNIQUE]['isVirtual'] = $subQuote->isVirtual();
+            $fullSubscriptionData[Create::NON_UNIQUE]['storeId'] = $item->getStoreId();
 
             $items[] = [
                 'title' => __('Subscription') . ' #' . ($counter++),

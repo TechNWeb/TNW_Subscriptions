@@ -147,7 +147,7 @@
                 </item>
             </argument>
         </column>
-        <column name="grand_total" class="Magento\Sales\Ui\Component\Listing\Column\Price">
+        <column name="grand_total" class="TNW\Subscriptions\Ui\Component\Listing\Column\Price">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="filter" xsi:type="string">textRange</item>
