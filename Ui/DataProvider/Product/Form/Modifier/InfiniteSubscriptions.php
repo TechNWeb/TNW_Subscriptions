@@ -58,6 +58,7 @@ class InfiniteSubscriptions extends AbstractModifier
             $meta,
             [
                 'notice' =>  __('Subscription to this product will be infinite.'),
+                'default' => $value ? '1' : '0',
             ]
         );
 
