@@ -358,13 +358,6 @@ class Product extends Create
                 ['non_unique']
                 ['current_preset_qty_price'];
             }
-            if (isset($productData['modify_profile'])
-                && isset($productData['admin_modification'])
-                && $productData['modify_profile']
-                && $productData['admin_modification']
-            ) {
-                $currentProductCustomPrice = $customProductPrice;
-            }
             if (in_array(
                 $this->config->getPricingStrategy(),
                 [PriceStrategy::GRANDFATHERED_PRICE, PriceStrategy::DYNAMIC_PRICE]
