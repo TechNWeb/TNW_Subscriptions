@@ -104,15 +104,21 @@ class DescriptionCreator
     public function getDescription(array $subscriptionData)
     {
         $isTrial = $subscriptionData[CreateProfile::UNIQUE]['is_trial'];
+        $storeId = array_key_exists(
+            'storeId',
+            $subscriptionData[CreateProfile::NON_UNIQUE]
+        )
+            ? $subscriptionData[CreateProfile::NON_UNIQUE]['storeId']
+            : null;
         $formattedTotalPrice = ($subscriptionData[CreateProfile::NON_UNIQUE]['totalPrice'])
-            ? $this->formatPrice(
-                $subscriptionData[CreateProfile::NON_UNIQUE]['totalPrice'],
-                $subscriptionData[CreateProfile::NON_UNIQUE]['storeId']
-            )
-            : __('Free');
+                ? $this->formatPrice(
+                    $subscriptionData[CreateProfile::NON_UNIQUE]['totalPrice'],
+                    $storeId
+                )
+                : __('Free');
         $formattedPrice = $this->formatPrice(
             $subscriptionData[CreateProfile::NON_UNIQUE]['price'],
-            $subscriptionData[CreateProfile::NON_UNIQUE]['storeId']
+            $storeId
         );
         $frequencyUnit = isset($subscriptionData[CreateProfile::UNIQUE]['billing_frequency']) ?
             $this->getFrequencyWithUnit($subscriptionData[CreateProfile::UNIQUE]['billing_frequency']) : false;
