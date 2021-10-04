@@ -944,6 +944,7 @@ class SubscriptionProfile extends AbstractExtensibleModel implements Subscriptio
      * Get is expiration date is now
      *
      * @param $subscriptionProfile
+     * @param $finalDate
      * @return int|null
      */
     public function getCcEcpirationStatus($subscriptionProfile, $finalDate)
@@ -980,7 +981,7 @@ class SubscriptionProfile extends AbstractExtensibleModel implements Subscriptio
     public function getFinalDate($billingFrequency, $totalBillingCycles, $startDate, $term)
     {
         $result = null;
-        if ($term == '1') {
+        if ($term == '1' && $totalBillingCycles < 2) {
             return null;
         }
         $total = $billingFrequency->getFrequency() * ($totalBillingCycles - 1);
@@ -1012,60 +1013,112 @@ class SubscriptionProfile extends AbstractExtensibleModel implements Subscriptio
     public function getRecurringInstallmentData($profileOrders, $subscriptionProfile, $profileIds)
     {
         $result = [];
+        $profileStatus = $subscriptionProfile->getStatus();
         $staticTotalBillingCycles = $subscriptionProfile->getStaticTotalBillingCycles();
+        if (
+            $profileStatus !== ProfileStatus::STATUS_COMPLETE
+            || $profileStatus !== ProfileStatus::STATUS_CANCELED
+        ) {
+            if (strpos($profileIds, ',') !== false) {
+                $result = $this->getInstallmentDataForMultipleProfiles($profileIds);
+            } else {
+                $result = $this->getInstallmentDataForSingleProfile(
+                    $profileOrders,
+                    $subscriptionProfile,
+                    $staticTotalBillingCycles
+                );
+            }
+            $result['staticTotalBillingCycles'] = $staticTotalBillingCycles;
+        }
+
+        return $result;
+    }
+
+    /**
+     * @param $profileIds
+     * @return array
+     */
+    private function getInstallmentDataForMultipleProfiles($profileIds)
+    {
+        $profileIds = explode(',', $profileIds);
+        $paid = [];
+        $firstRecurring = [];
+        $finalRecurring = [];
+        $ccExpiration = [];
+        foreach ($profileIds as $profileId) {
+            try {
+                $profile = $this->profileRepository->getById($profileId);
+                $profileOrders = $this->subscriptionProfileOrder->getProfileOrdersByProfileId(
+                    $profileId
+                );
+            } catch (NoSuchEntityException $e) {
+                $profile = null;
+                $profileOrders = null;
+                $this->_logger->error($e->getMessage());
+            }
+            $static = $profile->getStaticTotalBillingCycles();
+            if (isset($static)) {
+                $paid[] = implode(",", [count($profileOrders), $static]);
+            } else {
+                $paid[] = implode(",", [count($profileOrders)]);
+            }
+            $firstRecurring[] = $profile->getStartDate();
+            try {
+                $billingFrequency = $this->billingFrequencyRepository->getById(
+                    $profile->getBillingFrequencyId()
+                );
+            } catch (NoSuchEntityException $e) {
+                $billingFrequency = null;
+                $this->_logger->error($e->getMessage());
+            }
+            $ccFinal = $this->getFinalDate(
+                $billingFrequency,
+                $static,
+                $profile->getStartDate(),
+                $profile->getTerm()
+            );
+            $ccExpiration[] = $this->getCcEcpirationStatus($profile, $ccFinal);
+            $finalRecurring[] = $ccFinal;
+        }
+
+        return [
+            'paidRecurring' => $this->serializer->serialize($paid),
+            'firstRecurring' => $this->serializer->serialize($firstRecurring),
+            'finalRecurring' => $this->serializer->serialize($finalRecurring),
+            'expirationCc' => $this->serializer->serialize($ccExpiration),
+        ];
+    }
+
+    /**
+     * @param $profileOrders
+     * @param $subscriptionProfile
+     * @param $staticTotalBillingCycles
+     * @return array
+     */
+    private function getInstallmentDataForSingleProfile($profileOrders, $subscriptionProfile, $staticTotalBillingCycles)
+    {
+        if ($staticTotalBillingCycles !== null && $staticTotalBillingCycles > 1) {
+            $result['paidRecurring'] = implode(",", [count($profileOrders), $staticTotalBillingCycles]);
+        } else {
+            $result['paidRecurring'] = implode(",", [count($profileOrders)]);
+        }
         $result['firstRecurring'] = $subscriptionProfile->getStartDate();
         $startDate = $subscriptionProfile->getStartDate();
         try {
             $billingFrequency = $this->billingFrequencyRepository->getById(
                 $subscriptionProfile->getBillingFrequencyId()
             );
-            $result['finalRecurring'] = $this->getFinalDate(
-                $billingFrequency,
-                $staticTotalBillingCycles,
-                $startDate,
-                $subscriptionProfile->getTerm(),
-            );
         } catch (NoSuchEntityException $e) {
+            $billingFrequency = null;
             $this->_logger->error($e->getMessage());
         }
+        $result['finalRecurring'] = $this->getFinalDate(
+            $billingFrequency,
+            $staticTotalBillingCycles,
+            $startDate,
+            $subscriptionProfile->getTerm(),
+        );
         $result['expirationCc'] = $this->getCcEcpirationStatus($subscriptionProfile, $result['finalRecurring']);
-
-        $result['staticTotalBillingCycles'] = $subscriptionProfile->getStaticTotalBillingCycles();
-
-        $profileStatus = $subscriptionProfile->getStatus();
-
-        if (
-            $profileStatus !== ProfileStatus::STATUS_COMPLETE
-            || $profileStatus !== ProfileStatus::STATUS_CANCELED
-        ) {
-            if (strpos($profileIds, ',') !== false) {
-                $profileIds = explode(',', $profileIds);
-                $paid = [];
-                foreach ($profileIds as $profileId) {
-                    try {
-                        $profile = $this->profileRepository->getById($profileId);
-                        $profileOrders = $this->subscriptionProfileOrder->getProfileOrdersByProfileId(
-                            $profile->getId()
-                        );
-                        $static = $profile->getStaticTotalBillingCycles();
-                        if (isset($static)) {
-                            $paid[] = implode(",", [count($profileOrders), $static]);
-                        } else {
-                            $paid[] = implode(",", [count($profileOrders)]);
-                        }
-                    } catch (NoSuchEntityException $e) {
-                        $this->_logger->error($e->getMessage());
-                    }
-                }
-                $result['paidRecurring'] = $this->serializer->serialize($paid);
-            } else {
-                if (isset($staticTotalBillingCycles)) {
-                    $result['paidRecurring'] = implode(",", [count($profileOrders), $staticTotalBillingCycles]);
-                } else {
-                    $result['paidRecurring'] = implode(",", [count($profileOrders)]);
-                }
-            }
-        }
 
         return $result;
     }
