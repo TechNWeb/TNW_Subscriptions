@@ -104,16 +104,26 @@ class DescriptionCreator
     public function getDescription(array $subscriptionData)
     {
         $isTrial = $subscriptionData[CreateProfile::UNIQUE]['is_trial'];
-        $formattedTotalPrice = ($subscriptionData[CreateProfile::NON_UNIQUE]['totalPrice'])
-            ? $this->formatPrice(
-                $subscriptionData[CreateProfile::NON_UNIQUE]['totalPrice'],
+        if (array_key_exists(
+            'storeId',
+            $subscriptionData[CreateProfile::NON_UNIQUE]
+        )) {
+            $formattedTotalPrice = ($subscriptionData[CreateProfile::NON_UNIQUE]['totalPrice'])
+                ? $this->formatPrice(
+                    $subscriptionData[CreateProfile::NON_UNIQUE]['totalPrice'],
+                    $subscriptionData[CreateProfile::NON_UNIQUE]['storeId']
+                )
+                : __('Free');
+            $formattedPrice = $this->formatPrice(
+                $subscriptionData[CreateProfile::NON_UNIQUE]['price'],
                 $subscriptionData[CreateProfile::NON_UNIQUE]['storeId']
-            )
-            : __('Free');
-        $formattedPrice = $this->formatPrice(
-            $subscriptionData[CreateProfile::NON_UNIQUE]['price'],
-            $subscriptionData[CreateProfile::NON_UNIQUE]['storeId']
-        );
+            );
+        } else {
+            $formattedTotalPrice = ($subscriptionData[CreateProfile::NON_UNIQUE]['totalPrice'])
+                ? $this->formatPrice($subscriptionData[CreateProfile::NON_UNIQUE]['totalPrice'])
+                : __('Free');
+            $formattedPrice = $this->formatPrice($subscriptionData[CreateProfile::NON_UNIQUE]['price']);
+        }
         $frequencyUnit = isset($subscriptionData[CreateProfile::UNIQUE]['billing_frequency']) ?
             $this->getFrequencyWithUnit($subscriptionData[CreateProfile::UNIQUE]['billing_frequency']) : false;
         $startDate = isset($subscriptionData[CreateProfile::UNIQUE]['start_on']) ?
