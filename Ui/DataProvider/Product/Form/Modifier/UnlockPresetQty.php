@@ -41,8 +41,11 @@ class UnlockPresetQty extends AbstractModifier
      * @param ArrayManager $arrayManager
      * @param LocatorInterface $locator
      */
-    public function __construct(Config $config, ArrayManager $arrayManager, LocatorInterface $locator)
-    {
+    public function __construct(
+        Config $config,
+        ArrayManager $arrayManager,
+        LocatorInterface $locator
+    ) {
         $this->config = $config;
         $this->arrayManager = $arrayManager;
         $this->locator = $locator;
@@ -56,6 +59,7 @@ class UnlockPresetQty extends AbstractModifier
      */
     public function modifyMeta(array $meta)
     {
+        $value = $this->config->getUnlockPresetQtyStatus();
         if ($this->locator->getProduct()->getTypeId() === Configurable::TYPE_CODE) {
             $config = [
                 'disabled' => true,
@@ -63,7 +67,6 @@ class UnlockPresetQty extends AbstractModifier
                 'notice' =>  __('Preset qty can be unlocked and set in child product only'),
             ];
         } else {
-            $value = $this->config->getUnlockPresetQtyStatus();
             $config = [
                 'default' => $value ? '1' : '0',
                 'notice' => __('Product quantity is preset for the customer and cannot be changed.'),

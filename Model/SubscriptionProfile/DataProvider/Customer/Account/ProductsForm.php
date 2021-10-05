@@ -17,6 +17,7 @@ use Magento\InventorySalesApi\Api\GetProductSalableQtyInterface;
 use Magento\Ui\Component\Container as UiContainer;
 use Magento\Ui\Component\Form as UiForm;
 use Magento\Ui\DataProvider\Modifier\PoolInterface;
+use TNW\Subscriptions\Api\SubscriptionProfileRepositoryInterface;
 use TNW\Subscriptions\Model\Config;
 use TNW\Subscriptions\Model\Config\Source\PriceStrategy;
 use TNW\Subscriptions\Model\Context;
@@ -78,6 +79,7 @@ class ProductsForm extends SummaryProductsForm
      * @param GetProductSalableQtyInterface $productSalableQty
      * @param StockResolverInterface $stockResolver
      * @param StoreManagerInterface $storeManager
+     * @param SubscriptionProfileRepositoryInterface $profileRepository
      * @param string $scope
      * @param array $meta
      * @param array $data
@@ -99,6 +101,7 @@ class ProductsForm extends SummaryProductsForm
         GetProductSalableQtyInterface $productSalableQty,
         StockResolverInterface $stockResolver,
         StoreManagerInterface $storeManager,
+        SubscriptionProfileRepositoryInterface $profileRepository,
         $scope = '',
         array $meta = [],
         array $data = []
@@ -120,6 +123,7 @@ class ProductsForm extends SummaryProductsForm
             $urlBuilder,
             $productTypeResolver,
             $stockRegistry,
+            $profileRepository,
             $scope,
             $meta,
             $data

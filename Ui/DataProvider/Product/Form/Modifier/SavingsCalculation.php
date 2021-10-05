@@ -58,6 +58,7 @@ class SavingsCalculation extends AbstractModifier
             $meta,
             [
                 'notice' =>  __('Product is a service and customers use it on daily basis.'),
+                'default' => $value ? '1' : '0',
             ]
         );
 

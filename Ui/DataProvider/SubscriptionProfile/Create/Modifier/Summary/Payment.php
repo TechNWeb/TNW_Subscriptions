@@ -16,6 +16,7 @@ use Magento\Ui\DataProvider\Modifier\ModifierInterface;
 use TNW\Subscriptions\Model\Context;
 use TNW\Subscriptions\Model\QuoteSessionInterface;
 use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Modal\Context as FormContext;
+use Magento\Framework\Pricing\PriceCurrencyInterface;
 
 /**
  * Class Payment - modifier
@@ -73,6 +74,11 @@ class Payment implements ModifierInterface
     private $context;
 
     /**
+     * @var PriceCurrencyInterface
+     */
+    private $priceCurrency;
+
+    /**
      * Payment constructor.
      * @param ScopeConfigInterface $scopeConfig
      * @param Config $paymentConfig
@@ -83,6 +89,7 @@ class Payment implements ModifierInterface
      * @param TotalsConverter $totalsConverter
      * @param FormContext $formContext
      * @param Context $context
+     * @param PriceCurrencyInterface $priceCurrency
      */
     public function __construct(
         ScopeConfigInterface $scopeConfig,
@@ -93,7 +100,8 @@ class Payment implements ModifierInterface
         DataObjectHelper $dataObjectHelper,
         TotalsConverter $totalsConverter,
         FormContext $formContext,
-        Context $context
+        Context $context,
+        PriceCurrencyInterface $priceCurrency
     ) {
         $this->paymentConfig = $paymentConfig;
         $this->session = $session;
@@ -104,6 +112,7 @@ class Payment implements ModifierInterface
         $this->dataObjectHelper = $dataObjectHelper;
         $this->totalsConverter = $totalsConverter;
         $this->context = $context;
+        $this->priceCurrency = $priceCurrency;
     }
 
     /**
@@ -116,8 +125,18 @@ class Payment implements ModifierInterface
         $data['new_subscription'][OrderPaymentInterface::CC_TYPE] = $this->getCardTypeLabel();
         $data['new_subscription'][OrderPaymentInterface::CC_LAST_4] = $this->getCardLastFour();
         foreach ($this->getTotalsData() as $key => $total) {
-            $data['new_subscription'][$key] =
-                $this->context->getPriceCurrency()->convertAndFormat((float)$total['value'], false);
+            $storeId = $this->subQuote->getStoreId();
+            if ($storeId) {
+                $storeCurrency = $this->priceCurrency->getCurrency($storeId);
+                $data['new_subscription'][$key] = $storeCurrency->format(
+                    $total['value'],
+                    false,
+                    false
+                );
+            } else {
+                $data['new_subscription'][$key] =
+                    $this->context->getPriceCurrency()->convertAndFormat((float) $total['value'], false);
+            }
         }
         return $data;
     }

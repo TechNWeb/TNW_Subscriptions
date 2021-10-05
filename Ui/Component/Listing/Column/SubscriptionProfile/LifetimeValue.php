@@ -32,16 +32,16 @@ class LifetimeValue extends Column
     /**
      * @param ContextInterface $context
      * @param UiComponentFactory $uiComponentFactory
-     * @param SubscriptionProfileRepositoryInterface $profileRepository
      * @param PriceCurrencyInterface $priceFormatter
+     * @param SubscriptionProfileRepositoryInterface $profileRepository
      * @param array $components
      * @param array $data
      */
     public function __construct(
         ContextInterface $context,
         UiComponentFactory $uiComponentFactory,
-        SubscriptionProfileRepositoryInterface $profileRepository,
         PriceCurrencyInterface $priceFormatter,
+        SubscriptionProfileRepositoryInterface $profileRepository,
         array $components = [],
         array $data = []
     ) {
@@ -60,11 +60,9 @@ class LifetimeValue extends Column
         if (isset($dataSource['data']['items'])) {
             foreach ($dataSource['data']['items'] as & $item) {
                 $profileId = $item['entity_id'];
-                /** @var \TNW\Subscriptions\Model\SubscriptionProfile $profile */
                 $profile = $this->profileRepository->getById($profileId);
                 $currentValue = $profile->getCurrentValue();
-                $currencyCode = isset($item[SubscriptionProfileInterface::PROFILE_CURRENCY_CODE]) ?
-                    $item[SubscriptionProfileInterface::PROFILE_CURRENCY_CODE] : null;
+                $currencyCode = $item[SubscriptionProfileInterface::PROFILE_CURRENCY_CODE] ?? null;
                 $currentValue = $this->priceFormatter->format(
                     $currentValue,
                     false,

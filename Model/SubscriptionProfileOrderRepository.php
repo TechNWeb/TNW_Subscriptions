@@ -207,7 +207,9 @@ class SubscriptionProfileOrderRepository implements SubscriptionProfileOrderRepo
                         $installRecurringData['expirationCc'],
                         $installRecurringData['staticTotalBillingCycles']
                     );
-                    $this->emailSender->send($this->orderRepository->get($magentoOrderId));
+                    if (!$subscriptionProfileOrder->getData('email_sent')) {
+                        $this->emailSender->send($this->orderRepository->get($magentoOrderId));
+                    }
                 }
             } catch (Exception $e) {
                 $this->logger->warning($e->getMessage());

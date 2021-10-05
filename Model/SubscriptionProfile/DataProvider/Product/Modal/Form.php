@@ -23,6 +23,7 @@ use TNW\Subscriptions\Model\Product\Attribute;
 use TNW\Subscriptions\Model\ProductBillingFrequency\PriceCalculator;
 use TNW\Subscriptions\Model\ProductSubscriptionProfile\ProductTypeManagerResolver;
 use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product;
+use TNW\Subscriptions\Api\SubscriptionProfileRepositoryInterface;
 
 /**
  * Modal form for adding single product to subscription.
@@ -103,6 +104,11 @@ class Form extends AbstractDataProvider
     private $productBillingFrequencies;
 
     /**
+     * @var SubscriptionProfileRepositoryInterface
+     */
+    private $profileRepository;
+
+    /**
      * @param string $name
      * @param string $primaryFieldName
      * @param string $requestFieldName
@@ -111,6 +117,7 @@ class Form extends AbstractDataProvider
      * @param Context $formContext
      * @param PoolInterface $pool
      * @param ProductTypeManagerResolver $productTypeResolver
+     * @param SubscriptionProfileRepositoryInterface $profileRepository
      * @param string $scope
      * @param array $meta
      * @param array $data
@@ -124,6 +131,7 @@ class Form extends AbstractDataProvider
         Context $formContext,
         PoolInterface $pool,
         ProductTypeManagerResolver $productTypeResolver,
+        SubscriptionProfileRepositoryInterface $profileRepository,
         $scope = '',
         array $meta = [],
         array $data = []
@@ -136,6 +144,7 @@ class Form extends AbstractDataProvider
         $this->productBillingFrequencies = [];
         $this->pool = $pool;
         $this->productTypeResolver = $productTypeResolver;
+        $this->profileRepository = $profileRepository;
 
         parent::__construct($name, $primaryFieldName, $requestFieldName, $meta, $data);
     }
@@ -540,6 +549,21 @@ class Form extends AbstractDataProvider
     }
 
     /**
+     * @param $id
+     * @return string
+     * @throws NoSuchEntityException
+     */
+    protected function getCurrencySymbolForProfile($id)
+    {
+        $profile = $this->profileRepository->getById($id);
+        $this->currentCurrency = $this->formContext->getCurrencyFactory()
+            ->create()
+            ->load($profile->getProfileCurrencyCode());
+
+        return $this->currentCurrency->getCurrencySymbol();
+    }
+
+    /**
      * @param $price
      * @return float
      * @throws NoSuchEntityException
@@ -888,7 +912,7 @@ class Form extends AbstractDataProvider
                     ->load($currencyCode);
             } else {
                 $this->currentCurrency = $this->formContext->getStoreManager()
-                    ->getStore()
+                    ->getStore($this->formContext->getSession()->getStoreId())
                     ->getBaseCurrency();
             }
         }
@@ -936,7 +960,6 @@ class Form extends AbstractDataProvider
                 $price = $simpleProduct->getPrice();
             }
             $productPrice = $this->convertPrice($price);
-
         }
 
         return $productPrice;
