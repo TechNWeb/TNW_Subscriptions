@@ -324,7 +324,7 @@ define([
             if (this.currentProduct) {
                 return JSON.stringify(this.get('currentProduct.qtyValidators'));
             }
-            return '';
+            return false;
         },
 
         manageStartOn: function () {
