@@ -16,6 +16,8 @@ use Magento\Store\Model\StoreManagerInterface;
 use Magento\Catalog\Model\Product\Action;
 use Magento\Catalog\Api\ProductAttributeRepositoryInterface;
 use Magento\Eav\Setup\EavSetupFactory;
+use Magento\Catalog\Model\Product;
+use Magento\Framework\Exception\NoSuchEntityException;
 
 /**
  * Add filtering in product grid by 'Available For' attr and setup default value for this attr
@@ -96,41 +98,24 @@ class AddDefaultValueForPurchaseType implements DataPatchInterface
     }
 
     /**
-     * @return AddDefaultValueForPurchaseType|void
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     * @return DataPatchInterface|void
+     * @throws NoSuchEntityException
      */
     public function apply()
     {
         $eavSetup = $this->eavSetupFactory->create(['setup' => $this->setup]);
         $id = $this->attributeRepository->get(Attribute::SUBSCRIPTION_PURCHASE_TYPE)->getAttributeId();
-        $eavSetup->updateAttribute(\Magento\Catalog\Model\Product::ENTITY, $id, 'filterable', 1, null);
-        $eavSetup->updateAttribute(\Magento\Catalog\Model\Product::ENTITY, $id, 'filterable_in_search', 1, null);
-        $eavSetup->updateAttribute(\Magento\Catalog\Model\Product::ENTITY, $id, 'is_used_in_grid', 1, null);
-        $eavSetup->updateAttribute(\Magento\Catalog\Model\Product::ENTITY, $id, 'is_visible_in_grid', 1, null);
-        $eavSetup->updateAttribute(\Magento\Catalog\Model\Product::ENTITY, $id, 'is_filterable_in_grid', 1, null);
-
-        $products = $this->productCollection
-            ->addFieldToFilter('type_id', ['neq' => Type::TYPE_BUNDLE])
-            ->addAttributeToSelect(Attribute::SUBSCRIPTION_PURCHASE_TYPE)
-            ->load();
-
-        $ids = [];
-        foreach ($products as $product) {
-            $productPurchaseType = $product->getData(Attribute::SUBSCRIPTION_PURCHASE_TYPE);
-            if (!isset($productPurchaseType)) {
-                $ids[] = $product->getId();
-            }
-        }
-
-        if ($ids) {
-            $stores = $this->storeManager->getStores(true);
-            foreach ($stores as $store) {
-                $this->productAction->updateAttributes(
-                    $ids,
-                    [Attribute::SUBSCRIPTION_PURCHASE_TYPE => PurchaseType::ONE_TIME_PURCHASE_TYPE],
-                    $store->getId()
-                );
-            }
-        }
+        $eavSetup->updateAttribute(Product::ENTITY, $id, 'filterable', 1, null);
+        $eavSetup->updateAttribute(Product::ENTITY, $id, 'filterable_in_search', 1, null);
+        $eavSetup->updateAttribute(Product::ENTITY, $id, 'is_used_in_grid', 1, null);
+        $eavSetup->updateAttribute(Product::ENTITY, $id, 'is_visible_in_grid', 1, null);
+        $eavSetup->updateAttribute(Product::ENTITY, $id, 'is_filterable_in_grid', 1, null);
+        $eavSetup->updateAttribute(
+            Product::ENTITY,
+            $id,
+            'default_value',
+            PurchaseType::ONE_TIME_PURCHASE_TYPE,
+            null
+        );
     }
 }
