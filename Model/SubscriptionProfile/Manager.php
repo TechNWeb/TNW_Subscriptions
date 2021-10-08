@@ -871,12 +871,18 @@ class Manager
      * @param $quoteItems
      * @param null $date
      * @param bool $paymentChange
-     * @return $this
+     * @param bool $tempProfile
+     * @return $this|SubscriptionProfileInterface
      * @throws LocalizedException
      * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
-    public function populateProfileData(Quote $quote, $quoteItems, $date = null, $paymentChange = false)
-    {
+    public function populateProfileData(
+        Quote $quote,
+        $quoteItems,
+        $date = null,
+        $paymentChange = false,
+        $tempProfile = false
+    ) {
         $request = $this->getUniqueBuyRequest($quoteItems);
         if (empty($request)) {
             return $this;
@@ -885,7 +891,12 @@ class Manager
         $frequency = $this->frequencyRepository->getById($request['billing_frequency']);
         $startDate = $this->getFullStartDate($request['start_on'], $date);
         $totalBillingCycles = !$request['term'] ? $paymentChange ? $request['period'] : $request['period'] - 1 : 0;
-        $this->getProfile()
+        if ($tempProfile) {
+            $profile = $this->getEmptyProfile();
+        } else {
+            $profile = $this->getProfile();
+        }
+        $profile
             ->setCustomerId($quote->getCustomerId())
             ->setWebsiteId($quote->getStore()->getWebsiteId())
             ->setStoreId($quote->getStoreId())
@@ -908,21 +919,21 @@ class Manager
             ->setGenerateQuotesState(SubscriptionProfile::GENERATE_QUOTES_STATE_NEED_GENERATE)
             ->setCouponCode($quote->getCouponCode());
 
-        $this->getProfile()->getPayment()
+        $profile->getPayment()
             ->setEngineCode($quote->getPayment()->getMethod());
 
         //set trial start date to profile
         if ($request['is_trial']) {
-            $this->getProfile()
+            $profile
                 ->setTrialStartDate($startDate);
             $calculatedStatDate = $this->calculateStartDate();
-            $this->getProfile()
+            $profile
                 ->setStartDate($calculatedStatDate)
                 ->setOriginalStartDate($calculatedStatDate);
 
             //set status "trial" if trial period starts immediately
             if (strtotime($startDate) <= time()) {
-                $this->getProfile()->setStatus(ProfileStatus::STATUS_TRIAL);
+                $profile->setStatus(ProfileStatus::STATUS_TRIAL);
             }
         }
 
@@ -930,11 +941,15 @@ class Manager
         $profileChildProducts = $this->productManager->populateChildProductsData($quoteItems, $profileProducts);
         $profileAddress = $this->populateAddressesData($quote);
 
-        $this->getProfile()
+        $profile
             ->setAddresses($profileAddress)
             ->setProducts(array_merge($profileProducts, $profileChildProducts));
 
-        return $this;
+        if ($tempProfile) {
+            return $profile;
+        } else {
+            return $this;
+        }
     }
 
     /**
