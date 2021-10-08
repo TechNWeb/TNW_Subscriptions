@@ -9,6 +9,7 @@ use Magento\Framework\Exception\LocalizedException;
 use Magento\Sales\Model\ResourceModel\Order;
 use TNW\Subscriptions\Model\SubscriptionProfileOrder\Manager as ProfileOrderManager;
 use TNW\Subscriptions\Model\Queue\ProfitManager;
+use TNW\Subscriptions\Model\SubscriptionProfile\Manager;
 
 /**
  * Class TotalProfitPlugin sets profile ids to calculate profit
@@ -27,16 +28,24 @@ class TotalProfitPlugin
     private $profitManager;
 
     /**
+     * @var Manager
+     */
+    private $manager;
+
+    /**
      * TotalProfitPlugin constructor.
      * @param ProfileOrderManager $profileOrderManager
      * @param ProfitManager $profitManager
+     * @param Manager $manager
      */
     public function __construct(
         ProfileOrderManager $profileOrderManager,
-        ProfitManager $profitManager
+        ProfitManager $profitManager,
+        Manager $manager
     ) {
         $this->profileOrderManager = $profileOrderManager;
         $this->profitManager = $profitManager;
+        $this->manager = $manager;
     }
 
     /**
@@ -51,10 +60,7 @@ class TotalProfitPlugin
         $result,
         $object
     ) {
-        if ($object->hasInvoices()) {
-            $profileIds = $this->profileOrderManager->getProfileIdsByOrder($object->getEntityId());
-            $this->profitManager->setProfilesToCalculateProfit($profileIds);
-        }
+        $this->manager->setProfilesToCalculateProfit($object);
         return $result;
     }
 }

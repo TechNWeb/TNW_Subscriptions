@@ -239,6 +239,7 @@ class CreateProfile implements ObserverInterface
 
         // Save Items Relation
         $this->relationResource->insertSales($insertData);
+        $this->profileManager->setProfilesToCalculateProfit($order);
     }
 
     /**

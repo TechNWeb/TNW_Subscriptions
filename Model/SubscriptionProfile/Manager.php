@@ -50,6 +50,8 @@ use TNW\Subscriptions\Model\Config\Source\FreeShipping;
 use Magento\Sales\Model\ResourceModel\Order\Grid\CollectionFactory;
 use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfile as ProfileResource;
 use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfileOrder;
+use TNW\Subscriptions\Model\Queue\ProfitManager;
+use TNW\Subscriptions\Model\SubscriptionProfileOrder\Manager as ProfileOrderManager;
 
 /**
  * Class Manager - used for managing the subscription profiles
@@ -267,6 +269,16 @@ class Manager
     private $customPaymentData = [];
 
     /**
+     * @var ProfitManager
+     */
+    private $profitManager;
+
+    /**
+     * @var ProfileOrderManager
+     */
+    private $profileOrderManager;
+
+    /**
      * Manager constructor.
      * @param EnginePool $enginePool
      * @param SubscriptionProfileRepository $subscriptionProfileRepository
@@ -329,7 +341,9 @@ class Manager
         CustomerProductHistoryInterfaceFactory $customerProductHistoryInterfaceFactory,
         CustomerProductHistoryRepositoryInterface $customerProductHistoryRepository,
         ProfileResource $profileResource,
-        SubscriptionProfileOrder $subscriptionProfileOrder
+        SubscriptionProfileOrder $subscriptionProfileOrder,
+        ProfitManager $profitManager,
+        ProfileOrderManager $profileOrderManager
     ) {
         $this->orderCollectionFactory = $orderCollectionFactory;
         $this->totalsCollector = $totalsCollector;
@@ -362,6 +376,8 @@ class Manager
         $this->customerProductHistoryRepository = $customerProductHistoryRepository;
         $this->profileResource = $profileResource;
         $this->subscriptionProfileOrder = $subscriptionProfileOrder;
+        $this->profitManager = $profitManager;
+        $this->profileOrderManager = $profileOrderManager;
     }
 
     /**
@@ -1799,5 +1815,17 @@ class Manager
             $profile->getId(),
             $totalBillingCycles
         );
+    }
+
+    /**
+     * @param $order
+     * @throws LocalizedException
+     */
+    public function setProfilesToCalculateProfit($order)
+    {
+        if ($order->hasInvoices()) {
+            $profileIds = $this->profileOrderManager->getProfileIdsByOrder($order->getEntityId());
+            $this->profitManager->setProfilesToCalculateProfit($profileIds);
+        }
     }
 }

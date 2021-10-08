@@ -603,6 +603,7 @@ class Manager
                         $product->setNeedRecollect(false);
                     }
                     $this->profileRepository->save($profile);
+                    $this->profileManager->setProfilesToCalculateProfit($order);
                 }
             } catch (\Exception $e) {
                 if ($e instanceof \Magento\Payment\Gateway\Command\CommandException && $e->getCode() == 2099) {
