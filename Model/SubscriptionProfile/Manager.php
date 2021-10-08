@@ -872,6 +872,7 @@ class Manager
         $this->getProfile()
             ->setCustomerId($quote->getCustomerId())
             ->setWebsiteId($quote->getStore()->getWebsiteId())
+            ->setStoreId($quote->getStoreId())
             ->setShippingMethod($quote->getShippingAddress()->getShippingMethod())
             ->setShippingDescription($quote->getShippingAddress()->getShippingDescription())
             ->setIsVirtual($this->isQuoteHasVirtualProducts($quoteItems))
@@ -1032,9 +1033,7 @@ class Manager
         $quote->setData('scheduled', true);
 
         //Set store
-        $quote->setStore(
-            $profile->getWebsite()->getDefaultStore()
-        );
+        $quote->setStore($profile->getStore());
 
         //Set currency
         $quote->setQuoteCurrencyCode($profile->getProfileCurrencyCode());
@@ -1048,7 +1047,7 @@ class Manager
         foreach ($profile->getVisibleProducts() as $profileProduct) {
             $magentoProduct = $profileProduct->getMagentoProduct();
             $magentoProduct->getTypeInstance()->setStoreFilter(
-                $profile->getWebsite()->getDefaultStore(),
+                $profile->getStore(),
                 $magentoProduct
             );
             if ($isReBill) {
@@ -1183,7 +1182,7 @@ class Manager
      * @param $profile
      * @return $this
      */
-    protected function processShippingMethodRate($quote, $profile)
+    public function processShippingMethodRate($quote, $profile)
     {
         $shippingMethodToSet = $profile->getShippingMethod();
         $quote->getShippingAddress()->setShippingMethod($shippingMethodToSet);
