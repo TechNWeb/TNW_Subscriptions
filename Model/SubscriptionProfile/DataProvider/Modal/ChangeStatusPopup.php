@@ -11,6 +11,7 @@ use Magento\Ui\DataProvider\AbstractDataProvider;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use TNW\Subscriptions\Model\EmailNotifier;
 use TNW\Subscriptions\Model\SubscriptionProfile\Manager;
+use Magento\Store\Model\StoreManagerInterface;
 
 /**
  * Data provider for cancel button form in popup.
@@ -25,18 +26,19 @@ class ChangeStatusPopup extends AbstractDataProvider
     private $dataPersistor;
 
     /**
-     * Core store config
-     *
-     * @var \Magento\Framework\App\Config\ScopeConfigInterface
+     * @var ScopeConfigInterface
      */
     private $scopeConfig;
 
     /**
-     * Profile manager
-     *
-     * @var \TNW\Subscriptions\Model\SubscriptionProfile\Manager
+     * @var Manager
      */
     private $profileManager;
+
+    /**
+     * @var StoreManagerInterface
+     */
+    private $storeManager;
 
     /**
      * @param string $name
@@ -45,6 +47,7 @@ class ChangeStatusPopup extends AbstractDataProvider
      * @param DataPersistorInterface $dataPersistor
      * @param ScopeConfigInterface $scopeConfig
      * @param Manager $profileManager
+     * @param StoreManagerInterface $storeManager
      * @param array $meta
      * @param array $data
      */
@@ -55,9 +58,11 @@ class ChangeStatusPopup extends AbstractDataProvider
         DataPersistorInterface $dataPersistor,
         ScopeConfigInterface $scopeConfig,
         Manager $profileManager,
+        StoreManagerInterface $storeManager,
         array $meta = [],
         array $data = []
     ) {
+        $this->storeManager = $storeManager;
         $this->dataPersistor = $dataPersistor;
         $this->scopeConfig = $scopeConfig;
         $this->profileManager = $profileManager;
@@ -117,11 +122,17 @@ class ChangeStatusPopup extends AbstractDataProvider
      */
     private function getConfigValue($profileId)
     {
-        $websiteId = $this->profileManager->loadProfile($profileId)->getWebsiteId();
+        $profile = $this->profileManager->loadProfile($profileId);
+        if ($profile->getStoreId()) {
+            $storeId = $profile->getStoreId();
+        } else {
+            $websiteId = $this->profileManager->loadProfile($profileId)->getWebsiteId();
+            $storeId = $this->storeManager->getWebsite($websiteId)->getDefaultStore()->getId();
+        }
         return $this->scopeConfig->getValue(
             EmailNotifier::XML_PATH_ENABLE_COMMENT_ADDED,
             \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
-            $websiteId
+            $storeId
         );
     }
 }
