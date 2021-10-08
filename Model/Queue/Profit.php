@@ -162,7 +162,6 @@ class Profit
         $profit = 0;
         $invoiceItems = [];
         if ($profile->getStatus() == ProfileStatus::STATUS_CANCELED
-            || $profile->getStatus() == ProfileStatus::STATUS_COMPLETE
         ) {
             return $profit;
         }

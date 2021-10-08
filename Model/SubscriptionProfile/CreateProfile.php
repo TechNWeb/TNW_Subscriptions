@@ -731,6 +731,7 @@ class CreateProfile extends BaseCreate
 
             //Generate quote for next payment.
             $this->quoteGenerator->generateProfileQuotes($profile, 1);
+            $this->profileManager->setProfilesToCalculateProfit($order);
 
             $profiles[] = $profile;
         }

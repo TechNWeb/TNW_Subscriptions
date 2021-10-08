@@ -61,13 +61,15 @@ class DataBuilder
                     $subscriptionItems[] = $item;
                 }
             }
+            $profile = $this->manager->getProfile();
             if ($subscriptionItems) {
-                $this->manager->populateProfileData($order, $subscriptionItems, null, $this->is3DSecure);
+                $profile = $this->manager
+                    ->populateProfileData($order, $subscriptionItems, null, $this->is3DSecure, true);
             }
             if ($order instanceof Quote) {
-                $result = $this->getAmountByProfile($this->manager->getProfile(), $order);
+                $result = $this->getAmountByProfile($profile, $order);
             } else {
-                $result = $this->getAmountByProfile($this->manager->getProfile());
+                $result = $this->getAmountByProfile($profile);
             }
         }
         return $result;

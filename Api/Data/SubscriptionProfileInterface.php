@@ -8,7 +8,7 @@ namespace TNW\Subscriptions\Api\Data;
 use Magento\Framework\Api\CustomAttributesDataInterface;
 
 /**
- * Interface SubscriptionProfileInterface - defaines the functionality required for SP
+ * Interface SubscriptionProfileInterface - defines the functionality required for SP
  */
 interface SubscriptionProfileInterface extends CustomAttributesDataInterface
 {
@@ -16,6 +16,7 @@ interface SubscriptionProfileInterface extends CustomAttributesDataInterface
      * Constants for field names
      */
     const WEBSITE_ID = 'website_id';
+    const STORE_ID = 'store_id';
     const UNIT = 'unit';
     const CUSTOMER_ID = 'customer_id';
     const STATUS = 'status';
@@ -169,11 +170,33 @@ interface SubscriptionProfileInterface extends CustomAttributesDataInterface
     public function setWebsiteId($websiteId);
 
     /**
+     * Gets store id.
+     *
+     * @return string|null
+     */
+    public function getStoreId();
+
+    /**
+     * Sets store id.
+     *
+     * @param string $storeId
+     * @return $this
+     */
+    public function setStoreId($storeId);
+
+    /**
      * Gets website.
      *
      * @return \Magento\Store\Model\Website
      */
     public function getWebsite();
+
+    /**
+     * Gets store.
+     *
+     * @return \Magento\Store\Model\Store
+     */
+    public function getStore();
 
     /**
      * Gets status.

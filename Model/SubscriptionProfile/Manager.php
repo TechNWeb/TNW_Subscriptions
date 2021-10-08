@@ -50,6 +50,8 @@ use TNW\Subscriptions\Model\Config\Source\FreeShipping;
 use Magento\Sales\Model\ResourceModel\Order\Grid\CollectionFactory;
 use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfile as ProfileResource;
 use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfileOrder;
+use TNW\Subscriptions\Model\Queue\ProfitManager;
+use TNW\Subscriptions\Model\SubscriptionProfileOrder\Manager as ProfileOrderManager;
 
 /**
  * Class Manager - used for managing the subscription profiles
@@ -267,6 +269,16 @@ class Manager
     private $customPaymentData = [];
 
     /**
+     * @var ProfitManager
+     */
+    private $profitManager;
+
+    /**
+     * @var ProfileOrderManager
+     */
+    private $profileOrderManager;
+
+    /**
      * Manager constructor.
      * @param EnginePool $enginePool
      * @param SubscriptionProfileRepository $subscriptionProfileRepository
@@ -329,7 +341,9 @@ class Manager
         CustomerProductHistoryInterfaceFactory $customerProductHistoryInterfaceFactory,
         CustomerProductHistoryRepositoryInterface $customerProductHistoryRepository,
         ProfileResource $profileResource,
-        SubscriptionProfileOrder $subscriptionProfileOrder
+        SubscriptionProfileOrder $subscriptionProfileOrder,
+        ProfitManager $profitManager,
+        ProfileOrderManager $profileOrderManager
     ) {
         $this->orderCollectionFactory = $orderCollectionFactory;
         $this->totalsCollector = $totalsCollector;
@@ -362,6 +376,8 @@ class Manager
         $this->customerProductHistoryRepository = $customerProductHistoryRepository;
         $this->profileResource = $profileResource;
         $this->subscriptionProfileOrder = $subscriptionProfileOrder;
+        $this->profitManager = $profitManager;
+        $this->profileOrderManager = $profileOrderManager;
     }
 
     /**
@@ -855,12 +871,18 @@ class Manager
      * @param $quoteItems
      * @param null $date
      * @param bool $paymentChange
-     * @return $this
+     * @param bool $tempProfile
+     * @return $this|SubscriptionProfileInterface
      * @throws LocalizedException
      * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
-    public function populateProfileData(Quote $quote, $quoteItems, $date = null, $paymentChange = false)
-    {
+    public function populateProfileData(
+        Quote $quote,
+        $quoteItems,
+        $date = null,
+        $paymentChange = false,
+        $tempProfile = false
+    ) {
         $request = $this->getUniqueBuyRequest($quoteItems);
         if (empty($request)) {
             return $this;
@@ -869,9 +891,15 @@ class Manager
         $frequency = $this->frequencyRepository->getById($request['billing_frequency']);
         $startDate = $this->getFullStartDate($request['start_on'], $date);
         $totalBillingCycles = !$request['term'] ? $paymentChange ? $request['period'] : $request['period'] - 1 : 0;
-        $this->getProfile()
+        if ($tempProfile) {
+            $profile = $this->getEmptyProfile();
+        } else {
+            $profile = $this->getProfile();
+        }
+        $profile
             ->setCustomerId($quote->getCustomerId())
             ->setWebsiteId($quote->getStore()->getWebsiteId())
+            ->setStoreId($quote->getStoreId())
             ->setShippingMethod($quote->getShippingAddress()->getShippingMethod())
             ->setShippingDescription($quote->getShippingAddress()->getShippingDescription())
             ->setIsVirtual($this->isQuoteHasVirtualProducts($quoteItems))
@@ -891,21 +919,21 @@ class Manager
             ->setGenerateQuotesState(SubscriptionProfile::GENERATE_QUOTES_STATE_NEED_GENERATE)
             ->setCouponCode($quote->getCouponCode());
 
-        $this->getProfile()->getPayment()
+        $profile->getPayment()
             ->setEngineCode($quote->getPayment()->getMethod());
 
         //set trial start date to profile
         if ($request['is_trial']) {
-            $this->getProfile()
+            $profile
                 ->setTrialStartDate($startDate);
             $calculatedStatDate = $this->calculateStartDate();
-            $this->getProfile()
+            $profile
                 ->setStartDate($calculatedStatDate)
                 ->setOriginalStartDate($calculatedStatDate);
 
             //set status "trial" if trial period starts immediately
             if (strtotime($startDate) <= time()) {
-                $this->getProfile()->setStatus(ProfileStatus::STATUS_TRIAL);
+                $profile->setStatus(ProfileStatus::STATUS_TRIAL);
             }
         }
 
@@ -913,11 +941,15 @@ class Manager
         $profileChildProducts = $this->productManager->populateChildProductsData($quoteItems, $profileProducts);
         $profileAddress = $this->populateAddressesData($quote);
 
-        $this->getProfile()
+        $profile
             ->setAddresses($profileAddress)
             ->setProducts(array_merge($profileProducts, $profileChildProducts));
 
-        return $this;
+        if ($tempProfile) {
+            return $profile;
+        } else {
+            return $this;
+        }
     }
 
     /**
@@ -1032,9 +1064,7 @@ class Manager
         $quote->setData('scheduled', true);
 
         //Set store
-        $quote->setStore(
-            $profile->getWebsite()->getDefaultStore()
-        );
+        $quote->setStore($profile->getStore());
 
         //Set currency
         $quote->setQuoteCurrencyCode($profile->getProfileCurrencyCode());
@@ -1048,7 +1078,7 @@ class Manager
         foreach ($profile->getVisibleProducts() as $profileProduct) {
             $magentoProduct = $profileProduct->getMagentoProduct();
             $magentoProduct->getTypeInstance()->setStoreFilter(
-                $profile->getWebsite()->getDefaultStore(),
+                $profile->getStore(),
                 $magentoProduct
             );
             if ($isReBill) {
@@ -1183,7 +1213,7 @@ class Manager
      * @param $profile
      * @return $this
      */
-    protected function processShippingMethodRate($quote, $profile)
+    public function processShippingMethodRate($quote, $profile)
     {
         $shippingMethodToSet = $profile->getShippingMethod();
         $quote->getShippingAddress()->setShippingMethod($shippingMethodToSet);
@@ -1800,5 +1830,17 @@ class Manager
             $profile->getId(),
             $totalBillingCycles
         );
+    }
+
+    /**
+     * @param $order
+     * @throws LocalizedException
+     */
+    public function setProfilesToCalculateProfit($order)
+    {
+        if ($order->hasInvoices()) {
+            $profileIds = $this->profileOrderManager->getProfileIdsByOrder($order->getEntityId());
+            $this->profitManager->setProfilesToCalculateProfit($profileIds);
+        }
     }
 }

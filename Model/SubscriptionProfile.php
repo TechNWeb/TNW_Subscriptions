@@ -14,6 +14,7 @@ use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\Model\AbstractExtensibleModel;
 use Magento\Framework\Model\Context as ModelContext;
 use Magento\Framework\Registry;
+use Magento\Store\Api\StoreRepositoryInterface;
 use Magento\Store\Api\WebsiteRepositoryInterface;
 use TNW\Subscriptions\Api\Data\SubscriptionProfileAddressInterface;
 use TNW\Subscriptions\Api\Data\SubscriptionProfileInterface;
@@ -108,6 +109,7 @@ class SubscriptionProfile extends AbstractExtensibleModel implements Subscriptio
      */
     protected $interfaceAttributes = [
         self::WEBSITE_ID,
+        self::STORE_ID,
         self::UNIT,
         self::CUSTOMER_ID,
         self::STATUS,
@@ -158,6 +160,11 @@ class SubscriptionProfile extends AbstractExtensibleModel implements Subscriptio
     private $subscriptionProfileOrder;
 
     /**
+     * @var StoreRepositoryInterface
+     */
+    private $storeRepository;
+
+    /**
      * SubscriptionProfile constructor.
      * @param ModelContext $context
      * @param Registry $registry
@@ -165,6 +172,7 @@ class SubscriptionProfile extends AbstractExtensibleModel implements Subscriptio
      * @param AttributeValueFactory $customAttributeFactory
      * @param CustomerRepositoryInterface $customerRepository
      * @param WebsiteRepositoryInterface $websiteRepository
+     * @param StoreRepositoryInterface $storeRepository
      * @param SubscriptionProfileAttributeRepositoryInterface $metadataService
      * @param PaymentCollectionFactory $paymentCollectionFactory
      * @param UserContextInterface $userContext
@@ -184,6 +192,7 @@ class SubscriptionProfile extends AbstractExtensibleModel implements Subscriptio
         AttributeValueFactory $customAttributeFactory,
         CustomerRepositoryInterface $customerRepository,
         WebsiteRepositoryInterface $websiteRepository,
+        StoreRepositoryInterface $storeRepository,
         SubscriptionProfileAttributeRepositoryInterface $metadataService,
         PaymentCollectionFactory $paymentCollectionFactory,
         UserContextInterface $userContext,
@@ -216,6 +225,7 @@ class SubscriptionProfile extends AbstractExtensibleModel implements Subscriptio
         $this->profileProfit = $profileProfit;
         $this->profileRepository = $profileRepository;
         $this->subscriptionProfileOrder = $subscriptionProfileOrder;
+        $this->storeRepository = $storeRepository;
     }
 
     /**
@@ -331,11 +341,36 @@ class SubscriptionProfile extends AbstractExtensibleModel implements Subscriptio
 
     /**
      * @inheritdoc
+     */
+    public function getStoreId()
+    {
+        return $this->getData(self::STORE_ID);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function setStoreId($storeId)
+    {
+        return $this->setData(self::STORE_ID, $storeId);
+    }
+
+    /**
+     * @inheritdoc
      * @throws NoSuchEntityException
      */
     public function getWebsite()
     {
         return $this->websiteRepository->getById($this->getWebsiteId());
+    }
+
+    /**
+     * @inheritdoc
+     * @throws NoSuchEntityException
+     */
+    public function getStore()
+    {
+        return $this->storeRepository->getById($this->getStoreId());
     }
 
     /**
@@ -1055,5 +1090,13 @@ class SubscriptionProfile extends AbstractExtensibleModel implements Subscriptio
     public function setTotalProfit($profit)
     {
         return $this->profileProfit->setTotalProfit($profit);
+    }
+
+    /**
+     * @return array
+     */
+    public function getFirstOrderData()
+    {
+        return $this->getResource()->getFirstOrderData($this);
     }
 }
