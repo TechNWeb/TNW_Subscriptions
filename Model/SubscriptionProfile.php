@@ -918,8 +918,8 @@ class SubscriptionProfile extends AbstractExtensibleModel implements Subscriptio
         if (isset($paymentInfo) && isset($finalDate)) {
             $getExpireDate = $this->serializer->unserialize($paymentInfo);
             if (isset($getExpireDate['cc_exp_month']) && isset($getExpireDate['cc_exp_year'])) {
-                $ccExpMonth = (int)$getExpireDate['cc_exp_month'];
-                $ccExpYear = (int)$getExpireDate['cc_exp_year'];
+                $ccExpMonth = (int) $getExpireDate['cc_exp_month'];
+                $ccExpYear = (int) $getExpireDate['cc_exp_year'];
                 $currentDate = explode('-', $finalDate);
                 switch ($currentDate) {
                     case $currentDate['1'] > $ccExpMonth && $currentDate['0'] > $ccExpYear:
@@ -954,19 +954,19 @@ class SubscriptionProfile extends AbstractExtensibleModel implements Subscriptio
         if ($term == '1') {
             return null;
         }
-        $total = $billingFrequency->getFrequency() * $totalBillingCycles;
+        $total = $billingFrequency->getFrequency() * ($totalBillingCycles - 1);
         switch ($billingFrequency->getUnit()) {
             case BillingFrequencyUnitType::DAYS:
                 $billingCycles = "+" . $total . " days";
-                $result = date("Y-m-d", strtotime($billingCycles, strtotime($startDate)));
+                $result = date("Y-m-d H:i:s", strtotime($billingCycles, strtotime($startDate)));
                 break;
             case BillingFrequencyUnitType::MONTHS:
                 $billingCycles = "+" . $total . " months";
-                $result = date("Y-m-d", strtotime($billingCycles, strtotime($startDate)));
+                $result = date("Y-m-d H:i:s", strtotime($billingCycles, strtotime($startDate)));
                 break;
             case BillingFrequencyUnitType::YEARS:
                 $billingCycles = "+" . $total . " years";
-                $result = date("Y-m-d", strtotime($billingCycles, strtotime($startDate)));
+                $result = date("Y-m-d H:i:s", strtotime($billingCycles, strtotime($startDate)));
                 break;
         }
         return $result;
