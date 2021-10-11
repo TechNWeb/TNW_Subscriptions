@@ -921,7 +921,7 @@ class SubscriptionProfile extends AbstractExtensibleModel implements Subscriptio
                 $ccExpMonth = (int) $getExpireDate['cc_exp_month'];
                 $ccExpYear = (int) $getExpireDate['cc_exp_year'];
                 $finalTimestamp = strtotime($finalDate);
-                $finalDay = date("d", $finalTimestamp);
+                $finalDay = (int) date("d", $finalTimestamp) + 1;
                 $expirationDate = strtotime($ccExpYear . '-' . $ccExpMonth . '-' . $finalDay);
                 if ($finalTimestamp > $expirationDate) {
                     $result = 1;
