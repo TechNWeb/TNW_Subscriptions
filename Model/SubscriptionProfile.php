@@ -920,19 +920,13 @@ class SubscriptionProfile extends AbstractExtensibleModel implements Subscriptio
             if (isset($getExpireDate['cc_exp_month']) && isset($getExpireDate['cc_exp_year'])) {
                 $ccExpMonth = (int) $getExpireDate['cc_exp_month'];
                 $ccExpYear = (int) $getExpireDate['cc_exp_year'];
-                $currentDate = explode('-', $finalDate);
-                switch ($currentDate) {
-                    case $currentDate['1'] > $ccExpMonth && $currentDate['0'] > $ccExpYear:
-                    case $currentDate['1'] > $ccExpMonth && $currentDate['0'] == $ccExpYear:
-                        $result = 1;
-                        break;
-                    case $currentDate['1'] == $ccExpMonth && $currentDate['0'] == $ccExpYear:
-                    case $currentDate['1'] < $ccExpMonth && $currentDate['0'] < $ccExpYear:
-                    case $currentDate['1'] < $ccExpMonth && $currentDate['0'] == $ccExpYear:
-                    case $currentDate['1'] > $ccExpMonth && $currentDate['0'] < $ccExpYear:
-                    case $currentDate['1'] == $ccExpMonth && $currentDate['0'] < $ccExpYear:
-                        $result = 0;
-                        break;
+                $finalTimestamp = strtotime($finalDate);
+                $finalDay = (int) date("d", $finalTimestamp) + 1;
+                $expirationDate = strtotime($ccExpYear . '-' . $ccExpMonth . '-' . $finalDay);
+                if ($finalTimestamp > $expirationDate) {
+                    $result = 1;
+                } else {
+                    $result = 0;
                 }
             }
         }
