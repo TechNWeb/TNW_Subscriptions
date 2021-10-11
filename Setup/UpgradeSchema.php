@@ -179,10 +179,6 @@ class UpgradeSchema implements UpgradeSchemaInterface
             $this->addSubscriptionProfileProfitTable($setup);
         }
 
-        if (version_compare($context->getVersion(), '2.3.49', '<')) {
-            $this->addStoreIdToSubscriptionProfileTable($setup);
-        }
-
         $setup->endSetup();
     }
 
@@ -1159,23 +1155,5 @@ class UpgradeSchema implements UpgradeSchemaInterface
             ], 'Total profit');
 
         $setup->getConnection()->createTable($table);
-    }
-
-    /**
-     * @param SchemaSetupInterface $setup
-     */
-    private function addStoreIdToSubscriptionProfileTable(SchemaSetupInterface $setup)
-    {
-        $table = $setup->getTable(SubscriptionProfile::SUBSCRIPTION_PROFILE_ENTITY);
-        $setup->getConnection()->addColumn(
-            $table,
-            'store_id',
-            [
-                'type' => Table::TYPE_SMALLINT,
-                'unsigned' => true,
-                'nullable' => true,
-                'comment' => 'Store Id'
-            ]
-        );
     }
 }
