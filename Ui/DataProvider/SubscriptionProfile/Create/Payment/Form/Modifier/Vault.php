@@ -198,7 +198,7 @@ class Vault extends Base
     public function modifyMeta(array $meta)
     {
         $storeId = $this->getProfile()
-            ? $this->getProfile()->getStoreId()
+            ? $this->getProfile()->getWebsite()->getDefaultStore()->getStoreId()
             : $this->session->getStoreId();
         $this->storeManager->setCurrentStore($storeId);
 
