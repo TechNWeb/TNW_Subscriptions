@@ -61,23 +61,15 @@ class Price extends Column
     {
         if (isset($dataSource['data']['items'])) {
             foreach ($dataSource['data']['items'] as & $item) {
-                $total = isset($item['grand_total']) ? $item['grand_total'] : null;
-
+                $total = $item['grand_total'] ?? null;
                 if ($total) {
                     $currencyCode = $item[SubscriptionProfileInterface::PROFILE_CURRENCY_CODE] ?? null;
-                    $total = $this->priceFormatter->format(
-                        $total,
-                        false,
-                        null,
-                        null,
-                        $currencyCode
-                    );
+                    $currency = $this->priceFormatter->getCurrency($item['store_id'], $currencyCode);
+                    $total = $currency->format($total, false, null);
                 }
-
                 $item[$this->getData('name')] = $total;
             }
         }
-
         return $dataSource;
     }
 
