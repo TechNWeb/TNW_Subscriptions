@@ -149,13 +149,11 @@ class NextPayment extends Template
             return '--';
         } else {
             $grandTotal -= $this->getShippingCost();
-            return $this->priceFormatter->format(
-                $grandTotal,
-                false,
-                null,
-                null,
-                $this->getSubscriptionProfile()->getProfileCurrencyCode()
-            );
+            $profile = $this->getSubscriptionProfile();
+            $currency = $this->priceFormatter->getCurrency(
+                $profile->getStoreId(),
+                $profile->getProfileCurrencyCode());
+            return $currency->format($grandTotal, false, null);
         }
     }
 

@@ -10,6 +10,7 @@ use Magento\Framework\View\Element\UiComponent\ContextInterface;
 use Magento\Framework\View\Element\UiComponentFactory;
 use Magento\Ui\Component\Listing\Columns\Column;
 use TNW\Subscriptions\Api\Data\SubscriptionProfileInterface;
+use TNW\Subscriptions\Api\SubscriptionProfileRepositoryInterface;
 
 /**
  * Class Total Price column
@@ -24,11 +25,17 @@ class Total extends Column
     private $priceFormatter;
 
     /**
+     * @var SubscriptionProfileRepositoryInterface
+     */
+    private $profileRepository;
+
+    /**
      * Constructor
      *
      * @param ContextInterface $context
      * @param UiComponentFactory $uiComponentFactory
      * @param PriceCurrencyInterface $priceFormatter
+     * @param SubscriptionProfileRepositoryInterface $profileRepository
      * @param array $components
      * @param array $data
      */
@@ -36,10 +43,12 @@ class Total extends Column
         ContextInterface $context,
         UiComponentFactory $uiComponentFactory,
         PriceCurrencyInterface $priceFormatter,
+        SubscriptionProfileRepositoryInterface $profileRepository,
         array $components = [],
         array $data = []
     ) {
         $this->priceFormatter = $priceFormatter;
+        $this->profileRepository = $profileRepository;
         parent::__construct($context, $uiComponentFactory, $components, $data);
     }
 
@@ -53,23 +62,18 @@ class Total extends Column
     {
         if (isset($dataSource['data']['items'])) {
             foreach ($dataSource['data']['items'] as & $item) {
-                $total = isset($item['grand_total']) ? $item['grand_total'] : null;
-
+                $total = $item['grand_total'] ?? null;
                 if ($total) {
                     $currencyCode = $item[SubscriptionProfileInterface::PROFILE_CURRENCY_CODE] ?? null;
-                    $total = $this->priceFormatter->format(
-                        $total,
-                        false,
-                        null,
-                        null,
+                    $currency = $this->priceFormatter->getCurrency(
+                        $item['store_id'],
                         $currencyCode
                     );
+                    $total = $currency->format($total, false, null);
                 }
-
                 $item[$this->getData('name')] = $total;
             }
         }
-
         return $dataSource;
     }
 }
