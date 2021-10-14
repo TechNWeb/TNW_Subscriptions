@@ -9,6 +9,7 @@ use Magento\Framework\View\Element\UiComponent\ContextInterface;
 use Magento\Framework\View\Element\UiComponentFactory;
 use Magento\Ui\Component\Listing\Columns\Column;
 use Magento\Framework\Stdlib\DateTime\TimezoneInterface;
+use Magento\Framework\Serialize\SerializerInterface;
 use IntlDateFormatter;
 
 /**
@@ -22,10 +23,16 @@ class FinalInstallment extends Column
     private $timezone;
 
     /**
+     * @var SerializerInterface
+     */
+    private $serializer;
+
+    /**
      * FinalInstallment constructor.
      * @param ContextInterface $context
      * @param UiComponentFactory $uiComponentFactory
      * @param TimezoneInterface $timezone
+     * @param SerializerInterface $serializer
      * @param array $components
      * @param array $data
      */
@@ -33,6 +40,7 @@ class FinalInstallment extends Column
         ContextInterface $context,
         UiComponentFactory $uiComponentFactory,
         TimezoneInterface $timezone,
+        SerializerInterface $serializer,
         array $components = [],
         array $data = []
     ) {
@@ -43,6 +51,7 @@ class FinalInstallment extends Column
             $data
         );
         $this->timezone = $timezone;
+        $this->serializer = $serializer;
     }
 
     /**
@@ -58,11 +67,27 @@ class FinalInstallment extends Column
                 if (!isset($item['subscription_final_installment_date'])) {
                     $item['subscription_final_installment_date'] = "--";
                 } else {
-                    $item['subscription_final_installment_date'] =
-                        $this->timezone->formatDate(
-                            $item['subscription_final_installment_date'],
-                            IntlDateFormatter::MEDIUM
-                        );
+                    if (strpos($item['subscription_final_installment_date'], '[') !== false) {
+                        $options = $this->serializer->unserialize($item['subscription_final_installment_date']);
+                        $result = [];
+                        foreach ($options as $option) {
+                            if ($option === null) {
+                                $result[] = "--";
+                            } else {
+                                $result[] = $this->timezone->formatDate(
+                                    $option,
+                                    IntlDateFormatter::MEDIUM
+                                );
+                            }
+                        }
+                        $item['subscription_final_installment_date'] = implode(', ', $result);
+                    } else {
+                        $item['subscription_final_installment_date'] =
+                            $this->timezone->formatDate(
+                                $item['subscription_final_installment_date'],
+                                IntlDateFormatter::MEDIUM
+                            );
+                    }
                 }
             }
         }
