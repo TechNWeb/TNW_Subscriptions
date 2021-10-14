@@ -69,7 +69,8 @@ class Collection extends SearchResult
                 'start_date',
                 'created_at',
                 'customer_id',
-                'profile_currency_code'
+                'profile_currency_code',
+                'store_id'
             ]
         );
 

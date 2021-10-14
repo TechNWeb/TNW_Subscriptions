@@ -5,6 +5,8 @@
  */
 namespace TNW\Subscriptions\Ui\Component\Listing\Column\SubscriptionProfile;
 
+use Magento\Framework\Exception\LocalizedException;
+use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\Pricing\PriceCurrencyInterface;
 use Magento\Framework\View\Element\UiComponent\ContextInterface;
 use Magento\Framework\View\Element\UiComponentFactory;
@@ -52,24 +54,17 @@ class LifetimeValue extends Column
 
     /**
      * @inheritdoc
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
-     * @throws \Magento\Framework\Exception\LocalizedException
+     * @throws NoSuchEntityException
+     * @throws LocalizedException
      */
     public function prepareDataSource(array $dataSource)
     {
         if (isset($dataSource['data']['items'])) {
             foreach ($dataSource['data']['items'] as & $item) {
-                $profileId = $item['entity_id'];
-                $profile = $this->profileRepository->getById($profileId);
-                $currentValue = $profile->getCurrentValue();
+                $profile = $this->profileRepository->getById($item['entity_id']);
                 $currencyCode = $item[SubscriptionProfileInterface::PROFILE_CURRENCY_CODE] ?? null;
-                $currentValue = $this->priceFormatter->format(
-                    $currentValue,
-                    false,
-                    null,
-                    null,
-                    $currencyCode
-                );
+                $currency = $this->priceFormatter->getCurrency($profile->getStoreId(), $currencyCode);
+                $currentValue = $currency->format($profile->getCurrentValue(), false, null);
                 $item[$this->getData('name')] = $currentValue;
             }
         }

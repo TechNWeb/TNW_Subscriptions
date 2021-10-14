@@ -183,6 +183,11 @@ class UpgradeSchema implements UpgradeSchemaInterface
             $this->addStoreIdToSubscriptionProfileTable($setup);
         }
 
+        if (version_compare($context->getVersion(), '2.3.50', '<')) {
+            $this->updateRecurringInstallmentDatesSalesOrder($setup);
+            $this->updateRecurringInstallmentDates($setup);
+        }
+
         $setup->endSetup();
     }
 
@@ -788,7 +793,6 @@ class UpgradeSchema implements UpgradeSchemaInterface
         ];
 
         foreach ($nextPaymentAttributes as $nextPaymentAttribute) {
-
             $setup->getConnection()
                 ->addColumn($setup->getTable(
                     SubscriptionProfile::SUBSCRIPTION_PROFILE_ENTITY
@@ -1175,6 +1179,69 @@ class UpgradeSchema implements UpgradeSchemaInterface
                 'unsigned' => true,
                 'nullable' => true,
                 'comment' => 'Store Id'
+            ]
+        );
+    }
+
+    public function updateRecurringInstallmentDatesSalesOrder(SchemaSetupInterface $setup)
+    {
+        $connection = $setup->getConnection();
+        $table = $setup->getTable('sales_order');
+        $connection->changeColumn(
+            $table,
+            'subscription_first_installment_date',
+            'subscription_first_installment_date',
+            [
+                'type' => Table::TYPE_TEXT,
+                'length' => Table::MAX_TEXT_SIZE,
+                'nullable' => true,
+                'default' => '',
+                'comment' => 'Recurring 1st Installment Date'
+            ]
+        );
+        $connection->changeColumn(
+            $table,
+            'subscription_final_installment_date',
+            'subscription_final_installment_date',
+            [
+                'type' => Table::TYPE_TEXT,
+                'length' => Table::MAX_TEXT_SIZE,
+                'nullable' => true,
+                'default' => '',
+                'comment' => 'Recurring Final Installment Date'
+            ]
+        );
+    }
+
+    /**
+     * @param SchemaSetupInterface $setup
+     */
+    public function updateRecurringInstallmentDates(SchemaSetupInterface $setup)
+    {
+        $connection = $setup->getConnection();
+        $table = $setup->getTable('sales_order_grid');
+        $connection->changeColumn(
+            $table,
+            'subscription_first_installment_date',
+            'subscription_first_installment_date',
+            [
+                'type' => Table::TYPE_TEXT,
+                'length' => Table::MAX_TEXT_SIZE,
+                'nullable' => true,
+                'default' => '',
+                'comment' => 'Recurring 1st Installment Date'
+            ]
+        );
+        $connection->changeColumn(
+            $table,
+            'subscription_final_installment_date',
+            'subscription_final_installment_date',
+            [
+                'type' => Table::TYPE_TEXT,
+                'length' => Table::MAX_TEXT_SIZE,
+                'nullable' => true,
+                'default' => '',
+                'comment' => 'Recurring Final Installment Date'
             ]
         );
     }

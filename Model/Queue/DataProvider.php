@@ -82,7 +82,8 @@ class DataProvider extends AbstractDataProvider
             ],
             'subscription_profile.entity_id = relation.subscription_profile_id',
             [
-            'subscription_profile.profile_currency_code'
+                'subscription_profile.profile_currency_code',
+                'subscription_profile.store_id'
             ]
         );
 
