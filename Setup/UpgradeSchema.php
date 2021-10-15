@@ -170,11 +170,6 @@ class UpgradeSchema implements UpgradeSchemaInterface
             $this->addRecurringInstallmentDatesSalesOrder($setup);
         }
 
-        if (version_compare($context->getVersion(), '2.3.36', '<')) {
-            $this->addVaultThreeDSecureFields($setup);
-            $this->addRebillTable($setup);
-        }
-
         if (version_compare($context->getVersion(), '2.3.40', '<')) {
             $this->addSubscriptionProfileProfitTable($setup);
         }
@@ -183,9 +178,14 @@ class UpgradeSchema implements UpgradeSchemaInterface
             $this->addStoreIdToSubscriptionProfileTable($setup);
         }
 
-        if (version_compare($context->getVersion(), '2.3.50', '<')) {
+        if (version_compare($context->getVersion(), '2.3.52', '<')) {
             $this->updateRecurringInstallmentDatesSalesOrder($setup);
             $this->updateRecurringInstallmentDates($setup);
+        }
+        
+        if (version_compare($context->getVersion(), '2.3.52', '<')) {
+            $this->addVaultThreeDSecureFields($setup);
+            $this->addRebillTable($setup);
         }
 
         $setup->endSetup();
