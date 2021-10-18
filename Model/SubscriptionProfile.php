@@ -370,6 +370,9 @@ class SubscriptionProfile extends AbstractExtensibleModel implements Subscriptio
      */
     public function getStore()
     {
+        if (!$this->getStoreId()) {
+            return $this->getWebsite()->getDefaultStore();
+        }
         return $this->storeRepository->getById($this->getStoreId());
     }
 
