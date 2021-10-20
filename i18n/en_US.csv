@@ -423,3 +423,4 @@ The number of future quotes to generate at a time for the new subscription profi
 "Fee charged once upon creation of the subscription. Leave blank if subscription has no initial fee.", "Fee charged once upon creation of the subscription. Leave blank if subscription has no initial fee."
 "Cannot unlink product from Billing frequency. Some <a href="%1" target="_blank">subscription profiles</a> use it.", "Cannot unlink product from Billing frequency. Some <a href="%1" target="_blank">subscription profiles</a> use it."
 "Cannot unlink product", "Cannot unlink product"
+"Only future dates are allowed for Next Payment Date","Only future dates are allowed for Next Payment Date"

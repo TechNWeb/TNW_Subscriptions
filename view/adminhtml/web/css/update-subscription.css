@@ -112,6 +112,12 @@
 .tnw_subscriptionprofile_form_areas_dashboard_dashboard_next_payment_date_insert_form .admin__field-complex {
   padding-left: 0;
 }
+.tnw_subscriptionprofile_form_areas_dashboard_dashboard_next_payment_date_insert_form .subs-next-payment-date {
+    padding-left: 50px;
+}
+.subs-next-payment-date {
+  padding-left: 10px;
+}
 .profile-dashboard-subscription-details-title-wrapper {
   border-bottom: 1px solid #ffffff;
 }

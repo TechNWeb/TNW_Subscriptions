@@ -33,7 +33,9 @@ define(
                     insertFrom.render();
                     this.setMessageFromResponse();
                 } else {
-                    window.location.reload();
+                    if (!this.responseData().error) {
+                        window.location.reload();
+                    }
                 }
             },
 
@@ -46,8 +48,10 @@ define(
                     var messages = result.messages;
                     if (messages) {
                         messages.forEach(function (message) {
-                            var tab = registry.get(message.index);
-                            tab.setMessagesData(message.message);
+                            registry.async(message.index)(function (component) {
+                                component.setMessagesData(message.message);
+
+                            });
                         });
                     }
                 }

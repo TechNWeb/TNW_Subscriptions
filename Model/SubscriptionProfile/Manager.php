@@ -1407,10 +1407,10 @@ class Manager
 
     /**
      * Handles messages for subscription edit form
-     *
+     * @param $response
      * @return array
      */
-    public function handleMessages()
+    public function handleMessages($response)
     {
         $messages = [];
         /** @var SubscriptionProfile $profile */
@@ -1425,6 +1425,12 @@ class Manager
             $messages[] = [
                 'index' => 'index = profit_message',
                 'message' => $profile->getProductChangesMadeMessageForProfit()
+            ];
+        }
+        if ($response === 1) {
+            $messages[] = [
+                'index' => 'index = next_payment_date_message',
+                'message' => __('Only future dates are allowed for Next Payment Date')
             ];
         }
         return $messages;
@@ -1842,5 +1848,10 @@ class Manager
             $profileIds = $this->profileOrderManager->getProfileIdsByOrder($order->getEntityId());
             $this->profitManager->setProfilesToCalculateProfit($profileIds);
         }
+    }
+
+    public function isCorrectNextPaymentDate($request)
+    {
+        return $request['next_payment_date_value'] <= date('m/d/Y', time());
     }
 }
