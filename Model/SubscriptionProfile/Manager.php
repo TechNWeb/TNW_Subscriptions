@@ -1821,11 +1821,17 @@ class Manager
         $profileOrders = $this->subscriptionProfileOrder->getProfileOrdersByProfileId(
             $profile->getId()
         );
-        if (empty($profileOrders)) {
-            $totalBillingCycles = 1 + $profile->getTotalBillingCycles();
+        
+        if ($profile->getTerm() == 0) {
+            if (empty($profileOrders)) {
+                $totalBillingCycles = 1 + $profile->getTotalBillingCycles();
+            } else {
+                $totalBillingCycles = count($profileOrders) + $profile->getTotalBillingCycles();
+            }
         } else {
-            $totalBillingCycles = count($profileOrders) + $profile->getTotalBillingCycles();
+            $totalBillingCycles = 1;
         }
+
         $this->profileResource->updateStaticBillingCyclesForProfile(
             $profile->getId(),
             $totalBillingCycles
