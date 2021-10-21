@@ -5,11 +5,11 @@
  */
 namespace TNW\Subscriptions\Ui\Component\Listing\Column\SubscriptionProfile;
 
+use Magento\Framework\Pricing\PriceCurrencyInterface;
 use Magento\Framework\View\Element\UiComponent\ContextInterface;
 use Magento\Framework\View\Element\UiComponentFactory;
 use Magento\Ui\Component\Listing\Columns\Column;
-use TNW\Subscriptions\Api\SubscriptionProfileRepositoryInterface;
-use TNW\Subscriptions\Model\SubscriptionProfile\ProfitCalculator;
+use TNW\Subscriptions\Api\Data\SubscriptionProfileInterface;
 
 /**
  * Class Current Value column
@@ -17,49 +17,45 @@ use TNW\Subscriptions\Model\SubscriptionProfile\ProfitCalculator;
 class CurrentValue extends Column
 {
     /**
-     * @var SubscriptionProfileRepositoryInterface
+     * @var PriceCurrencyInterface
      */
-    private $profileRepository;
-
-    /**
-     * @var ProfitCalculator
-     */
-    private $profitCalculator;
+    private $priceFormatter;
 
     /**
      * @param ContextInterface $context
      * @param UiComponentFactory $uiComponentFactory
-     * @param SubscriptionProfileRepositoryInterface $profileRepository
-     * @param ProfitCalculator $profitCalculator
+     * @param PriceCurrencyInterface $priceFormatter
      * @param array $components
      * @param array $data
      */
     public function __construct(
         ContextInterface $context,
         UiComponentFactory $uiComponentFactory,
-        SubscriptionProfileRepositoryInterface $profileRepository,
-        ProfitCalculator $profitCalculator,
+        PriceCurrencyInterface $priceFormatter,
         array $components = [],
         array $data = []
     ) {
-        $this->profileRepository = $profileRepository;
-        $this->profitCalculator = $profitCalculator;
+        $this->priceFormatter = $priceFormatter;
         parent::__construct($context, $uiComponentFactory, $components, $data);
     }
 
     /**
-     * @inheritdoc
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
-     * @throws \Magento\Framework\Exception\LocalizedException
+     * @param array $dataSource
+     * @return array
      */
     public function prepareDataSource(array $dataSource)
     {
         if (isset($dataSource['data']['items'])) {
             foreach ($dataSource['data']['items'] as & $item) {
-                $profileId = $item['entity_id'];
-                /** @var \TNW\Subscriptions\Model\SubscriptionProfile $profile */
-                $profile = $this->profileRepository->getById($profileId);
-                $currentValue = $this->profitCalculator->getRenderedAsOfTodayProfit($profile, false);
+                $currentValue = $item[$this->getData('name')] ?? null;
+                if ($currentValue) {
+                    $currencyCode = $item[SubscriptionProfileInterface::PROFILE_CURRENCY_CODE] ?? null;
+                    $currency = $this->priceFormatter->getCurrency(
+                        $item['store_id'],
+                        $currencyCode
+                    );
+                    $currentValue = $currency->format($currentValue, false, null);
+                }
                 $item[$this->getData('name')] = $currentValue;
             }
         }

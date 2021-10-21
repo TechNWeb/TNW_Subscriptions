@@ -107,6 +107,16 @@ class Collection extends SearchResult
                 ['frequency_label' => 'frequency.label']
             )
             ->joinLeft(
+                ['profit' => $this->getTable('tnw_subscriptions_profile_profit')],
+                "main_table.entity_id = profit.profile_id AND profit.profit_type = 'as_of_today'",
+                ['current_value' => 'profit.total_profit']
+            )
+            ->joinLeft(
+                ['lifetime_value' => $this->getTable('tnw_subscriptions_profile_profit')],
+                "main_table.entity_id = lifetime_value.profile_id AND lifetime_value.profit_type = 'lifetime'",
+                ['lifetime_value' => 'lifetime_value.total_profit']
+            )
+            ->joinLeft(
                 ['relation' => $this->getTable(SubscriptionProfileOrderInterface::MAIN_TABLE)],
                 'relation.id = (' . (string) $this->getRelationJoinSelect() . ')',
                 ['next_billing_cycle_date' => 'relation.scheduled_at']
