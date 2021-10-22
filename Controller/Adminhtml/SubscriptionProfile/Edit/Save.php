@@ -74,13 +74,18 @@ class Save extends AbstractSave
     public function execute()
     {
         $result = $this->initProfile();
+        $request = $this->getRequest()->getParams();
         if ($result) {
             try {
                 /** @var SubscriptionProfile $profile */
                 $profile = $this->profileManager->getProfile();
                 $profileDataChanges = $profile->hasDataChanges();
                 $profile->setDataChanges(false);
-                $this->processRequestData();
+                if ($request['next_payment_date_value'] <= date('m/d/Y', time())) {
+                    $result = 1;
+                } else {
+                    $this->processRequestData();
+                }
                 if ($profile->hasDataChanges()) {
                     $profile->setNeedRecollect('1');
                 }
@@ -129,7 +134,7 @@ class Save extends AbstractSave
      */
     private function createResponse($result)
     {
-        $messages = $this->profileManager->handleMessages();
+        $messages = $this->profileManager->handleMessages($result);
         $response = new DataObject();
         $response->setData(
             [
