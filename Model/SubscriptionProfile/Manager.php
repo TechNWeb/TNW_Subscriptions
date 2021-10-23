@@ -1407,10 +1407,10 @@ class Manager
 
     /**
      * Handles messages for subscription edit form
-     *
+     * @param $response
      * @return array
      */
-    public function handleMessages()
+    public function handleMessages($response)
     {
         $messages = [];
         /** @var SubscriptionProfile $profile */
@@ -1425,6 +1425,12 @@ class Manager
             $messages[] = [
                 'index' => 'index = profit_message',
                 'message' => $profile->getProductChangesMadeMessageForProfit()
+            ];
+        }
+        if ($response === 1) {
+            $messages[] = [
+                'index' => 'index = next_payment_date_message',
+                'message' => __('Only future dates are allowed for Next Payment Date')
             ];
         }
         return $messages;
@@ -1821,11 +1827,17 @@ class Manager
         $profileOrders = $this->subscriptionProfileOrder->getProfileOrdersByProfileId(
             $profile->getId()
         );
-        if (empty($profileOrders)) {
-            $totalBillingCycles = 1 + $profile->getTotalBillingCycles();
+        
+        if ($profile->getTerm() == 0) {
+            if (empty($profileOrders)) {
+                $totalBillingCycles = 1 + $profile->getTotalBillingCycles();
+            } else {
+                $totalBillingCycles = count($profileOrders) + $profile->getTotalBillingCycles();
+            }
         } else {
-            $totalBillingCycles = count($profileOrders) + $profile->getTotalBillingCycles();
+            $totalBillingCycles = 1;
         }
+
         $this->profileResource->updateStaticBillingCyclesForProfile(
             $profile->getId(),
             $totalBillingCycles

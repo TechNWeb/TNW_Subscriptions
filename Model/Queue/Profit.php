@@ -160,6 +160,7 @@ class Profit
     public function calculateProfitAndSave($profile)
     {
         $profit = 0;
+        $lifetimeValue = 0;
         $invoiceItems = [];
         if ($profile->getStatus() == ProfileStatus::STATUS_CANCELED
         ) {
@@ -201,12 +202,15 @@ class Profit
                 if (!$initialFeeAdded && isset($recurringOption['initial_fee']) && $recurringOption['initial_fee']) {
                     $initialFeeAdded = true;
                     $profit += $recurringOption['initial_fee'];
+                    $lifetimeValue += $recurringOption['initial_fee'];
                 }
                 $profit += ($item['base_price'] - $item['base_cost']) * $item['qty'];
+                $lifetimeValue += $item['base_price'] * $item['qty'];
             }
         }
 
         $this->setProfitData($profile, $profit, ProfitCalculator::AS_OF_TODAY);
+        $this->setProfitData($profile, $lifetimeValue, ProfitCalculator::LIFETIME);
 
         $lastInvoiceItem = array_pop($invoiceItems);
         if ($lastInvoiceItem) {

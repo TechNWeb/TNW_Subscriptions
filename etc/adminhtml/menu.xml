@@ -2,7 +2,7 @@
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Backend:etc/menu.xsd">
     <menu>
-        <add id="TNW_Subscriptions::top_level" module="TNW_Subscriptions" resource="Magento_Backend::content"
+        <add id="TNW_Subscriptions::top_level" module="TNW_Subscriptions" resource="TNW_Subscriptions::tnw_subscriptions_root"
              sortOrder="49" title="mPower" translate="title"
              dependsOnModule="TNW_Subscriptions"
              />
@@ -29,7 +29,7 @@
         <!-- Subscription -> Configuration -> General Configuration -->
         <add id="TNW_Subscriptions::tnw_subscriptions_config_general" title="General" module="TNW_Subscriptions"
              action="adminhtml/system_config/edit/section/tnw_subscriptions_general" sortOrder="65"
-             parent="TNW_Subscriptions::tnw_subscriptions_settings" resource="Magento_Sales::sales"/>
+             parent="TNW_Subscriptions::tnw_subscriptions_settings" resource="TNW_Subscriptions::general_config"/>
         <!-- Subscription -> Configuration -> Billing Frequencies - Billing Frequencies grid -->
         <add id="TNW_Subscriptions::tnw_subscriptions_billing_frequencies" title="Billing Frequencies"
              translate="title" module="TNW_Subscriptions" sortOrder="70" parent="TNW_Subscriptions::tnw_subscriptions_settings"
@@ -37,18 +37,18 @@
         <!-- Subscription -> Configuration -> Subscription Profiles -->
         <add id="TNW_Subscriptions::tnw_subscriptions_config_profile_options" title="Subscription Profiles" module="TNW_Subscriptions"
              action="adminhtml/system_config/edit/section/tnw_subscriptions_profile_options" sortOrder="72"
-             parent="TNW_Subscriptions::tnw_subscriptions_settings" resource="Magento_Sales::sales"/>
+             parent="TNW_Subscriptions::tnw_subscriptions_settings" resource="TNW_Subscriptions::sales_settings"/>
         <add id="TNW_Subscriptions::tnw_subscriptions_config_profile_notification" title="Notifications" module="TNW_Subscriptions"
              action="adminhtml/system_config/edit/section/tnw_subscriptions_profile_notification" sortOrder="73"
-             parent="TNW_Subscriptions::tnw_subscriptions_settings" resource="Magento_Sales::sales"/>
+             parent="TNW_Subscriptions::tnw_subscriptions_settings" resource="TNW_Subscriptions::sales_settings"/>
         <!-- Subscription -> Configuration -> Products -->
         <add id="TNW_Subscriptions::tnw_subscriptions_config_product" title="Products" module="TNW_Subscriptions"
              action="adminhtml/system_config/edit/section/tnw_subscriptions_product" sortOrder="74"
-             parent="TNW_Subscriptions::tnw_subscriptions_settings" resource="Magento_Catalog::products"/>
+             parent="TNW_Subscriptions::tnw_subscriptions_settings" resource="TNW_Subscriptions::product_settings"/>
         <!-- Subscription -> Configuration -> Customers -->
         <add id="TNW_Subscriptions::tnw_subscriptions_config_customer" title="Customers" module="TNW_Subscriptions"
              action="adminhtml/system_config/edit/section/tnw_subscriptions_customer" sortOrder="76"
-             parent="TNW_Subscriptions::tnw_subscriptions_settings" resource="Magento_Customer::customers"/>
+             parent="TNW_Subscriptions::tnw_subscriptions_settings" resource="TNW_Subscriptions::customer_settings"/>
 
         <!-- Subscription -> Attributes -->
         <add id="TNW_Subscriptions::tnw_subscriptions_attributes" title="Custom Attributes" translate="title"

@@ -16,6 +16,8 @@ use TNW\Subscriptions\Api\SubscriptionProfileOrderRepositoryInterface as Relatio
 use TNW\Subscriptions\Model\SubscriptionProfileOrderFactory;
 use TNW\Subscriptions\Model\Source\ProfileStatus;
 use TNW\Subscriptions\Model\Config;
+use Magento\Sales\Model\AdminOrder\EmailSender;
+use Magento\Sales\Api\OrderRepositoryInterface;
 
 /**
  * Class Manager - for subscription profile order
@@ -63,25 +65,41 @@ class Manager
     private $config;
 
     /**
+     * @var EmailSender
+     */
+    private $sender;
+
+    /**
+     * @var OrderRepositoryInterface
+     */
+    private $orderRepository;
+
+    /**
      * Manager constructor.
      * @param SubscriptionProfileOrderFactory $profileFactory
      * @param RelationRepository $profileOrderRepository
      * @param SearchCriteriaBuilder $criteriaBuilder
      * @param SortOrderBuilder $sortOrderBuilder
      * @param Config $config
+     * @param EmailSender $sender
+     * @param OrderRepositoryInterface $orderRepository
      */
     public function __construct(
         SubscriptionProfileOrderFactory $profileFactory,
         RelationRepository $profileOrderRepository,
         SearchCriteriaBuilder $criteriaBuilder,
         SortOrderBuilder $sortOrderBuilder,
-        Config $config
+        Config $config,
+        EmailSender $sender,
+        OrderRepositoryInterface $orderRepository
     ) {
         $this->profileOrderFactory = $profileFactory;
         $this->profileOrderRepository = $profileOrderRepository;
         $this->criteriaBuilder = $criteriaBuilder;
         $this->sortOrderBuilder = $sortOrderBuilder;
         $this->config = $config;
+        $this->sender = $sender;
+        $this->orderRepository = $orderRepository;
     }
 
     /**
@@ -142,6 +160,13 @@ class Manager
         }
 
         $relation = $this->profileOrderRepository->save($relation);
+        if (array_key_exists('magento_order_id', $relation->getData())) {
+            if (!$relation->getData('email_sent')) {
+                $this->sender->send($this->orderRepository->get(
+                    $relation->getMagentoOrderId()
+                ));
+            }
+        }
 
         return $relation;
     }

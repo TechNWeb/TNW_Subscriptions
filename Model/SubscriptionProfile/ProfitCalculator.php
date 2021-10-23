@@ -29,6 +29,11 @@ class ProfitCalculator
     const REMAINING = 'remaining';
 
     /**
+     * Profile type lifetime value
+     */
+    const LIFETIME = 'lifetime';
+
+    /**
      * @var array
      */
     private $remainingProfit = [];
@@ -37,6 +42,11 @@ class ProfitCalculator
      * @var array
      */
     private $asOfTodayProfit = [];
+
+    /**
+     * @var array
+     */
+    private $lifetimeValue = [];
 
     /**
      * @var ProductBillingFrequencyRepositoryInterface
@@ -176,6 +186,35 @@ class ProfitCalculator
     {
         $profit = $this->getRemainingProfit($subscriptionProfile);
         return $this->renderPrice($profit, $subscriptionProfile, $includeContainer);
+    }
+
+    /**
+     * Get lifetime value (sum of all profile items in invoices) for given profile
+     *
+     * @param SubscriptionProfile $subscriptionProfile
+     * @return array|mixed|string|null
+     */
+    public function getLifetimeValue(SubscriptionProfile $subscriptionProfile)
+    {
+        if (empty($this->lifetimeValue[$subscriptionProfile->getId()])) {
+            $this->lifetimeValue[$subscriptionProfile->getId()]
+                =  $this->getProfit($subscriptionProfile, self::LIFETIME);
+        }
+
+        return $this->lifetimeValue[$subscriptionProfile->getId()];
+    }
+
+    /**
+     * Get rendered lifetime value for given profile
+     *
+     * @param SubscriptionProfile $subscriptionProfile
+     * @param bool $includeContainer
+     * @return string
+     */
+    public function getRenderedLifetimeValue(SubscriptionProfile $subscriptionProfile, $includeContainer = true)
+    {
+        $lifetimeValue = $this->getLifetimeValue($subscriptionProfile);
+        return $this->renderPrice($lifetimeValue, $subscriptionProfile, $includeContainer);
     }
 
     /**

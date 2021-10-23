@@ -52,9 +52,20 @@
                 <visible>false</visible>
             </settings>
         </field>
+        <container name="next_payment_date_message"
+                   component="TNW_Subscriptions/js/components/container-with-message"
+                   sortOrder="1">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="sortOrder" xsi:type="number">10</item>
+                    <item name="additionalClasses" xsi:type="string">message message-warning warning subs-next-payment-date</item>
+                    <item name="label" xsi:type="boolean">false</item>
+                </item>
+            </argument>
+        </container>
         <container name="next_payment_date_header"
                    template="TNW_Subscriptions/form/subscription-profile/edit/buttons"
-                   sortOrder="0">
+                   sortOrder="5">
             <field name="edit_next_payment_date" formElement="button"
                    component="Magento_Ui/js/form/components/button" sortOrder="0">
                 <argument name="data" xsi:type="array">

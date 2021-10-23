@@ -13,10 +13,10 @@ use TNW\Subscriptions\Model\SubscriptionProfileRepository;
 use Psr\Log\LoggerInterface;
 
 /**
- * Class CalculateExistingSubscriptionsOrdersProfit forced calculate profit
- * for existing orders.
+ * Class CalculateExistingSubscriptionsProfitTypes force calculate profit types
+ * for existing profile orders.
  */
-class CalculateExistingSubscriptionsOrdersProfit implements DataPatchInterface
+class CalculateExistingSubscriptionsProfitTypes implements DataPatchInterface
 {
     /**
      * @var ModuleDataSetupInterface
