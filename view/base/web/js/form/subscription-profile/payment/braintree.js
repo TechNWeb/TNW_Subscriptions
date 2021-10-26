@@ -161,6 +161,8 @@ define([
                 }
             });
 
+            this.processErrors([$t('Please correct the problems with the Credit Card fields.')]);
+            $('body').trigger('processStop');
             return false;
         },
 
