@@ -5,8 +5,10 @@
  */
 namespace TNW\Subscriptions\Controller\Adminhtml\SubscriptionProfile\Edit;
 
+use Exception;
 use Magento\Backend\App\Action\Context;
 use Magento\Framework\Controller\Result\JsonFactory;
+use Magento\Framework\Controller\ResultInterface;
 use Magento\Framework\DataObject;
 use Magento\Framework\Registry;
 use TNW\Subscriptions\Model\SubscriptionProfile\Manager as ProfileManager;
@@ -15,6 +17,7 @@ use TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Form\Modifier\SummaryI
 use TNW\Subscriptions\Controller\Adminhtml\SubscriptionProfile\AbstractSave;
 use TNW\Subscriptions\Model\Processor\Request as RequestProcessor;
 use Magento\Framework\App\Request\DataPersistorInterface;
+use Psr\Log\LoggerInterface;
 
 /**
  * Class Save - controller
@@ -43,6 +46,11 @@ class Save extends AbstractSave
     private $profileManager;
 
     /**
+     * @var LoggerInterface
+     */
+    private $logger;
+
+    /**
      * Save constructor.
      * @param Context $context
      * @param Registry $coreRegistry
@@ -50,6 +58,7 @@ class Save extends AbstractSave
      * @param ProfileManager $profileManager
      * @param RequestProcessor $saveProcessor
      * @param DataPersistorInterface $dataPersistor
+     * @param LoggerInterface $logger
      */
     public function __construct(
         Context $context,
@@ -57,11 +66,13 @@ class Save extends AbstractSave
         JsonFactory $jsonFactory,
         ProfileManager $profileManager,
         RequestProcessor $saveProcessor,
-        DataPersistorInterface $dataPersistor
+        DataPersistorInterface $dataPersistor,
+        LoggerInterface $logger
     ) {
         $this->coreRegistry = $coreRegistry;
         $this->jsonFactory = $jsonFactory;
         $this->profileManager = $profileManager;
+        $this->logger = $logger;
 
         parent::__construct($context, $coreRegistry, $dataPersistor, $saveProcessor);
     }
@@ -69,7 +80,7 @@ class Save extends AbstractSave
     /**
      * Save action
      *
-     * @return \Magento\Framework\Controller\ResultInterface
+     * @return ResultInterface
      */
     public function execute()
     {
@@ -81,17 +92,14 @@ class Save extends AbstractSave
                 $profile = $this->profileManager->getProfile();
                 $profileDataChanges = $profile->hasDataChanges();
                 $profile->setDataChanges(false);
-                if ($request['next_payment_date_value'] <= date('m/d/Y', time())) {
-                    $result = 1;
-                } else {
-                    $this->processRequestData();
-                }
+                $this->processRequestData();
                 if ($profile->hasDataChanges()) {
                     $profile->setNeedRecollect('1');
                 }
                 $profile->setDataChanges($profileDataChanges || $profile->hasDataChanges());
                 $this->profileManager->saveProfile();
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
+                $this->logger->error($e->getMessage());
                 $result = false;
             }
         }
@@ -134,7 +142,7 @@ class Save extends AbstractSave
      */
     private function createResponse($result)
     {
-        $messages = $this->profileManager->handleMessages($result);
+        $messages = $this->profileManager->handleMessages();
         $response = new DataObject();
         $response->setData(
             [

@@ -33,6 +33,9 @@ class NextPaymentDate extends Base
      */
     public function process(array $data)
     {
-        $this->profileManager->processNextPaymentDate($data);
+        $process = $this->profileManager->processNextPaymentDate($data);
+        if ($process === false) {
+            $this->errors[] = __('Only future dates are allowed for Next Payment Date');
+        }
     }
 }

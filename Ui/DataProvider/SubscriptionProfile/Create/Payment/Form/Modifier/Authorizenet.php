@@ -5,7 +5,11 @@
  */
 namespace TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Payment\Form\Modifier;
 
+use Magento\Framework\Module\Manager;
+use Magento\Framework\ObjectManagerInterface;
 use Magento\Payment\Model\Config;
+use Magento\Quote\Api\CartRepositoryInterface;
+use Magento\Store\Model\StoreManagerInterface;
 use Magento\Ui\Component\Container;
 use Magento\Ui\Component\Form;
 use TNW\Subscriptions\Model\QuoteSessionInterface;
@@ -43,22 +47,24 @@ class Authorizenet extends Base
      * @param QuoteSessionInterface $session
      * @param SubscriptionProfileRepository $profileRepository
      * @param OrderRelationManager $relationManager
-     * @param \Magento\Quote\Api\CartRepositoryInterface $cartRepository
-     * @param \Magento\Framework\Module\Manager $moduleManager
-     * @param \Magento\Framework\ObjectManagerInterface $objectManager
+     * @param CartRepositoryInterface $cartRepository
+     * @param Manager $moduleManager
+     * @param ObjectManagerInterface $objectManager
      * @param Config $paymentConfig
+     * @param StoreManagerInterface $storeManager
      */
     public function __construct(
         \TNW\Subscriptions\Model\Config $config,
         QuoteSessionInterface $session,
         SubscriptionProfileRepository $profileRepository,
         OrderRelationManager $relationManager,
-        \Magento\Quote\Api\CartRepositoryInterface $cartRepository,
-        \Magento\Framework\Module\Manager $moduleManager,
-        \Magento\Framework\ObjectManagerInterface $objectManager,
-        Config $paymentConfig
+        CartRepositoryInterface $cartRepository,
+        Manager $moduleManager,
+        ObjectManagerInterface $objectManager,
+        Config $paymentConfig,
+        StoreManagerInterface $storeManager
     ) {
-        parent::__construct($config, $session, $profileRepository, $relationManager, $cartRepository);
+        parent::__construct($config, $session, $profileRepository, $relationManager, $cartRepository, $storeManager);
         if ($moduleManager->isEnabled("TNW_AuthorizeCim")) {
             $this->authorizenetConfig = $objectManager->get(\TNW\AuthorizeCim\Gateway\Config\Config::class);
         }

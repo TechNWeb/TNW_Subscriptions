@@ -5,6 +5,8 @@
  */
 namespace TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Payment\Form\Modifier;
 
+use Magento\Quote\Api\CartRepositoryInterface;
+use Magento\Store\Model\StoreManagerInterface;
 use TNW\Subscriptions\Model\Payment\Braintree\AdapterFactory;
 use Magento\Payment\Model\Config;
 use Magento\Ui\Component\Container;
@@ -46,21 +48,39 @@ class Braintree extends Base
      */
     private $clientToken = '';
 
+    /**
+     * @var DataBuilder
+     */
     private $dataBuilder;
 
+    /**
+     * Braintree constructor.
+     * @param \TNW\Subscriptions\Model\Config $config
+     * @param QuoteSessionInterface $session
+     * @param SubscriptionProfileRepository $profileRepository
+     * @param OrderRelationManager $relationManager
+     * @param CartRepositoryInterface $cartRepository
+     * @param Manager $moduleManager
+     * @param ObjectManagerInterface $objectManager
+     * @param Config $paymentConfig
+     * @param AdapterFactory $braintreeAdapterFactory
+     * @param DataBuilder $dataBuilder
+     * @param StoreManagerInterface $storeManager
+     */
     public function __construct(
         \TNW\Subscriptions\Model\Config $config,
         QuoteSessionInterface $session,
         SubscriptionProfileRepository $profileRepository,
         OrderRelationManager $relationManager,
-        \Magento\Quote\Api\CartRepositoryInterface $cartRepository,
+        CartRepositoryInterface $cartRepository,
         Manager $moduleManager,
         ObjectManagerInterface $objectManager,
         Config $paymentConfig,
         AdapterFactory $braintreeAdapterFactory,
-        DataBuilder $dataBuilder
+        DataBuilder $dataBuilder,
+        StoreManagerInterface $storeManager
     ) {
-        parent::__construct($config, $session, $profileRepository, $relationManager, $cartRepository);
+        parent::__construct($config, $session, $profileRepository, $relationManager, $cartRepository, $storeManager);
         if ($moduleManager->isEnabled("PayPal_Braintree")) {
             $this->braintreeConfig = $objectManager->get(\PayPal\Braintree\Gateway\Config\Config::class);
         }

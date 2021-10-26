@@ -5,6 +5,8 @@
  */
 namespace TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Payment\Form\Modifier\Paypal;
 
+use Magento\Quote\Api\CartRepositoryInterface;
+use Magento\Store\Model\StoreManagerInterface;
 use Magento\Ui\Component\Container;
 use Magento\Ui\Component\Form\Element\DataType\Text;
 use Magento\Ui\Component\Form\Element\Input;
@@ -76,26 +78,28 @@ class PaymentsPro extends Base implements PaymentModifierInterface
      * @param QuoteSessionInterface $session
      * @param SubscriptionProfileRepository $profileRepository
      * @param OrderRelationManager $relationManager
-     * @param \Magento\Quote\Api\CartRepositoryInterface $cartRepository
+     * @param CartRepositoryInterface $cartRepository
      * @param Context $context
      * @param Repository $assetRepository
      * @param RequestInterface $request
      * @param UrlInterface $urlBuilder
      * @param Manager $moduleManager
      * @param ObjectManagerInterface $objectManager
+     * @param StoreManagerInterface $storeManager
      */
     public function __construct(
         SubscriptionConfig $config,
         QuoteSessionInterface $session,
         SubscriptionProfileRepository $profileRepository,
         OrderRelationManager $relationManager,
-        \Magento\Quote\Api\CartRepositoryInterface $cartRepository,
+        CartRepositoryInterface $cartRepository,
         Context $context,
         Repository $assetRepository,
         RequestInterface $request,
         UrlInterface $urlBuilder,
         Manager $moduleManager,
-        ObjectManagerInterface $objectManager
+        ObjectManagerInterface $objectManager,
+        StoreManagerInterface $storeManager
     ) {
 
         if ($moduleManager->isEnabled("Magento_Paypal")) {
@@ -107,7 +111,7 @@ class PaymentsPro extends Base implements PaymentModifierInterface
         $this->assetRepository = $assetRepository;
         $this->request = $request;
         $this->urlBuilder = $urlBuilder;
-        parent::__construct($config, $session, $profileRepository, $relationManager, $cartRepository);
+        parent::__construct($config, $session, $profileRepository, $relationManager, $cartRepository, $storeManager);
     }
 
     /**

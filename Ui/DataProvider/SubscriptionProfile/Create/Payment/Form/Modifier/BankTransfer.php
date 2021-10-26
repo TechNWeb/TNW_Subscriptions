@@ -6,6 +6,8 @@
 namespace TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Payment\Form\Modifier;
 
 use Magento\OfflinePayments\Model\Banktransfer as BanktransferPayment;
+use Magento\Quote\Api\CartRepositoryInterface;
+use Magento\Store\Model\StoreManagerInterface;
 use TNW\Subscriptions\Model\Config;
 use TNW\Subscriptions\Model\Context;
 use TNW\Subscriptions\Model\QuoteSessionInterface;
@@ -38,22 +40,24 @@ class BankTransfer extends Base implements PaymentModifierInterface
      * @param QuoteSessionInterface $session
      * @param SubscriptionProfileRepository $profileRepository
      * @param OrderRelationManager $relationManager
-     * @param \Magento\Quote\Api\CartRepositoryInterface $cartRepository
+     * @param CartRepositoryInterface $cartRepository
      * @param Context $context
      * @param BanktransferPayment $banktransferPayment
+     * @param StoreManagerInterface $storeManager
      */
     public function __construct(
         Config $config,
         QuoteSessionInterface $session,
         SubscriptionProfileRepository $profileRepository,
         OrderRelationManager $relationManager,
-        \Magento\Quote\Api\CartRepositoryInterface $cartRepository,
+        CartRepositoryInterface $cartRepository,
         Context $context,
-        BanktransferPayment $banktransferPayment
+        BanktransferPayment $banktransferPayment,
+        StoreManagerInterface $storeManager
     ) {
         $this->context = $context;
         $this->banktransferPayment = $banktransferPayment;
-        parent::__construct($config, $session, $profileRepository, $relationManager, $cartRepository);
+        parent::__construct($config, $session, $profileRepository, $relationManager, $cartRepository, $storeManager);
     }
 
     /**

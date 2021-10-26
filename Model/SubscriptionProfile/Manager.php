@@ -279,6 +279,11 @@ class Manager
     private $profileOrderManager;
 
     /**
+     * @var bool
+     */
+    private $isNextPaymentDateValid = true;
+
+    /**
      * Manager constructor.
      * @param EnginePool $enginePool
      * @param SubscriptionProfileRepository $subscriptionProfileRepository
@@ -1407,10 +1412,9 @@ class Manager
 
     /**
      * Handles messages for subscription edit form
-     * @param $response
      * @return array
      */
-    public function handleMessages($response)
+    public function handleMessages()
     {
         $messages = [];
         /** @var SubscriptionProfile $profile */
@@ -1427,7 +1431,7 @@ class Manager
                 'message' => $profile->getProductChangesMadeMessageForProfit()
             ];
         }
-        if ($response === 1) {
+        if (!$this->isNextPaymentDateValid) {
             $messages[] = [
                 'index' => 'index = next_payment_date_message',
                 'message' => __('Only future dates are allowed for Next Payment Date')
@@ -1793,6 +1797,7 @@ class Manager
 
     /**
      * @param array $data
+     * @return false|void
      * @throws \Exception
      */
     public function processNextPaymentDate(array $data)
@@ -1806,14 +1811,20 @@ class Manager
             } elseif ($gmtOffset > 0) {
                 $nextDate->sub(new \DateInterval('PT' . $gmtOffset . 'H'));
             }
-            $this->orderRelationManager->updateNextPaymentDate(
-                $this->getProfile(),
-                $nextDate->format(DateTime::DATETIME_PHP_FORMAT)
-            );
-            $message = __(
-                'Profile next payment date changed to <b>%1</b>',
-                $nextDate->format('m/d/Y')
-            );
+
+            if ($data['next_payment_date_value'] <= date('m/d/Y', time())) {
+                $this->isNextPaymentDateValid = false;
+                return false;
+            } else {
+                $this->orderRelationManager->updateNextPaymentDate(
+                    $this->getProfile(),
+                    $nextDate->format(DateTime::DATETIME_PHP_FORMAT)
+                );
+                $message = __(
+                    'Profile next payment date changed to <b>%1</b>',
+                    $nextDate->format('m/d/Y')
+                );
+            }
             $this->historyLogger->log($message, $this->getProfile()->getId());
         }
     }
@@ -1827,7 +1838,7 @@ class Manager
         $profileOrders = $this->subscriptionProfileOrder->getProfileOrdersByProfileId(
             $profile->getId()
         );
-        
+
         if ($profile->getTerm() == 0) {
             if (empty($profileOrders)) {
                 $totalBillingCycles = 1 + $profile->getTotalBillingCycles();
