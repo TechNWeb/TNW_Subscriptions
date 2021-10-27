@@ -157,7 +157,7 @@ class Vault extends Base
         StoreManagerInterface $storeManager,
         $tokensConfigClass = ''
     ) {
-        parent::__construct($config, $session, $profileRepository, $relationManager, $cartRepository);
+        parent::__construct($config, $session, $profileRepository, $relationManager, $cartRepository, $storeManager);
         if ($tokensConfigClass) {
             $this->tokensConfigProvider = $objectManager->get($tokensConfigClass);
         } else {

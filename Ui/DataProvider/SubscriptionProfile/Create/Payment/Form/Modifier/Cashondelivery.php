@@ -6,6 +6,8 @@
 namespace TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Payment\Form\Modifier;
 
 use Magento\OfflinePayments\Model\Cashondelivery as CashondeliveryPayment;
+use Magento\Quote\Api\CartRepositoryInterface;
+use Magento\Store\Model\StoreManagerInterface;
 use TNW\Subscriptions\Model\Config;
 use TNW\Subscriptions\Model\Context;
 use TNW\Subscriptions\Model\QuoteSessionInterface;
@@ -38,22 +40,24 @@ class Cashondelivery extends Base implements PaymentModifierInterface
      * @param QuoteSessionInterface $session
      * @param SubscriptionProfileRepository $profileRepository
      * @param OrderRelationManager $relationManager
-     * @param \Magento\Quote\Api\CartRepositoryInterface $cartRepository
+     * @param CartRepositoryInterface $cartRepository
      * @param Context $context
      * @param CashondeliveryPayment $cashondeliveryPayment
+     * @param StoreManagerInterface $storeManager
      */
     public function __construct(
         Config $config,
         QuoteSessionInterface $session,
         SubscriptionProfileRepository $profileRepository,
         OrderRelationManager $relationManager,
-        \Magento\Quote\Api\CartRepositoryInterface $cartRepository,
+        CartRepositoryInterface $cartRepository,
         Context $context,
-        CashondeliveryPayment $cashondeliveryPayment
+        CashondeliveryPayment $cashondeliveryPayment,
+        StoreManagerInterface $storeManager
     ) {
         $this->context = $context;
         $this->cashondeliveryPayment = $cashondeliveryPayment;
-        parent::__construct($config, $session, $profileRepository, $relationManager, $cartRepository);
+        parent::__construct($config, $session, $profileRepository, $relationManager, $cartRepository, $storeManager);
     }
 
     /**

@@ -64,7 +64,8 @@ class FinalInstallment extends Column
     {
         if (isset($dataSource['data']['items'])) {
             foreach ($dataSource['data']['items'] as & $item) {
-                if (!isset($item['subscription_final_installment_date'])) {
+                if (!isset($item['subscription_final_installment_date'])
+                || $item['subscription_final_installment_date'] == '') {
                     $item['subscription_final_installment_date'] = "--";
                 } else {
                     if (strpos($item['subscription_final_installment_date'], '[') !== false) {

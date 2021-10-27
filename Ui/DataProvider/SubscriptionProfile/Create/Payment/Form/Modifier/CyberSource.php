@@ -13,6 +13,7 @@ use Magento\Framework\UrlInterface;
 use Magento\Framework\View\Asset\Repository;
 use Magento\Payment\Model\Config;
 use Magento\Quote\Api\CartRepositoryInterface;
+use Magento\Store\Model\StoreManagerInterface;
 use Magento\Ui\Component\Container;
 use Magento\Ui\Component\Form;
 use TNW\Subscriptions\Model\Context;
@@ -84,6 +85,7 @@ class CyberSource extends Base
      * @param RequestInterface $request
      * @param Repository $assetRepository
      * @param Context $context
+     * @param StoreManagerInterface $storeManager
      */
     public function __construct(
         \TNW\Subscriptions\Model\Config $config,
@@ -97,9 +99,10 @@ class CyberSource extends Base
         UrlInterface $urlBuilder,
         RequestInterface $request,
         Repository $assetRepository,
-        Context $context
+        Context $context,
+        StoreManagerInterface $storeManager
     ) {
-        parent::__construct($config, $session, $profileRepository, $relationManager, $cartRepository);
+        parent::__construct($config, $session, $profileRepository, $relationManager, $cartRepository, $storeManager);
         if ($moduleManager->isEnabled("CyberSource_SecureAcceptance")) {
             $this->cybersourceConfig = $objectManager->get(\CyberSource\SecureAcceptance\Gateway\Config\Config::class);
             $this->fingerprintBlock = $objectManager->get(\CyberSource\Core\Block\Fingerprint::class);

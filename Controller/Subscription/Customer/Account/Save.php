@@ -156,11 +156,7 @@ class Save extends Action\Action
                 $profileDataChanges = $profile->hasDataChanges();
                 $profile->setDataChanges(false);
 
-                if ($request['next_payment_date_value'] <= date('m/d/Y', time())) {
-                    $errors[] = __('Only future dates are allowed for Next Payment Date');
-                } else {
-                    $errors = $this->processRequestData($request);
-                }
+                $errors = $this->processRequestData($request);
 
                 if (!$errors) {
                     if ($profile->hasDataChanges()) {

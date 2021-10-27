@@ -5,7 +5,11 @@
  */
 namespace TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Payment\Form\Modifier;
 
+use Magento\Framework\Module\Manager;
+use Magento\Framework\ObjectManagerInterface;
 use Magento\Payment\Model\Config;
+use Magento\Quote\Api\CartRepositoryInterface;
+use Magento\Store\Model\StoreManagerInterface;
 use Magento\Ui\Component\Form;
 use TNW\Subscriptions\Model\QuoteSessionInterface;
 use TNW\Subscriptions\Model\SubscriptionProfileOrder\Manager as OrderRelationManager;
@@ -43,24 +47,26 @@ class Stripe extends Base
      * @param QuoteSessionInterface $session
      * @param SubscriptionProfileRepository $profileRepository
      * @param OrderRelationManager $relationManager
-     * @param \Magento\Quote\Api\CartRepositoryInterface $cartRepository
+     * @param CartRepositoryInterface $cartRepository
      * @param Config $paymentConfig
      * @param LayoutFactory $layoutFactory
-     * @param \Magento\Framework\Module\Manager $moduleManager
-     * @param \Magento\Framework\ObjectManagerInterface $objectManager
+     * @param Manager $moduleManager
+     * @param ObjectManagerInterface $objectManager
+     * @param StoreManagerInterface $storeManager
      */
     public function __construct(
         \TNW\Subscriptions\Model\Config $config,
         QuoteSessionInterface $session,
         SubscriptionProfileRepository $profileRepository,
         OrderRelationManager $relationManager,
-        \Magento\Quote\Api\CartRepositoryInterface $cartRepository,
+        CartRepositoryInterface $cartRepository,
         Config $paymentConfig,
         LayoutFactory $layoutFactory,
-        \Magento\Framework\Module\Manager $moduleManager,
-        \Magento\Framework\ObjectManagerInterface $objectManager
+        Manager $moduleManager,
+        ObjectManagerInterface $objectManager,
+        StoreManagerInterface $storeManager
     ) {
-        parent::__construct($config, $session, $profileRepository, $relationManager, $cartRepository);
+        parent::__construct($config, $session, $profileRepository, $relationManager, $cartRepository, $storeManager);
         if ($moduleManager->isEnabled("TNW_Stripe")) {
             $this->stripeConfig
                 = $objectManager->get(\TNW\Stripe\Gateway\Config\Config::class);
