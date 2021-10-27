@@ -41,6 +41,14 @@ define([
             }
         },
 
+        initialize: function () {
+            this._super()
+            if (this.index === 'braintree') {
+                validator.setConfig(this)
+            }
+            return this
+        },
+
         /**
          * Set list of observable attributes
          * @returns {exports.initObservable}
@@ -70,7 +78,6 @@ define([
             if (checkBoxChecked && !this.scriptLoaded()) {
                 this.loadScript();
             }
-            validator.setConfig(this);
         },
 
         /**

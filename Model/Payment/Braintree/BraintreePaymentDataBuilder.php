@@ -7,6 +7,7 @@ namespace TNW\Subscriptions\Model\Payment\Braintree;
 
 use Magento\Framework\App\ProductMetadataInterface;
 use Magento\Payment\Gateway\Config\Config;
+use Magento\Store\Model\StoreManagerInterface;
 use TNW\Subscriptions\Model\Config as SubscriptionConfig;
 use TNW\Subscriptions\Model\SubscriptionProfile\Manager;
 use Magento\Framework\ObjectManagerInterface;
@@ -203,12 +204,18 @@ class BraintreePaymentDataBuilder extends \TNW\Subscriptions\Model\Payment\DataB
     protected $paymentNonceCommand;
 
     /**
+     * @var StoreManagerInterface
+     */
+    private $storeManager;
+
+    /**
      * BraintreePaymentDataBuilder constructor.
      * @param ProductMetadataInterface $productMetadata
      * @param SubscriptionConfig $subscriptionConfig
      * @param Manager $manager
      * @param ModuleManager $moduleManager
      * @param ObjectManagerInterface $objectManager
+     * @param StoreManagerInterface $storeManager
      * @param Config|null $config
      */
     public function __construct(
@@ -217,6 +224,7 @@ class BraintreePaymentDataBuilder extends \TNW\Subscriptions\Model\Payment\DataB
         Manager $manager,
         ModuleManager $moduleManager,
         ObjectManagerInterface $objectManager,
+        StoreManagerInterface $storeManager,
         Config $config = null
     ) {
         if ($moduleManager->isEnabled("PayPal_Braintree")) {
@@ -228,6 +236,7 @@ class BraintreePaymentDataBuilder extends \TNW\Subscriptions\Model\Payment\DataB
         }
         $this->productMetadata = $productMetadata;
         $this->config = $config ?: $objectManager->get(Config::class);
+        $this->storeManager = $storeManager;
         parent::__construct($subscriptionConfig, $manager);
     }
 
@@ -241,6 +250,8 @@ class BraintreePaymentDataBuilder extends \TNW\Subscriptions\Model\Payment\DataB
      */
     public function build($order, $paymentData)
     {
+        $this->storeManager->setCurrentStore($order->getStoreId());
+
         if ($this->is3DSecureEnabled($order)) {
             $this->is3DSecure = true;
         }
@@ -312,7 +323,7 @@ class BraintreePaymentDataBuilder extends \TNW\Subscriptions\Model\Payment\DataB
             $result['options']['threeDSecure'] = ['required' => true];
         }
 
-        if (!$this->braintreeConfig->hasFraudProtection($order->getStoreId())) {
+        if (!$this->braintreeConfig->hasFraudProtection()) {
             $data = isset($paymentData['additional_data']) ? $paymentData['additional_data'] : [];
 
             if (isset($data[self::DATA_DEVICE_DATA])) {
@@ -320,7 +331,7 @@ class BraintreePaymentDataBuilder extends \TNW\Subscriptions\Model\Payment\DataB
             }
         }
 
-        $values = $this->braintreeConfig->getDynamicDescriptors($order->getStoreId());
+        $values = $this->braintreeConfig->getDynamicDescriptors();
         if (!empty($values)) {
             $result[self::$descriptorKey] = $values;
         }
@@ -341,17 +352,17 @@ class BraintreePaymentDataBuilder extends \TNW\Subscriptions\Model\Payment\DataB
     private function is3DSecureEnabled($order, $amount = null)
     {
         $storeId = $order->getStoreId();
-        if (!$this->braintreeConfig->isVerify3DSecure($storeId)
+        if (!$this->braintreeConfig->isVerify3DSecure()
             || (
                 $amount !== null
-                && $amount < $this->braintreeConfig->getThresholdAmount($storeId)
+                && $amount < $this->braintreeConfig->getThresholdAmount()
             )
         ) {
             return false;
         }
 
         $billingAddress = $order->getBillingAddress();
-        $specificCounties = $this->braintreeConfig->get3DSecureSpecificCountries($storeId);
+        $specificCounties = $this->braintreeConfig->get3DSecureSpecificCountries();
         if (!empty($specificCounties) && !in_array($billingAddress->getCountryId(), $specificCounties)) {
             return false;
         }
