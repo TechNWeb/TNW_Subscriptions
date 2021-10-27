@@ -1482,4 +1482,8 @@
         <plugin name="tnw_add_installment_extension_attributes"
                 type="TNW\Subscriptions\Plugin\OrderRepositoryPlugin"/>
     </type>
+    <type name="Magento\Sales\Model\Order\Email\Sender\InvoiceSender">
+        <plugin name="tnw_prevent_send_invoice_email"
+                type="TNW\Subscriptions\Plugin\Model\Order\Email\Sender\PreventSendInvoiceEmail"/>
+    </type>
 </config>
