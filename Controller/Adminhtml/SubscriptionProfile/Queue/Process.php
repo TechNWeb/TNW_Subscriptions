@@ -15,6 +15,9 @@ use TNW\Subscriptions\Model\Source\ProfileStatus;
 use TNW\Subscriptions\Model\SubscriptionProfileRepository;
 use TNW\Subscriptions\Exception\ProfileProductsUnsaleableException;
 use Magento\Payment\Gateway\Command\CommandException;
+use TNW\Subscriptions\Api\SubscriptionProfileQueueRepositoryInterface;
+use TNW\Subscriptions\Model\Source\Queue\Status as QueueStatus;
+use TNW\Subscriptions\Api\SubscriptionProfileOrderRepositoryInterface;
 
 /**
  * Class Process- controller
@@ -46,20 +49,36 @@ class Process extends Action
     private $profileStatus;
 
     /**
+     * @var SubscriptionProfileQueueRepositoryInterface
+     */
+    private $queueRepository;
+
+    /**
+     * @var SubscriptionProfileOrderRepositoryInterface
+     */
+    private $subscriptionProfileOrderRepository;
+
+    /**
      * Process constructor.
      * @param Context $context
      * @param Manager $queueManager
      * @param ProfileProcessor $profileProcessor
      * @param SubscriptionProfileRepository $profileRepository
      * @param ProfileStatus $profileStatus
+     * @param SubscriptionProfileQueueRepositoryInterface $queueRepository
+     * @param SubscriptionProfileOrderRepositoryInterface $subscriptionProfileOrderRepository
      */
     public function __construct(
         Context $context,
         Manager $queueManager,
         ProfileProcessor $profileProcessor,
         SubscriptionProfileRepository $profileRepository,
-        ProfileStatus $profileStatus
+        ProfileStatus $profileStatus,
+        SubscriptionProfileQueueRepositoryInterface $queueRepository,
+        SubscriptionProfileOrderRepositoryInterface $subscriptionProfileOrderRepository
     ) {
+        $this->subscriptionProfileOrderRepository = $subscriptionProfileOrderRepository;
+        $this->queueRepository = $queueRepository;
         $this->queueManager = $queueManager;
         $this->profileProcessor = $profileProcessor;
         $this->profileRepository = $profileRepository;
@@ -74,7 +93,7 @@ class Process extends Action
     public function execute()
     {
         /** @var int $queueId */
-        $queueId = (int)$this->getRequest()->getParam('id', 0);
+        $queueId = (int) $this->getRequest()->getParam('id', 0);
         $acceptableStatuses = [
             ProfileStatus::STATUS_ACTIVE,
             ProfileStatus::STATUS_PAST_DUE,
@@ -88,7 +107,20 @@ class Process extends Action
                 /** @var Queue $item */
                 $item = $collection->getFirstItem();
                 $profile = $this->profileRepository->getById($item->getSubscriptionProfileId());
+                $queueModel = $this->queueRepository->getById($queueId);
                 if ($item && $item->getId() && in_array($profile->getStatus(), $acceptableStatuses)) {
+                    if ($queueModel->getStatus() == QueueStatus::QUEUE_STATUS_RUNNING) {
+                        $profileOrderId = $queueModel->getProfileOrderId();
+                        $profileOrder = $this->subscriptionProfileOrderRepository->getById($profileOrderId);
+                        if (date('Ymd')
+                            == date('Ymd', strtotime($profileOrder->getScheduledAt()))
+                        ) {
+                            throw new \Exception('Can`t manually process running profile.');
+                        }
+                    }
+                    if ($queueModel->getStatus() == QueueStatus::QUEUE_STATUS_COMPLETE) {
+                        throw new \Exception('Can`t process completed profile.');
+                    }
                     $this->queueManager->makeRunning($queueId);
                     try {
                         $this->queueManager->placeOrderByGroupQueue([$item]);
