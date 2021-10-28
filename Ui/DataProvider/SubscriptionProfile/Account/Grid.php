@@ -22,6 +22,19 @@ class Grid extends SubscriptionsGrid
      */
     private $customerSession;
 
+    /**
+     * Grid constructor.
+     * @param Session $customerSession
+     * @param string $name
+     * @param string $primaryFieldName
+     * @param string $requestFieldName
+     * @param ReportingInterface $reporting
+     * @param SearchCriteriaBuilder $searchCriteriaBuilder
+     * @param RequestInterface $request
+     * @param FilterBuilder $filterBuilder
+     * @param array $meta
+     * @param array $data
+     */
     public function __construct(
         Session $customerSession,
         $name,

@@ -1,12 +1,11 @@
 <?php
 /**
- *  Copyright © 2018 TechNWeb, Inc. All rights reserved.
+ *  Copyright © 2021 TechNWeb, Inc. All rights reserved.
  *  See TNW_LICENSE.txt for license details.
  */
 namespace TNW\Subscriptions\Plugin\Model\ResourceModel\Order\Grid;
 
 use Magento\Sales\Model\ResourceModel\Order\Grid\Collection as OrderGridCollection;
-use TNW\Subscriptions\Api\Data\SubscriptionProfileOrderInterface;
 
 /**
  * Used to modify data in Magento\Sales\Model\ResourceModel\Order\Grid\Collection items.
@@ -14,31 +13,16 @@ use TNW\Subscriptions\Api\Data\SubscriptionProfileOrderInterface;
 class Collection
 {
     /**
-     * Add subscription id to order data collection.
+     * Add website id to collection
      *
      * @param OrderGridCollection $collection
-     * @return null
+     * @return OrderGridCollection
      */
     public function beforeLoad(OrderGridCollection $collection)
     {
         if (!$collection->isLoaded()) {
-
-            $collection->getSelect()->joinLeft(
-                ['profile_table' => $collection->getTable(SubscriptionProfileOrderInterface::MAIN_TABLE)],
-                'main_table.entity_id = profile_table.' . SubscriptionProfileOrderInterface::MAGENTO_ORDER_ID,
-                []
-            );
-            $collection->addExpressionFieldToSelect(
-                'subscription_profile_id',
-                'GROUP_CONCAT(profile_table.{{profileId}})',
-                [
-                    'profileId' => SubscriptionProfileOrderInterface::SUBSCRIPTION_PROFILE_ID
-                ]
-            );
-
-            $collection->getSelect()->group('main_table.' . $collection->getIdFieldName());
+            $collection->getSelect()->columns(['website_id' => 'store_id']);
         }
-
-        return null;
+        return $collection;
     }
 }

@@ -23,8 +23,9 @@ interface UrlBuilderInterface
      * Get subscription edit URL link
      *
      * @param int $id
+     * @param $websiteId
      * @param bool $targetBlank
      * @return string
      */
-    public function getEditHtmlLink($id, $targetBlank = true);
+    public function getEditHtmlLink($id, $websiteId, $targetBlank = true);
 }

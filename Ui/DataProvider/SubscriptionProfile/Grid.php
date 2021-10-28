@@ -6,7 +6,6 @@
 namespace TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile;
 
 use Magento\Framework\View\Element\UiComponent\DataProvider\DataProvider;
-use TNW\Subscriptions\Api\Data\SubscriptionProfileInterface;
 
 /**
  * Class Grid - SubscriptionProfile DataProvider
@@ -37,13 +36,7 @@ class Grid extends DataProvider
         }
 
         if ($field === 'label') {
-            $filter->setValue(
-                str_ireplace(
-                    SubscriptionProfileInterface::LABEL_PREFIX,
-                    '',
-                    $filter->getValue()
-                )
-            );
+            $filter->setValue($filter->getValue());
             $filter->setField('main_table.entity_id');
         }
 

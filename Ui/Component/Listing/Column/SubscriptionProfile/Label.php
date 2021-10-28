@@ -10,6 +10,7 @@ use Magento\Framework\View\Element\UiComponent\ContextInterface;
 use Magento\Ui\Component\Listing\Columns\Column;
 use TNW\Subscriptions\Api\UrlBuilderInterface;
 use TNW\Subscriptions\Api\Data\SubscriptionProfileInterface;
+use \TNW\Subscriptions\Model\Config;
 
 /**
  * Class Label Column
@@ -22,9 +23,15 @@ class Label extends Column
     private $profileUrlBuilder;
 
     /**
+     * @var Config
+     */
+    private $config;
+
+    /**
      * @param ContextInterface $context
      * @param UiComponentFactory $uiComponentFactory
      * @param UrlBuilderInterface $profileUrlBuilder
+     * @param Config $config
      * @param array $components
      * @param array $data
      */
@@ -32,13 +39,15 @@ class Label extends Column
         ContextInterface $context,
         UiComponentFactory $uiComponentFactory,
         UrlBuilderInterface $profileUrlBuilder,
+        Config $config,
         array $components,
         array $data
     ) {
         parent::__construct($context, $uiComponentFactory, $components, $data);
         $this->profileUrlBuilder = $profileUrlBuilder;
+        $this->config = $config;
     }
-    
+
     /**
      * Prepare Data Source
      *
@@ -53,7 +62,7 @@ class Label extends Column
                     $item[SubscriptionProfileInterface::LABEL] = [
                         'edit' => [
                             'href' => $this->profileUrlBuilder->getEditUrl($item[SubscriptionProfileInterface::ID]),
-                            'label' => $item[SubscriptionProfileInterface::LABEL],
+                            'label' => $this->config->getPrefix($item[SubscriptionProfileInterface::WEBSITE_ID]) . $item[SubscriptionProfileInterface::ID]
                         ]
                     ];
                 }

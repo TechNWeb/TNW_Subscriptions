@@ -91,8 +91,7 @@ class Collection extends SearchResult
             [
                 'label' => $connection->getConcatSql(
                     [
-                        $connection->quote(SubscriptionProfileInterface::LABEL_PREFIX),
-                        'main_table.entity_id',
+                        'main_table.entity_id'
                     ]
                 ),
             ]

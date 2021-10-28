@@ -66,11 +66,6 @@ interface SubscriptionProfileInterface extends CustomAttributesDataInterface
     const PROFILE_PRODUCTS = 'profile_products';
     /**#@-*/
 
-    /**
-     * Label prefix value
-     */
-    const LABEL_PREFIX = '#S-';
-
     /**#@+
      * Generate quotes states.
      */

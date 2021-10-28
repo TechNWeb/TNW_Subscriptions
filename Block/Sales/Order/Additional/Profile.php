@@ -6,6 +6,8 @@
 namespace TNW\Subscriptions\Block\Sales\Order\Additional;
 
 use Magento\Framework\View\Element\Template;
+use TNW\Subscriptions\Model\ResourceModel\SalesItemRelation;
+use TNW\Subscriptions\Model\Config;
 
 /**
  * Class Profile - block to disaply the profile on product additional
@@ -13,23 +15,30 @@ use Magento\Framework\View\Element\Template;
 class Profile extends \Magento\Framework\View\Element\Template
 {
     /**
-     * @var \TNW\Subscriptions\Model\ResourceModel\SalesItemRelation
+     * @var SalesItemRelation
      */
     private $itemRelationResource;
 
     /**
+     * @var Config
+     */
+    private $config;
+
+    /**
      * Profile constructor.
      * @param Template\Context $context
-     * @param \TNW\Subscriptions\Model\ResourceModel\SalesItemRelation $itemRelationResource
+     * @param SalesItemRelation $itemRelationResource
+     * @param Config $config
      * @param array $data
      */
     public function __construct(
         Template\Context $context,
-        \TNW\Subscriptions\Model\ResourceModel\SalesItemRelation $itemRelationResource,
+        SalesItemRelation $itemRelationResource,
+        Config $config,
         array $data = []
     ) {
         parent::__construct($context, $data);
-
+        $this->config = $config;
         $this->itemRelationResource = $itemRelationResource;
     }
 
@@ -79,6 +88,6 @@ class Profile extends \Magento\Framework\View\Element\Template
      */
     public function textProfileId($profileId)
     {
-        return sprintf('S-%d', $profileId);
+        return $this->config->getPrefix($this->getItem()->getStore()->getWebsiteId()) . $profileId;
     }
 }

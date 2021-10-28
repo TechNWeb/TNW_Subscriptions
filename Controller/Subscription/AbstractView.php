@@ -165,10 +165,10 @@ abstract class AbstractView extends AbstractAccount
     {
         $products = $subscription->getVisibleProducts();
         if (count($products) === 1) {
-            return __('%1 Subscription (#S-%2)', reset($products)->getName(), $subscription->getId());
+            return __('%1 Subscription (%2)', reset($products)->getName(), $subscription->getLabel());
         }
 
-        return __('Subscription (#S-%1) - %2 products', $subscription->getId(), count($products));
+        return __('Subscription (%1) - %2 products', $subscription->getLabel(), count($products));
     }
 
     /**

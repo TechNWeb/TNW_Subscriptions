@@ -80,10 +80,15 @@
             <label>Subscription Profiles</label>
             <tab>tnw_subscriptions</tab>
             <resource>TNW_Subscriptions::config_profile_options</resource>
-            <group id="general" translate="label" sortOrder="65" showInDefault="1" showInWebsite="0" showInStore="0">
+            <group id="general" translate="label" sortOrder="65" showInDefault="1" showInWebsite="1" showInStore="0">
                 <label>General</label>
-                <field id="product_price_strategy" translate="label" type="select" sortOrder="10" showInDefault="1"
+                <field id="prefix" translate="label" type="text" sortOrder="10" showInDefault="1"
                        showInWebsite="1" showInStore="0">
+                    <label>Prefix</label>
+                    <comment>Subscription Profile ID Prefix</comment>
+                </field>
+                <field id="product_price_strategy" translate="label" type="select" sortOrder="20" showInDefault="1"
+                       showInWebsite="0" showInStore="0">
                     <label>Profile Product Price</label>
                     <source_model>TNW\Subscriptions\Model\Config\Source\PriceStrategy</source_model>
                     <comment>
@@ -100,8 +105,8 @@
                         ]]>
                     </comment>
                 </field>
-                <field id="shipping_fallback" translate="label" type="select" sortOrder="20" showInDefault="1"
-                       showInWebsite="1" showInStore="0">
+                <field id="shipping_fallback" translate="label" type="select" sortOrder="30" showInDefault="1"
+                       showInWebsite="0" showInStore="0">
                     <label>Shipping Fallback</label>
                     <source_model>TNW\Subscriptions\Model\Config\Source\ShippingFallback</source_model>
                     <comment>
@@ -115,14 +120,14 @@
                         ]]>
                     </comment>
                 </field>
-                <field id="default_shipping" translate="label" type="select" sortOrder="30" showInDefault="1"
-                       showInWebsite="1" showInStore="0">
+                <field id="default_shipping" translate="label" type="select" sortOrder="40" showInDefault="1"
+                       showInWebsite="0" showInStore="0">
                     <label>Default Shipping Method</label>
                     <source_model>TNW\Subscriptions\Model\Config\Source\ShippingMethods</source_model>
                     <comment model ="TNW\Subscriptions\Block\Adminhtml\System\Config\ShippingMethodsComment" />
                 </field>
-                <field id="free_shipping" translate="label" type="select" sortOrder="40" showInDefault="1"
-                       showInWebsite="1" showInStore="0">
+                <field id="free_shipping" translate="label" type="select" sortOrder="50" showInDefault="1"
+                       showInWebsite="0" showInStore="0">
                     <label>Free Shipping</label>
                     <source_model>TNW\Subscriptions\Model\Config\Source\FreeShipping</source_model>
                     <comment>

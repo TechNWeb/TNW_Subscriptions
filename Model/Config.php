@@ -17,6 +17,7 @@ use TNW\Subscriptions\Block\Adminhtml\System\Config\PaymentMethods\ActiveMethods
 use Magento\Framework\Module\Manager;
 use Magento\Framework\ObjectManagerInterface;
 use Magento\Customer\Model\ResourceModel\Group\Collection;
+use TNW\Subscriptions\Model\SubscriptionProfileRepository;
 
 /**
  * Class Config - config model for subscriptions
@@ -27,6 +28,7 @@ class Config
     const METHOD_PAYMENT_PRO = 'paypal_payment_pro';
     const METHOD_PAYFLOWPRO = 'payflowpro';
     const METHOD_BRAINTREE = 'braintree';
+    const BLANK = '-';
 
     /**#@+
      * Config xml path for General section
@@ -784,5 +786,19 @@ class Config
             }
         }
         return $result;
+    }
+
+    /**
+     * @param bool $websiteId
+     * @return mixed
+     * @throws NoSuchEntityException
+     */
+    public function getPrefix($websiteId = false)
+    {
+        return $this->scopeConfig->getValue(
+                'tnw_subscriptions_profile_options/general/prefix',
+                \Magento\Store\Model\ScopeInterface::SCOPE_WEBSITES,
+                $websiteId
+            ) . self::BLANK;
     }
 }

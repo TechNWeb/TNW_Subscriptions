@@ -519,4 +519,8 @@
         <plugin name="tnw_prevent_disable_output_in_admin"
                 type="TNW\Subscriptions\Plugin\Config\PreventDisableOutput"/>
     </type>
+    <type name="Magento\Sales\Model\ResourceModel\Order\Grid\Collection">
+        <plugin name="tnw_change_data_order_grid_collection"
+                type="TNW\Subscriptions\Plugin\Model\ResourceModel\Order\Grid\Collection"/>
+    </type>
 </config>

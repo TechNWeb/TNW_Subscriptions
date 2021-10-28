@@ -213,7 +213,7 @@ class PlaceOrder
         if (count($profileIds)) {
             $profileId = array_shift($profileIds);
             $this->messageManager->addSuccessMessage(
-                __('Your subscription number is: %1', $this->profileUrlBuilder->getEditLabel($profileId))
+                __('Your subscription number is: %1', $this->profileUrlBuilder->getEditLabel($profileId, $order->getStoreId()))
             );
         }
 

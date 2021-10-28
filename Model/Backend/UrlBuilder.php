@@ -8,8 +8,8 @@ namespace TNW\Subscriptions\Model\Backend;
 use Magento\Framework\App\Area;
 use Magento\Framework\App\State;
 use Magento\Framework\UrlInterface;
-use TNW\Subscriptions\Api\Data\SubscriptionProfileInterface;
 use TNW\Subscriptions\Api\UrlBuilderInterface;
+use TNW\Subscriptions\Model\Config;
 
 /**
  * Class to retrieve subscription url
@@ -45,13 +45,23 @@ class UrlBuilder implements UrlBuilderInterface
     private $state;
 
     /**
+     * @var Config
+     */
+    private $config;
+
+    /**
      * @param UrlInterface $baseUrlBuilder
      * @param State $state
+     * @param Config $config
      */
-    public function __construct(UrlInterface $baseUrlBuilder, State $state)
-    {
+    public function __construct(
+        UrlInterface $baseUrlBuilder,
+        State $state,
+        Config $config
+    ) {
         $this->baseUrlBuilder = $baseUrlBuilder;
         $this->state = $state;
+        $this->config = $config;
     }
 
     /**
@@ -72,28 +82,29 @@ class UrlBuilder implements UrlBuilderInterface
 
     /**
      * @param $id
-     *
+     * @param $websiteId
      * @return string
      */
-    public function getEditLabel($id)
+    public function getEditLabel($id, $websiteId)
     {
-        return SubscriptionProfileInterface::LABEL_PREFIX . $id;
+        return $this->config->getPrefix($websiteId) . $id;
     }
 
     /**
      * Get subscription edit URL link
      *
      * @param int $id
+     * @param $websiteId
      * @param bool $targetBlank
      * @return string
      */
-    public function getEditHtmlLink($id, $targetBlank = false)
+    public function getEditHtmlLink($id, $websiteId, $targetBlank = false)
     {
         return sprintf(
             "<a%s href=\"%s\">%s</a>",
             $targetBlank ? ' target="_blank"' : '',
             $this->getEditUrl($id),
-            $this->getEditLabel($id)
+            $this->getEditLabel($id, $websiteId)
         );
     }
 }

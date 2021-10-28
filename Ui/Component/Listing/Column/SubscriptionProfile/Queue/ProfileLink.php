@@ -5,14 +5,40 @@
  */
 namespace TNW\Subscriptions\Ui\Component\Listing\Column\SubscriptionProfile\Queue;
 
+use Magento\Framework\View\Element\UiComponent\ContextInterface;
+use Magento\Framework\View\Element\UiComponentFactory;
 use Magento\Ui\Component\Listing\Columns\Column;
-use TNW\Subscriptions\Model\SubscriptionProfile;
+use TNW\Subscriptions\Model\Config;
 
 /**
  * Class ProfileLink - ui
  */
 class ProfileLink extends Column
 {
+    /**
+     * @var Config
+     */
+    private $config;
+
+    /**
+     * ProfileLink constructor.
+     * @param ContextInterface $context
+     * @param UiComponentFactory $uiComponentFactory
+     * @param Config $config
+     * @param array $components
+     * @param array $data
+     */
+    public function __construct(
+        ContextInterface $context,
+        UiComponentFactory $uiComponentFactory,
+        Config $config,
+        array $components = [],
+        array $data = []
+    ) {
+        $this->config = $config;
+        parent::__construct($context, $uiComponentFactory, $components, $data);
+    }
+
     /**
      * Prepare Data Source
      *
@@ -33,7 +59,7 @@ class ProfileLink extends Column
                     $html = sprintf(
                         "<a target=\"_blank\" href ='%s'\">%s</a>",
                         $url,
-                        SubscriptionProfile::LABEL_PREFIX . $item[$fieldName]
+                        $this->config->getPrefix($item['store_id']) . $item[$fieldName]
                     );
                     $item[$fieldName] = $html;
                 }
