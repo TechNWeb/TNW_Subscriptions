@@ -5,15 +5,40 @@
  */
 namespace TNW\Subscriptions\Block\Adminhtml\SubscriptionProfile\Edit\Buttons;
 
+use Magento\Backend\Block\Widget\Context;
+use Magento\Framework\Registry;
 use Magento\Framework\View\Element\UiComponent\Control\ButtonProviderInterface;
-use TNW\Subscriptions\Api\Data\SubscriptionProfileInterface;
 use TNW\Subscriptions\Model\Source\ProfileStatus;
+use TNW\Subscriptions\Model\SubscriptionProfile\StatusManager;
+use TNW\Subscriptions\Model\Config;
 
 /**
  * Class of change status to "Cancel" button block on Subscription Profile edit form
  */
 class CancelButton extends ChangeStatusButton implements ButtonProviderInterface
 {
+    /**
+     * @var Config
+     */
+    protected $config;
+
+    /**
+     * CancelButton constructor.
+     * @param Context $context
+     * @param Registry $registry
+     * @param StatusManager $statusManager
+     * @param Config $config
+     */
+    public function __construct(
+        Context $context,
+        Registry $registry,
+        StatusManager $statusManager,
+        Config $config
+    ) {
+        $this->config = $config;
+        parent::__construct($context, $registry, $statusManager);
+    }
+
     /**
      * Retrieve button-specified settings
      *
@@ -42,7 +67,7 @@ class CancelButton extends ChangeStatusButton implements ButtonProviderInterface
                                 'params' => [
                                     __(
                                         'Are you sure you want to cancel Subscription %1?',
-                                        SubscriptionProfileInterface::LABEL_PREFIX . $this->getModelId()
+                                        $this->config->getPrefix($this->registry->registry('tnw_subscription_profile')->getWebsiteId()) . $this->getModelId()
                                     )
                                 ]
                             ],

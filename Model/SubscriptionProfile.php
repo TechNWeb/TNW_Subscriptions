@@ -29,6 +29,7 @@ use Magento\Framework\Serialize\Serializer\Json;
 use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfileProfit;
 use TNW\Subscriptions\Api\SubscriptionProfileRepositoryInterface;
 use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfileOrder;
+use TNW\Subscriptions\Model\Config;
 
 /**
  * Subscription Profile model.
@@ -165,6 +166,11 @@ class SubscriptionProfile extends AbstractExtensibleModel implements Subscriptio
     private $storeRepository;
 
     /**
+     * @var Config
+     */
+    private $config;
+
+    /**
      * SubscriptionProfile constructor.
      * @param ModelContext $context
      * @param Registry $registry
@@ -181,6 +187,7 @@ class SubscriptionProfile extends AbstractExtensibleModel implements Subscriptio
      * @param SubscriptionProfileProfit $profileProfit
      * @param SubscriptionProfileRepositoryInterface $profileRepository
      * @param SubscriptionProfileOrder $subscriptionProfileOrder
+     * @param \TNW\Subscriptions\Model\Config $config
      * @param Resource|null $resource
      * @param AbstractDb|null $resourceCollection
      * @param array $data
@@ -201,6 +208,7 @@ class SubscriptionProfile extends AbstractExtensibleModel implements Subscriptio
         SubscriptionProfileProfit $profileProfit,
         SubscriptionProfileRepositoryInterface $profileRepository,
         SubscriptionProfileOrder $subscriptionProfileOrder,
+        Config $config,
         Resource $resource = null,
         AbstractDb $resourceCollection = null,
         array $data = []
@@ -226,6 +234,7 @@ class SubscriptionProfile extends AbstractExtensibleModel implements Subscriptio
         $this->profileRepository = $profileRepository;
         $this->subscriptionProfileOrder = $subscriptionProfileOrder;
         $this->storeRepository = $storeRepository;
+        $this->config = $config;
     }
 
     /**
@@ -304,7 +313,7 @@ class SubscriptionProfile extends AbstractExtensibleModel implements Subscriptio
      */
     public function getLabel()
     {
-        return self::LABEL_PREFIX . $this->getId();
+        return $this->config->getPrefix($this->getWebsiteId()) . $this->getId();
     }
 
     /**

@@ -17,6 +17,7 @@ use TNW\Subscriptions\Block\Adminhtml\System\Config\PaymentMethods\ActiveMethods
 use Magento\Framework\Module\Manager;
 use Magento\Framework\ObjectManagerInterface;
 use Magento\Customer\Model\ResourceModel\Group\Collection;
+use TNW\Subscriptions\Model\SubscriptionProfileRepository;
 
 /**
  * Class Config - config model for subscriptions
@@ -27,6 +28,7 @@ class Config
     const METHOD_PAYMENT_PRO = 'paypal_payment_pro';
     const METHOD_PAYFLOWPRO = 'payflowpro';
     const METHOD_BRAINTREE = 'braintree';
+    const BLANK = '-';
 
     /**#@+
      * Config xml path for General section
@@ -459,12 +461,15 @@ class Config
     public function getWebsiteId()
     {
         $website = null;
-        try {
-            /** Getting actual website id, where subscription was created */
-            $subscriptionProfileId = $this->request->getParam('subscription_profile_id');
-            $websiteId = $this->profileRepository->getById($subscriptionProfileId)->getWebsiteId();
-        } catch (NoSuchEntityException $e) {
-            $websiteId = $this->request->getParam('website');
+        /** Getting actual website id, where subscription was created */
+        $subscriptionProfileId = $this->request->getParam('subscription_profile_id');
+        $websiteId = $this->request->getParam('website');
+        if ($subscriptionProfileId) {
+            try {
+                $websiteId = $this->profileRepository->getById($subscriptionProfileId)->getWebsiteId();
+            } catch (NoSuchEntityException $e) {
+                //TODO: remove repository and model load from config model
+            }
         }
         if ($websiteId) {
             if (!is_array($websiteId)) {
@@ -475,7 +480,7 @@ class Config
             $website = $this->getWebsite(0);
         }
 
-        return (int)$website->getId();
+        return (int) $website->getId();
     }
 
     /**
@@ -784,5 +789,19 @@ class Config
             }
         }
         return $result;
+    }
+
+    /**
+     * @param bool $websiteId
+     * @return mixed
+     * @throws NoSuchEntityException
+     */
+    public function getPrefix($websiteId = false)
+    {
+        return $this->scopeConfig->getValue(
+                'tnw_subscriptions_profile_options/general/prefix',
+                \Magento\Store\Model\ScopeInterface::SCOPE_WEBSITES,
+                $websiteId
+            ) . self::BLANK;
     }
 }

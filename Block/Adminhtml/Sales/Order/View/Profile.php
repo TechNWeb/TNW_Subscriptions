@@ -5,30 +5,42 @@
  */
 namespace TNW\Subscriptions\Block\Adminhtml\Sales\Order\View;
 
+use Magento\Backend\Block\Template\Context;
+use TNW\Subscriptions\Model\ResourceModel\SalesItemRelation;
+use TNW\Subscriptions\Model\Config;
+
 /**
  * Class Profile- adminhtml block for profile view
  */
 class Profile extends \Magento\Backend\Block\Template
 {
     /**
-     * @var \TNW\Subscriptions\Model\ResourceModel\SalesItemRelation
+     * @var SalesItemRelation
      */
     private $itemRelationResource;
 
     /**
+     * @var Config
+     */
+    private $config;
+
+    /**
      * Profile constructor.
      *
-     * @param \Magento\Backend\Block\Template\Context $context
-     * @param \TNW\Subscriptions\Model\ResourceModel\SalesItemRelation $itemRelationResource
+     * @param Context $context
+     * @param SalesItemRelation $itemRelationResource
+     * @param Config $config
      * @param array $data
      */
     public function __construct(
-        \Magento\Backend\Block\Template\Context $context,
-        \TNW\Subscriptions\Model\ResourceModel\SalesItemRelation $itemRelationResource,
+        Context $context,
+        SalesItemRelation $itemRelationResource,
+        Config $config,
         array $data = []
     ) {
         parent::__construct($context, $data);
         $this->itemRelationResource = $itemRelationResource;
+        $this->config = $config;
     }
 
     /**
@@ -51,7 +63,6 @@ class Profile extends \Magento\Backend\Block\Template
         if (!$item instanceof \Magento\Sales\Model\Order\Item) {
             return [];
         }
-
         return $this->itemRelationResource->profileIdsByOrderItemId($item->getItemId());
     }
 
@@ -71,6 +82,6 @@ class Profile extends \Magento\Backend\Block\Template
      */
     public function textProfileId($profileId)
     {
-        return sprintf('S-%d', $profileId);
+        return $this->config->getPrefix($this->getItem()->getStore()->getWebsiteId()) . $profileId;
     }
 }

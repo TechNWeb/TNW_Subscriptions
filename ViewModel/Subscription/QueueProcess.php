@@ -258,7 +258,11 @@ class QueueProcess implements ArgumentInterface
         $ids = $this->getRebill()->getSubscriptionProfiles();
         $result = [];
         foreach ($ids as $id) {
-            $result[] = $this->urlBuilder->getEditHtmlLink($id, true);
+            $result[] = $this->urlBuilder->getEditHtmlLink(
+                $id,
+                $this->profileRepository->getById($id)->getWebsiteId(),
+                true
+            );
         }
         return implode(', ', $result);
     }
