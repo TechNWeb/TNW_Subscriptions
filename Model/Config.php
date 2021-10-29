@@ -461,12 +461,15 @@ class Config
     public function getWebsiteId()
     {
         $website = null;
-        try {
-            /** Getting actual website id, where subscription was created */
-            $subscriptionProfileId = $this->request->getParam('subscription_profile_id');
-            $websiteId = $this->profileRepository->getById($subscriptionProfileId)->getWebsiteId();
-        } catch (NoSuchEntityException $e) {
-            $websiteId = $this->request->getParam('website');
+        /** Getting actual website id, where subscription was created */
+        $subscriptionProfileId = $this->request->getParam('subscription_profile_id');
+        $websiteId = $this->request->getParam('website');
+        if ($subscriptionProfileId) {
+            try {
+                $websiteId = $this->profileRepository->getById($subscriptionProfileId)->getWebsiteId();
+            } catch (NoSuchEntityException $e) {
+                //TODO: remove repository and model load from config model
+            }
         }
         if ($websiteId) {
             if (!is_array($websiteId)) {
@@ -477,7 +480,7 @@ class Config
             $website = $this->getWebsite(0);
         }
 
-        return (int)$website->getId();
+        return (int) $website->getId();
     }
 
     /**
