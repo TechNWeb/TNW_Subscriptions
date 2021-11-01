@@ -567,4 +567,15 @@ interface SubscriptionProfileInterface extends CustomAttributesDataInterface
      * @return $this
      */
     public function setTotalProfit($profit);
+
+    /**
+     * Get last day of recurring
+     *
+     * @param $billingFrequency
+     * @param $totalBillingCycles
+     * @param $startDate
+     * @param $term
+     * @return string|null
+     */
+    public function getFinalDate($billingFrequency, $totalBillingCycles, $startDate, $term);
 }
