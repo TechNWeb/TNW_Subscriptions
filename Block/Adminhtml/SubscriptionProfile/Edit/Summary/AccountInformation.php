@@ -8,11 +8,14 @@ namespace TNW\Subscriptions\Block\Adminhtml\SubscriptionProfile\Edit\Summary;
 use Magento\Backend\Block\Template;
 use Magento\Customer\Api\GroupRepositoryInterface;
 use Magento\Customer\Api\GroupManagementInterface;
+use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\Registry;
 use TNW\Subscriptions\Api\Data\SubscriptionProfileInterface;
 use TNW\Subscriptions\Model\Source\ProfileStatus;
 use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfile as SubscriptionProfileResource;
 use TNW\Subscriptions\Model\SubscriptionProfile\Manager;
+use TNW\Subscriptions\Model\BillingFrequencyRepository;
+use Psr\Log\LoggerInterface;
 
 /**
  * Block for view subscription profile information
@@ -75,6 +78,16 @@ class AccountInformation extends Template
     private $profileManager;
 
     /**
+     * @var BillingFrequencyRepository
+     */
+    private $billingFrequencyRepository;
+
+    /**
+     * @var LoggerInterface
+     */
+    private $logger;
+
+    /**
      * AccountInformation constructor.
      * @param SubscriptionProfileResource $subscriptionProfileResource
      * @param ProfileStatus $profileStatus
@@ -93,6 +106,8 @@ class AccountInformation extends Template
         Template\Context $context,
         Manager $profileManager,
         GroupManagementInterface $groupManagement,
+        BillingFrequencyRepository $billingFrequencyRepository,
+        LoggerInterface $logger,
         array $data = []
     ) {
         $this->setTemplate('TNW_Subscriptions::subscription_profile/summary/account_information.phtml');
@@ -103,6 +118,8 @@ class AccountInformation extends Template
         $this->groupRepository = $groupRepository;
         $this->profileStatus = $profileStatus;
         $this->subscriptionProfileResource = $subscriptionProfileResource;
+        $this->billingFrequencyRepository = $billingFrequencyRepository;
+        $this->logger = $logger;
     }
 
     /**
@@ -158,8 +175,7 @@ class AccountInformation extends Template
 
     /**
      * If term equal 1 return 'UNTIL_CANCELED',
-     * if term equal 0 return last not submit order date.
-     * If quites were not generated return 'N/A.'
+     * if term equal 0 return calculated end subscription date.
      *
      * @return string
      */
@@ -167,14 +183,28 @@ class AccountInformation extends Template
     {
         $class = 'ends-on';
         $result = self::DATE_NOT_FOUND;
-        $term = $this->getSubscriptionProfile()->getTerm();
+        $profile = $this->getSubscriptionProfile();
+        try {
+            $billingFrequency = $this->billingFrequencyRepository->getById(
+                $profile->getBillingFrequencyId()
+            );
+        } catch (NoSuchEntityException $e) {
+            $this->logger->error($e->getMessage());
+            $billingFrequency = null;
+        }
+        $term = $profile->getTerm();
         $lastOrderData = $this->subscriptionProfileResource
             ->getLastOrderData($this->getSubscriptionProfile(), false);
         switch ($term) {
             case 0:
                 $date = '';
-                if (!empty($lastOrderData)) {
-                    $date = $lastOrderData['scheduled_at'];
+                if (!empty($lastOrderData) && $billingFrequency !== null) {
+                    $date = $profile->getFinalDate(
+                        $billingFrequency,
+                        $profile->getStaticTotalBillingCycles(),
+                        $profile->getStartDate(),
+                        $term
+                    );
                 }
                 $result = $this->normalizeDateFormat($date);
                 break;

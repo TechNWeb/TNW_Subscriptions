@@ -1803,26 +1803,19 @@ class Manager
     public function processNextPaymentDate(array $data)
     {
         if (!empty($data['next_payment_date_value'])) {
-            $nextDate = $this->localeDate->date($data['next_payment_date_value']);
-
-            $gmtOffset = $this->dateConversion->getGmtOffset('hours');
-            if ($gmtOffset < 0) {
-                $nextDate->add(new \DateInterval('PT' . -1*$gmtOffset . 'H'));
-            } elseif ($gmtOffset > 0) {
-                $nextDate->sub(new \DateInterval('PT' . $gmtOffset . 'H'));
-            }
-
-            if ($data['next_payment_date_value'] <= date('m/d/Y', time())) {
+            $nextProfileRelation = $this->getNextProfileRelation($this->getProfile());
+            $oldDateTimeStamp = strtotime($nextProfileRelation->getScheduledAt());
+            $newFullDate = $data['next_payment_date_value'] . ' ' . date('H:i:s', $oldDateTimeStamp);
+            $newDateTimeStamp = strtotime($newFullDate);
+            if ($newDateTimeStamp <= time()) {
                 $this->isNextPaymentDateValid = false;
                 return false;
             } else {
-                $this->orderRelationManager->updateNextPaymentDate(
-                    $this->getProfile(),
-                    $nextDate->format(DateTime::DATETIME_PHP_FORMAT)
-                );
+                $newDate =  date(DateTime::DATETIME_PHP_FORMAT, $newDateTimeStamp);
+                $nextProfileRelation->setScheduledAt($newDate)->save();
                 $message = __(
-                    'Profile next payment date changed to <b>%1</b>',
-                    $nextDate->format('m/d/Y')
+                    'Profile next payment date changed to <b>%1</b> (UTC)',
+                    $newDate
                 );
             }
             $this->historyLogger->log($message, $this->getProfile()->getId());
