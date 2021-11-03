@@ -260,7 +260,7 @@ class QueueProcess implements ArgumentInterface
         foreach ($ids as $id) {
             $result[] = $this->urlBuilder->getEditHtmlLink(
                 $id,
-                $this->profileRepository->getById($id)->getWebsiteId(),
+                $this->profileRepository->getById($id)->getStoreId(),
                 true
             );
         }

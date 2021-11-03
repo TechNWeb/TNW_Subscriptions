@@ -62,7 +62,8 @@ class Label extends Column
                     $item[SubscriptionProfileInterface::LABEL] = [
                         'edit' => [
                             'href' => $this->profileUrlBuilder->getEditUrl($item[SubscriptionProfileInterface::ID]),
-                            'label' => $this->config->getPrefix($item[SubscriptionProfileInterface::WEBSITE_ID]) . $item[SubscriptionProfileInterface::ID]
+                            'label' => $this->config->getPrefix($item[SubscriptionProfileInterface::STORE_ID])
+                                . $item[SubscriptionProfileInterface::ID]
                         ]
                     ];
                 }

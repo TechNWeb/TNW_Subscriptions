@@ -82,29 +82,29 @@ class UrlBuilder implements UrlBuilderInterface
 
     /**
      * @param $id
-     * @param $websiteId
+     * @param $storeId
      * @return string
      */
-    public function getEditLabel($id, $websiteId)
+    public function getEditLabel($id, $storeId = null)
     {
-        return $this->config->getPrefix($websiteId) . $id;
+        return $this->config->getPrefix($storeId) . $id;
     }
 
     /**
      * Get subscription edit URL link
      *
      * @param int $id
-     * @param $websiteId
+     * @param $storeId
      * @param bool $targetBlank
      * @return string
      */
-    public function getEditHtmlLink($id, $websiteId, $targetBlank = false)
+    public function getEditHtmlLink($id, $storeId = null, $targetBlank = false)
     {
         return sprintf(
             "<a%s href=\"%s\">%s</a>",
             $targetBlank ? ' target="_blank"' : '',
             $this->getEditUrl($id),
-            $this->getEditLabel($id, $websiteId)
+            $this->getEditLabel($id, $storeId)
         );
     }
 }
