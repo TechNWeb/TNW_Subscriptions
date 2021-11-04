@@ -82,6 +82,6 @@ class Profile extends \Magento\Backend\Block\Template
      */
     public function textProfileId($profileId)
     {
-        return $this->config->getPrefix($this->getItem()->getStore()->getWebsiteId()) . $profileId;
+        return $this->config->getPrefix($this->getItem()->getStoreId()) . $profileId;
     }
 }

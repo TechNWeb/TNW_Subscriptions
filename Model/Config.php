@@ -792,16 +792,16 @@ class Config
     }
 
     /**
-     * @param bool $websiteId
+     * @param $storeId
      * @return mixed
      * @throws NoSuchEntityException
      */
-    public function getPrefix($websiteId = false)
+    public function getPrefix($storeId = null)
     {
         return $this->scopeConfig->getValue(
                 'tnw_subscriptions_profile_options/general/prefix',
-                \Magento\Store\Model\ScopeInterface::SCOPE_WEBSITES,
-                $websiteId
+                ScopeInterface::SCOPE_STORE,
+                $storeId
             ) . self::BLANK;
     }
 }

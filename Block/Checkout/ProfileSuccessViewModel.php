@@ -116,8 +116,10 @@ class ProfileSuccessViewModel implements \Magento\Framework\View\Element\Block\A
      */
     public function getEditLabel($profileOrder)
     {
-        $websiteId = $this->checkoutSession->getLastRealOrder()->getStore()->getWebsiteId();
-        return $this->urlBuilder->getEditLabel($profileOrder->getSubscriptionProfileId(), $websiteId);
+        return $this->urlBuilder->getEditLabel(
+            $profileOrder->getSubscriptionProfileId(),
+            $this->checkoutSession->getLastRealOrder()->getStoreId()
+        );
     }
 
     /**

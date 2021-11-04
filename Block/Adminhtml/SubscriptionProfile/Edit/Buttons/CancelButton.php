@@ -67,7 +67,12 @@ class CancelButton extends ChangeStatusButton implements ButtonProviderInterface
                                 'params' => [
                                     __(
                                         'Are you sure you want to cancel Subscription %1?',
-                                        $this->config->getPrefix($this->registry->registry('tnw_subscription_profile')->getWebsiteId()) . $this->getModelId()
+                                        $this->config
+                                            ->getPrefix(
+                                                $this->registry
+                                                    ->registry('tnw_subscription_profile')
+                                                    ->getStoreId()
+                                            ) . $this->getModelId()
                                     )
                                 ]
                             ],

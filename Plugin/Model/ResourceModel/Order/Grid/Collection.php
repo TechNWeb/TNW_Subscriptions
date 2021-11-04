@@ -21,7 +21,7 @@ class Collection
     public function beforeLoad(OrderGridCollection $collection)
     {
         if (!$collection->isLoaded()) {
-            $collection->getSelect()->columns(['website_id' => 'store_id']);
+            $collection->getSelect()->columns(['profile_store_id' => 'store_id']);
         }
         return $collection;
     }
