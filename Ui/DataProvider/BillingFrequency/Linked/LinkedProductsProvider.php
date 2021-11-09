@@ -123,7 +123,7 @@ class LinkedProductsProvider extends DataProvider
 
         $column = 'entity_id';
         // In case of EE we need to use row_id instead of entity_id
-        if ($edition == 'Enterprise') {
+        if (in_array($edition, ['B2B', 'Enterprise'])) {
             $column = 'row_id';
         }
 
