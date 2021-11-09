@@ -313,7 +313,7 @@ class SubscriptionProfile extends AbstractExtensibleModel implements Subscriptio
      */
     public function getLabel()
     {
-        return $this->config->getPrefix($this->getWebsiteId()) . $this->getId();
+        return $this->config->getPrefix($this->getStore()) . $this->getId();
     }
 
     /**
