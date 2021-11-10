@@ -137,7 +137,7 @@ $_customerProductsHistoryListViewModel = $block->getData('customerProductsHistor
             <?php endforeach; ?>
         </ol>
     </div>
-    <?= $block->getToolbarHtml() ?>
+    <?= $block->getChildBlock('toolbar')->setIsBottom(true)->toHtml() ?>
     <?php if (!$block->isRedirectToCartEnabled()): ?>
         <script type="text/x-magento-init">
         {
