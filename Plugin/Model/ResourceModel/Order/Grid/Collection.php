@@ -13,16 +13,16 @@ use Magento\Sales\Model\ResourceModel\Order\Grid\Collection as OrderGridCollecti
 class Collection
 {
     /**
-     * Add website id to collection
-     *
      * @param OrderGridCollection $collection
-     * @return OrderGridCollection
+     * @param bool $printQuery
+     * @param bool $logQuery
+     * @return array
      */
-    public function beforeLoad(OrderGridCollection $collection)
+    public function beforeLoad(OrderGridCollection $collection, $printQuery = false, $logQuery = false)
     {
         if (!$collection->isLoaded()) {
-            $collection->getSelect()->columns(['website_id' => 'store_id']);
+            $collection->getSelect()->columns(['profile_store_id' => 'store_id']);
         }
-        return $collection;
+        return [$printQuery, $logQuery];
     }
 }

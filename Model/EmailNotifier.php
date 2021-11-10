@@ -535,12 +535,13 @@ class EmailNotifier
                 ]
             )->setTemplateVars(
                 $vars
-            )->setFrom(
+            )->setFromByScope(
                 $this->scopeConfig->getValue(
                     self::XML_PATH_EMAIL_IDENTITY,
                     \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
                     $storeId
-                )
+                ),
+                $storeId
             )->addTo(
                 $to['email'],
                 $to['name']

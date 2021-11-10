@@ -49,9 +49,15 @@ class ProfileLink extends Column
         if (isset($dataSource['data']['items'])) {
             foreach ($dataSource['data']['items'] as & $item) {
                 if (!empty($item['subscription_profile_id'])) {
-                    $item['subscription_profile_id'] = implode(', ', array_map(function ($profileId, $websiteId) {
-                        return $this->profileUrlBuilder->getEditHtmlLink($profileId, $websiteId, true);
-                    }, explode(',', $item['subscription_profile_id']), explode(',', $item['website_id'])));
+                    $item['subscription_profile_id'] = implode(
+                        ', ',
+                        array_map(function ($profileId, $storeId) {
+                            return $this->profileUrlBuilder->getEditHtmlLink($profileId, $storeId, true);
+                        }, explode(
+                            ',',
+                            $item['subscription_profile_id']
+                        ), explode(',', $item['profile_store_id']))
+                    );
                 }
             }
         }
