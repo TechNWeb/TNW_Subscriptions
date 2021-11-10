@@ -209,31 +209,44 @@ abstract class Base implements TypeInterface
         //Calculate product Price
         $lockProductPriceStatus =
             (bool) $product->getData(SubscriptionProductAttributes::SUBSCRIPTION_LOCK_PRODUCT_PRICE);
+        $productPrice = isset($productData['price']) ? $productData['price'] : null;
+        if (!$productPrice && isset($productData['custom_price']) && !$lockProductPriceStatus && !$full) {
+            $productPrice = $productData['custom_price'];
+        }
         $price = $this->priceCalculator->getUnitPrice(
             $product,
             $productData['billing_frequency'],
-            isset($productData['price']) ? $productData['price'] : null,
+            $productPrice,
             $full
         );
         if ($this->profileProduct) {
             $originProfileProductData = $this->profileProduct->getOrigData();
             $originUnitPrice = (float) $originProfileProductData['price'];
             $currentProfile = $this->getProfile();
-            if ($this->config->getPricingStrategy() == PriceStrategy::GRANDFATHERED_PRICE
-                && $currentProfile
-                && $currentProfile->getOrigData('billing_frequency_id')
-                    == $currentProfile->getData('billing_frequency_id')
-                && $originProfileProductData['qty']
+            $isNotBillingFrequencyChange = $currentProfile->getOrigData('billing_frequency_id')
+                == $currentProfile->getData('billing_frequency_id');
+            if (!isset($productData['admin_modification']) || !$productData['admin_modification']) {
+                if (($originProfileProductData['qty'] == $productData['qty']
+                        || $this->config->getPricingStrategy() == PriceStrategy::STATIC_PRICE)
+                    && $isNotBillingFrequencyChange
+                ) {
+                    $price = $originUnitPrice;
+                }
+                if ($this->config->getPricingStrategy() == PriceStrategy::GRANDFATHERED_PRICE
+                    && $currentProfile
+                    && $isNotBillingFrequencyChange
+                    && $originProfileProductData['qty']
                     != $productData['qty']
-            ) {
-                $price = min($originUnitPrice, $price);
+                ) {
+                    $price = min($originUnitPrice, $price);
+                }
             }
         }
         if ($lockProductPriceStatus && $productQty) {
             $tierPrice = $this->productRepository
                 ->getById($product->getData('child_product_id'))
                 ->getTierPrice($productQty);
-            if ($tierPrice) {
+            if ($tierPrice && $this->config->getPricingStrategy() != PriceStrategy::STATIC_PRICE) {
                 $price = min($tierPrice, $price);
             }
         }
