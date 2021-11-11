@@ -105,7 +105,7 @@ class SubscriptionProfile extends AbstractEntity
                 $profit = $profitOfLastItem * 12 / $object->getFrequency();
             }
         } else {
-            $profit = $profitOfLastItem * $object->getTotalBillingCycles();
+            $profit = $profitOfLastItem * $object->getStaticTotalBillingCycles();
         }
         return $profit;
     }
