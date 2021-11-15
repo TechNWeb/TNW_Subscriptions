@@ -66,14 +66,14 @@ class FinalInstallment extends Column
             foreach ($dataSource['data']['items'] as & $item) {
                 if (!isset($item['subscription_final_installment_date'])
                 || $item['subscription_final_installment_date'] == '') {
-                    $item['subscription_final_installment_date'] = "--";
+                    $item['subscription_final_installment_date'] = "";
                 } else {
                     if (strpos($item['subscription_final_installment_date'], '[') !== false) {
                         $options = $this->serializer->unserialize($item['subscription_final_installment_date']);
                         $result = [];
                         foreach ($options as $option) {
                             if ($option === null) {
-                                $result[] = "--";
+                                $result[] = "";
                             } else {
                                 $result[] = $this->timezone->formatDate(
                                     $option,
