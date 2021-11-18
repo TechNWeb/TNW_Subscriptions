@@ -90,4 +90,16 @@ class Add extends Action
         return $this->resultFactory->create(ResultFactory::TYPE_JSON)
             ->setData(['error' => false, 'messages' => []]);
     }
+
+    /**
+     * Acl check for admin
+     *
+     * @return bool
+     */
+    protected function _isAllowed()
+    {
+        return $this->_authorization->isAllowed(
+            'TNW_Subscriptions::SubscriptionProfile_edit'
+        );
+    }
 }

@@ -7,22 +7,81 @@
                 <resource id="TNW_Subscriptions::tnw_subscriptions_root" title="TNW Subscriptions Menu"
                           sortOrder="600">
                     <resource id="TNW_Subscriptions::tnw_subscriptions_attributes" title="Custom Attributes"
-                              sortOrder="200"/>
+                              sortOrder="200" />
+                    <resource id="TNW_Subscriptions::tnw_subscriptions" title="TNW Subscriptions General Actions">
+                        <resource id="TNW_Subscriptions::tnw_subscriptions_operations" title="TNW Subscriptions"
+                                  sortOrder="100">
+                            <resource id="TNW_Subscriptions::tnw_subscriptions_subscription_profile" sortOrder="10"
+                                      title="Subscription Profiles">
+                                <resource id="TNW_Subscriptions::SubscriptionProfile" sortOrder="10" title="Subscription Profile"
+                                          translate="title">
+                                    <resource id="TNW_Subscriptions::SubscriptionProfile_save" sortOrder="20"
+                                              title="Save SubscriptionProfile"
+                                              translate="title">
+                                        <resource id="TNW_Subscriptions::SubscriptionProfile_create" sortOrder="30"
+                                                  title="Create SubscriptionProfile"
+                                                  translate="title" />
+                                        <resource id="TNW_Subscriptions::SubscriptionProfile_edit" sortOrder="10"
+                                                  title="Edit SubscriptionProfile"
+                                                  translate="title" />
+                                    </resource>
+                                </resource>
+                                <resource id="TNW_Subscriptions::tnw_subscriptions_queue" sortOrder="10"
+                                          title="Subscription Profiles Queue">
+                                    <resource id="TNW_Subscriptions::tnw_subscriptions_queue_delete" sortOrder="30"
+                                              title="Delete Subscription Profiles Queue"
+                                              translate="title" />
+                                    <resource id="TNW_Subscriptions::tnw_subscriptions_queue_mass_delete" sortOrder="10"
+                                              title="Mass Delete Subscription Profiles Queue"
+                                              translate="title" />
+                                    <resource id="TNW_Subscriptions::tnw_subscriptions_queue_process" sortOrder="10"
+                                              title="Process Subscription Profiles Queue"
+                                              translate="title" />
+                                </resource>
+                            </resource>
+                        </resource>
+                        <resource id="TNW_Subscriptions::tnw_subscriptions_settings" title="TNW Subscriptions Settings"
+                                  sortOrder="100">
+                            <resource id="TNW_Subscriptions::general_config" sortOrder="20"
+                                      title="TNW General Settings"/>
+                            <resource id="TNW_Subscriptions::BillingFrequency" sortOrder="10" title="BillingFrequency Grid View">
+                                <resource id="TNW_Subscriptions::BillingFrequency_save" sortOrder="30"
+                                          title="Save BillingFrequency">
+                                    <resource id="TNW_Subscriptions::BillingFrequency_edit" sortOrder="20"
+                                              title="Edit BillingFrequency"/>
+                                </resource>
+                                <resource id="TNW_Subscriptions::BillingFrequency_delete" sortOrder="40"
+                                          title="Delete BillingFrequency"/>
+                            </resource>
+                            <resource id="TNW_Subscriptions::sales_settings" sortOrder="20"
+                                      title="TNW Sales Settings"/>
+                            <resource id="TNW_Subscriptions::product_settings" sortOrder="30"
+                                      title="TNW Product Settings"/>
+                            <resource id="TNW_Subscriptions::customer_settings" sortOrder="40"
+                                      title="TNW Customer Settings"/>
+                        </resource>
+                        <resource id="TNW_Subscriptions::tools" title="TNW Subscriptions Tools"
+                                  sortOrder="100">
+                            <resource id="TNW_Subscriptions::tools_message_view" sortOrder="10" title="View Message Log" />
+                            <resource id="TNW_Subscriptions::tools_message_remove" sortOrder="10" title="Truncate Message Log" />
+                            <resource id="TNW_Subscriptions::tools_message_download" sortOrder="10" title="Download Message Log" />
+                        </resource>
+                    </resource>
                 </resource>
                 <resource id="Magento_Backend::stores">
                     <resource id="Magento_Backend::stores_settings">
                         <resource id="Magento_Config::config">
                             <resource id="TNW_Subscriptions::config_general" title="TNW Subscriptions Config General"
                                       sortOrder="100">
-                                <resource id="TNW_Subscriptions::config_profile_options" title="TNW Subscriptions Config Profile Options"
+                                <resource id="TNW_Subscriptions::config_profile_options" title="Profile Options"
                                           sortOrder="200"/>
-                                <resource id="TNW_Subscriptions::config_product" title="TNW Subscriptions Config Product"
+                                <resource id="TNW_Subscriptions::config_product" title="Product"
                                           sortOrder="300"/>
-                                <resource id="TNW_Subscriptions::config_profile_notification" title="TNW Subscriptions Config Profile Options"
+                                <resource id="TNW_Subscriptions::config_profile_notification" title="Profile Notification Options"
                                           sortOrder="400"/>
-                                <resource id="TNW_Subscriptions::config_payment" title="TNW Subscriptions Payment Product"
+                                <resource id="TNW_Subscriptions::config_payment" title="Payment Product"
                                           sortOrder="500"/>
-                                <resource id="TNW_Subscriptions::config_customer" title="TNW Subscriptions Customer"
+                                <resource id="TNW_Subscriptions::config_customer" title="Customer"
                                           sortOrder="600"/>
                             </resource>
                         </resource>
@@ -32,72 +91,22 @@
                         <resource id="TNW_Subscriptions::ProductSubscriptionProfile_attributes" sortOrder="20" title="TNW Product SubscriptionProfile" />
                     </resource>
                 </resource>
-                <resource id="TNW_Subscriptions::tnw_subscriptions" title="TNW Subscriptions General Actions">
-                    <resource id="TNW_Subscriptions::tnw_subscriptions_operations" title="TNW Subscriptions"
-                              sortOrder="100">
-                        <resource id="TNW_Subscriptions::tnw_subscriptions_subscription_profile" sortOrder="10"
-                                  title="Subscription Profiles">
-                            <resource id="TNW_Subscriptions::SubscriptionProfile" sortOrder="10" title="Subscription Profile"
-                                      translate="title">
-                                <resource id="TNW_Subscriptions::SubscriptionProfile_edit" sortOrder="10"
-                                          title="Edit SubscriptionProfile"
-                                          translate="title"/>
-                                <resource id="TNW_Subscriptions::SubscriptionProfile_save" sortOrder="20"
-                                          title="Save SubscriptionProfile"
-                                          translate="title"/>
-                                <resource id="TNW_Subscriptions::SubscriptionProfile_create" sortOrder="30"
-                                          title="Create SubscriptionProfile"
-                                          translate="title"/>
-                            </resource>
-                        </resource>
-                        <resource id="TNW_Subscriptions::ProductSubscriptionProfile" sortOrder="10"
-                                  title="Product Subscription Profile"
-                                  translate="title">
-                            <resource id="TNW_Subscriptions::SubscriptionProfile_create_product_save" sortOrder="30"
-                                      title="Create SubscriptionProfile Product Save"
-                                      translate="title"/>
-                        </resource>
-                    </resource>
-                    <resource id="TNW_Subscriptions::tnw_subscriptions_settings" title="TNW Subscriptions Settings"
-                              sortOrder="100">
-                        <resource id="TNW_Subscriptions::general_config" sortOrder="20"
-                                  title="TNW General Settings"/>
-                        <resource id="TNW_Subscriptions::BillingFrequency" sortOrder="10" title="BillingFrequency">
-                            <resource id="TNW_Subscriptions::BillingFrequency_edit" sortOrder="20"
-                                      title="Edit BillingFrequency"/>
-                            <resource id="TNW_Subscriptions::BillingFrequency_save" sortOrder="30"
-                                      title="Save BillingFrequency"/>
-                            <resource id="TNW_Subscriptions::BillingFrequency_delete" sortOrder="40"
-                                      title="Delete BillingFrequency"/>
-                        </resource>
-                        <resource id="TNW_Subscriptions::sales_settings" sortOrder="20"
-                                  title="TNW Sales Settings"/>
-                        <resource id="TNW_Subscriptions::product_settings" sortOrder="30"
-                                  title="TNW Product Settings"/>
-                        <resource id="TNW_Subscriptions::customer_settings" sortOrder="40"
-                                  title="TNW Customer Settings"/>
-                    </resource>
-                    <resource id="TNW_Subscriptions::tools" title="TNW Subscriptions Tools"
-                              sortOrder="100">
-                        <resource id="TNW_Subscriptions::tools_message" sortOrder="10" title="BillingFrequency" />
-                    </resource>
-                </resource>
                 <resource id="Magento_Sales::sales">
                     <resource id="TNW_Subscriptions::recurring" sortOrder="10" title="TNW Recurring" />
                 </resource>
                 <resource id="Magento_Reports::report">
                     <resource id="TNW_Subscriptions::billing_frequencies" sortOrder="10" title="TNW Billing Frequencies">
-                        <resource id="TNW_Subscriptions::report_subscribe_billing_frequency_customers" sortOrder="10" title="TNW Subscriptions By Subscribe Customers" />
+                        <resource id="TNW_Subscriptions::report_subscribe_billing_frequency_customers" sortOrder="10" title="By Subscribed Customers" />
                     </resource>
                     <resource id="Magento_Reports::customers">
-                        <resource id="TNW_Subscriptions::report_subscribe_customer_products" sortOrder="10" title="TNW Subscriptions By Product Reports" />
-                        <resource id="TNW_Subscriptions::report_subscribe_customer_billing_frequencies" sortOrder="10" title="TNW Subscriptions By Billing Frequency" />
+                        <resource id="TNW_Subscriptions::report_subscribe_customer_products" sortOrder="10" title="TNW Subscriptions By Products" />
+                        <resource id="TNW_Subscriptions::report_subscribe_customer_billing_frequencies" sortOrder="10" title="TNW Subscriptions By Billing Frequencies" />
                     </resource>
                     <resource id="Magento_Reports::salesroot">
                         <resource id="TNW_Subscriptions::report_sales_subscriptions" sortOrder="10" title="TNW Subscriptions" />
                     </resource>
                     <resource id="Magento_Reports::report_products">
-                        <resource id="TNW_Subscriptions::report_subscribe_product_customers" sortOrder="10" title="TNW Subscriptions By Subscribe Customers" />
+                        <resource id="TNW_Subscriptions::report_subscribe_product_customers" sortOrder="10" title="TNW Subscriptions By Subscribed Customers" />
                     </resource>
                 </resource>
             </resource>

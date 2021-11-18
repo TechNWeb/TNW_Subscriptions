@@ -45,4 +45,16 @@ class Download extends \Magento\Backend\App\Action
             'value' => $filaName
         ], DirectoryList::LOG, 'text/plain');
     }
+
+    /**
+     * Acl check for admin
+     *
+     * @return bool
+     */
+    protected function _isAllowed()
+    {
+        return $this->_authorization->isAllowed(
+            'TNW_Subscriptions::tools_message_download'
+        );
+    }
 }

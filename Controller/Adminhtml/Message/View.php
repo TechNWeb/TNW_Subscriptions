@@ -27,4 +27,16 @@ class View extends \Magento\Backend\App\Action
 
         return $resultPage;
     }
+
+    /**
+     * Acl check for admin
+     *
+     * @return bool
+     */
+    protected function _isAllowed()
+    {
+        return $this->_authorization->isAllowed(
+            'TNW_Subscriptions::tools_message_view'
+        );
+    }
 }

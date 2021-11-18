@@ -102,7 +102,7 @@ class Schedule extends Action
     protected function _isAllowed()
     {
         return $this->_authorization->isAllowed(
-            'TNW_Subscriptions::SubscriptionProfile_save'
+            'TNW_Subscriptions::SubscriptionProfile_edit'
         );
     }
 }

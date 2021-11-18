@@ -47,7 +47,7 @@ class Save extends SubscriptionProfile
     protected function _isAllowed()
     {
         return $this->_authorization->isAllowed(
-            'TNW_Subscriptions::SubscriptionProfile_create_product_save'
+            'TNW_Subscriptions::SubscriptionProfile_create'
         );
     }
 

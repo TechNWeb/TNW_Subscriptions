@@ -22,7 +22,7 @@ class InlineEdit extends Action implements HttpPostActionInterface
     /**
      * Authorization level
      */
-    const ADMIN_RESOURCE = 'TNW_Subscriptions::BillingFrequency_save';
+    const ADMIN_RESOURCE = 'TNW_Subscriptions::BillingFrequency_edit';
 
     /**
      * @var JsonFactory

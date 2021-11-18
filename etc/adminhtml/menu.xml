@@ -20,7 +20,7 @@
         <!-- Sales -> Operations -> Processing Queue - Processing Queue grid -->
         <add id="TNW_Subscriptions::tnw_subscriptions_processing_queue" title="Processing Queue"
              translate="title" module="TNW_Subscriptions" sortOrder="30" parent="TNW_Subscriptions::tnw_subscriptions_operations"
-             action="tnw_subscriptions/subscriptionprofile_queue/index" resource="TNW_Subscriptions::SubscriptionProfile"/>
+             action="tnw_subscriptions/subscriptionprofile_queue/index" resource="TNW_Subscriptions::tnw_subscriptions_queue"/>
 
         <!-- Subscription -> Configuration -->
         <add id="TNW_Subscriptions::tnw_subscriptions_settings" title="Configuration" translate="title"
@@ -89,7 +89,7 @@
         <!-- Sales -> Recurring -> Processing Queue - Processing Queue grid -->
         <add id="TNW_Subscriptions::tnw_subscriptions_recurring_processing_queue" title="Processing Queue"
              translate="title" module="TNW_Subscriptions" sortOrder="30" parent="TNW_Subscriptions::tnw_subscriptions_recurring"
-             action="tnw_subscriptions/subscriptionprofile_queue/index" resource="TNW_Subscriptions::SubscriptionProfile"
+             action="tnw_subscriptions/subscriptionprofile_queue/index" resource="TNW_Subscriptions::tnw_subscriptions_queue"
              dependsOnModule="TNW_Subscriptions"
              />
 
@@ -173,6 +173,6 @@
              module="TNW_Subscriptions"
              sortOrder="10"
              parent="TNW_Subscriptions::tools"
-             resource="TNW_Subscriptions::tools_message"/>
+             resource="TNW_Subscriptions::tools_message_view"/>
     </menu>
 </config>

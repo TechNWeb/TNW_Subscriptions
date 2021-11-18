@@ -46,4 +46,16 @@ class Truncate extends \Magento\Backend\App\Action
         return $this->resultRedirectFactory->create()
             ->setRefererUrl();
     }
+
+    /**
+     * Acl check for admin
+     *
+     * @return bool
+     */
+    protected function _isAllowed()
+    {
+        return $this->_authorization->isAllowed(
+            'TNW_Subscriptions::tools_message_remove'
+        );
+    }
 }
