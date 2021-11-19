@@ -230,6 +230,7 @@ class Manager
                 QueueStatus::QUEUE_STATUS_SKIPPED
             ]),
             $connection->quoteInto('main_table.attempt_count <= ?', $this->config->getAttemptCount()),
+            $connection->prepareSqlCondition('relation.magento_order_id', ["null" => true]),
         ]);
 
         $collection->getSelect()

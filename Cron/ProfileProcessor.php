@@ -127,7 +127,7 @@ class ProfileProcessor
                 }
                 $orderProcessHasError = false;
             } catch (\Exception $e) {
-                $this->context->messageError('Error on proc       essing profile: %s', $e);
+                $this->context->messageError('Error on processing profile: %s', $e);
                 $this->queueManager->makeError($queueIds, $e->getMessage());
                 $orderProcessHasError = false;
             } finally {
