@@ -1807,11 +1807,12 @@ class Manager
             $oldDateTimeStamp = strtotime($nextProfileRelation->getScheduledAt());
             $newFullDate = $data['next_payment_date_value'] . ' ' . date('H:i:s', $oldDateTimeStamp);
             $newDateTimeStamp = strtotime($newFullDate);
-            if ($newDateTimeStamp <= time()) {
-                $this->isNextPaymentDateValid = false;
+            $currentDate = date('m/d/Y', time());
+            if ($newDateTimeStamp <= time() || $currentDate == $data['next_payment_date_value']) {
+                 $this->isNextPaymentDateValid = false;
                 return false;
             } else {
-                $newDate =  date(DateTime::DATETIME_PHP_FORMAT, $newDateTimeStamp);
+                $newDate = date(DateTime::DATETIME_PHP_FORMAT, $newDateTimeStamp);
                 $nextProfileRelation->setScheduledAt($newDate)->save();
                 $message = __(
                     'Profile next payment date changed to <b>%1</b> (UTC)',
