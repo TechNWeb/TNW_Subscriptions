@@ -220,15 +220,18 @@ class Profit
             $profitOfLastItem = 0;
         }
 
+        $asTodayProfit = $profit;
+
         if ($profile->getTerm() == 1) {
             if ($profile->getUnit() == 3) {
-                $profit = $profitOfLastItem * 365 / $profile->getFrequency();
+                $profit = ($profitOfLastItem * 365 / $profile->getFrequency()) - $asTodayProfit;
             } else {
-                $profit = $profitOfLastItem * 12 / $profile->getFrequency();
+                $profit = ($profitOfLastItem * 12 / $profile->getFrequency()) - $asTodayProfit;
             }
         } else {
-            $profit += $profitOfLastItem * $profile->getTotalBillingCycles();
+            $profit += ($profitOfLastItem * $profile->getTotalBillingCycles()) - $asTodayProfit;
         }
+
 
         $this->setProfitData($profile, $profit, ProfitCalculator::REMAINING);
 

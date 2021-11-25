@@ -118,4 +118,16 @@ class CancelSubscription extends Action
         return $this->resultRedirectFactory->create()
             ->setPath('tnw_subscriptions/subscriptionprofile/edit', ['entity_id' => $subscriptionId]);
     }
+
+    /**
+     * Acl check for admin
+     *
+     * @return bool
+     */
+    protected function _isAllowed()
+    {
+        return $this->_authorization->isAllowed(
+            'TNW_Subscriptions::SubscriptionProfile_edit'
+        );
+    }
 }

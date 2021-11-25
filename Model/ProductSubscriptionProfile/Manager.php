@@ -378,6 +378,9 @@ class Manager
      */
     protected function processData(&$profileModel, &$product, $productId, $data, $requestData)
     {
+        if (isset($data['admin_modification'])) {
+            $requestData['admin_modification'] = $data['admin_modification'];
+        }
         $priceFormat = $this->serializer->unserialize(
             $this->subscriptionContext->getPriceFormatData(
                 $profileModel->getProfileCurrencyCode()
@@ -485,8 +488,8 @@ class Manager
             $requestData['price']
         ));
         $product->setPrice($requestPrice);
-        if (isset($data['admin_modification'])) {
-            $product->setData('admin_modification', true);
+        if (isset($requestData['admin_modification'])) {
+            $product->setData('admin_modification', $requestData['admin_modification']);
         }
         return $product;
     }
@@ -669,6 +672,9 @@ class Manager
                 ['child_product' => $child->getMagentoProduct()]
             )
             : $data['item_' . $productId];
+        if (isset($data['admin_modification'])) {
+            $productData['admin_modification'] = $data['admin_modification'];
+        }
         $price = $this->productTypeResolver->resolve($product->getMagentoProduct()->getTypeId())
             ->setProfile($profileModel)
             ->setOriginalProfileProduct($product)

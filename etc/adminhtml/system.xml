@@ -93,7 +93,7 @@
                     <source_model>TNW\Subscriptions\Model\Config\Source\PriceStrategy</source_model>
                     <comment>
                         <![CDATA[
-                        <strong>Grandfathered Price</strong> - product price is grandfathered and will not change
+                        <strong>Grandfathered</strong> - product price is grandfathered and will not change
                         for existing profiles when orders are created even if the product price changes in the catalog
                         for new customers.<br><strong>Dynamic</strong> (full) - product price will be automatically
                         re-calculated when the customer makes changes to the quantity of the existing subscription.

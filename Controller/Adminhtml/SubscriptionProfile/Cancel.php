@@ -27,4 +27,16 @@ class Cancel extends SubscriptionProfile
 
         return $resultRedirect;
     }
+
+    /**
+     * Acl check for admin
+     *
+     * @return bool
+     */
+    protected function _isAllowed()
+    {
+        return $this->_authorization->isAllowed(
+            'TNW_Subscriptions::SubscriptionProfile_edit'
+        );
+    }
 }

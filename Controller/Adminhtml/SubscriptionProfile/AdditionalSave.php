@@ -84,4 +84,16 @@ class AdditionalSave extends \Magento\Backend\App\Action
             ->create(ResultFactory::TYPE_JSON)
             ->setData($response);
     }
+
+    /**
+     * Acl check for admin
+     *
+     * @return bool
+     */
+    protected function _isAllowed()
+    {
+        return $this->_authorization->isAllowed(
+            'TNW_Subscriptions::SubscriptionProfile_edit'
+        );
+    }
 }

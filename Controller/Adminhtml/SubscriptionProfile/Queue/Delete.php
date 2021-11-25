@@ -59,4 +59,16 @@ class Delete extends Action
             ->create()
             ->setPath($this->_redirect->getRefererUrl());
     }
+
+    /**
+     * Acl check for admin
+     *
+     * @return bool
+     */
+    protected function _isAllowed()
+    {
+        return $this->_authorization->isAllowed(
+            'TNW_Subscriptions::tnw_subscriptions_queue_delete'
+        );
+    }
 }

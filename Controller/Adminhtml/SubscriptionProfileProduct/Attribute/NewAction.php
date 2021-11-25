@@ -48,4 +48,16 @@ class NewAction extends \Magento\Catalog\Controller\Adminhtml\Product\Attribute
     {
         return $this->resultForwardFactory->create()->forward('edit');
     }
+
+    /**
+     * Acl check for admin
+     *
+     * @return bool
+     */
+    protected function _isAllowed()
+    {
+        return $this->_authorization->isAllowed(
+            'TNW_Subscriptions::ProductSubscriptionProfile_attributes'
+        );
+    }
 }

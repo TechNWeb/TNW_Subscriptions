@@ -185,10 +185,13 @@ class CustomerAddress implements OptionSourceInterface
                 ->create();
             $this->criteriaBuilder->addFilters([$filter]);
             $searchCriteria = $this->criteriaBuilder->create();
-            $result = $this->addressService->getList($searchCriteria)
-                ->getItems();
+            try {
+                $result = $this->addressService->getList($searchCriteria)
+                    ->getItems();
+            } catch (\Exception $e) {
+                return $result;
+            }
         }
-
         return $result;
     }
 

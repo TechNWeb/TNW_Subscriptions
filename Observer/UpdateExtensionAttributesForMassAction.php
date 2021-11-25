@@ -6,14 +6,13 @@
  */
 namespace TNW\Subscriptions\Observer;
 
-use Magento\Catalog\Api\ProductRepositoryInterface;
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
-use Magento\Framework\Exception\CouldNotSaveException;
 use Magento\Store\Model\ScopeInterface;
-use Psr\Log\LoggerInterface;
-use Magento\Framework\App\Config\ScopeConfigInterface;
 use TNW\Subscriptions\Model\Product\Attribute;
+use Magento\Catalog\Model\ResourceModel\Product\Action;
+use Magento\Framework\App\Config\ScopeConfigInterface;
+use Psr\Log\LoggerInterface;
 
 /**
  * Add default eav attribute value for mass update tnw_purchase_type
@@ -23,14 +22,9 @@ use TNW\Subscriptions\Model\Product\Attribute;
 class UpdateExtensionAttributesForMassAction implements ObserverInterface
 {
     /**
-     * @var ProductRepositoryInterface
+     * @var Action
      */
-    private $productRepository;
-
-    /**
-     * @var LoggerInterface
-     */
-    private $logger;
+    private $productAction;
 
     /**
      * @var ScopeConfigInterface
@@ -38,49 +32,58 @@ class UpdateExtensionAttributesForMassAction implements ObserverInterface
     private $scopeConfig;
 
     /**
+     * @var LoggerInterface
+     */
+    private $logger;
+
+    /**
      * UpdateExtensionAttributesForMassAction constructor.
-     * @param ProductRepositoryInterface $productRepository
+     * @param Action $productAction
+     * @param ScopeConfigInterface $scopeConfig
      * @param LoggerInterface $logger
      */
     public function __construct(
-        ProductRepositoryInterface $productRepository,
-        LoggerInterface $logger,
-        ScopeConfigInterface $scopeConfig
+        Action $productAction,
+        ScopeConfigInterface $scopeConfig,
+        LoggerInterface $logger
     ) {
-        $this->productRepository = $productRepository;
-        $this->logger = $logger;
+        $this->productAction = $productAction;
         $this->scopeConfig = $scopeConfig;
+        $this->logger = $logger;
     }
 
     /**
+     * Update extension attribute for mass action.
+     *
      * @param Observer $observer
-     * @throws \Magento\Framework\Exception\InputException
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
-     * @throws \Magento\Framework\Exception\StateException
      */
     public function execute(Observer $observer)
     {
+        $ids = [];
         $attributesData = $observer->getData('attributes_data');
         $productIds = $observer->getData('product_ids');
         $storeId = $observer->getData('store_id');
-        foreach ($productIds as $productId) {
-            $product = $this->productRepository->getById($productId, false, $storeId);
-            $needleAttributes = $this->getAttributeCodeAndValue($storeId);
-            foreach ($attributesData as $attributeKey => $attributeDatum) {
-                if ($attributeKey == 'tnw_subscr_purchase_type' && $attributeDatum != 1) {
-                    foreach ($needleAttributes as $key => $value) {
-                        $attribute = $product->getCustomAttribute($key);
-                        if ($attribute == null) {
-                            $product->setCustomAttribute($key, $value);
-                        }
+        $needleAttributes = $this->getAttributeCodeAndValue($storeId);
+
+        foreach ($attributesData as $attributeKey => $attributeValue) {
+            if ($attributeKey == Attribute::SUBSCRIPTION_PURCHASE_TYPE && $attributeValue != 1) {
+                foreach ($productIds as $productId) {
+                    $productAttribute = $this->productAction->getAttributeRawValue(
+                        $productId,
+                        array_keys($needleAttributes),
+                        $storeId
+                    );
+                    if (empty($productAttribute)) {
+                        $ids[] = $productId;
                     }
                 }
-            }
-            try {
-                $this->productRepository->save($product);
-            } catch (CouldNotSaveException $e) {
-                $this->logger->error($e);
-
+                if ($ids) {
+                    try {
+                        $this->productAction->updateAttributes(array_unique($ids), $needleAttributes, $storeId);
+                    } catch (\Exception $exception) {
+                        $this->logger->log($exception->getMessage());
+                    }
+                }
             }
         }
     }
@@ -129,7 +132,7 @@ class UpdateExtensionAttributesForMassAction implements ObserverInterface
             )
         ];
 
-        if ($attributes[Attribute::SUBSCRIPTION_OFFER_FLAT_DISCOUNT]) {
+        if (isset($attributes[Attribute::SUBSCRIPTION_OFFER_FLAT_DISCOUNT])) {
             $attributes[Attribute::SUBSCRIPTION_DISCOUNT_AMOUNT] = $this->scopeConfig->getValue(
                 'tnw_subscriptions_product/discount/discount_amount',
                 ScopeInterface::SCOPE_STORE,
@@ -142,7 +145,7 @@ class UpdateExtensionAttributesForMassAction implements ObserverInterface
             );
         }
 
-        if ($attributes[Attribute::SUBSCRIPTION_TRIAL_STATUS]) {
+        if (isset($attributes[Attribute::SUBSCRIPTION_TRIAL_STATUS])) {
             $attributes[Attribute::SUBSCRIPTION_TRIAL_PRICE] = $this->scopeConfig->getValue(
                 'tnw_subscriptions_product/trial/trial_price',
                 ScopeInterface::SCOPE_STORE,

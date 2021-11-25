@@ -103,4 +103,16 @@ abstract class AbstractSave extends SubscriptionProfile
 
         }
     }
+
+    /**
+     * Acl check for admin
+     *
+     * @return bool
+     */
+    protected function _isAllowed()
+    {
+        return $this->_authorization->isAllowed(
+            'TNW_Subscriptions::SubscriptionProfile_edit'
+        );
+    }
 }

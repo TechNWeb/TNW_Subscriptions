@@ -50,14 +50,14 @@ class ExpireCc extends Column
         if (isset($dataSource['data']['items'])) {
             foreach ($dataSource['data']['items'] as & $item) {
                 if ($item['subscription_expire_cc'] === null) {
-                    $item['subscription_expire_cc'] = "--";
+                    $item['subscription_expire_cc'] = "";
                 } else {
                     if (strpos($item['subscription_expire_cc'], '[') !== false) {
                         $options = $this->serializer->unserialize($item['subscription_expire_cc']);
                         $result = [];
                         foreach ($options as $option) {
                             if ($option === null) {
-                                $result[] = "--";
+                                $result[] = "";
                             } else {
                                 if ($option == 0) {
                                     $result[] = __("No");

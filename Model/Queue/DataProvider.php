@@ -70,19 +70,10 @@ class DataProvider extends AbstractDataProvider
             ]
         )->joinLeft(
             [
-                'magento_quote' => $collection->getTable('quote')
-            ],
-            'magento_quote.entity_id = relation.magento_quote_id',
-            [
-                'magento_quote.grand_total'
-            ]
-        )->joinLeft(
-            [
             'subscription_profile' => $collection->getTable('tnw_subscriptions_subscription_profile_entity')
             ],
             'subscription_profile.entity_id = relation.subscription_profile_id',
             [
-                'subscription_profile.profile_currency_code',
                 'subscription_profile.store_id'
             ]
         );

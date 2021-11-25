@@ -169,9 +169,11 @@ class Manager
                 $customerAddress = $profileAddress->exportCustomerAddress();
                 list($customer, $addresses) = $this->getCustomerAddresses();
                 $addresses[] = $customerAddress;
-                $customer->setAddresses($addresses);
-                $this->saveCustomer($customer);
-                $customerAddressId = $customerAddress->getId();
+                if ($customer) {
+                    $customer->setAddresses($addresses);
+                    $this->saveCustomer($customer);
+                    $customerAddressId = $customerAddress->getId();
+                }
             }
 
             $profileAddress->setCustomerAddressId((string)$customerAddressId);
@@ -265,7 +267,10 @@ class Manager
     {
         /** @var CustomerInterface $customer */
         $customer = $this->profileManager->getProfile()->getCustomer();
-        $addresses = (array)$customer->getAddresses();
+        $addresses = [];
+        if ($customer) {
+            $addresses = (array) $customer->getAddresses();
+        }
         return [$customer, $addresses];
     }
 
