@@ -110,6 +110,7 @@ class Profit
             $unserializedData = $this->jsonHelper->unserialize($serializedData);
             foreach ($unserializedData as $unserialized) {
                 foreach ($unserialized as $key => $value) {
+                    $this->profileRepository->unsetLoadedProfileData($value);
                     $profile = $this->profileRepository->getById($value);
                     $this->calculateProfitAndSave($profile);
                 }
