@@ -21,5 +21,6 @@ class Collection extends \Magento\Framework\Model\ResourceModel\Db\Collection\Ab
             \TNW\Subscriptions\Model\BillingFrequency::class,
             \TNW\Subscriptions\Model\ResourceModel\BillingFrequency::class
         );
+        $this->setFlag('admin_gws_filtered', true);
     }
 }

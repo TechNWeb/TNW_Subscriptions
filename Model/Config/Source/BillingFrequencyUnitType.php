@@ -34,30 +34,14 @@ class BillingFrequencyUnitType implements ArrayInterface
     {
         /** @var array $optionList */
         $optionList = [
-//            [
-//                'value' => self::MINUTES,
-//                'label' => __('Minute(s)'),
-//            ],
-//            [
-//                'value' => self::HOURS,
-//                'label' => __('Hour(s)'),
-//            ],
             [
                 'value' => self::DAYS,
                 'label' => 'Day',
             ],
-//            [
-//                'value' => self::WEEKS,
-//                'label' => __('Week(s)'),
-//            ],
             [
                 'value' => self::MONTHS,
                 'label' => 'Month',
             ],
-//            [
-//                'value' => self::YEARS,
-//                'label' => __('Year(s)'),
-//            ],
         ];
 
         return $optionList;
