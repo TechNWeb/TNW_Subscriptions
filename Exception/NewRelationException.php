@@ -1,0 +1,15 @@
+<?php
+/**
+ * Copyright © 2018 TechNWeb, Inc. All rights reserved.
+ * See TNW_LICENSE.txt for license details.
+ */
+namespace TNW\Subscriptions\Exception;
+
+use Magento\Framework\Exception\LocalizedException;
+
+/**
+ * Class NewRelationException - used to define the new profile relation creation
+ */
+class NewRelationException extends LocalizedException
+{
+}

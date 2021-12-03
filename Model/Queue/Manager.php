@@ -20,6 +20,13 @@ use TNW\Subscriptions\Model\SubscriptionProfileOrder\Manager as RelationManager;
 use TNW\Subscriptions\Model\SubscriptionProfileRepository;
 use TNW\Subscriptions\Model\EmailNotifierFactory;
 use TNW\Subscriptions\Model\SubscriptionProfile\ReBillManager;
+use TNW\Subscriptions\Exception\ReBillOrderEmailException;
+use TNW\Subscriptions\Exception\LinkProfileItemIdWithOrderItemIdException;
+use TNW\Subscriptions\Exception\NewRelationException;
+use TNW\Subscriptions\Exception\ChangeProfileStatusException;
+use TNW\Subscriptions\Exception\AssignOrderToRelationException;
+use TNW\Subscriptions\Exception\ProfileProductsUnsaleableException;
+use Magento\Payment\Gateway\Command\CommandException;
 
 /**
  * Class Manager - queue manager model
@@ -426,11 +433,18 @@ class Manager
 
     /**
      * @param $groupQueue
+     * @throws AssignOrderToRelationException
+     * @throws ChangeProfileStatusException
+     * @throws LinkProfileItemIdWithOrderItemIdException
+     * @throws NewRelationException
+     * @throws ReBillOrderEmailException
+     * @throws SubscriptionProfile\Engine\InvalidEngineException
      * @throws \Magento\Framework\Exception\CouldNotSaveException
      * @throws \Magento\Framework\Exception\LocalizedException
+     * @throws \Magento\Framework\Exception\MailException
      * @throws \Magento\Framework\Exception\NoSuchEntityException
-     * @throws \Magento\Payment\Gateway\Command\CommandException
-     * @throws \TNW\Subscriptions\Exception\ProfileProductsUnsaleableException
+     * @throws CommandException
+     * @throws ProfileProductsUnsaleableException
      */
     public function placeOrderByGroupQueue($groupQueue)
     {
@@ -508,104 +522,8 @@ class Manager
                     ->getEngine()
                     ->getCartManagement()
                     ->submit($quote);
-                $this->orderSender->send($order);
-
-                $insertData = [];
-                foreach ($quote->getAllVisibleItems() as $item) {
-                    $profileItemIds = $item->getData('profile_item_ids');
-                    if (empty($profileItemIds)) {
-                        continue;
-                    }
-
-                    $orderItem = $order->getItemByQuoteItemId($item->getId());
-                    if (!$orderItem instanceof \Magento\Sales\Model\Order\Item) {
-                        continue;
-                    }
-
-                    foreach ($profileItemIds as $profileItemId) {
-                        $insertData[] = [
-                            'profile_item_id' => $profileItemId,
-                            'quote_item_id' => $item->getId(),
-                            'order_item_id' => $orderItem->getItemId(),
-                        ];
-                    }
-                }
-
-                // Save Items Relation
-                $this->relationResource->insertSales($insertData);
-
-                foreach ($groupQueue as $queue) {
-                    $profile = $this->profileRepository->getById($queue->getData('subscription_profile_id'));
-
-                    $oldStatus = $profile->getStatus();
-
-                    $profile->setStatus(ProfileStatus::STATUS_ACTIVE);
-                    if ($profile->getTrialStartDate() && time() < strtotime($profile->getStartDate())) {
-                        $profile->setStatus(ProfileStatus::STATUS_TRIAL);
-                    }
-
-                    $this->profileManager->setProfile($profile);
-                    $this->profileManager->saveProfile();
-
-                    if ($oldStatus != $profile->getStatus()) {
-                        //Add comment profile place.
-                        $this->messageHistoryLogger->message(
-                            SubscriptionProfile\MessageHistoryLogger::MESSAGE_SUBSCRIPTION_STATUS_CHANGED,
-                            [
-                                $this->profileStatus->getLabelByValue($oldStatus),
-                                $this->profileStatus->getLabelByValue($profile->getStatus())
-                            ],
-                            $profile->getId(),
-                            false,
-                            false,
-                            true
-                        );
-                    }
-
-                    //Add comment profile place.
-                    $this->messageHistoryLogger->message(
-                        SubscriptionProfile\MessageHistoryLogger::MESSAGE_ORDER_CREATED_FROM_QUOTE,
-                        [
-                            $order->getEntityId(),
-                            $order->getIncrementId(),
-                            $this->messageHistoryLogger->getConvertedQuoteId($quote->getId())
-                        ],
-                        $profile->getId(),
-                        false,
-                        false,
-                        true
-                    );
-
-                    if ($quote->getCouponCode() === "") {
-                        $this->messageHistoryLogger->message(
-                            SubscriptionProfile\MessageHistoryLogger::COUPON_INVALID,
-                            [
-                                $profile->getCouponCode()
-                            ],
-                            $profile->getId(),
-                            false,
-                            false,
-                            true
-                        );
-                    }
-
-                    $relation = $this->relationManager
-                        ->getRelationById($queue->getProfileOrderId())
-                        ->setMagentoQuoteId($quote->getId())
-                        ->setMagentoOrderId($order->getId());
-
-                    $this->relationManager->saveRelation($relation);
-                    $this->createNewRelation($queue, $profile);
-                    $profile->setTotalBillingCycles($profile->getTotalBillingCycles() - 1);
-                    $profile->setNeedRecollect(false);
-                    foreach ($profile->getProducts() as $product) {
-                        $product->setNeedRecollect(false);
-                    }
-                    $this->profileRepository->save($profile);
-                    $this->profileManager->setProfilesToCalculateProfit($order);
-                }
             } catch (\Exception $e) {
-                if ($e instanceof \Magento\Payment\Gateway\Command\CommandException && $e->getCode() == 2099) {
+                if ($e instanceof CommandException && $e->getCode() == 2099) {
                     $reBill = $this->reBillManager->createReBillByFailedGroupQueue($groupQueue);
                 }
                 foreach ($groupQueue as $queue) {
@@ -629,7 +547,7 @@ class Manager
                             true
                         );
                     }
-                    if ($e instanceof \Magento\Payment\Gateway\Command\CommandException) {
+                    if ($e instanceof CommandException) {
                         if (isset($reBill) && $reBill->getId()) {
                             $this->emailNotifierFactory->create()->paymentVerificationFailed($profile, $reBill);
                         } else {
@@ -639,12 +557,134 @@ class Manager
                 }
                 throw $e;
             }
+            try {
+                $this->orderSender->send($order);
+            } catch (\Exception $e) {
+                foreach ($groupQueue as $queue) {
+                    $profile = $this->profileRepository->getById($queue->getData('subscription_profile_id'));
+                    $this->createNewRelation($queue, $profile);
+                }
+                throw new ReBillOrderEmailException(__('Could not send Order email.'));
+            }
+            $insertData = [];
+            foreach ($quote->getAllVisibleItems() as $item) {
+                $profileItemIds = $item->getData('profile_item_ids');
+                if (empty($profileItemIds)) {
+                    continue;
+                }
+
+                $orderItem = $order->getItemByQuoteItemId($item->getId());
+                if (!$orderItem instanceof \Magento\Sales\Model\Order\Item) {
+                    continue;
+                }
+
+                foreach ($profileItemIds as $profileItemId) {
+                    $insertData[] = [
+                        'profile_item_id' => $profileItemId,
+                        'quote_item_id' => $item->getId(),
+                        'order_item_id' => $orderItem->getItemId(),
+                    ];
+                }
+            }
+
+            try {
+                // Save Items Relation
+                $this->relationResource->insertSales($insertData);
+            } catch (\Exception $e) {
+                foreach ($groupQueue as $queue) {
+                    $profile = $this->profileRepository->getById($queue->getData('subscription_profile_id'));
+                    $this->createNewRelation($queue, $profile);
+                }
+                throw new LinkProfileItemIdWithOrderItemIdException(
+                    __('Could not Link Profile Item ID with order item ID.')
+                );
+            }
+
+            foreach ($groupQueue as $queue) {
+                $profile = $this->profileRepository->getById($queue->getData('subscription_profile_id'));
+
+                $oldStatus = $profile->getStatus();
+
+                $profile->setStatus(ProfileStatus::STATUS_ACTIVE);
+                if ($profile->getTrialStartDate() && time() < strtotime($profile->getStartDate())) {
+                    $profile->setStatus(ProfileStatus::STATUS_TRIAL);
+                }
+
+                $this->profileManager->setProfile($profile);
+                try {
+                    $this->profileManager->saveProfile();
+                } catch (\Exception $e) {
+                    throw new ChangeProfileStatusException(__('Could not change profile status.'));
+                }
+
+
+                if ($oldStatus != $profile->getStatus()) {
+                    //Add comment profile place.
+                    $this->messageHistoryLogger->message(
+                        SubscriptionProfile\MessageHistoryLogger::MESSAGE_SUBSCRIPTION_STATUS_CHANGED,
+                        [
+                            $this->profileStatus->getLabelByValue($oldStatus),
+                            $this->profileStatus->getLabelByValue($profile->getStatus())
+                        ],
+                        $profile->getId(),
+                        false,
+                        false,
+                        true
+                    );
+                }
+
+                //Add comment profile place.
+                $this->messageHistoryLogger->message(
+                    SubscriptionProfile\MessageHistoryLogger::MESSAGE_ORDER_CREATED_FROM_QUOTE,
+                    [
+                        $order->getEntityId(),
+                        $order->getIncrementId(),
+                        $this->messageHistoryLogger->getConvertedQuoteId($quote->getId())
+                    ],
+                    $profile->getId(),
+                    false,
+                    false,
+                    true
+                );
+
+                if ($quote->getCouponCode() === "") {
+                    $this->messageHistoryLogger->message(
+                        SubscriptionProfile\MessageHistoryLogger::COUPON_INVALID,
+                        [
+                            $profile->getCouponCode()
+                        ],
+                        $profile->getId(),
+                        false,
+                        false,
+                        true
+                    );
+                }
+
+                $relation = $this->relationManager
+                    ->getRelationById($queue->getProfileOrderId())
+                    ->setMagentoQuoteId($quote->getId())
+                    ->setMagentoOrderId($order->getId());
+
+                try {
+                    $this->relationManager->saveRelation($relation);
+                } catch (\Exception $e) {
+                    throw new AssignOrderToRelationException(__('Could not assign order id to profile relation.'));
+                }
+                $this->createNewRelation($queue, $profile);
+                $profile->setTotalBillingCycles($profile->getTotalBillingCycles() - 1);
+                $profile->setNeedRecollect(false);
+                foreach ($profile->getProducts() as $product) {
+                    $product->setNeedRecollect(false);
+                }
+                $this->profileRepository->save($profile);
+                $this->profileManager->setProfilesToCalculateProfit($order);
+            }
         } else {
             foreach ($groupQueue as $queue) {
                 $profile = $this->profileRepository->getById($queue->getData('subscription_profile_id'));
                 $this->createNewRelation($queue, $profile);
             }
-            throw new \TNW\Subscriptions\Exception\ProfileProductsUnsaleableException(
+            throw new ProfileProductsUnsaleableException(
                 __('There were no saleable products in queue profiles.')
             );
         }
@@ -653,26 +693,30 @@ class Manager
     /**
      * @param $queue
      * @param $profile
-     * @throws \Magento\Framework\Exception\LocalizedException
+     * @throws NewRelationException
      */
     private function createNewRelation($queue, $profile)
     {
         /** @var BillingCyclesManager $billingCyclesManager */
         $billingCyclesManager = $this->billingCyclesManagerFactory->create();
-        list($cycles, $needMore, $existingCycles) =
-            $billingCyclesManager->getBillingCycles($profile, 1, true);
-        if ($needMore && $cycles) {
-            $relations = [];
-            foreach ($cycles as $cycle) {
-                $newRelation = $this->relationManager->getNewProfileOrderRelation()
-                    ->setSubscriptionProfileId($profile->getId())
-                    ->setMagentoQuoteId($queue->getData('magento_quote_id'))
-                    ->setScheduledAt($cycle);
-                $relations[] = $this->relationManager->saveRelation($newRelation)->getId();
+        try {
+            list($cycles, $needMore, $existingCycles) =
+                $billingCyclesManager->getBillingCycles($profile, 1, true);
+            if ($needMore && $cycles) {
+                $relations = [];
+                foreach ($cycles as $cycle) {
+                    $newRelation = $this->relationManager->getNewProfileOrderRelation()
+                        ->setSubscriptionProfileId($profile->getId())
+                        ->setMagentoQuoteId($queue->getData('magento_quote_id'))
+                        ->setScheduledAt($cycle);
+                    $relations[] = $this->relationManager->saveRelation($newRelation)->getId();
+                }
+                if ($relations) {
+                    $this->insertItems($relations);
+                }
             }
-            if ($relations) {
-                $this->insertItems($relations);
-            }
+        } catch (\Exception $e) {
+            throw new NewRelationException(__('Could not create new relation.'));
         }
     }
 

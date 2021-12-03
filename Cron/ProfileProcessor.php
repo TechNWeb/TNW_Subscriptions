@@ -14,6 +14,12 @@ use TNW\Subscriptions\Model\SubscriptionProfile\Process\PoolInterface;
 use TNW\Subscriptions\Model\Source\Queue\Status as QueueStatus;
 use TNW\Subscriptions\Model\SubscriptionProfileRepository;
 use Magento\Framework\Serialize\SerializerInterface;
+use TNW\Subscriptions\Exception\ReBillOrderEmailException;
+use TNW\Subscriptions\Exception\LinkProfileItemIdWithOrderItemIdException;
+use TNW\Subscriptions\Exception\ProfileProductsUnsaleableException;
+use TNW\Subscriptions\Exception\NewRelationException;
+use TNW\Subscriptions\Exception\ChangeProfileStatusException;
+use TNW\Subscriptions\Exception\AssignOrderToRelationException;
 
 /**
  * Class ProfileProcessor - cron
@@ -113,7 +119,13 @@ class ProfileProcessor
                 $this->queueManager->placeOrderByGroupQueue($queues);
                 $this->queueManager->makeCompleted($queueIds);
                 $orderProcessHasError = false;
-            } catch (\TNW\Subscriptions\Exception\ProfileProductsUnsaleableException $e) {
+            } catch (ReBillOrderEmailException
+                | LinkProfileItemIdWithOrderItemIdException
+                | ProfileProductsUnsaleableException
+                | NewRelationException
+                | ChangeProfileStatusException
+                | AssignOrderToRelationException $e
+            ) {
                 $this->context->messageError($e->getMessage());
                 $this->queueManager->makeCompleted($queueIds, $e->getMessage());
                 $orderProcessHasError = false;
