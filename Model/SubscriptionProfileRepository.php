@@ -321,6 +321,18 @@ class SubscriptionProfileRepository implements SubscriptionProfileRepositoryInte
     }
 
     /**
+     * @param $profileId
+     * @return $this
+     */
+    public function unsetLoadedProfileData($profileId)
+    {
+        if (isset($this->profileById[$profileId])) {
+            unset($this->profileById[$profileId]);
+        }
+        return $this;
+    }
+
+    /**
      * @inheritdoc
      */
     public function getList(

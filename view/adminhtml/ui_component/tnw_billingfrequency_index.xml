@@ -55,17 +55,6 @@
     <columns name="tnw_billingfrequency_columns">
         <argument name="data" xsi:type="array">
             <item name="config" xsi:type="array">
-<!--                <item name="editorConfig" xsi:type="array">
-                    <item name="selectProvider"
-                          xsi:type="string">tnw_billingfrequency_index.tnw_billingfrequency_index.tnw_billingfrequency_columns.ids
-                    </item>
-                    <item name="enabled" xsi:type="boolean">true</item>
-                    <item name="indexField" xsi:type="string">id</item>
-                    <item name="clientConfig" xsi:type="array">
-                        <item name="saveUrl" path="tnw_subscriptions/BillingFrequency/inlineEdit" xsi:type="url"/>
-                        <item name="validateBeforeSave" xsi:type="boolean">false</item>
-                    </item>
-                </item>-->
                 <item name="childDefaults" xsi:type="array">
                     <item name="fieldAction" xsi:type="array">
                         <item name="provider"

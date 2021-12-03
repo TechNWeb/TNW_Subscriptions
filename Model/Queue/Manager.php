@@ -411,9 +411,7 @@ class Manager
      */
     private function getAttemptDate()
     {
-        return $this->timezone->date()
-            ->modify(sprintf('-%d day', $this->config->getAttemptInterval()))->setTime(23, 59, 59)
-            ->format(\Magento\Framework\Stdlib\DateTime::DATETIME_PHP_FORMAT);
+        return date('Y-m-d 23:59:59', strtotime(sprintf('-%d day', $this->config->getAttemptInterval())));
     }
 
     /**

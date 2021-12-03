@@ -193,18 +193,23 @@ class AccountInformation extends Template
             $billingFrequency = null;
         }
         $term = $profile->getTerm();
+        $isProfileComplete = $profile->getStatus() == ProfileStatus::STATUS_COMPLETE;
         $lastOrderData = $this->subscriptionProfileResource
-            ->getLastOrderData($this->getSubscriptionProfile(), false);
+            ->getLastOrderData($this->getSubscriptionProfile(), $isProfileComplete);
         switch ($term) {
             case 0:
                 $date = '';
                 if (!empty($lastOrderData) && $billingFrequency !== null) {
-                    $date = $profile->getFinalDate(
-                        $billingFrequency,
-                        $profile->getStaticTotalBillingCycles(),
-                        $profile->getStartDate(),
-                        $term
-                    );
+                    if ($isProfileComplete) {
+                        $date = $lastOrderData['scheduled_at'];
+                    } else {
+                        $date = $profile->getFinalDate(
+                            $billingFrequency,
+                            $profile->getStaticTotalBillingCycles(),
+                            $profile->getStartDate(),
+                            $term
+                        );
+                    }
                 }
                 $result = $this->normalizeDateFormat($date);
                 break;

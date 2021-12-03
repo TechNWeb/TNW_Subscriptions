@@ -15,6 +15,7 @@ use TNW\Subscriptions\Model\Source\ProfileStatus;
 use TNW\Subscriptions\Model\SubscriptionProfile;
 use TNW\Subscriptions\Model\SubscriptionProfile\Manager as ProfileManager;
 use TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Form\Modifier\SummaryInsertForm;
+use TNW\Subscriptions\Api\Data\SubscriptionProfileOrderInterface;
 
 /**
  * Used for next order date summary
@@ -48,11 +49,9 @@ class SummaryNextPaymentDateForm extends AbstractDataProvider
     private $profileManager;
 
     /**
-     * Next quote
-     *
-     * @var Quote
+     * @var SubscriptionProfileOrderInterface
      */
-    private $nextQuote;
+    private $nextProfileRelation;
 
     /**
      * @var TimezoneInterface
@@ -81,7 +80,7 @@ class SummaryNextPaymentDateForm extends AbstractDataProvider
         $this->profileManager = $profileManager;
         $this->profile = $this->profileManager->loadProfileFromRequest(SummaryInsertForm::FORM_DATA_KEY)
             ?? $this->profileManager->loadProfileFromRequest('entity_id');
-        $this->nextQuote = $this->profileManager->getNextQuote();
+        $this->nextProfileRelation = $this->profileManager->getNextProfileRelation();
         $this->localeDate = $localeDate;
         parent::__construct($name, $primaryFieldName, $requestFieldName, $meta, $data);
     }
@@ -183,7 +182,7 @@ class SummaryNextPaymentDateForm extends AbstractDataProvider
         $isEditVisible = false;
 
         if ($this->profile && $this->profile->canEditProfile()) {
-            $isEditVisible = (null !== $this->nextQuote);
+            $isEditVisible = (null !== $this->nextProfileRelation);
         }
 
         $editFieldConfig = [
