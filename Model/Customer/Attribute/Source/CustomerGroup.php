@@ -25,6 +25,7 @@ class CustomerGroup extends Group
      * @param OptionFactory $attrOptionFactory
      * @param GroupManagementInterface $groupManagement
      * @param DataObject $converter
+     * @param Config $subscriptionConfig
      */
     public function __construct(
         CollectionFactory $attrOptionCollectionFactory,
@@ -47,6 +48,7 @@ class CustomerGroup extends Group
      */
     public function getAllOptions($withEmpty = true, $defaultValues = false)
     {
+        $result = [];
         if (!$this->_options) {
             $groups = $this->_groupManagement->getLoggedInGroups();
 
@@ -55,7 +57,6 @@ class CustomerGroup extends Group
                 $customerGroups = $this->subscriptionConfig->getCustomerGroupLimit();
                 if ($customerGroups != null) {
                     $customerGroupArray = explode(',', $customerGroups);
-                    $result = [];
                     foreach ($this->_options as $option) {
                         if (array_search($option['value'], $customerGroupArray) === false) {
                             $result[] = [

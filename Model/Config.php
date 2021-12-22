@@ -17,7 +17,6 @@ use TNW\Subscriptions\Block\Adminhtml\System\Config\PaymentMethods\ActiveMethods
 use Magento\Framework\Module\Manager;
 use Magento\Framework\ObjectManagerInterface;
 use Magento\Customer\Model\ResourceModel\Group\Collection;
-use TNW\Subscriptions\Model\SubscriptionProfileRepository;
 
 /**
  * Class Config - config model for subscriptions

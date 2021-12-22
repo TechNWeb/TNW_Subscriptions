@@ -10,6 +10,8 @@ use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Modal\CustomerExist
 use Magento\Ui\Component\Container;
 use Magento\Ui\Component\Form\Fieldset;
 use Magento\Ui\Component\Modal;
+use Magento\Framework\App\Config\ScopeConfigInterface;
+use TNW\Subscriptions\Model\QuoteSessionInterface;
 
 /**
  * Class to modify customer popup.
@@ -26,12 +28,28 @@ class CustomerPopupModifier implements \Magento\Ui\DataProvider\Modifier\Modifie
     private $urlBuilder;
 
     /**
+     * @var QuoteSessionInterface
+     */
+    private $session;
+
+    /**
+     * @var ScopeConfigInterface
+     */
+    private $scopeConfig;
+
+    /**
      * CustomerPopupModifier constructor.
      * @param UrlInterface $urlBuilder
+     * @param QuoteSessionInterface $session
+     * @param ScopeConfigInterface $scopeConfig
      */
     public function __construct(
-        UrlInterface $urlBuilder
+        UrlInterface $urlBuilder,
+        QuoteSessionInterface $session,
+        ScopeConfigInterface $scopeConfig
     ) {
+        $this->session = $session;
+        $this->scopeConfig = $scopeConfig;
         $this->urlBuilder = $urlBuilder;
     }
 
@@ -40,6 +58,14 @@ class CustomerPopupModifier implements \Magento\Ui\DataProvider\Modifier\Modifie
      */
     public function modifyMeta(array $meta)
     {
+        $groupId = $this->session->getCustomerGroup();
+        if (!$groupId) {
+            $groupId = $this->scopeConfig->getValue(
+                'customer/create_account/default_group',
+                'store',
+                $this->session->getStoreId()
+            );
+        }
         $meta = array_merge_recursive(
             $meta,
             [
@@ -58,6 +84,23 @@ class CustomerPopupModifier implements \Magento\Ui\DataProvider\Modifier\Modifie
                         ],
                     ],
                 ],
+                'account_info' => [
+                    'children' => [
+                        'account' => [
+                            'children' => [
+                                'group' => [
+                                    'arguments' => [
+                                        'data' => [
+                                            'config' => [
+                                                'default' => $groupId
+                                            ]
+                                        ]
+                                    ]
+                                ]
+                            ]
+                        ]
+                    ]
+                ]
             ]
         );
 
