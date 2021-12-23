@@ -13,13 +13,14 @@
             <argument name="resourceModel" xsi:type="string">TNW\Subscriptions\Model\ResourceModel\Message</argument>
         </arguments>
     </virtualType>
-    <type name="TNW\Subscriptions\Model\ResourceModel\BillingFrequency\Grid\Collection">
+    <virtualType name="TNW\Subscriptions\Model\ResourceModel\BillingFrequency\Grid\Collection"
+                 type="Magento\Framework\View\Element\UiComponent\DataProvider\SearchResult">
         <arguments>
             <argument name="mainTable" xsi:type="string">tnw_subscriptions_billing_frequency</argument>
             <argument name="resourceModel"
                       xsi:type="string">TNW\Subscriptions\Model\ResourceModel\BillingFrequency\Collection</argument>
         </arguments>
-    </type>
+    </virtualType>
     <type name="Magento\Sales\Api\OrderItemRepositoryInterface">
         <plugin name="add_proposed_shipping_date"
                 type="TNW\Subscriptions\Plugin\Sales\Model\Order\ItemRepository" />

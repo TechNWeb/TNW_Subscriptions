@@ -17,7 +17,6 @@ $billingFrequency->addData([
     'label' => 'test billing frequency',
     'status' => '1',
     'frequency' => 5,
-    'website_id' => 1,
     'unit' => 3,
 ]);
 
