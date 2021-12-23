@@ -37,10 +37,10 @@
         <!-- Subscription -> Configuration -> Subscription Profiles -->
         <add id="TNW_Subscriptions::tnw_subscriptions_config_profile_options" title="Subscription Profiles" module="TNW_Subscriptions"
              action="adminhtml/system_config/edit/section/tnw_subscriptions_profile_options" sortOrder="72"
-             parent="TNW_Subscriptions::tnw_subscriptions_settings" resource="TNW_Subscriptions::sales_settings"/>
+             parent="TNW_Subscriptions::tnw_subscriptions_settings" resource="TNW_Subscriptions::config_profile_options"/>
         <add id="TNW_Subscriptions::tnw_subscriptions_config_profile_notification" title="Notifications" module="TNW_Subscriptions"
              action="adminhtml/system_config/edit/section/tnw_subscriptions_profile_notification" sortOrder="73"
-             parent="TNW_Subscriptions::tnw_subscriptions_settings" resource="TNW_Subscriptions::sales_settings"/>
+             parent="TNW_Subscriptions::tnw_subscriptions_settings" resource="TNW_Subscriptions::config_profile_notification"/>
         <!-- Subscription -> Configuration -> Products -->
         <add id="TNW_Subscriptions::tnw_subscriptions_config_product" title="Products" module="TNW_Subscriptions"
              action="adminhtml/system_config/edit/section/tnw_subscriptions_product" sortOrder="74"

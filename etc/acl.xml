@@ -53,8 +53,6 @@
                                 <resource id="TNW_Subscriptions::BillingFrequency_delete" sortOrder="40"
                                           title="Delete BillingFrequency"/>
                             </resource>
-                            <resource id="TNW_Subscriptions::sales_settings" sortOrder="20"
-                                      title="TNW Sales Settings"/>
                             <resource id="TNW_Subscriptions::product_settings" sortOrder="30"
                                       title="TNW Product Settings"/>
                             <resource id="TNW_Subscriptions::customer_settings" sortOrder="40"
