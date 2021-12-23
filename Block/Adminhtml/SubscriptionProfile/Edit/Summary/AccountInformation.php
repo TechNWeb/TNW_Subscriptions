@@ -184,34 +184,15 @@ class AccountInformation extends Template
         $class = 'ends-on';
         $result = self::DATE_NOT_FOUND;
         $profile = $this->getSubscriptionProfile();
-        try {
-            $billingFrequency = $this->billingFrequencyRepository->getById(
-                $profile->getBillingFrequencyId()
-            );
-        } catch (NoSuchEntityException $e) {
-            $this->logger->error($e->getMessage());
-            $billingFrequency = null;
-        }
         $term = $profile->getTerm();
         $isProfileComplete = $profile->getStatus() == ProfileStatus::STATUS_COMPLETE;
         $lastOrderData = $this->subscriptionProfileResource
             ->getLastOrderData($this->getSubscriptionProfile(), $isProfileComplete);
         switch ($term) {
             case 0:
-                $date = '';
-                if (!empty($lastOrderData) && $billingFrequency !== null) {
-                    if ($isProfileComplete) {
-                        $date = $lastOrderData['scheduled_at'];
-                    } else {
-                        $date = $profile->getFinalDate(
-                            $billingFrequency,
-                            $profile->getStaticTotalBillingCycles(),
-                            $profile->getStartDate(),
-                            $term
-                        );
-                    }
-                }
-                $result = $this->normalizeDateFormat($date);
+                $result = $this->normalizeDateFormat(
+                    $profile->getFinalDateForAccountInformation()
+                );
                 break;
             case 1:
                 if (!empty($lastOrderData)) {

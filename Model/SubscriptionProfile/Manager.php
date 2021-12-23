@@ -1803,7 +1803,7 @@ class Manager
     public function processNextPaymentDate(array $data)
     {
         if (!empty($data['next_payment_date_value'])) {
-            $nextProfileRelation = $this->getNextProfileRelation($this->getProfile());
+            $nextProfileRelation = $this->getNextProfileRelation();
             $oldDateTimeStamp = strtotime($nextProfileRelation->getScheduledAt());
             $newFullDate = $data['next_payment_date_value'] . ' ' . date('H:i:s', $oldDateTimeStamp);
             $newDateTimeStamp = strtotime($newFullDate);
