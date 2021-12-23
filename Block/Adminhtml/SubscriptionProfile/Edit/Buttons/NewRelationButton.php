@@ -12,6 +12,10 @@ use TNW\Subscriptions\Model\Source\ProfileStatus;
 use TNW\Subscriptions\Model\SubscriptionProfile\StatusManager;
 use TNW\Subscriptions\Model\SubscriptionProfile\BillingCyclesManager;
 use TNW\Subscriptions\Model\SubscriptionProfileOrder\Manager as RelationManager;
+use TNW\Subscriptions\Api\SubscriptionProfileQueueRepositoryInterface;
+use TNW\Subscriptions\Model\Source\Queue\Status as QueueStatus;
+use TNW\Subscriptions\Api\SubscriptionProfileOrderRepositoryInterface;
+use TNW\Subscriptions\Model\SubscriptionProfile\Manager as ProfileManager;
 
 /**
  * Class NewRelationButton - button for new schedule creation
@@ -29,20 +33,28 @@ class NewRelationButton extends ChangeStatusButton implements ButtonProviderInte
     private $relationManager;
 
     /**
+     * @var ProfileManager
+     */
+    private $profileManager;
+
+    /**
      * NewRelationButton constructor.
      * @param Context $context
      * @param Registry $registry
      * @param StatusManager $statusManager
      * @param BillingCyclesManager $billingCyclesManager
      * @param RelationManager $relationManager
+     * @param ProfileManager $profileManager
      */
     public function __construct(
         Context $context,
         Registry $registry,
         StatusManager $statusManager,
         BillingCyclesManager $billingCyclesManager,
-        RelationManager $relationManager
+        RelationManager $relationManager,
+        ProfileManager $profileManager
     ) {
+        $this->profileManager = $profileManager;
         $this->relationManager = $relationManager;
         $this->billingCyclesManager = $billingCyclesManager;
         parent::__construct($context, $registry, $statusManager);
@@ -91,9 +103,17 @@ class NewRelationButton extends ChangeStatusButton implements ButtonProviderInte
     {
         $result = false;
         $profile = $this->getCurrentSubscriptionProfile();
-        if ($profile->getStatus() == ProfileStatus::STATUS_ACTIVE
-            && !$this->relationManager->getNextProfileRelation($profile)
-        ) {
+        $unscheduled = false;
+        try {
+            $incompleteRelation = $this->profileManager->getNextIncompleteProfileRelation($profile);
+            if (!$incompleteRelation) {
+                $unscheduled = true;
+            }
+        } catch (\Exception $e) {
+            $unscheduled = true;
+        }
+
+        if ($profile->getStatus() == ProfileStatus::STATUS_ACTIVE && $unscheduled) {
             $billingCyclesManager = $this->billingCyclesManager;
             try {
                 list($cycles, $needMore, $existingCycles) =

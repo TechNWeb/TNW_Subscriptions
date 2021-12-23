@@ -52,6 +52,13 @@ use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfile as ProfileResource
 use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfileOrder;
 use TNW\Subscriptions\Model\Queue\ProfitManager;
 use TNW\Subscriptions\Model\SubscriptionProfileOrder\Manager as ProfileOrderManager;
+use TNW\Subscriptions\Model\ResourceModel\Queue;
+use Magento\Framework\DataObject\Factory;
+use TNW\Subscriptions\Model\Config;
+use TNW\Subscriptions\Model\Shipping\Free;
+use Magento\Quote\Model\Quote\TotalsCollector;
+use TNW\Subscriptions\Api\SubscriptionProfileQueueRepositoryInterface;
+use TNW\Subscriptions\Model\Queue as ProfileQueueModel;
 
 /**
  * Class Manager - used for managing the subscription profiles
@@ -169,7 +176,7 @@ class Manager
     private $paymentRepository;
 
     /**
-     * @var \TNW\Subscriptions\Model\ResourceModel\Queue
+     * @var Queue
      */
     private $resourceQueue;
 
@@ -184,12 +191,12 @@ class Manager
     private $dataObjectFactory;
 
     /**
-     * @var \TNW\Subscriptions\Model\Config
+     * @var Config
      */
     private $mpowerConfig;
 
     /**
-     * @var \TNW\Subscriptions\Model\Shipping\Free
+     * @var Free
      */
     private $freeShipping;
 
@@ -284,6 +291,11 @@ class Manager
     private $isNextPaymentDateValid = true;
 
     /**
+     * @var SubscriptionProfileQueueRepositoryInterface
+     */
+    private $queueRepository;
+
+    /**
      * Manager constructor.
      * @param EnginePool $enginePool
      * @param SubscriptionProfileRepository $subscriptionProfileRepository
@@ -293,7 +305,7 @@ class Manager
      * @param DataObjectHelper $dataObjectHelper
      * @param AddressFactory $profileAddressFactory
      * @param ProductManager $productManager
-     * @param OrderRelationManager $orderRelationManager
+     * @param ProfileOrderManager $orderRelationManager
      * @param RequestInterface $request
      * @param CartRepositoryInterface $quoteRepository
      * @param SearchCriteriaBuilder $searchCriteriaBuilder
@@ -301,19 +313,24 @@ class Manager
      * @param MessageHistoryLogger $historyLogger
      * @param ScopeConfigInterface $scopeConfig
      * @param PaymentConfig $paymentConfig
-     * @param \TNW\Subscriptions\Model\ResourceModel\Queue $resourceQueue
+     * @param Queue $resourceQueue
      * @param ProfileStatus $profileStatus
-     * @param DataObject\Factory $dataObjectFactory
-     * @param \TNW\Subscriptions\Model\Config $mpowerConfig
-     * @param \TNW\Subscriptions\Model\Shipping\Free $freeShipping
+     * @param Factory $dataObjectFactory
+     * @param Config $mpowerConfig
+     * @param Free $freeShipping
      * @param QuoteFactory $quoteFactory
-     * @param Quote\TotalsCollector $totalsCollector
+     * @param TotalsCollector $totalsCollector
      * @param SerializerInterface $serializer
      * @param CollectionFactory $orderCollectionFactory
      * @param TimezoneInterface $localeDate
      * @param DateTime\DateTime $dateConversion
      * @param CustomerProductHistoryInterfaceFactory $customerProductHistoryInterfaceFactory
      * @param CustomerProductHistoryRepositoryInterface $customerProductHistoryRepository
+     * @param ProfileResource $profileResource
+     * @param SubscriptionProfileOrder $subscriptionProfileOrder
+     * @param ProfitManager $profitManager
+     * @param ProfileOrderManager $profileOrderManager
+     * @param SubscriptionProfileQueueRepositoryInterface $queueRepository
      */
     public function __construct(
         EnginePool $enginePool,
@@ -332,13 +349,13 @@ class Manager
         MessageHistoryLogger $historyLogger,
         ScopeConfigInterface $scopeConfig,
         PaymentConfig $paymentConfig,
-        \TNW\Subscriptions\Model\ResourceModel\Queue $resourceQueue,
+        Queue $resourceQueue,
         ProfileStatus $profileStatus,
-        \Magento\Framework\DataObject\Factory $dataObjectFactory,
-        \TNW\Subscriptions\Model\Config $mpowerConfig,
-        \TNW\Subscriptions\Model\Shipping\Free $freeShipping,
+        Factory $dataObjectFactory,
+        Config $mpowerConfig,
+        Free $freeShipping,
         QuoteFactory $quoteFactory,
-        \Magento\Quote\Model\Quote\TotalsCollector $totalsCollector,
+        TotalsCollector $totalsCollector,
         SerializerInterface $serializer,
         CollectionFactory $orderCollectionFactory,
         TimezoneInterface $localeDate,
@@ -348,8 +365,10 @@ class Manager
         ProfileResource $profileResource,
         SubscriptionProfileOrder $subscriptionProfileOrder,
         ProfitManager $profitManager,
-        ProfileOrderManager $profileOrderManager
+        ProfileOrderManager $profileOrderManager,
+        SubscriptionProfileQueueRepositoryInterface $queueRepository
     ) {
+        $this->queueRepository = $queueRepository;
         $this->orderCollectionFactory = $orderCollectionFactory;
         $this->totalsCollector = $totalsCollector;
         $this->quoteFactory = $quoteFactory;
@@ -1360,6 +1379,41 @@ class Manager
     public function getNextProfileRelation()
     {
         return $this->orderRelationManager->getNextProfileRelation($this->getProfile());
+    }
+
+    /**
+     * @param null $profile
+     * @return bool|mixed|SubscriptionProfileOrderInterface
+     */
+    public function getNextIncompleteProfileRelation($profile = null)
+    {
+        $profile = $profile ?: $this->getProfile();
+        $result = $profileOrders = $this->orderRelationManager->getNextProfileRelation($profile, true);
+        $profileOrderIds = [];
+        if (is_array($profileOrders) && $result) {
+            foreach ($profileOrders as $profileOrder) {
+                $profileOrderIds[] = $profileOrder->getId();
+            }
+            $this->searchCriteriaBuilder
+                ->addFilter(ProfileQueueModel::PROFILE_ORDER_ID, $profileOrderIds, 'in')
+                ->addFilter(ProfileQueueModel::STATUS, 'complete');
+            try {
+                $queueItems = $this->queueRepository->getList($this->searchCriteriaBuilder->create())->getItems();
+            } catch (\Exception $e) {
+                $queueItems = [];
+            }
+            foreach ($queueItems as $queue) {
+                $orderPosition = 0;
+                foreach ($profileOrders as $profileOrder) {
+                    if ($profileOrder->getId() == $queue->getProfileOrderId()) {
+                        unset($result[$orderPosition]);
+                    }
+                    $orderPosition++;
+                }
+            }
+            return reset($result);
+        }
+        return false;
     }
 
     /**
