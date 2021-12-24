@@ -705,9 +705,6 @@ class Manager
                 $nextPaymentDate = $this->orderRelationManager
                     ->getNextProfileRelation($profileModel)->getScheduledAt();
                 $startOn = $this->getNewStartDate($product, $nextPaymentDate);
-                $startOn = (new \DateTime($startOn))
-                    ->add(new \DateInterval($this->getCurrentTimeExpression()))
-                    ->format(\Magento\Framework\Stdlib\DateTime::DATETIME_PHP_FORMAT);
                 $profileModel->setStartDate($startOn);
             }
             $frequency = $this->frequencyRepository->getById($frequencyId);

@@ -5,7 +5,19 @@
  */
 namespace TNW\Subscriptions\Model\SubscriptionProfile\Create\Request\Save\Profile;
 
-use \TNW\Subscriptions\Model\SubscriptionProfile\Engine\Stripe as StripeEngine;
+use Magento\Framework\Encryption\EncryptorInterface;
+use Magento\Framework\Exception\LocalizedException;
+use Magento\Framework\Module\Manager;
+use Magento\Framework\ObjectManagerInterface;
+use Magento\Framework\UrlInterface;
+use Magento\Payment\Gateway\Command\CommandException;
+use Magento\Quote\Model\Quote;
+use Magento\Vault\Api\PaymentTokenRepositoryInterface;
+use TNW\Stripe\Model\Adapter\StripeAdapterFactory;
+use TNW\Subscriptions\Model\Payment\VaultPaymentAuthorization;
+use TNW\Subscriptions\Model\QuoteSessionInterface;
+use TNW\Subscriptions\Model\SubscriptionProfile\CreateProfile;
+use TNW\Subscriptions\Model\SubscriptionProfile\Engine\Stripe as StripeEngine;
 
 /**
  * Class Stripe - used to save the stripe payed subscription profile
@@ -13,17 +25,17 @@ use \TNW\Subscriptions\Model\SubscriptionProfile\Engine\Stripe as StripeEngine;
 class Stripe extends Base
 {
     /**
-     * @var \TNW\Subscriptions\Model\Payment\VaultPaymentAuthorization
+     * @var VaultPaymentAuthorization
      */
     private $vaultPaymentAuthorization;
 
     /**
-     * @var \Magento\Framework\Encryption\EncryptorInterface
+     * @var EncryptorInterface
      */
     private $encryptor;
 
     /**
-     * @var \Magento\Vault\Api\PaymentTokenRepositoryInterface
+     * @var PaymentTokenRepositoryInterface
      */
     private $paymentTokenRepository;
 
@@ -33,37 +45,45 @@ class Stripe extends Base
     private $adapterFactory;
 
     /**
+     * @var UrlInterface
+     */
+    private $url;
+
+    /**
      * Stripe constructor.
-     * @param \TNW\Subscriptions\Model\SubscriptionProfile\CreateProfile $createModel
-     * @param \TNW\Subscriptions\Model\QuoteSessionInterface $session
-     * @param \TNW\Subscriptions\Model\Payment\VaultPaymentAuthorization $vaultPaymentAuthorization
-     * @param \Magento\Framework\Encryption\EncryptorInterface $encryptor
-     * @param \Magento\Vault\Api\PaymentTokenRepositoryInterface $paymentTokenRepository
-     * @param \Magento\Framework\Module\Manager $moduleManager
-     * @param \Magento\Framework\ObjectManagerInterface $objectManager
+     * @param CreateProfile $createModel
+     * @param QuoteSessionInterface $session
+     * @param VaultPaymentAuthorization $vaultPaymentAuthorization
+     * @param EncryptorInterface $encryptor
+     * @param PaymentTokenRepositoryInterface $paymentTokenRepository
+     * @param Manager $moduleManager
+     * @param ObjectManagerInterface $objectManager
+     * @param UrlInterface $url
      */
     public function __construct(
-        \TNW\Subscriptions\Model\SubscriptionProfile\CreateProfile $createModel,
-        \TNW\Subscriptions\Model\QuoteSessionInterface $session,
-        \TNW\Subscriptions\Model\Payment\VaultPaymentAuthorization $vaultPaymentAuthorization,
-        \Magento\Framework\Encryption\EncryptorInterface $encryptor,
-        \Magento\Vault\Api\PaymentTokenRepositoryInterface $paymentTokenRepository,
-        \Magento\Framework\Module\Manager $moduleManager,
-        \Magento\Framework\ObjectManagerInterface $objectManager
+        CreateProfile $createModel,
+        QuoteSessionInterface $session,
+        VaultPaymentAuthorization $vaultPaymentAuthorization,
+        EncryptorInterface $encryptor,
+        PaymentTokenRepositoryInterface $paymentTokenRepository,
+        Manager $moduleManager,
+        ObjectManagerInterface $objectManager,
+        UrlInterface $url
     ) {
         $this->paymentTokenRepository = $paymentTokenRepository;
         $this->encryptor = $encryptor;
         $this->vaultPaymentAuthorization = $vaultPaymentAuthorization;
+        $this->url = $url;
         if ($moduleManager->isEnabled("TNW_Stripe")) {
-            $this->adapterFactory = $objectManager->get(\TNW\Stripe\Model\Adapter\StripeAdapterFactory::class);
+            $this->adapterFactory = $objectManager->get(StripeAdapterFactory::class);
         }
         parent::__construct($createModel, $session);
     }
 
     /**
      * @param array $data
-     * @throws \Magento\Framework\Exception\LocalizedException
-     * @throws \Magento\Payment\Gateway\Command\CommandException
+     * @throws LocalizedException
+     * @throws CommandException
      */
     public function process(array $data)
     {
@@ -74,7 +94,7 @@ class Stripe extends Base
         $paymentData['method'] = 'tnw_stripe';
         $paymentData['additional_data'] = array_merge($paymentData, $paymentData['additional']);
 
-        /** @var \Magento\Quote\Model\Quote[] $subQuotes */
+        /** @var Quote[] $subQuotes */
         $subQuotes = $this->getSubCreateModel()->getSubQuotes();
         $quote = reset($subQuotes);
         $guestEmail = null;
@@ -92,7 +112,8 @@ class Stripe extends Base
         $cs = $stripeAdapter->customer([
             'email' => $guestEmail ?: $quote->getCustomerEmail(),
             'payment_method' => $paymentId,
-            'invoice_settings' => ['default_payment_method' => $paymentId]
+            'invoice_settings' => ['default_payment_method' => $paymentId],
+            'metadata' => ['site' => $this->url->getBaseUrl()]
         ]);
         $params = [
             StripeEngine::CUSTOMER => $cs->id,
@@ -117,7 +138,6 @@ class Stripe extends Base
         $paymentToken->setCustomerId($quote->getCustomerId());
         $paymentToken->setPaymentMethodCode('tnw_stripe');
         $this->paymentTokenRepository->save($paymentToken);
-        /** @var \Magento\Quote\Model\Quote $subQuote */
         foreach ($subQuotes as $subQuote) {
             $subQuote->getPayment()
                 ->setAdditionalInformation('cc_number', $paymentData['cc_last_4'])

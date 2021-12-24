@@ -10,6 +10,8 @@ use TNW\Subscriptions\Api\SubscriptionProfileRepositoryInterface;
 use TNW\Subscriptions\Api\SubscriptionProfileOrderRepositoryInterface;
 use TNW\Subscriptions\Model\Queue\Manager;
 use TNW\Subscriptions\Model\SubscriptionProfile\MessageHistoryLogger;
+use TNW\Subscriptions\Api\SubscriptionProfileQueueRepositoryInterface;
+use TNW\Subscriptions\Model\Source\Queue\Status as QueueStatus;
 
 /**
  * Controller for creating relation of subscription profile.
@@ -37,20 +39,28 @@ class Schedule extends Action
     private $messageHistoryLogger;
 
     /**
+     * @var SubscriptionProfileQueueRepositoryInterface
+     */
+    private $queueRepository;
+
+    /**
      * Schedule constructor.
      * @param Action\Context $context
      * @param SubscriptionProfileRepositoryInterface $subscriptionProfileRepository
      * @param SubscriptionProfileOrderRepositoryInterface $subscriptionProfileOrderRepository
      * @param Manager $queueManager
      * @param MessageHistoryLogger $messageHistoryLogger
+     * @param SubscriptionProfileQueueRepositoryInterface $queueRepository
      */
     public function __construct(
         Action\Context $context,
         SubscriptionProfileRepositoryInterface $subscriptionProfileRepository,
         SubscriptionProfileOrderRepositoryInterface $subscriptionProfileOrderRepository,
         Manager $queueManager,
-        MessageHistoryLogger $messageHistoryLogger
+        MessageHistoryLogger $messageHistoryLogger,
+        SubscriptionProfileQueueRepositoryInterface $queueRepository
     ) {
+        $this->queueRepository = $queueRepository;
         $this->messageHistoryLogger = $messageHistoryLogger;
         $this->queueManager = $queueManager;
         $this->subscriptionProfileOrderRepository = $subscriptionProfileOrderRepository;
@@ -77,6 +87,16 @@ class Schedule extends Action
         ) {
             $quoteId = $profileOrder['magento_quote_id'];
         }
+        if ($profileOrder && array_key_exists('id', $profileOrder) && $profileOrder['id']) {
+            $queue = $this->queueRepository->retrieveByRelationId($profileOrder['id']);
+            if ($queue->getId()
+                && $queue->getStatus() == QueueStatus::QUEUE_STATUS_COMPLETE
+                && !$profileOrder['magento_order_id']
+            ) {
+                $quoteId = $profileOrder['magento_quote_id'];
+            }
+        }
+
         if ($quoteId) {
             $relations = $this->queueManager->createNewRelationByQuoteId($quoteId, $profile);
         } elseif ($profileOrder) {

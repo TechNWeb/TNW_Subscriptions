@@ -182,10 +182,14 @@ class UpgradeSchema implements UpgradeSchemaInterface
             $this->updateRecurringInstallmentDatesSalesOrder($setup);
             $this->updateRecurringInstallmentDates($setup);
         }
-        
+
         if (version_compare($context->getVersion(), '2.3.52', '<')) {
             $this->addVaultThreeDSecureFields($setup);
             $this->addRebillTable($setup);
+        }
+
+        if (version_compare($context->getVersion(), '2.3.61', '<')) {
+            $setup->getConnection()->dropColumn('tnw_subscriptions_billing_frequency', 'website_id');
         }
 
         $setup->endSetup();
@@ -817,10 +821,10 @@ class UpgradeSchema implements UpgradeSchemaInterface
                 $setup->getTable(SubscriptionProfilePaymentInterface::SUBSCRIPTIONS_PROFILE_PAYMENT_TABLE),
                 'sent_mail',
                 [
-                'type' => Table::TYPE_BOOLEAN,
-                'nullable' => false,
-                'default' => 0,
-                'comment' => 'sent_mail'
+                    'type' => Table::TYPE_BOOLEAN,
+                    'nullable' => false,
+                    'default' => 0,
+                    'comment' => 'sent_mail'
 
                 ]
             );

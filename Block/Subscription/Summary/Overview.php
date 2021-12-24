@@ -152,7 +152,7 @@ class Overview extends ContentAbstract implements ExpireWarningSupportInterface
             if (!$profile || !$profile->getId()) {
                 $this->nextSubscriptionProfileOrder = false;
             } else {
-                $this->nextSubscriptionProfileOrder = $this->profileManager->getNextProfileRelation();
+                $this->nextSubscriptionProfileOrder = $this->profileManager->getNextIncompleteProfileRelation();
             }
         }
 

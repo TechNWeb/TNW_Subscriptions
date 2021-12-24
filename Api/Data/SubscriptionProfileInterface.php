@@ -569,13 +569,14 @@ interface SubscriptionProfileInterface extends CustomAttributesDataInterface
     public function setTotalProfit($profit);
 
     /**
-     * Get last day of recurring
-     *
-     * @param $billingFrequency
-     * @param $totalBillingCycles
-     * @param $startDate
-     * @param $term
+     * @param $profile
+     * @param $profileOrders
      * @return string|null
      */
-    public function getFinalDate($billingFrequency, $totalBillingCycles, $startDate, $term);
+    public function getFinalDateForInstallmentData($profile, $profileOrders);
+
+    /**
+     * @return string|null
+     */
+    public function getFinalDateForAccountInformation();
 }

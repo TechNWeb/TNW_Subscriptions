@@ -69,25 +69,6 @@ class BillingFrequency extends \Magento\Framework\Model\AbstractModel implements
     }
 
     /**
-     * Get website_id
-     * @return string
-     */
-    public function getWebsiteId()
-    {
-        return $this->getData(self::WEBSITE_ID);
-    }
-
-    /**
-     * Set website_id
-     * @param string $website_id
-     * @return \TNW\Subscriptions\Api\Data\BillingFrequencyInterface
-     */
-    public function setWebsiteId($website_id)
-    {
-        return $this->setData(self::WEBSITE_ID, $website_id);
-    }
-
-    /**
      * Get label
      * @return string
      */

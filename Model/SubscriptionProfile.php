@@ -982,20 +982,92 @@ class SubscriptionProfile extends AbstractExtensibleModel implements Subscriptio
     }
 
     /**
-     * Get last day of recurring
-     *
-     * @param $billingFrequency
-     * @param $totalBillingCycles
-     * @param $startDate
-     * @param $term
+     * @param SubscriptionProfile $profile
+     * @param array $profileOrders
      * @return string|null
      */
-    public function getFinalDate($billingFrequency, $totalBillingCycles, $startDate, $term)
+    public function getFinalDateForInstallmentData($profile, $profileOrders)
     {
-        $result = null;
-        if ($term == '1' && $totalBillingCycles < 2) {
+        $remainingBillingCycles = (int) $profile->getTotalBillingCycles() - 1;
+
+        if ($profileOrders && count($profileOrders) == 1) {
+            $remainingBillingCycles++;
+        }
+
+        return $this->getFinalDate($profile, $remainingBillingCycles, $profileOrders);
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getFinalDateForAccountInformation()
+    {
+        $remainingBillingCycles = (int) $this->getTotalBillingCycles();
+        $profileOrders = $this->subscriptionProfileOrder->getProfileOrdersByProfileId(
+            $this->getId()
+        );
+
+        return $this->getFinalDate($this, $remainingBillingCycles, $profileOrders);
+    }
+
+    /**
+     * Get last day of recurring
+     *
+     * @param SubscriptionProfile $profile
+     * @param int $remainingBillingCycles
+     * @param array $profileOrders
+     * @return string|null
+     */
+    private function getFinalDate($profile, $remainingBillingCycles, $profileOrders)
+    {
+        $startDate = $profile->getStartDate();
+        $totalBillingCycles = $remainingBillingCycles + $this->getCountOrdersSinceStartDate($startDate, $profileOrders);
+
+        if ($profile->getTerm() == 1 && $totalBillingCycles < 2) {
+            return null;
+        } elseif ($profile->getTerm() == 0) {
+            if ($remainingBillingCycles == 1) {
+                $order = $this->subscriptionProfileOrder->getLastProfileOrderByProfileId($profile->getId());
+                if ($order && $order['magento_order_id'] === null) {
+                    return $order['scheduled_at'];
+                }
+            } elseif ($remainingBillingCycles == 0 && $profileOrders) {
+                return $this->getFinalOrderScheduledAt($profileOrders);
+            }
+        }
+
+        return $this->calculateFinalDate($profile, $totalBillingCycles);
+    }
+
+    /**
+     * @param array $profileOrders
+     * @return string
+     */
+    private function getFinalOrderScheduledAt($profileOrders)
+    {
+        usort($profileOrders, function ($order1, $order2) {
+            return strtotime($order2['scheduled_at']) - strtotime($order1['scheduled_at']);
+        });
+        return $profileOrders[0]['scheduled_at'];
+    }
+
+    /**
+     * @param SubscriptionProfile $profile
+     * @param int $totalBillingCycles
+     * @return string|null
+     */
+    private function calculateFinalDate($profile, $totalBillingCycles)
+    {
+        try {
+            $billingFrequency = $this->billingFrequencyRepository->getById(
+                $profile->getBillingFrequencyId()
+            );
+        } catch (NoSuchEntityException $e) {
+            $this->_logger->error($e->getMessage());
             return null;
         }
+
+        $startDate = $profile->getStartDate();
         $total = $billingFrequency->getFrequency() * ($totalBillingCycles - 1);
         switch ($billingFrequency->getUnit()) {
             case BillingFrequencyUnitType::DAYS:
@@ -1010,6 +1082,8 @@ class SubscriptionProfile extends AbstractExtensibleModel implements Subscriptio
                 $billingCycles = "+" . $total . " years";
                 $result = date("Y-m-d H:i:s", strtotime($billingCycles, strtotime($startDate)));
                 break;
+            default:
+                return null;
         }
         return $result;
     }
@@ -1075,20 +1149,7 @@ class SubscriptionProfile extends AbstractExtensibleModel implements Subscriptio
                 $paid[] = implode(",", [count($profileOrders)]);
             }
             $firstRecurring[] = $profile->getStartDate();
-            try {
-                $billingFrequency = $this->billingFrequencyRepository->getById(
-                    $profile->getBillingFrequencyId()
-                );
-            } catch (NoSuchEntityException $e) {
-                $billingFrequency = null;
-                $this->_logger->error($e->getMessage());
-            }
-            $ccFinal = $this->getFinalDate(
-                $billingFrequency,
-                $static,
-                $profile->getStartDate(),
-                $profile->getTerm()
-            );
+            $ccFinal = $this->getFinalDateForInstallmentData($profile, $profileOrders);
             $ccExpiration[] = $this->getCcEcpirationStatus($profile, $ccFinal);
             $finalRecurring[] = $ccFinal;
         }
@@ -1103,7 +1164,7 @@ class SubscriptionProfile extends AbstractExtensibleModel implements Subscriptio
 
     /**
      * @param $profileOrders
-     * @param $subscriptionProfile
+     * @param SubscriptionProfile $subscriptionProfile
      * @param $staticTotalBillingCycles
      * @return array
      */
@@ -1115,21 +1176,7 @@ class SubscriptionProfile extends AbstractExtensibleModel implements Subscriptio
             $result['paidRecurring'] = implode(",", [count($profileOrders)]);
         }
         $result['firstRecurring'] = $subscriptionProfile->getStartDate();
-        $startDate = $subscriptionProfile->getStartDate();
-        try {
-            $billingFrequency = $this->billingFrequencyRepository->getById(
-                $subscriptionProfile->getBillingFrequencyId()
-            );
-        } catch (NoSuchEntityException $e) {
-            $billingFrequency = null;
-            $this->_logger->error($e->getMessage());
-        }
-        $result['finalRecurring'] = $this->getFinalDate(
-            $billingFrequency,
-            $staticTotalBillingCycles,
-            $startDate,
-            $subscriptionProfile->getTerm(),
-        );
+        $result['finalRecurring'] = $this->getFinalDateForInstallmentData($subscriptionProfile, $profileOrders);
         $result['expirationCc'] = $this->getCcEcpirationStatus($subscriptionProfile, $result['finalRecurring']);
 
         return $result;
@@ -1157,5 +1204,23 @@ class SubscriptionProfile extends AbstractExtensibleModel implements Subscriptio
     public function getFirstOrderData()
     {
         return $this->getResource()->getFirstOrderData($this);
+    }
+
+    /**
+     * @param array $profileOrders
+     * @return int
+     */
+    private function getCountOrdersSinceStartDate($startDate, $profileOrders)
+    {
+        $startDateTs = strtotime($startDate);
+
+        return count(
+            array_filter(
+                $profileOrders,
+                function ($order) use ($startDateTs) {
+                    return $startDateTs <= strtotime($order['scheduled_at']);
+                }
+            )
+        );
     }
 }

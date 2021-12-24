@@ -16,11 +16,6 @@ interface BillingFrequencyInterface
     const SUBSCRIPTIONS_BILLING_FREQUENCY_TABLE = 'tnw_subscriptions_billing_frequency';
 
     /**
-     *  Website Id field name
-     */
-    const WEBSITE_ID = 'website_id';
-
-    /**
      *  Unit field name
      */
     const UNIT = 'unit';
@@ -71,19 +66,6 @@ interface BillingFrequencyInterface
      * @return \TNW\Subscriptions\Api\Data\BillingFrequencyInterface
      */
     public function setUnit($unit);
-
-    /**
-     * Get website_id
-     * @return string|null
-     */
-    public function getWebsiteId();
-
-    /**
-     * Set website_id
-     * @param string $website_id
-     * @return \TNW\Subscriptions\Api\Data\BillingFrequencyInterface
-     */
-    public function setWebsiteId($website_id);
 
     /**
      * Get label

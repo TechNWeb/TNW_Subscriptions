@@ -18,6 +18,11 @@ use Magento\Payment\Gateway\Command\CommandException;
 use TNW\Subscriptions\Api\SubscriptionProfileQueueRepositoryInterface;
 use TNW\Subscriptions\Model\Source\Queue\Status as QueueStatus;
 use TNW\Subscriptions\Api\SubscriptionProfileOrderRepositoryInterface;
+use TNW\Subscriptions\Exception\ReBillOrderEmailException;
+use TNW\Subscriptions\Exception\LinkProfileItemIdWithOrderItemIdException;
+use TNW\Subscriptions\Exception\NewRelationException;
+use TNW\Subscriptions\Exception\ChangeProfileStatusException;
+use TNW\Subscriptions\Exception\AssignOrderToRelationException;
 
 /**
  * Class Process- controller
@@ -132,7 +137,13 @@ class Process extends Action
                             'Record was successfully processed.',
                             'backend'
                         );
-                    } catch (ProfileProductsUnsaleableException $e) {
+                    } catch (ReBillOrderEmailException
+                        | LinkProfileItemIdWithOrderItemIdException
+                        | ProfileProductsUnsaleableException
+                        | NewRelationException
+                        | ChangeProfileStatusException
+                        | AssignOrderToRelationException $e
+                    ) {
                         $this->messageManager->addErrorMessage($e->getMessage());
                         $this->queueManager->makeCompleted($item->getId(), $e->getMessage());
                     } catch (CommandException $e) {
