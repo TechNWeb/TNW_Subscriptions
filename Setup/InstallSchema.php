@@ -86,12 +86,6 @@ class InstallSchema implements InstallSchemaInterface
                 ['nullable' => false, 'unsigned' => true],
                 'unit'
             )->addColumn(
-                'website_id',
-                Table::TYPE_SMALLINT,
-                null,
-                ['nullable' => false, 'unsigned' => true],
-                'website_id'
-            )->addColumn(
                 'label',
                 Table::TYPE_TEXT,
                 512,
@@ -109,17 +103,6 @@ class InstallSchema implements InstallSchemaInterface
                 null,
                 ['nullable' => false, 'unsigned' => true],
                 'frequency'
-            )->addForeignKey(
-                $setup->getConnection()->getForeignKeyName(
-                    $tableName,
-                    'website_id',
-                    'store_website',
-                    'website_id'
-                ),
-                'website_id',
-                $setup->getTable('store_website'),
-                'website_id',
-                \Magento\Framework\DB\Ddl\Table::ACTION_CASCADE
             );
             $setup->getConnection()->createTable($tableTnwBillingFrequency);
         }
@@ -227,7 +210,7 @@ class InstallSchema implements InstallSchemaInterface
     }
 
     /**
-     * Create table 'tnw_subscriptions_product_billing_frequency'.
+     * Create table 'tnw_subscriptions_subscription_profile_address'.
      *
      * @param SchemaSetupInterface $setup
      * @return void
