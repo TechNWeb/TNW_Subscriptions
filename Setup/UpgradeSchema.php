@@ -189,7 +189,9 @@ class UpgradeSchema implements UpgradeSchemaInterface
         }
 
         if (version_compare($context->getVersion(), '2.3.61', '<')) {
-            $setup->getConnection()->dropColumn('tnw_subscriptions_billing_frequency', 'website_id');
+            if ($setup->tableExists('tnw_subscriptions_billing_frequency')) {
+                $setup->getConnection()->dropColumn('tnw_subscriptions_billing_frequency', 'website_id');
+            }
         }
 
         $setup->endSetup();
