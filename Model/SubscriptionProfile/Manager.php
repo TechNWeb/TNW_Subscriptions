@@ -1872,6 +1872,16 @@ class Manager
                     'Profile next payment date changed to <b>%1</b> (UTC)',
                     $newDate
                 );
+                if (isset($this->profile)) {
+                    $originalStartDate = strtotime($this->profile->getOriginalStartDate());
+                    $startDate = strtotime($this->profile->getStartDate());
+                    if ($startDate > $originalStartDate
+                        && $startDate == $oldDateTimeStamp
+                         && $oldDateTimeStamp > $newDateTimeStamp
+                    ) {
+                        $this->profile->setStartDate($newDate);
+                    }
+                }
             }
             $this->historyLogger->log($message, $this->getProfile()->getId());
         }

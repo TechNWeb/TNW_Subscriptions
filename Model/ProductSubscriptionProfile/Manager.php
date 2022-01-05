@@ -20,6 +20,7 @@ use TNW\Subscriptions\Model\ProductSubscriptionProfileFactory;
 use TNW\Subscriptions\Model\SubscriptionProfile\Create;
 use TNW\Subscriptions\Model\SubscriptionProfile\MessageHistoryLogger;
 use TNW\Subscriptions\Model\SubscriptionProfileOrder\Manager as OrderRelationManager;
+use Magento\Framework\Stdlib\DateTime;
 
 /**
  * Class Manager - subscription products manager model
@@ -855,7 +856,7 @@ class Manager
     protected function getNewStartDate($product, $nextDate = null)
     {
         $startDateType = $product->getData(Attribute::SUBSCRIPTION_START_DATE);
-        $nextDate = date_create($nextDate)->format('Y-m-d');
+        $nextDate = date_create($nextDate)->format(DateTime::DATETIME_PHP_FORMAT);
         switch ($startDateType) {
             case StartDateType::LAST_DAY_OF_THE_CURRENT_MONTH:
                 $result = date_create()->format('Y-m-t');
