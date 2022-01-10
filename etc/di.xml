@@ -216,6 +216,19 @@
                 disabled="false"/>
     </type>
 
+    <type name="TNW\Stripe\Gateway\Command\CaptureStrategyCommand">
+        <plugin name="set_save_card"
+                type="TNW\Subscriptions\Plugin\Stripe\Gateway\Command\StrategyCommand"
+                sortOrder="50"
+                disabled="false"/>
+    </type>
+    <type name="TNW\Stripe\Gateway\Command\AuthorizeStrategyCommand">
+        <plugin name="set_save_card"
+                type="TNW\Subscriptions\Plugin\Stripe\Gateway\Command\StrategyCommand"
+                sortOrder="50"
+                disabled="false"/>
+    </type>
+
     <type name="TNW\Subscriptions\Model\Payment\RequestState" shared="true" />
 
     <type name="Magento\Tax\Model\Sales\Total\Quote\Tax">
