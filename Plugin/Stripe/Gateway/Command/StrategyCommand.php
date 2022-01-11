@@ -5,7 +5,7 @@
  */
 namespace TNW\Subscriptions\Plugin\Stripe\Gateway\Command;
 
-use TNW\Stripe\Gateway\Helper\SubjectReader;
+use Magento\Payment\Gateway\Helper\SubjectReader;
 
 /**
  * Class StrategyCommand - used to forcibly save card for stripe
@@ -13,28 +13,13 @@ use TNW\Stripe\Gateway\Helper\SubjectReader;
 class StrategyCommand
 {
     /**
-     * @var SubjectReader
-     */
-    private $subjectReader;
-
-    /**
-     * StrategyCommand constructor.
-     * @param SubjectReader $subjectReader
-     */
-    public function __construct(
-        SubjectReader $subjectReader
-    ) {
-        $this->subjectReader = $subjectReader;
-    }
-
-    /**
      * @param $subject
      * @param array $commandSubject
      * @return array
      */
     public function beforeExecute($subject, array $commandSubject)
     {
-        $paymentDO = $this->subjectReader->readPayment($commandSubject);
+        $paymentDO = SubjectReader::readPayment($commandSubject);
         $payment = $paymentDO->getPayment();
         if (!$payment->getAdditionalInformation('is_active_payment_token_enabler')) {
             $order = $payment->getOrder();
