@@ -24,6 +24,9 @@ define([
                 this._super();
                 // Set initial groups to observable field
                 this.groups(quote.getGroups());
+                if (window.checkoutConfig && window.checkoutConfig.isNegotiableQuote) {
+                    return
+                }
                 customerData.get('cart').subscribe(function (cartSection) {
                     this.groups(cartSection['quoteGroupData']);
                 }.bind(this));
