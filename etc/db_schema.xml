@@ -1,0 +1,112 @@
+<?xml version="1.0"?>
+<schema xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:Setup/Declaration/Schema/etc/schema.xsd">
+    <table name="tnw_subscriptions_sales_order_aggregated_created" resource="sales" engine="innodb"
+           comment="TNW Subscriptions Sales Order Aggregated Created">
+        <column xsi:type="int" name="id" unsigned="true" nullable="false" identity="true" comment="ID"/>
+        <column xsi:type="date" name="period" comment="Period"/>
+        <column xsi:type="smallint" name="store_id" unsigned="true" nullable="true" identity="false"
+                comment="Store ID"/>
+        <column xsi:type="varchar" name="order_status" nullable="false" length="50" comment="Order Status"/>
+        <column xsi:type="int" name="orders_count" unsigned="false" nullable="false" identity="false"
+                default="0" comment="Orders Count"/>
+        <column xsi:type="decimal" name="total_qty_ordered" scale="4" precision="12" unsigned="false" nullable="false"
+                default="0" comment="Total Qty Ordered"/>
+        <column xsi:type="decimal" name="total_qty_invoiced" scale="4" precision="12" unsigned="false" nullable="false"
+                default="0" comment="Total Qty Invoiced"/>
+        <column xsi:type="decimal" name="total_income_amount" scale="4" precision="20" unsigned="false"
+                nullable="false" default="0" comment="Total Income Amount"/>
+        <column xsi:type="decimal" name="total_revenue_amount" scale="4" precision="20" unsigned="false"
+                nullable="false" default="0" comment="Total Revenue Amount"/>
+        <column xsi:type="decimal" name="total_profit_amount" scale="4" precision="20" unsigned="false"
+                nullable="false" default="0" comment="Total Profit Amount"/>
+        <column xsi:type="decimal" name="total_invoiced_amount" scale="4" precision="20" unsigned="false"
+                nullable="false" default="0" comment="Total Invoiced Amount"/>
+        <column xsi:type="decimal" name="total_canceled_amount" scale="4" precision="20" unsigned="false"
+                nullable="false" default="0" comment="Total Canceled Amount"/>
+        <column xsi:type="decimal" name="total_paid_amount" scale="4" precision="20" unsigned="false" nullable="false"
+                default="0" comment="Total Paid Amount"/>
+        <column xsi:type="decimal" name="total_refunded_amount" scale="4" precision="20" unsigned="false"
+                nullable="false" default="0" comment="Total Refunded Amount"/>
+        <column xsi:type="decimal" name="total_tax_amount" scale="4" precision="20" unsigned="false" nullable="false"
+                default="0" comment="Total Tax Amount"/>
+        <column xsi:type="decimal" name="total_tax_amount_actual" scale="4" precision="20" unsigned="false"
+                nullable="false" default="0" comment="Total Tax Amount Actual"/>
+        <column xsi:type="decimal" name="total_shipping_amount" scale="4" precision="20" unsigned="false"
+                nullable="false" default="0" comment="Total Shipping Amount"/>
+        <column xsi:type="decimal" name="total_shipping_amount_actual" scale="4" precision="20" unsigned="false"
+                nullable="false" default="0" comment="Total Shipping Amount Actual"/>
+        <column xsi:type="decimal" name="total_discount_amount" scale="4" precision="20" unsigned="false"
+                nullable="false" default="0" comment="Total Discount Amount"/>
+        <column xsi:type="decimal" name="total_discount_amount_actual" scale="4" precision="20" unsigned="false"
+                nullable="false" default="0" comment="Total Discount Amount Actual"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="id"/>
+        </constraint>
+        <constraint xsi:type="foreign" referenceId="TNW_SUBSCRIPTIONS_SALES_ORDER_AGGREGATED_CREATED_STORE_ID_STORE_STORE_ID"
+                    table="tnw_subscriptions_sales_order_aggregated_created" column="store_id" referenceTable="store"
+                    referenceColumn="store_id" onDelete="SET NULL"/>
+        <constraint xsi:type="unique" referenceId="TNW_SUBSCRIPTIONS_SALES_ORDER_AGGREGATED_CREATED_PERIOD_STORE_ID_ORDER_STATUS">
+            <column name="period"/>
+            <column name="store_id"/>
+            <column name="order_status"/>
+        </constraint>
+        <index referenceId="TNW_SUBSCRIPTIONS_SALES_ORDER_AGGREGATED_CREATED_STORE_ID" indexType="btree">
+            <column name="store_id"/>
+        </index>
+    </table>
+    <table name="tnw_subscriptions_sales_order_aggregated_updated" resource="sales" engine="innodb"
+           comment="TNW Subscriptions Sales Order Aggregated Updated">
+        <column xsi:type="int" name="id" unsigned="true" nullable="false" identity="true" comment="ID"/>
+        <column xsi:type="date" name="period" comment="Period"/>
+        <column xsi:type="smallint" name="store_id" unsigned="true" nullable="true" identity="false"
+                comment="Store ID"/>
+        <column xsi:type="varchar" name="order_status" nullable="false" length="50" comment="Order Status"/>
+        <column xsi:type="int" name="orders_count" unsigned="false" nullable="false" identity="false"
+                default="0" comment="Orders Count"/>
+        <column xsi:type="decimal" name="total_qty_ordered" scale="4" precision="12" unsigned="false" nullable="false"
+                default="0" comment="Total Qty Ordered"/>
+        <column xsi:type="decimal" name="total_qty_invoiced" scale="4" precision="12" unsigned="false" nullable="false"
+                default="0" comment="Total Qty Invoiced"/>
+        <column xsi:type="decimal" name="total_income_amount" scale="4" precision="20" unsigned="false"
+                nullable="false" default="0" comment="Total Income Amount"/>
+        <column xsi:type="decimal" name="total_revenue_amount" scale="4" precision="20" unsigned="false"
+                nullable="false" default="0" comment="Total Revenue Amount"/>
+        <column xsi:type="decimal" name="total_profit_amount" scale="4" precision="20" unsigned="false"
+                nullable="false" default="0" comment="Total Profit Amount"/>
+        <column xsi:type="decimal" name="total_invoiced_amount" scale="4" precision="20" unsigned="false"
+                nullable="false" default="0" comment="Total Invoiced Amount"/>
+        <column xsi:type="decimal" name="total_canceled_amount" scale="4" precision="20" unsigned="false"
+                nullable="false" default="0" comment="Total Canceled Amount"/>
+        <column xsi:type="decimal" name="total_paid_amount" scale="4" precision="20" unsigned="false" nullable="false"
+                default="0" comment="Total Paid Amount"/>
+        <column xsi:type="decimal" name="total_refunded_amount" scale="4" precision="20" unsigned="false"
+                nullable="false" default="0" comment="Total Refunded Amount"/>
+        <column xsi:type="decimal" name="total_tax_amount" scale="4" precision="20" unsigned="false" nullable="false"
+                default="0" comment="Total Tax Amount"/>
+        <column xsi:type="decimal" name="total_tax_amount_actual" scale="4" precision="20" unsigned="false"
+                nullable="false" default="0" comment="Total Tax Amount Actual"/>
+        <column xsi:type="decimal" name="total_shipping_amount" scale="4" precision="20" unsigned="false"
+                nullable="false" default="0" comment="Total Shipping Amount"/>
+        <column xsi:type="decimal" name="total_shipping_amount_actual" scale="4" precision="20" unsigned="false"
+                nullable="false" default="0" comment="Total Shipping Amount Actual"/>
+        <column xsi:type="decimal" name="total_discount_amount" scale="4" precision="20" unsigned="false"
+                nullable="false" default="0" comment="Total Discount Amount"/>
+        <column xsi:type="decimal" name="total_discount_amount_actual" scale="4" precision="20" unsigned="false"
+                nullable="false" default="0" comment="Total Discount Amount Actual"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="id"/>
+        </constraint>
+        <constraint xsi:type="foreign" referenceId="TNW_SUBSCRIPTIONS_SALES_ORDER_AGGREGATED_UPDATED_STORE_ID_STORE_STORE_ID"
+                    table="tnw_subscriptions_sales_order_aggregated_updated" column="store_id" referenceTable="store"
+                    referenceColumn="store_id" onDelete="SET NULL"/>
+        <constraint xsi:type="unique" referenceId="TNW_SUBSCRIPTIONS_SALES_ORDER_AGGREGATED_UPDATED_PERIOD_STORE_ID_ORDER_STATUS">
+            <column name="period"/>
+            <column name="store_id"/>
+            <column name="order_status"/>
+        </constraint>
+        <index referenceId="TNW_SUBSCRIPTIONS_SALES_ORDER_AGGREGATED_UPDATED_STORE_ID" indexType="btree">
+            <column name="store_id"/>
+        </index>
+    </table>
+</schema>

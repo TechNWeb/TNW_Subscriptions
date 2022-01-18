@@ -1,14 +1,17 @@
 <?php
 /**
- * Copyright © 2018 TechNWeb, Inc. All rights reserved.
+ * Copyright © 2022 TechNWeb, Inc. All rights reserved.
  * See TNW_LICENSE.txt for license details.
  */
 namespace TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Report;
 
+use Magento\Sales\Model\Order;
 use Magento\Ui\DataProvider\AbstractDataProvider;
-use TNW\Subscriptions\Model\ResourceModel\Report\Sales\SubscriptionsFactory;
 use Magento\Framework\App\RequestInterface;
-use TNW\Subscriptions\Model\ResourceModel\Report\Sales\Subscriptions;
+use TNW\Subscriptions\Model\ResourceModel\Report\Subscriptions\Collection as CreatedAtCollection;
+use TNW\Subscriptions\Model\ResourceModel\Report\Subscriptions\UpdatedAt\Collection as UpdatedAtCollection;
+use Magento\Reports\Model\ResourceModel\Report\Collection\Factory as CollectionFactory;
+use Magento\Sales\Model\Order\ConfigFactory;
 
 /**
  * Class Sales - dataProvider for sales report
@@ -16,47 +19,14 @@ use TNW\Subscriptions\Model\ResourceModel\Report\Sales\Subscriptions;
 class Sales extends AbstractDataProvider
 {
     /**
-     * Data Provider name
-     *
-     * @var string
-     */
-    protected $name;
-
-    /**
-     * @var array
-     */
-    protected $orders = [];
-
-    /**
-     * Data Provider Primary Identifier name
-     *
-     * @var string
-     */
-    protected $primaryFieldName;
-
-    /**
-     * Data Provider Request Parameter Identifier name
-     *
-     * @var string
-     */
-    protected $requestFieldName;
-
-    /**
-     * @var array
-     */
-    protected $meta = [];
-
-    /**
-     * Provider configuration data
-     *
-     * @var array
-     */
-    protected $data = [];
-
-    /**
-     * @var \TNW\Subscriptions\Model\ResourceModel\Report\Sales\Subscriptions
+     * @var CreatedAtCollection|UpdatedAtCollection
      */
     protected $collection;
+
+    /**
+     * @var CreatedAtCollection|UpdatedAtCollection
+     */
+    protected $totalsCollection;
 
     /**
      * @var RequestInterface
@@ -69,13 +39,24 @@ class Sales extends AbstractDataProvider
     private $loadedData = [];
 
     /**
+     * @var CollectionFactory
+     */
+    protected $collectionFactory;
+
+    /**
+     * @var ConfigFactory
+     */
+    protected $configFactory;
+
+    /**
      * Sales constructor.
      *
      * @param string $name
      * @param string $primaryFieldName
      * @param string $requestFieldName
-     * @param SubscriptionsFactory $collectionFactory
+     * @param CollectionFactory $collectionFactory
      * @param RequestInterface $request
+     * @param ConfigFactory $configFactory
      * @param array $meta
      * @param array $data
      */
@@ -83,13 +64,15 @@ class Sales extends AbstractDataProvider
         $name,
         $primaryFieldName,
         $requestFieldName,
-        SubscriptionsFactory $collectionFactory,
+        CollectionFactory $collectionFactory,
         RequestInterface $request,
+        ConfigFactory $configFactory,
         array $meta = [],
         array $data = []
     ) {
         $this->request = $request;
-        $this->collection = $collectionFactory->create();
+        $this->collectionFactory = $collectionFactory;
+        $this->configFactory = $configFactory;
         parent::__construct(
             $name,
             $primaryFieldName,
@@ -101,159 +84,37 @@ class Sales extends AbstractDataProvider
     }
 
     /**
-     * @return Subscriptions
+     * @return CreatedAtCollection|UpdatedAtCollection
      */
     public function getCollection()
     {
+        if (!$this->collection) {
+            $this->collection = $this->prepareCollection($this->createCollection());
+        }
+
         return $this->collection;
     }
 
     /**
-     * Get Data Provider name
-     *
-     * @return string
+     * @return CreatedAtCollection|UpdatedAtCollection
      */
-    public function getName()
+    public function getTotalsCollection()
     {
-        return $this->name;
+        if (!$this->totalsCollection) {
+            $collection = $this->prepareCollection($this->createCollection());
+            $collection->isTotals(true);
+            $this->totalsCollection = $collection;
+        }
+
+        return $this->totalsCollection;
     }
 
     /**
-     * Get primary field name
-     *
-     * @return string
-     */
-    public function getPrimaryFieldName()
-    {
-        return $this->primaryFieldName;
-    }
-
-    /**
-     * Get field name in request
-     *
-     * @return string
-     */
-    public function getRequestFieldName()
-    {
-        return $this->requestFieldName;
-    }
-
-    /**
-     * Return Meta
-     *
-     * @return array
-     */
-    public function getMeta()
-    {
-        return $this->meta;
-    }
-
-    /**
-     * Get field Set meta info
-     *
-     * @param string $fieldSetName
-     * @return array
-     */
-    public function getFieldSetMetaInfo($fieldSetName)
-    {
-        return $this->meta[$fieldSetName] ?? [];
-    }
-
-    /**
-     * Return fields meta info
-     *
-     * @param string $fieldSetName
-     * @return array
-     */
-    public function getFieldsMetaInfo($fieldSetName)
-    {
-        return $this->meta[$fieldSetName]['children'] ?? [];
-    }
-
-    /**
-     * Return field meta info
-     *
-     * @param string $fieldSetName
-     * @param string $fieldName
-     * @return array
-     */
-    public function getFieldMetaInfo($fieldSetName, $fieldName)
-    {
-        return $this->meta[$fieldSetName]['children'][$fieldName] ?? [];
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function addFilter(\Magento\Framework\Api\Filter $filter)
-    {
-        $this->getCollection()->addFieldToFilter(
-            $filter->getField(),
-            [$filter->getConditionType() => $filter->getValue()]
-        );
-    }
-
-    /**
-     * @return null
-     */
-    public function getSearchCriteria()
-    {
-        return null;
-    }
-
-    /**
-     * @return Subscriptions
+     * @return CreatedAtCollection|UpdatedAtCollection
      */
     public function getSearchResult()
     {
         return $this->getCollection();
-    }
-
-    /**
-     * Alias for self::setOrder()
-     *
-     * @param string $field
-     * @param string $direction
-     * @return void
-     */
-    public function addOrder($field, $direction)
-    {
-        $this->orders[] = [$field => $direction];
-    }
-
-    /**
-     * Set Query limit
-     *
-     * @param int $offset
-     * @param int $size
-     * @return void
-     */
-    public function setLimit($offset, $size)
-    {
-        $this->getCollection()->setPageSize($size);
-        $this->getCollection()->setCurPage($offset);
-    }
-
-    /**
-     * Removes field from select
-     *
-     * @param string|null $field
-     * @param bool $isAlias Alias identifier
-     * @return void
-     */
-    public function removeField($field, $isAlias = false)
-    {
-        $this->getCollection()->removeFieldFromSelect($field, $isAlias);
-    }
-
-    /**
-     * Removes all fields from select
-     *
-     * @return void
-     */
-    public function removeAllFields()
-    {
-        $this->getCollection()->removeAllFieldsFromSelect();
     }
 
     /**
@@ -265,110 +126,72 @@ class Sales extends AbstractDataProvider
     {
         $date = $this->request->getParam('date');
         $period = $this->request->getParam('period');
-        $unProcessedItems = $this->getCollection()->toArray();
-        $data = [];
+        $from = $this->request->getParam('from');
+        $to = $this->request->getParam('to');
+
+        if (!$date || !$period || ! $from || !$to) {
+            return [];
+        }
+
         $params =  $this->request->getParams();
         unset($params['sorting']);
         $dataKey = implode(',', $params);
-        if (array_key_exists($dataKey, $this->loadedData)) {
-            return $this->loadedData[$dataKey];
+
+        if (!array_key_exists($dataKey, $this->loadedData)) {
+            $this->getCollection()->load();
+            $this->addGrowthDataToCollection();
+            $data = $this->getCollection()->toArray();
+            if (!empty($data['items'])) {
+                $totals = $this->getTotalsCollection()->load()->toArray();
+                $totalsRow = reset($totals['items']);
+                $totalsRow['period'] = 'Total';
+                $data['totals'] = $totalsRow;
+            }
+            $this->loadedData[$dataKey] = $data;
         }
-        if ($unProcessedItems && $date && $period) {
-            $processedItemsGroupedByPeriods = [];
-            $periodStartTime = '';
-            $periodEndingTime = '';
-            $periodGroupValue = '';
-            foreach ($unProcessedItems as $itemData) {
-                $itemDateTime = strtotime($itemData[$date]);
-                if (!$periodStartTime || !$periodEndingTime || $itemDateTime > strtotime($periodEndingTime)) {
-                    switch ($period) {
-                        case 'day':
-                            $periodStartTime = date("Y-m-d 00:00:00", $itemDateTime);
-                            $periodEndingTime = date("Y-m-d 23:59:59", $itemDateTime);
-                            break;
-                        case 'month':
-                            $periodStartTime = date("Y-m-1 00:00:00", $itemDateTime);
-                            $periodEndingTime = date("Y-m-t 23:59:59", $itemDateTime);
-                            break;
-                        default:
-                            $periodStartTime = date("Y-1-1 00:00:00", $itemDateTime);
-                            $periodEndingTime = date("Y-12-31 23:59:59", $itemDateTime);
-                            break;
-                    }
-                    $periodGroupValue = $periodEndingTime;
-                }
-                if (array_key_exists($periodGroupValue, $processedItemsGroupedByPeriods)
-                    && array_key_exists($itemData['sku'], $processedItemsGroupedByPeriods[$periodGroupValue])
-                ) {
-                    $processedItemsGroupedByPeriods[$periodGroupValue][$itemData['sku']]['total']
-                        += $itemData['base_row_total_incl_tax'];
-                    $processedItemsGroupedByPeriods[$periodGroupValue][$itemData['sku']]['qty']
-                        += $itemData['qty_ordered'];
-                } else {
-                    $resultedRow = [
-                        'total' => $itemData['base_row_total_incl_tax'],
-                        'sku' => $itemData['sku'],
-                        'name' => $itemData['name'],
-                        'qty' => $itemData['qty_ordered'],
-                        'interval' => $periodGroupValue
-                    ];
-                    $processedItemsGroupedByPeriods[$periodGroupValue][$itemData['sku']] = $resultedRow;
-                }
-            }
-            $total = 0;
-            foreach ($processedItemsGroupedByPeriods as $periodValue => $skuBasedData) {
-                foreach ($skuBasedData as $sku => $rowData) {
-                    $data[] = $rowData;
-                    $total += $rowData['total'];
-                }
-            }
-            if ($total) {
-                $data[] = [
-                    'total' => $total,
-                    'sku' => '',
-                    'name' => 'Period Total',
-                    'qty' => null,
-                    'interval' => null
-                ];
-            }
-        }
-        $this->loadedData[$dataKey] = [
-            'totalRecords' => count($data),
-            'items' => $data
-        ];
-        //TODO: implement sort order based on grid selected order
+
         return $this->loadedData[$dataKey];
     }
 
     /**
-     * Retrieve count of loaded items
-     *
-     * @return int
+     * @param CreatedAtCollection|UpdatedAtCollection $collection
+     * @return CreatedAtCollection|UpdatedAtCollection
      */
-    public function count()
+    protected function prepareCollection($collection)
     {
-        return $this->getCollection()->count();
-    }
+        $collection->setPeriod(
+            $this->request->getParam('period')
+        );
 
-    /**
-     * Get config data
-     *
-     * @return mixed
-     */
-    public function getConfigData()
-    {
-        return $this->data['config'] ?? [];
-    }
+        if ($from = $this->request->getParam('from')) {
+            $from = date('Y-m-d 00:00:00', strtotime($from));
+        }
 
-    /**
-     * Set data
-     *
-     * @param mixed $config
-     * @return void
-     */
-    public function setConfigData($config)
-    {
-        $this->data['config'] = $config;
+        if ($to = $this->request->getParam('to')) {
+            $to = date('Y-m-d 23:59:59', strtotime($to));
+        }
+
+        $collection->setDateRange($from, $to);
+
+        $statusFilter = $this->request->getParam('order_status');
+        if (!$statusFilter || $statusFilter === 'any') {
+            $orderConfig = $this->configFactory->create();
+            $statusValues = [];
+            $canceledStatuses = $orderConfig->getStateStatuses(Order::STATE_CANCELED);
+            $statusCodes = array_keys($orderConfig->getStatuses());
+            foreach ($statusCodes as $code) {
+                if (!isset($canceledStatuses[$code])) {
+                    $statusValues[] = $code;
+                }
+            }
+            $collection->addOrderStatusFilter($statusValues);
+        } else {
+            $collection->addOrderStatusFilter($statusFilter);
+        }
+
+        // TODO: add store ids filter
+
+        return $collection;
     }
 
     /**
@@ -391,7 +214,83 @@ class Sales extends AbstractDataProvider
                     $paramValue
                 );
             }
-            $this->getCollection()->addFieldToFilter($paramName, ['eq' => $paramValue]);
         }
+    }
+
+    /**
+     * @return string
+     */
+    protected function getResourceCollectionName()
+    {
+        return $this->request->getParam('date') === 'updated_at' ? UpdatedAtCollection::class : CreatedAtCollection::class;
+    }
+
+    /**
+     * @return CreatedAtCollection|UpdatedAtCollection
+     */
+    protected function createCollection()
+    {
+        return $this->collectionFactory->create($this->getResourceCollectionName());
+    }
+
+    /**
+     * Adds growth data to collection.
+     *
+     * @return void
+     */
+    private function addGrowthDataToCollection()
+    {
+        $columns = [
+            'orders_count',
+            'total_qty_ordered',
+            'total_qty_invoiced',
+            'total_income_amount',
+            'total_revenue_amount',
+            'total_profit_amount',
+            'total_invoiced_amount',
+            'total_canceled_amount',
+            'total_paid_amount',
+            'total_refunded_amount',
+            'total_tax_amount',
+            'total_tax_amount_actual',
+            'total_shipping_amount',
+            'total_shipping_amount_actual'
+        ];
+
+        $prevItem = null;
+
+        foreach ($this->getCollection() as $item) {
+            if ($prevItem) {
+                foreach ($columns as $column) {
+                    $growthColumn = $column . '_growth';
+                    $item->setData(
+                        $growthColumn,
+                        $this->getGrowth(
+                            (float) $prevItem->getData($column),
+                            (float) $item->getData($column)
+                        )
+                    );
+                }
+            } else {
+                foreach ($columns as $column) {
+                    $growthColumn = $column . '_growth';
+                    $item->setData($growthColumn, null);
+                }
+            }
+
+            $prevItem = $item;
+        }
+    }
+
+    /**
+     * Returns term's growth, based on previous value.
+     *
+     * @param float|int $previous
+     * @param float|int $current
+     * @return float|int
+     */
+    private function getGrowth($previous, $current)
+    {
+        return $previous ? ($current - $previous) / $previous : null;
     }
 }

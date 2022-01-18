@@ -1,0 +1,15 @@
+<!--
+/**
+ * Copyright © 2022 TechNWeb, Inc. All rights reserved.
+ * See TNW_LICENSE.txt for license details.
+ */
+-->
+<div class="data-grid-cell-content">
+    <!--ko text: getLabel($row())--><!--/ko-->
+    <span if="hasGrowth($row())" css="getGrowthCssClass($row())">
+        (
+        <!--ko text: getGrowthPercent($row())--><!--/ko-->
+        <span if="shouldDisplayGrowthArrow($row())" css="getGrowthArrowCssClass($row())"/>
+        )
+    </span>
+</div>

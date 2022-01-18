@@ -1,42 +1,42 @@
 <?php
 /**
- * Copyright © 2018 TechNWeb, Inc. All rights reserved.
- * See COPYING.txt for license details.
+ * Copyright © 2022 TechNWeb, Inc. All rights reserved.
+ * See TNW_LICENSE.txt for license details.
  */
 namespace TNW\Subscriptions\Controller\Adminhtml\Report\Sales;
 
-use Magento\Backend\App\Action;
+use Magento\Framework\App\Action\HttpGetActionInterface;
+use Magento\Reports\Controller\Adminhtml\Report\Sales as BaseController;
+use TNW\Subscriptions\Model\ResourceModel\Report\Order;
 
 /**
- * Class Subscriptions -controller for report form/grid
+ * Subscriptions report admin controller
  */
-class Subscriptions extends Action
+class Subscriptions extends BaseController implements HttpGetActionInterface
 {
     /**
-     * @inheritdoc
+     * {@inheritdoc}
+     */
+    public function execute()
+    {
+        $this->_showLastExecutionTime(Order::REPORT_SUBSCRIPTION_FLAG_CODE, 'subscriptions');
+
+        $this->_initAction()->_setActiveMenu(
+            'Magento_Reports::report_sales_subscriptions'
+        )->_addBreadcrumb(
+            __('Subscriptions Report'),
+            __('Subscriptions Report')
+        );
+        $this->_view->getPage()->getConfig()->getTitle()->prepend(__('Subscriptions Report'));
+
+        $this->_view->renderLayout();
+    }
+
+    /**
+     * {@inheritdoc}
      */
     protected function _isAllowed()
     {
         return $this->_authorization->isAllowed('TNW_Subscriptions::report_sales_subscriptions');
-    }
-
-    /**
-     * Execute action based on request and return result
-     *
-     * Note: Request will be added as operation argument in future
-     *
-     * @return void
-     */
-    public function execute()
-    {
-        $this->_view->loadLayout();
-
-        $this->_setActiveMenu('Magento_Reports::report_sales_subscriptions')
-            ->_addBreadcrumb(__('Reports'), __('Reports'))
-            ->_addBreadcrumb(__('Sales'), __('Sales'))
-            ->_addBreadcrumb(__('Subscriptions'), __('Subscriptions'));
-
-        $this->_view->getPage()->getConfig()->getTitle()->prepend(__('Sales Subscriptions Report'));
-        $this->_view->renderLayout();
     }
 }

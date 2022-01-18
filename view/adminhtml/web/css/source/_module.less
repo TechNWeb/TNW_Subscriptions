@@ -1,0 +1,28 @@
+.tnw_subscriptions-report_sales-subscriptions {
+    .period {
+        white-space: nowrap;
+    }
+
+    .growth {
+        @_color-positive-growth: @color-green-apple;
+        @_color-negative-growth: @color-tomato-brick;
+
+        white-space: nowrap;
+
+        .growth-arrow {
+            .lib-icon-font(
+                @icon-arrow-left__content
+            );
+
+            &.arrow-up {
+                color: @_color-positive-growth;
+                transform: rotate(-90deg);
+            }
+
+            &.arrow-down {
+                color: @_color-negative-growth;
+                transform: rotate(90deg);
+            }
+        }
+    }
+}

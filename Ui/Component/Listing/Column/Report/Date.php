@@ -77,31 +77,30 @@ class Date extends OriginDate
      */
     public function prepareDataSource(array $dataSource)
     {
-        if (isset($dataSource['data']['items'])) {
+        $period = $this->request->getParam('period');
+
+        if (isset($dataSource['data']['items']) && $period !== 'year') {
             foreach ($dataSource['data']['items'] as & $item) {
-                if (isset($item[$this->getData('name')])
-                    && $item[$this->getData('name')] !== "0000-00-00 00:00:00"
+                $name = $this->getData('name');
+                if (isset($item[$name])
+                    && $item[$name] !== "0000-00-00 00:00:00"
                 ) {
-                    $date = $this->timezone->date(new \DateTime($item[$this->getData('name')]));
+                    $date = $this->timezone->date(new \DateTime($item[$name]));
                     $timezone = isset($this->getConfiguration()['timezone'])
                         ? $this->booleanUtils->convert($this->getConfiguration()['timezone'])
                         : true;
                     if (!$timezone) {
-                        $date = new \DateTime($item[$this->getData('name')]);
+                        $date = new \DateTime($item[$name]);
                     }
-                    $period = $this->request->getParam('period');
                     switch ($period) {
                         case 'month':
                             $format= 'Y-m';
-                            break;
-                        case 'year':
-                            $format= 'Y';
                             break;
                         default:
                             $format= 'Y-m-d';
                             break;
                     }
-                    $item[$this->getData('name')] = $date->format($format);
+                    $item[$name] = $date->format($format);
                 }
             }
         }

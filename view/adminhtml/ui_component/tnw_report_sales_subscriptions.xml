@@ -6,7 +6,8 @@
  */
 -->
 <listing xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
+         xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd"
+         >
     <argument name="data" xsi:type="array">
         <item name="js_config" xsi:type="array">
             <item name="provider" xsi:type="string">tnw_report_sales_subscriptions.tnw_report_sales_subscriptions_data_source</item>
@@ -41,10 +42,15 @@
             </settings>
         </dataProvider>
     </dataSource>
-    <columns name="tnw_report_sales_subscriptions_columns">
-        <column name="interval" sortOrder="10"
+    <columns name="tnw_report_sales_subscriptions_columns" component="TNW_Subscriptions/js/grid/report-subscriptions">
+        <column name="period" sortOrder="10"
                 class="TNW\Subscriptions\Ui\Component\Listing\Column\Report\Date"
-                component="Magento_Ui/js/grid/columns/date">
+                component="TNW_Subscriptions/js/grid/columns/report/column-with-total">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="fieldClass" xsi:type="string">period</item>
+                </item>
+            </argument>
             <settings>
                 <filter>dateRange</filter>
                 <dataType>date</dataType>
@@ -52,30 +58,157 @@
                 <sortable>false</sortable>
             </settings>
         </column>
-        <column name="name" sortOrder="20">
+        <column name="orders_count" sortOrder="20"
+                component="TNW_Subscriptions/js/grid/columns/report/column-with-growth">
             <settings>
                 <filter>text</filter>
-                <label translate="true">Product Name</label>
+                <label translate="true">Orders</label>
                 <sortable>false</sortable>
             </settings>
         </column>
-        <column name="sku" sortOrder="30">
+        <column name="total_qty_ordered" sortOrder="30"
+                component="TNW_Subscriptions/js/grid/columns/report/column-with-growth">
             <settings>
                 <filter>text</filter>
-                <label translate="true">SKU</label>
+                <label translate="true">Sales Items</label>
                 <sortable>false</sortable>
             </settings>
         </column>
-        <column name="qty" sortOrder="40">
+        <column name="total_qty_invoiced" sortOrder="40"
+                component="TNW_Subscriptions/js/grid/columns/report/column-with-growth">
             <settings>
-                <label translate="true">Total Qty</label>
+                <filter>text</filter>
+                <label translate="true">Items</label>
                 <sortable>false</sortable>
             </settings>
         </column>
-        <column name="total" class="Magento\Sales\Ui\Component\Listing\Column\Price" sortOrder="50">
+        <column name="total_income_amount"
+                sortOrder="50"
+                class="TNW\Subscriptions\Ui\Component\Listing\Column\Report\PriceWithTotal"
+                component="TNW_Subscriptions/js/grid/columns/report/column-with-growth">
             <settings>
                 <filter>textRange</filter>
-                <label translate="true">Total Price</label>
+                <label translate="true">Sales Total</label>
+                <sortable>false</sortable>
+            </settings>
+        </column>
+        <column name="total_revenue_amount"
+                sortOrder="60"
+                class="TNW\Subscriptions\Ui\Component\Listing\Column\Report\PriceWithTotal"
+                component="TNW_Subscriptions/js/grid/columns/report/column-with-growth">
+            <settings>
+                <filter>textRange</filter>
+                <label translate="true">Revenue</label>
+                <sortable>false</sortable>
+            </settings>
+        </column>
+        <column name="total_profit_amount"
+                sortOrder="70"
+                class="TNW\Subscriptions\Ui\Component\Listing\Column\Report\PriceWithTotal"
+                component="TNW_Subscriptions/js/grid/columns/report/column-with-growth">
+            <settings>
+                <filter>textRange</filter>
+                <label translate="true">Profit</label>
+                <sortable>false</sortable>
+            </settings>
+        </column>
+        <column name="total_invoiced_amount"
+                sortOrder="80"
+                class="TNW\Subscriptions\Ui\Component\Listing\Column\Report\PriceWithTotal"
+                component="TNW_Subscriptions/js/grid/columns/report/column-with-growth">
+            <settings>
+                <filter>textRange</filter>
+                <label translate="true">Invoiced</label>
+                <sortable>false</sortable>
+            </settings>
+        </column>
+        <column name="total_paid_amount"
+                sortOrder="90"
+                class="TNW\Subscriptions\Ui\Component\Listing\Column\Report\PriceWithTotal"
+                component="TNW_Subscriptions/js/grid/columns/report/column-with-growth">
+            <settings>
+                <filter>textRange</filter>
+                <label translate="true">Paid</label>
+                <sortable>false</sortable>
+            </settings>
+        </column>
+        <column name="total_refunded_amount"
+                sortOrder="100"
+                class="TNW\Subscriptions\Ui\Component\Listing\Column\Report\PriceWithTotal"
+                component="TNW_Subscriptions/js/grid/columns/report/column-with-growth">
+            <settings>
+                <filter>textRange</filter>
+                <label translate="true">Refunded</label>
+                <sortable>false</sortable>
+            </settings>
+        </column>
+        <column name="total_tax_amount"
+                sortOrder="110"
+                class="TNW\Subscriptions\Ui\Component\Listing\Column\Report\PriceWithTotal"
+                component="TNW_Subscriptions/js/grid/columns/report/column-with-growth">
+            <settings>
+                <filter>textRange</filter>
+                <label translate="true">Sales Tax</label>
+                <sortable>false</sortable>
+            </settings>
+        </column>
+        <column name="total_tax_amount_actual"
+                sortOrder="120"
+                class="TNW\Subscriptions\Ui\Component\Listing\Column\Report\PriceWithTotal"
+                component="TNW_Subscriptions/js/grid/columns/report/column-with-growth">
+            <settings>
+                <filter>textRange</filter>
+                <label translate="true">Tax</label>
+                <sortable>false</sortable>
+            </settings>
+        </column>
+        <column name="total_shipping_amount"
+                sortOrder="130"
+                class="TNW\Subscriptions\Ui\Component\Listing\Column\Report\PriceWithTotal"
+                component="TNW_Subscriptions/js/grid/columns/report/column-with-growth">
+            <settings>
+                <filter>textRange</filter>
+                <label translate="true">Sales Shipping</label>
+                <sortable>false</sortable>
+            </settings>
+        </column>
+        <column name="total_shipping_amount_actual"
+                sortOrder="140"
+                class="TNW\Subscriptions\Ui\Component\Listing\Column\Report\PriceWithTotal"
+                component="TNW_Subscriptions/js/grid/columns/report/column-with-growth">
+            <settings>
+                <filter>textRange</filter>
+                <label translate="true">Shipping</label>
+                <sortable>false</sortable>
+            </settings>
+        </column>
+        <column name="total_discount_amount"
+                sortOrder="150"
+                class="TNW\Subscriptions\Ui\Component\Listing\Column\Report\PriceWithTotal"
+                component="TNW_Subscriptions/js/grid/columns/report/column-with-growth">
+            <settings>
+                <filter>textRange</filter>
+                <label translate="true">Sales Discount</label>
+                <sortable>false</sortable>
+            </settings>
+        </column>
+        <column name="total_discount_amount_actual"
+                sortOrder="160"
+                class="TNW\Subscriptions\Ui\Component\Listing\Column\Report\PriceWithTotal"
+                component="TNW_Subscriptions/js/grid/columns/report/column-with-growth">
+            <settings>
+                <filter>textRange</filter>
+                <label translate="true">Discount</label>
+                <sortable>false</sortable>
+            </settings>
+        </column>
+        <column name="total_canceled_amount"
+                sortOrder="170"
+                class="TNW\Subscriptions\Ui\Component\Listing\Column\Report\PriceWithTotal"
+                component="TNW_Subscriptions/js/grid/columns/report/column-with-growth">
+            <settings>
+                <filter>textRange</filter>
+                <label translate="true">Canceled</label>
                 <sortable>false</sortable>
             </settings>
         </column>

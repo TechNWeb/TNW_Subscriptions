@@ -523,4 +523,15 @@
         <plugin name="tnw_change_data_order_grid_collection"
                 type="TNW\Subscriptions\Plugin\Model\ResourceModel\Order\Grid\Collection"/>
     </type>
+    <type name="Magento\Reports\Controller\Adminhtml\Report\Statistics">
+        <arguments>
+            <argument name="reportTypes" xsi:type="array">
+                <item name="subscriptions" xsi:type="string">TNW\Subscriptions\Model\ResourceModel\Report\Order</item>
+            </argument>
+        </arguments>
+    </type>
+    <type name="Magento\Reports\Model\ResourceModel\Refresh\Collection">
+        <plugin name="tnw_subscriptions_report_add_subscriptions_to_refresh_collection"
+                type="TNW\Subscriptions\Plugin\Report\Model\ResourceModel\Refresh\AddSubscriptionsToCollection"/>
+    </type>
 </config>
