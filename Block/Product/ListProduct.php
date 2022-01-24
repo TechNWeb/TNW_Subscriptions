@@ -13,6 +13,9 @@ use Magento\Catalog\Model\Product;
 use Magento\Framework\App\ActionInterface;
 use Magento\Framework\Data\Helper\PostHelper;
 use Magento\Framework\DataObject;
+use Magento\Framework\Exception\LocalizedException;
+use Magento\Framework\Exception\NoSuchEntityException;
+use Magento\Framework\Phrase;
 use Magento\Framework\Pricing\PriceCurrencyInterface;
 use Magento\Framework\Serialize\SerializerInterface;
 use Magento\Framework\Url\EncoderInterface;
@@ -20,6 +23,7 @@ use Magento\Framework\Url\Helper\Data;
 use Magento\GroupedProduct\Model\Product\Type\Grouped;
 use TNW\Subscriptions\Api\Data\ProductBillingFrequencyInterface;
 use TNW\Subscriptions\Api\ProductBillingFrequencyRepositoryInterface as FrequencyOptionRepository;
+use TNW\Subscriptions\Block\Product\ListProduct\ListProductButtons;
 use TNW\Subscriptions\Model\Config\Source\TrialLengthUnitType;
 use TNW\Subscriptions\Model\Product\Attribute;
 use TNW\Subscriptions\Model\Product\Attribute as SubscriptionProductAttributes;
@@ -28,6 +32,8 @@ use TNW\Subscriptions\Model\Config\Source\PurchaseType;
 use TNW\Subscriptions\Model\Config\Product\SubscriptionProductView;
 use Magento\Catalog\Model\Product\Type;
 use Magento\Downloadable\Model\Product\Type as DownloadableType;
+use Magento\Directory\Model\CurrencyFactory;
+use Magento\Store\Model\StoreManagerInterface;
 
 /**
  *  Subscription Product list.
@@ -82,6 +88,16 @@ class ListProduct extends OrigListProduct
     private $serializer;
 
     /**
+     * @var CurrencyFactory
+     */
+    private $currencyFactory;
+
+    /**
+     * @var StoreManagerInterface
+     */
+    private $storeManager;
+
+    /**
      * ListProduct constructor.
      * @param Context $context
      * @param PostHelper $postDataHelper
@@ -95,6 +111,8 @@ class ListProduct extends OrigListProduct
      * @param SubscriptionProductView $productView
      * @param EncoderInterface $urlEncoder
      * @param SerializerInterface $serializer
+     * @param CurrencyFactory $currencyFactory
+     * @param StoreManagerInterface $storeManager
      * @param array $data
      */
     public function __construct(
@@ -110,6 +128,8 @@ class ListProduct extends OrigListProduct
         SubscriptionProductView $productView,
         EncoderInterface $urlEncoder,
         SerializerInterface $serializer,
+        CurrencyFactory $currencyFactory,
+        StoreManagerInterface $storeManager,
         array $data = []
     ) {
         parent::__construct($context, $postDataHelper, $layerResolver, $categoryRepository, $urlHelper, $data);
@@ -120,7 +140,9 @@ class ListProduct extends OrigListProduct
         $this->productView = $productView;
         $this->urlEncoder = $urlEncoder;
         $this->serializer = $serializer;
-    }
+        $this->currencyFactory = $currencyFactory;
+        $this->storeManager = $storeManager;
+    }   
 
     /**
      * Prepare params too add button block.
@@ -178,12 +200,12 @@ class ListProduct extends OrigListProduct
      * Create and return buttons block HTML with params.
      *
      * @return mixed
-     * @throws \Magento\Framework\Exception\LocalizedException
+     * @throws LocalizedException
      */
     public function getButtonsHtml($dataPostButton = false)
     {
         $buyButtonsBlock = $this->getLayout()->createBlock(
-            \TNW\Subscriptions\Block\Product\ListProduct\ListProductButtons::class,
+            ListProductButtons::class,
             $this->getNameInLayout() . '_' . $this->postParamsToButtonsBlock['data']['product']->getId(),
             $this->postParamsToButtonsBlock
         );
@@ -196,7 +218,7 @@ class ListProduct extends OrigListProduct
      * Get length of trial period
      *
      * @param $product
-     * @return \Magento\Framework\Phrase|string
+     * @return Phrase|string
      */
     public function getTopMessage($product)
     {
@@ -235,7 +257,7 @@ class ListProduct extends OrigListProduct
      *
      * @param $product
      * @return float|string|null
-     * @throws \Magento\Framework\Exception\LocalizedException
+     * @throws LocalizedException
      */
     public function getTrialPriceForCategory($product)
     {
@@ -248,7 +270,7 @@ class ListProduct extends OrigListProduct
         ) {
             return $product->getTypeId() === Grouped::TYPE_CODE
                 ? null
-                : $this->formatCurrency($product->getPrice(), false);
+                : $this->formatCurrency($this->getConvertedPrice($product->getPrice()), false);
         }
 
         $result = null;
@@ -265,10 +287,10 @@ class ListProduct extends OrigListProduct
 
             if ($trialStatus == 0 && $productBillingFrequency['default_billing_frequency'] == 1) {
                 $subscriptionPrice = $productBillingFrequency['price'] + $initialFee;
-                $result = $this->formatCurrency($subscriptionPrice, false);
+                $result = $this->formatCurrency($this->getConvertedPrice($subscriptionPrice), false);
             } elseif ($trialStatus == 1 && $productBillingFrequency['default_billing_frequency'] == 1) {
                 $price = $trialPrice + $initialFee;
-                $customPrice = $this->formatCurrency($price, false);
+                $customPrice = $this->formatCurrency($this->getConvertedPrice($price), false);
 
                 if ($price != 0 && $trialStatus == 1) {
                     $result = $customPrice;
@@ -357,5 +379,21 @@ class ListProduct extends OrigListProduct
             $product->getId(),
             false
         );
+    }
+
+    /**
+     * Convert price from base currency to current currency
+     *
+     * @param $price
+     * @return float|int
+     * @throws LocalizedException
+     * @throws NoSuchEntityException
+     */
+    private function getConvertedPrice($price)
+    {
+        $currentCurrency = $this->storeManager->getStore()->getCurrentCurrency()->getCode();
+        $baseCurrency = $this->storeManager->getStore()->getBaseCurrency()->getCode();
+        $rate = $this->currencyFactory->create()->load($baseCurrency)->getAnyRate($currentCurrency);
+        return $price * $rate;
     }
 }
