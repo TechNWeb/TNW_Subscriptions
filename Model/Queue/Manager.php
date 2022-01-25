@@ -27,6 +27,10 @@ use TNW\Subscriptions\Exception\ChangeProfileStatusException;
 use TNW\Subscriptions\Exception\AssignOrderToRelationException;
 use TNW\Subscriptions\Exception\ProfileProductsUnsaleableException;
 use Magento\Payment\Gateway\Command\CommandException;
+use TNW\Subscriptions\Exception\CalculateProfitException;
+use Magento\Framework\Exception\CouldNotSaveException;
+use Magento\Framework\Exception\LocalizedException;
+use Magento\Framework\Exception\NoSuchEntityException;
 
 /**
  * Class Manager - queue manager model
@@ -434,17 +438,17 @@ class Manager
     /**
      * @param $groupQueue
      * @throws AssignOrderToRelationException
+     * @throws CalculateProfitException
      * @throws ChangeProfileStatusException
+     * @throws CommandException
+     * @throws CouldNotSaveException
      * @throws LinkProfileItemIdWithOrderItemIdException
+     * @throws LocalizedException
      * @throws NewRelationException
+     * @throws NoSuchEntityException
+     * @throws ProfileProductsUnsaleableException
      * @throws ReBillOrderEmailException
      * @throws SubscriptionProfile\Engine\InvalidEngineException
-     * @throws \Magento\Framework\Exception\CouldNotSaveException
-     * @throws \Magento\Framework\Exception\LocalizedException
-     * @throws \Magento\Framework\Exception\MailException
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
-     * @throws CommandException
-     * @throws ProfileProductsUnsaleableException
      */
     public function placeOrderByGroupQueue($groupQueue)
     {
@@ -677,7 +681,11 @@ class Manager
                     $product->setNeedRecollect(false);
                 }
                 $this->profileRepository->save($profile);
-                $this->profileManager->setProfilesToCalculateProfit($order);
+                try {
+                    $this->profileManager->setProfilesToCalculateProfit($order);
+                } catch (\Exception $e) {
+                    throw new CalculateProfitException(__('Could not calculate profile profit.'));
+                }
             }
         } else {
             foreach ($groupQueue as $queue) {
