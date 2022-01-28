@@ -23,6 +23,7 @@ use TNW\Subscriptions\Exception\LinkProfileItemIdWithOrderItemIdException;
 use TNW\Subscriptions\Exception\NewRelationException;
 use TNW\Subscriptions\Exception\ChangeProfileStatusException;
 use TNW\Subscriptions\Exception\AssignOrderToRelationException;
+use TNW\Subscriptions\Exception\CalculateProfitException;
 
 /**
  * Class Process- controller
@@ -142,6 +143,7 @@ class Process extends Action
                         | ProfileProductsUnsaleableException
                         | NewRelationException
                         | ChangeProfileStatusException
+                        | CalculateProfitException
                         | AssignOrderToRelationException $e
                     ) {
                         $this->messageManager->addErrorMessage($e->getMessage());

@@ -20,6 +20,7 @@ use TNW\Subscriptions\Exception\ProfileProductsUnsaleableException;
 use TNW\Subscriptions\Exception\NewRelationException;
 use TNW\Subscriptions\Exception\ChangeProfileStatusException;
 use TNW\Subscriptions\Exception\AssignOrderToRelationException;
+use TNW\Subscriptions\Exception\CalculateProfitException;
 
 /**
  * Class ProfileProcessor - cron
@@ -124,6 +125,7 @@ class ProfileProcessor
                 | ProfileProductsUnsaleableException
                 | NewRelationException
                 | ChangeProfileStatusException
+                | CalculateProfitException
                 | AssignOrderToRelationException $e
             ) {
                 $this->context->messageError($e->getMessage());
