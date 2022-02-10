@@ -85,7 +85,6 @@ class Save extends AbstractSave
     public function execute()
     {
         $result = $this->initProfile();
-        $request = $this->getRequest()->getParams();
         if ($result) {
             try {
                 /** @var SubscriptionProfile $profile */
