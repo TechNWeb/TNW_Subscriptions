@@ -115,14 +115,19 @@ class Process extends Action
                 $profile = $this->profileRepository->getById($item->getSubscriptionProfileId());
                 $queueModel = $this->queueRepository->getById($queueId);
                 if ($item && $item->getId() && in_array($profile->getStatus(), $acceptableStatuses)) {
+                    $profileOrderId = $queueModel->getProfileOrderId();
+                    $profileOrder = $this->subscriptionProfileOrderRepository->getById($profileOrderId);
                     if ($queueModel->getStatus() == QueueStatus::QUEUE_STATUS_RUNNING) {
-                        $profileOrderId = $queueModel->getProfileOrderId();
-                        $profileOrder = $this->subscriptionProfileOrderRepository->getById($profileOrderId);
                         if (date('Ymd')
                             == date('Ymd', strtotime($profileOrder->getScheduledAt()))
                         ) {
                             throw new \Exception('Can`t manually process running profile.');
                         }
+                    }
+                    if (date('Ymd')
+                        < date('Ymd', strtotime($profileOrder->getScheduledAt()))
+                    ) {
+                        throw new \Exception('Can`t manually process profile scheduled for future.');
                     }
                     if ($queueModel->getStatus() == QueueStatus::QUEUE_STATUS_COMPLETE) {
                         throw new \Exception('Can`t process completed profile.');
