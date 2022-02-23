@@ -27,9 +27,7 @@ use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfile\Payment\Collection
 use TNW\Subscriptions\Model\Source\ProfileStatus;
 use Magento\Framework\Serialize\Serializer\Json;
 use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfileProfit;
-use TNW\Subscriptions\Api\SubscriptionProfileRepositoryInterface;
 use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfileOrder;
-use TNW\Subscriptions\Model\Config;
 
 /**
  * Subscription Profile model.
@@ -151,11 +149,6 @@ class SubscriptionProfile extends AbstractExtensibleModel implements Subscriptio
     private $profileProfit;
 
     /**
-     * @var SubscriptionProfileRepositoryInterface
-     */
-    private $profileRepository;
-
-    /**
      * @var SubscriptionProfileOrder
      */
     private $subscriptionProfileOrder;
@@ -185,7 +178,6 @@ class SubscriptionProfile extends AbstractExtensibleModel implements Subscriptio
      * @param Json $serializer
      * @param BillingFrequencyRepository $billingFrequencyRepository
      * @param SubscriptionProfileProfit $profileProfit
-     * @param SubscriptionProfileRepositoryInterface $profileRepository
      * @param SubscriptionProfileOrder $subscriptionProfileOrder
      * @param \TNW\Subscriptions\Model\Config $config
      * @param Resource|null $resource
@@ -206,7 +198,6 @@ class SubscriptionProfile extends AbstractExtensibleModel implements Subscriptio
         Json $serializer,
         BillingFrequencyRepository $billingFrequencyRepository,
         SubscriptionProfileProfit $profileProfit,
-        SubscriptionProfileRepositoryInterface $profileRepository,
         SubscriptionProfileOrder $subscriptionProfileOrder,
         Config $config,
         Resource $resource = null,
@@ -231,7 +222,6 @@ class SubscriptionProfile extends AbstractExtensibleModel implements Subscriptio
         $this->serializer = $serializer;
         $this->billingFrequencyRepository = $billingFrequencyRepository;
         $this->profileProfit = $profileProfit;
-        $this->profileRepository = $profileRepository;
         $this->subscriptionProfileOrder = $subscriptionProfileOrder;
         $this->storeRepository = $storeRepository;
         $this->config = $config;
@@ -1085,100 +1075,6 @@ class SubscriptionProfile extends AbstractExtensibleModel implements Subscriptio
             default:
                 return null;
         }
-        return $result;
-    }
-
-    /**
-     * Get data for recurring installment columns
-     *
-     * @param $profileOrders
-     * @param $subscriptionProfile
-     * @param $profileIds
-     * @return array
-     */
-    public function getRecurringInstallmentData($profileOrders, $subscriptionProfile, $profileIds)
-    {
-        $result = [];
-        $profileStatus = $subscriptionProfile->getStatus();
-        $staticTotalBillingCycles = $subscriptionProfile->getStaticTotalBillingCycles();
-        if (
-            $profileStatus !== ProfileStatus::STATUS_COMPLETE
-            || $profileStatus !== ProfileStatus::STATUS_CANCELED
-        ) {
-            if (strpos($profileIds, ',') !== false) {
-                $result = $this->getInstallmentDataForMultipleProfiles($profileIds);
-            } else {
-                $result = $this->getInstallmentDataForSingleProfile(
-                    $profileOrders,
-                    $subscriptionProfile,
-                    $staticTotalBillingCycles
-                );
-            }
-            $result['staticTotalBillingCycles'] = $staticTotalBillingCycles;
-        }
-
-        return $result;
-    }
-
-    /**
-     * @param $profileIds
-     * @return array
-     */
-    private function getInstallmentDataForMultipleProfiles($profileIds)
-    {
-        $profileIds = explode(',', $profileIds);
-        $paid = [];
-        $firstRecurring = [];
-        $finalRecurring = [];
-        $ccExpiration = [];
-        foreach ($profileIds as $profileId) {
-            try {
-                $profile = $this->profileRepository->getById($profileId);
-                $profileOrders = $this->subscriptionProfileOrder->getProfileOrdersByProfileId(
-                    $profileId
-                );
-            } catch (NoSuchEntityException $e) {
-                $profile = null;
-                $profileOrders = null;
-                $this->_logger->error($e->getMessage());
-            }
-            $static = $profile->getStaticTotalBillingCycles();
-            if (isset($static)) {
-                $paid[] = implode(",", [count($profileOrders), $static]);
-            } else {
-                $paid[] = implode(",", [count($profileOrders)]);
-            }
-            $firstRecurring[] = $profile->getStartDate();
-            $ccFinal = $this->getFinalDateForInstallmentData($profile, $profileOrders);
-            $ccExpiration[] = $this->getCcEcpirationStatus($profile, $ccFinal);
-            $finalRecurring[] = $ccFinal;
-        }
-
-        return [
-            'paidRecurring' => $this->serializer->serialize($paid),
-            'firstRecurring' => $this->serializer->serialize($firstRecurring),
-            'finalRecurring' => $this->serializer->serialize($finalRecurring),
-            'expirationCc' => $this->serializer->serialize($ccExpiration),
-        ];
-    }
-
-    /**
-     * @param $profileOrders
-     * @param SubscriptionProfile $subscriptionProfile
-     * @param $staticTotalBillingCycles
-     * @return array
-     */
-    private function getInstallmentDataForSingleProfile($profileOrders, $subscriptionProfile, $staticTotalBillingCycles)
-    {
-        if ($staticTotalBillingCycles !== null && $staticTotalBillingCycles > 1) {
-            $result['paidRecurring'] = implode(",", [count($profileOrders), $staticTotalBillingCycles]);
-        } else {
-            $result['paidRecurring'] = implode(",", [count($profileOrders)]);
-        }
-        $result['firstRecurring'] = $subscriptionProfile->getStartDate();
-        $result['finalRecurring'] = $this->getFinalDateForInstallmentData($subscriptionProfile, $profileOrders);
-        $result['expirationCc'] = $this->getCcEcpirationStatus($subscriptionProfile, $result['finalRecurring']);
-
         return $result;
     }
 

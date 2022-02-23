@@ -12,9 +12,6 @@ use TNW\Subscriptions\Model\Source\ProfileStatus;
 use TNW\Subscriptions\Model\SubscriptionProfile\StatusManager;
 use TNW\Subscriptions\Model\SubscriptionProfile\BillingCyclesManager;
 use TNW\Subscriptions\Model\SubscriptionProfileOrder\Manager as RelationManager;
-use TNW\Subscriptions\Api\SubscriptionProfileQueueRepositoryInterface;
-use TNW\Subscriptions\Model\Source\Queue\Status as QueueStatus;
-use TNW\Subscriptions\Api\SubscriptionProfileOrderRepositoryInterface;
 use TNW\Subscriptions\Model\SubscriptionProfile\Manager as ProfileManager;
 
 /**

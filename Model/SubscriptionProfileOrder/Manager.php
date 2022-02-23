@@ -18,6 +18,15 @@ use TNW\Subscriptions\Model\Source\ProfileStatus;
 use TNW\Subscriptions\Model\Config;
 use Magento\Sales\Model\AdminOrder\EmailSender;
 use Magento\Sales\Api\OrderRepositoryInterface;
+use Exception;
+use Magento\Framework\Exception\NoSuchEntityException;
+use Psr\Log\LoggerInterface;
+use TNW\Subscriptions\Api\Data\SubscriptionProfileOrderInterfaceFactory;
+use TNW\Subscriptions\Api\Data\SubscriptionProfileOrderSearchResultsInterfaceFactory;
+use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfileOrder as ResourceSubscriptionProfileOrder;
+use TNW\Subscriptions\Api\SubscriptionProfileRepositoryInterface;
+use TNW\Subscriptions\Model\SubscriptionProfile;
+use Magento\Framework\Serialize\Serializer\Json;
 
 /**
  * Class Manager - for subscription profile order
@@ -75,6 +84,26 @@ class Manager
     private $orderRepository;
 
     /**
+     * @var LoggerInterface
+     */
+    private $logger;
+
+    /**
+     * @var SubscriptionProfileRepositoryInterface
+     */
+    private $profileRepository;
+
+    /**
+     * @var ResourceSubscriptionProfileOrder
+     */
+    private $resource;
+
+    /**
+     * @var Json
+     */
+    private $serializer;
+
+    /**
      * Manager constructor.
      * @param SubscriptionProfileOrderFactory $profileFactory
      * @param RelationRepository $profileOrderRepository
@@ -83,6 +112,10 @@ class Manager
      * @param Config $config
      * @param EmailSender $sender
      * @param OrderRepositoryInterface $orderRepository
+     * @param SubscriptionProfileRepositoryInterface $profileRepository
+     * @param ResourceSubscriptionProfileOrder $resource
+     * @param Json $serializer
+     * @param LoggerInterface|null $logger
      */
     public function __construct(
         SubscriptionProfileOrderFactory $profileFactory,
@@ -91,8 +124,16 @@ class Manager
         SortOrderBuilder $sortOrderBuilder,
         Config $config,
         EmailSender $sender,
-        OrderRepositoryInterface $orderRepository
+        OrderRepositoryInterface $orderRepository,
+        SubscriptionProfileRepositoryInterface $profileRepository,
+        ResourceSubscriptionProfileOrder $resource,
+        Json $serializer,
+        LoggerInterface $logger = null
     ) {
+        $this->serializer = $serializer;
+        $this->resource = $resource;
+        $this->profileRepository = $profileRepository;
+        $this->logger = $logger;
         $this->profileOrderFactory = $profileFactory;
         $this->profileOrderRepository = $profileOrderRepository;
         $this->criteriaBuilder = $criteriaBuilder;
@@ -160,6 +201,46 @@ class Manager
         }
 
         $relation = $this->profileOrderRepository->save($relation);
+        $magentoOrderId = $relation->getMagentoOrderId();
+        if ($magentoOrderId) {
+            try {
+                $profileIds = $this->resource->getProfileIdsByMagentoOrderId((int) $magentoOrderId);
+                $subscriptionProfile = $this->profileRepository->getById(
+                    $relation->getSubscriptionProfileId()
+                );
+                $profileOrders = $this->resource->getProfileOrdersByProfileId(
+                    $subscriptionProfile->getId()
+                );
+                $installRecurringData = $this->getRecurringInstallmentData(
+                    $profileOrders,
+                    $subscriptionProfile,
+                    $profileIds
+                );
+
+                if ($profileIds) {
+                    $this->resource->populateSalesOrderGridWithProfileIds((int) $magentoOrderId, $profileIds);
+                    $this->resource->populateRecurringInstallmentData(
+                        $magentoOrderId,
+                        $installRecurringData['paidRecurring'],
+                        $installRecurringData['finalRecurring'],
+                        $installRecurringData['firstRecurring'],
+                        $installRecurringData['expirationCc'],
+                        $installRecurringData['staticTotalBillingCycles']
+                    );
+                    $this->resource->populateRecurringInstallmentDataSalesOrder(
+                        $magentoOrderId,
+                        $installRecurringData['paidRecurring'],
+                        $installRecurringData['finalRecurring'],
+                        $installRecurringData['firstRecurring'],
+                        $installRecurringData['expirationCc'],
+                        $installRecurringData['staticTotalBillingCycles']
+                    );
+                }
+            } catch (Exception $e) {
+                $this->logger->warning($e->getMessage());
+            }
+        }
+
         if (array_key_exists('magento_order_id', $relation->getData())) {
             if (!$relation->getData('email_sent')) {
                 $this->sender->send($this->orderRepository->get(
@@ -172,10 +253,9 @@ class Manager
     }
 
     /**
-     * Returns list of all profile relations.
-     *
-     * @param int $profileId
+     * @param $profileId
      * @return SubscriptionProfileOrderInterface[]
+     * @throws LocalizedException
      */
     public function getAllProfileRelations($profileId)
     {
@@ -228,11 +308,10 @@ class Manager
     }
 
     /**
-     * Retrieve next Subscription profile order
-     *
      * @param SubscriptionProfileInterface $profile
-     * @param null|bool $all
-     * @return false|SubscriptionProfileOrderInterface|SubscriptionProfileOrderInterface[]
+     * @param null $all
+     * @return bool|mixed|SubscriptionProfileOrderInterface|SubscriptionProfileOrderInterface[]
+     * @throws LocalizedException
      */
     public function getNextProfileRelation(SubscriptionProfileInterface $profile, $all = null)
     {
@@ -337,6 +416,104 @@ class Manager
     {
         $next = $this->getNextProfileRelation($profile);
         $next->setScheduledAt($date)->save();
+    }
+
+    /**
+     * Get data for recurring installment columns
+     *
+     * @param $profileOrders
+     * @param $subscriptionProfile
+     * @param $profileIds
+     * @return array
+     */
+    private function getRecurringInstallmentData($profileOrders, $subscriptionProfile, $profileIds)
+    {
+        $result = [];
+        $profileStatus = $subscriptionProfile->getStatus();
+        $staticTotalBillingCycles = $subscriptionProfile->getStaticTotalBillingCycles();
+        if (
+            $profileStatus !== ProfileStatus::STATUS_COMPLETE
+            || $profileStatus !== ProfileStatus::STATUS_CANCELED
+        ) {
+            if (strpos($profileIds, ',') !== false) {
+                $result = $this->getInstallmentDataForMultipleProfiles($profileIds);
+            } else {
+                $result = $this->getInstallmentDataForSingleProfile(
+                    $profileOrders,
+                    $subscriptionProfile,
+                    $staticTotalBillingCycles
+                );
+            }
+            $result['staticTotalBillingCycles'] = $staticTotalBillingCycles;
+        }
+
+        return $result;
+    }
+
+    /**
+     * @param $profileIds
+     * @return array
+     */
+    private function getInstallmentDataForMultipleProfiles($profileIds)
+    {
+        $profileIds = explode(',', $profileIds);
+        $paid = [];
+        $firstRecurring = [];
+        $finalRecurring = [];
+        $ccExpiration = [];
+        foreach ($profileIds as $profileId) {
+            try {
+                $profile = $this->profileRepository->getById($profileId);
+                $profileOrders = $this->resource->getProfileOrdersByProfileId(
+                    $profileId
+                );
+            } catch (NoSuchEntityException $e) {
+                $profile = null;
+                $profileOrders = null;
+                $this->logger->error($e->getMessage());
+            }
+            $static = $profile->getStaticTotalBillingCycles();
+            if (isset($static)) {
+                $paid[] = implode(",", [count($profileOrders), $static]);
+            } else {
+                $paid[] = implode(",", [count($profileOrders)]);
+            }
+            $firstRecurring[] = $profile->getStartDate();
+            $ccFinal = $profile->getFinalDateForInstallmentData($profile, $profileOrders);
+            $ccExpiration[] = $profile->getCcEcpirationStatus($profile, $ccFinal);
+            $finalRecurring[] = $ccFinal;
+        }
+
+        return [
+            'paidRecurring' => $this->serializer->serialize($paid),
+            'firstRecurring' => $this->serializer->serialize($firstRecurring),
+            'finalRecurring' => $this->serializer->serialize($finalRecurring),
+            'expirationCc' => $this->serializer->serialize($ccExpiration),
+        ];
+    }
+
+    /**
+     * @param $profileOrders
+     * @param SubscriptionProfile $subscriptionProfile
+     * @param $staticTotalBillingCycles
+     * @return array
+     */
+    private function getInstallmentDataForSingleProfile(
+        $profileOrders,
+        $subscriptionProfile,
+        $staticTotalBillingCycles
+    ) {
+        if ($staticTotalBillingCycles !== null && $staticTotalBillingCycles > 1) {
+            $result['paidRecurring'] = implode(",", [count($profileOrders), $staticTotalBillingCycles]);
+        } else {
+            $result['paidRecurring'] = implode(",", [count($profileOrders)]);
+        }
+        $result['firstRecurring'] = $subscriptionProfile->getStartDate();
+        $result['finalRecurring'] = $subscriptionProfile
+            ->getFinalDateForInstallmentData($subscriptionProfile, $profileOrders);
+        $result['expirationCc'] = $subscriptionProfile
+            ->getCcEcpirationStatus($subscriptionProfile, $result['finalRecurring']);
+        return $result;
     }
 
     /**

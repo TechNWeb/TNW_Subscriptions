@@ -10,13 +10,9 @@ use Exception;
 use Magento\Framework\Api\DataObjectHelper;
 use Magento\Framework\Api\SearchCriteriaInterface;
 use Magento\Framework\Api\SortOrder;
-use Magento\Framework\App\ObjectManager;
 use Magento\Framework\Exception\CouldNotDeleteException;
 use Magento\Framework\Exception\CouldNotSaveException;
 use Magento\Framework\Exception\NoSuchEntityException;
-use Magento\Framework\Reflection\DataObjectProcessor;
-use Magento\Store\Model\StoreManagerInterface;
-use Psr\Log\LoggerInterface;
 use TNW\Subscriptions\Api\Data\SubscriptionProfileOrderInterface;
 use TNW\Subscriptions\Api\Data\SubscriptionProfileOrderInterfaceFactory;
 use TNW\Subscriptions\Api\Data\SubscriptionProfileOrderSearchResultsInterfaceFactory;
@@ -24,8 +20,6 @@ use TNW\Subscriptions\Api\SubscriptionProfileOrderRepositoryInterface;
 use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfileOrder as ResourceSubscriptionProfileOrder;
 use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfileOrder\CollectionFactory
     as SubscriptionProfileOrderCollectionFactory;
-use TNW\Subscriptions\Api\SubscriptionProfileRepositoryInterface;
-use Magento\Framework\Stdlib\DateTime\TimezoneInterface;
 
 /**
  * Class SubscriptionProfileOrderRepository - repository object for subscription profile orders
@@ -53,19 +47,9 @@ class SubscriptionProfileOrderRepository implements SubscriptionProfileOrderRepo
     private $dataSubscriptionProfileOrderFactory;
 
     /**
-     * @var StoreManagerInterface
-     */
-    private $storeManager;
-
-    /**
      * @var ResourceSubscriptionProfileOrder
      */
     private $resource;
-
-    /**
-     * @var DataObjectProcessor
-     */
-    private $dataObjectProcessor;
 
     /**
      * @var SubscriptionProfileOrderCollectionFactory
@@ -73,38 +57,13 @@ class SubscriptionProfileOrderRepository implements SubscriptionProfileOrderRepo
     private $subscriptionProfileOrderCollectionFactory;
 
     /**
-     * @var LoggerInterface
-     */
-    private $logger;
-
-    /**
-     * @var SubscriptionProfileRepositoryInterface
-     */
-    private $profileRepository;
-
-    /**
-     * @var TimezoneInterface
-     */
-    private $timezone;
-
-    /**
-     * @var SubscriptionProfile
-     */
-    private $subscriptionProfile;
-
-    /**
+     * SubscriptionProfileOrderRepository constructor.
      * @param ResourceSubscriptionProfileOrder $resource
      * @param SubscriptionProfileOrderFactory $subscriptionProfileOrderFactory
      * @param SubscriptionProfileOrderInterfaceFactory $dataSubscriptionProfileOrderFactory
      * @param SubscriptionProfileOrderCollectionFactory $subscriptionProfileOrderCollectionFactory
      * @param SubscriptionProfileOrderSearchResultsInterfaceFactory $searchResultsFactory
      * @param DataObjectHelper $dataObjectHelper
-     * @param DataObjectProcessor $dataObjectProcessor
-     * @param StoreManagerInterface $storeManager
-     * @param SubscriptionProfileRepositoryInterface $profileRepository
-     * @param TimezoneInterface $timezone
-     * @param SubscriptionProfile $subscriptionProfile
-     * @param LoggerInterface|null $logger
      */
     public function __construct(
         ResourceSubscriptionProfileOrder $resource,
@@ -112,13 +71,7 @@ class SubscriptionProfileOrderRepository implements SubscriptionProfileOrderRepo
         SubscriptionProfileOrderInterfaceFactory $dataSubscriptionProfileOrderFactory,
         SubscriptionProfileOrderCollectionFactory $subscriptionProfileOrderCollectionFactory,
         SubscriptionProfileOrderSearchResultsInterfaceFactory $searchResultsFactory,
-        DataObjectHelper $dataObjectHelper,
-        DataObjectProcessor $dataObjectProcessor,
-        StoreManagerInterface $storeManager,
-        SubscriptionProfileRepositoryInterface $profileRepository,
-        TimezoneInterface $timezone,
-        SubscriptionProfile $subscriptionProfile,
-        LoggerInterface $logger = null
+        DataObjectHelper $dataObjectHelper
     ) {
         $this->resource = $resource;
         $this->subscriptionProfileOrderFactory = $subscriptionProfileOrderFactory;
@@ -126,13 +79,6 @@ class SubscriptionProfileOrderRepository implements SubscriptionProfileOrderRepo
         $this->searchResultsFactory = $searchResultsFactory;
         $this->dataObjectHelper = $dataObjectHelper;
         $this->dataSubscriptionProfileOrderFactory = $dataSubscriptionProfileOrderFactory;
-        $this->dataObjectProcessor = $dataObjectProcessor;
-        $this->storeManager = $storeManager;
-        $this->profileRepository = $profileRepository;
-        $this->timezone = $timezone;
-        $this->subscriptionProfile = $subscriptionProfile;
-        $objectManager = ObjectManager::getInstance();
-        $this->logger = $logger ?: $objectManager->get(LoggerInterface::class);
     }
 
     /**
@@ -148,45 +94,6 @@ class SubscriptionProfileOrderRepository implements SubscriptionProfileOrderRepo
                 'Could not save the subscriptionProfileOrder: %1',
                 $exception->getMessage()
             ));
-        }
-        $magentoOrderId = $subscriptionProfileOrder->getMagentoOrderId();
-        if ($magentoOrderId) {
-            try {
-                $profileIds = $this->resource->getProfileIdsByMagentoOrderId((int)$magentoOrderId);
-                $subscriptionProfile = $this->profileRepository->getById(
-                    $subscriptionProfileOrder->getSubscriptionProfileId()
-                );
-                $profileOrders = $this->resource->getProfileOrdersByProfileId(
-                    $subscriptionProfile->getId()
-                );
-                $installRecurringData = $this->subscriptionProfile->getRecurringInstallmentData(
-                    $profileOrders,
-                    $subscriptionProfile,
-                    $profileIds
-                );
-
-                if ($profileIds) {
-                    $this->resource->populateSalesOrderGridWithProfileIds((int)$magentoOrderId, $profileIds);
-                    $this->resource->populateRecurringInstallmentData(
-                        $magentoOrderId,
-                        $installRecurringData['paidRecurring'],
-                        $installRecurringData['finalRecurring'],
-                        $installRecurringData['firstRecurring'],
-                        $installRecurringData['expirationCc'],
-                        $installRecurringData['staticTotalBillingCycles']
-                    );
-                    $this->resource->populateRecurringInstallmentDataSalesOrder(
-                        $magentoOrderId,
-                        $installRecurringData['paidRecurring'],
-                        $installRecurringData['finalRecurring'],
-                        $installRecurringData['firstRecurring'],
-                        $installRecurringData['expirationCc'],
-                        $installRecurringData['staticTotalBillingCycles']
-                    );
-                }
-            } catch (Exception $e) {
-                $this->logger->warning($e->getMessage());
-            }
         }
         return $subscriptionProfileOrder;
     }
