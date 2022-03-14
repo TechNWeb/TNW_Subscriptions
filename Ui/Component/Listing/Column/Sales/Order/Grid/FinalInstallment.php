@@ -73,7 +73,7 @@ class FinalInstallment extends Column
                         $result = [];
                         foreach ($options as $option) {
                             if ($option === null) {
-                                $result[] = "";
+                                $result[] = " - ";
                             } else {
                                 $result[] = $this->timezone->formatDate(
                                     $option,
