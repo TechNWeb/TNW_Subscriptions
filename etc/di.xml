@@ -1343,6 +1343,7 @@
     </type>
     <type name="Magento\Quote\Model\Quote">
         <plugin name="tnw_subscriptions_update_quote_item" type="TNW\Subscriptions\Plugin\Quote\Model\UpdateQuoteItem"/>
+        <plugin name="validate_tnw_billing_frequency" type="TNW\Subscriptions\Plugin\Quote\Model\ValidateBillingFrequency"/>
     </type>
     <type name="Magento\Checkout\Model\Cart">
         <plugin name="tnw_subscriptions_update_cart_items" type="TNW\Subscriptions\Plugin\Checkout\Model\UpdateCartItems"/>
@@ -1502,4 +1503,9 @@
     <type name="TNW\Subscriptions\Model\Customer\Attribute\Source\CustomerGroup">
         <plugin name="shared_catalogs_group" type="Magento\SharedCatalog\Plugin\Source\CustomerGroupPlugin" disabled="true"/>
     </type>
+    <type name="Magento\Quote\Model\Quote\Validator\MinimumOrderAmount\ValidationMessage">
+        <plugin name="validate_tnw_billing_frequency"
+                type="TNW\Subscriptions\Plugin\Quote\Model\Quote\Validator\MinimumOrderAmount\ValidationMessage"/>
+    </type>
+    <type name="TNW\Subscriptions\Model\Quote\ValidationState" shared="true" />
 </config>
