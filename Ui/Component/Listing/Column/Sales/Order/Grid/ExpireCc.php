@@ -57,7 +57,7 @@ class ExpireCc extends Column
                         $result = [];
                         foreach ($options as $option) {
                             if ($option === null) {
-                                $result[] = "";
+                                $result[] = " - ";
                             } else {
                                 if ($option == 0) {
                                     $result[] = __("No");

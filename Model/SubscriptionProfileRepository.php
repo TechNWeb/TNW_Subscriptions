@@ -28,6 +28,7 @@ use TNW\Subscriptions\Model\SubscriptionProfile\Status\HistoryLogger;
 use TNW\Subscriptions\Model\SubscriptionProfile\Status\HistoryManager;
 use TNW\Subscriptions\Model\SubscriptionProfileOrder\Manager as ProfileOrderManager;
 use TNW\Subscriptions\Model\ProductBillingFrequency\AvailableSubscriptionProfileGrid;
+use Magento\Framework\Registry;
 
 /**
  * Repository for subscription profiles.
@@ -142,6 +143,11 @@ class SubscriptionProfileRepository implements SubscriptionProfileRepositoryInte
     private $availableSubscriptionProfileGrid;
 
     /**
+     * @var Registry
+     */
+    private $registry;
+
+    /**
      * SubscriptionProfileRepository constructor.
      * @param ResourceSubscriptionProfile $resource
      * @param SubscriptionProfileFactory $subscriptionProfileFactory
@@ -158,6 +164,7 @@ class SubscriptionProfileRepository implements SubscriptionProfileRepositoryInte
      * @param MessageHistoryLogger $messageHistoryLogger
      * @param EmailNotifierFactory $emailNotifierFactory
      * @param AvailableSubscriptionProfileGrid $availableSubscriptionProfileGrid
+     * @param Registry $registry
      */
     public function __construct(
         ResourceSubscriptionProfile $resource,
@@ -174,7 +181,8 @@ class SubscriptionProfileRepository implements SubscriptionProfileRepositoryInte
         HistoryLogger $statusHistoryLogger,
         MessageHistoryLogger $messageHistoryLogger,
         EmailNotifierFactory $emailNotifierFactory,
-        AvailableSubscriptionProfileGrid $availableSubscriptionProfileGrid
+        AvailableSubscriptionProfileGrid $availableSubscriptionProfileGrid,
+        Registry $registry
     ) {
         $this->messageHistoryLogger = $messageHistoryLogger;
         $this->resource = $resource;
@@ -191,6 +199,7 @@ class SubscriptionProfileRepository implements SubscriptionProfileRepositoryInte
         $this->statusHistoryLogger = $statusHistoryLogger;
         $this->emailNotifierFactory = $emailNotifierFactory;
         $this->availableSubscriptionProfileGrid = $availableSubscriptionProfileGrid;
+        $this->registry = $registry;
     }
 
     /**
@@ -259,20 +268,23 @@ class SubscriptionProfileRepository implements SubscriptionProfileRepositoryInte
                 ));
             }
             if ($oldStatus) {
-                try {
-                    $this->emailNotifierFactory->create()->profileStatusChange(
-                        $subscriptionProfile,
-                        $oldStatus,
-                        $newStatus
-                    );
-                } catch (\Exception $exception) {
-                    $this->messageHistoryLogger->log(
-                        __('Profile Status change email was not send due to some email sender error.'),
-                        $subscriptionProfile->getId(),
-                        true,
-                        false,
-                        true
-                    );
+                if ($this->registry->registry('tnw_status_change') == null) {
+                    try {
+                        $this->emailNotifierFactory->create()->profileStatusChange(
+                            $subscriptionProfile,
+                            $oldStatus,
+                            $newStatus
+                        );
+                        $this->registry->register('tnw_status_change', true);
+                    } catch (\Exception $exception) {
+                        $this->messageHistoryLogger->log(
+                            __('Profile Status change email was not send due to some email sender error.'),
+                            $subscriptionProfile->getId(),
+                            true,
+                            false,
+                            true
+                        );
+                    }
                 }
             }
         }

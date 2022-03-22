@@ -100,7 +100,7 @@ class TokenExtractor
      */
     private function getVaultPaymentToken($paymentData, $transaction, $customerId = 0)
     {
-        $gateWayToken = $transaction['customer'];
+        $gateWayToken = $transaction['customer'] . '/' . $transaction['payment_method'];
 
         if (!$paymentToken = $this->tokenManagement->getByGatewayToken(
             $gateWayToken,

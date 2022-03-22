@@ -291,6 +291,6 @@ class Sales extends AbstractDataProvider
      */
     private function getGrowth($previous, $current)
     {
-        return $previous ? ($current - $previous) / $previous : null;
+        return $previous ? ($current - $previous) / abs($previous) : null;
     }
 }

@@ -79,29 +79,8 @@ class CreatedAt extends BaseModel
                         $connection->getIfNullSql('orders.base_to_global_rate', 0)
                     )
                 ),
-                'total_revenue_amount' => new Zend_Db_Expr(
-                    sprintf(
-                        'SUM((%s - %s - %s - (%s - %s - %s)) * %s)',
-                        $connection->getIfNullSql('orders.base_total_invoiced', 0),
-                        $connection->getIfNullSql('orders.base_tax_invoiced', 0),
-                        $connection->getIfNullSql('orders.base_shipping_invoiced', 0),
-                        $connection->getIfNullSql('orders.base_total_refunded', 0),
-                        $connection->getIfNullSql('orders.base_tax_refunded', 0),
-                        $connection->getIfNullSql('orders.base_shipping_refunded', 0),
-                        $connection->getIfNullSql('orders.base_to_global_rate', 0)
-                    )
-                ),
-                'total_profit_amount' => new Zend_Db_Expr(
-                    sprintf(
-                        'SUM((%s - %s - %s - %s - %s) * %s)',
-                        $connection->getIfNullSql('orders.base_total_paid', 0),
-                        $connection->getIfNullSql('orders.base_total_refunded', 0),
-                        $connection->getIfNullSql('orders.base_tax_invoiced', 0),
-                        $connection->getIfNullSql('orders.base_shipping_invoiced', 0),
-                        $connection->getIfNullSql('orders.base_total_invoiced_cost', 0),
-                        $connection->getIfNullSql('orders.base_to_global_rate', 0)
-                    )
-                ),
+                'total_revenue_amount' => $this->getTotalRevenueAmountColumnExpression(),
+                'total_profit_amount' => $this->getTotalProfitAmountColumnExpression(),
                 'total_invoiced_amount' => new Zend_Db_Expr(
                     sprintf(
                         'SUM(%s * %s)',
@@ -246,5 +225,64 @@ class CreatedAt extends BaseModel
         }
 
         return $this;
+    }
+
+    /**
+     * Returns expression for profit calculation for single order
+     *
+     * @return Zend_Db_Expr
+     */
+    private function getTotalProfitAmountColumnExpression()
+    {
+        $connection = $this->getConnection();
+        $generalProfitFormula = sprintf(
+            '%s - %s - %s - %s',
+            $connection->getIfNullSql('orders.base_total_paid', 0),
+            $connection->getIfNullSql('orders.base_tax_invoiced', 0),
+            $connection->getIfNullSql('orders.base_shipping_invoiced', 0),
+            $connection->getIfNullSql('orders.base_total_invoiced_cost', 0)
+        );
+        $refundedProfitFormula = sprintf(
+            '%s - %s',
+            $connection->getIfNullSql('orders.base_total_paid', 0),
+            $connection->getIfNullSql('orders.base_total_refunded', 0)
+        );
+        return new Zend_Db_Expr(
+            sprintf(
+                'SUM(IF(orders.base_total_refunded = 0 OR orders.base_total_refunded IS NULL, %s, %s) * %s)',
+                $generalProfitFormula,
+                $refundedProfitFormula,
+                $connection->getIfNullSql('orders.base_to_global_rate', 0)
+            )
+        );
+    }
+
+    /**
+     * Returns expression for revenue calculation for single order
+     *
+     * @return Zend_Db_Expr
+     */
+    private function getTotalRevenueAmountColumnExpression()
+    {
+        $connection = $this->getConnection();
+        $generalRevenueFormula = sprintf(
+            '%s - %s - %s',
+            $connection->getIfNullSql('orders.base_total_invoiced', 0),
+            $connection->getIfNullSql('orders.base_tax_invoiced', 0),
+            $connection->getIfNullSql('orders.base_shipping_invoiced', 0)
+        );
+        $refundedRevenueFormula = sprintf(
+            '%s - %s',
+            $connection->getIfNullSql('orders.base_total_invoiced', 0),
+            $connection->getIfNullSql('orders.base_total_refunded', 0)
+        );
+        return new Zend_Db_Expr(
+            sprintf(
+                'SUM(IF(orders.base_total_refunded = 0 OR orders.base_total_refunded IS NULL, %s, %s) * %s)',
+                $generalRevenueFormula,
+                $refundedRevenueFormula,
+                $connection->getIfNullSql('orders.base_to_global_rate', 0)
+            )
+        );
     }
 }
