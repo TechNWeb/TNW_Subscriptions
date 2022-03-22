@@ -59,6 +59,7 @@ use TNW\Subscriptions\Model\Shipping\Free;
 use Magento\Quote\Model\Quote\TotalsCollector;
 use TNW\Subscriptions\Api\SubscriptionProfileQueueRepositoryInterface;
 use TNW\Subscriptions\Model\Queue as ProfileQueueModel;
+use TNW\Subscriptions\Model\Config\Source\BillingFrequencyUnitType;
 
 /**
  * Class Manager - used for managing the subscription profiles
@@ -1488,7 +1489,9 @@ class Manager
         if (!$this->isNextPaymentDateValid) {
             $messages[] = [
                 'index' => 'index = next_payment_date_message',
-                'message' => __('Only future dates are allowed for Next Payment Date')
+                'message' => __('Only future dates or date less than double billing frequency '
+                    . 'are allowed for Next Payment Date'
+                )
             ];
         }
         return $messages;
@@ -1861,9 +1864,16 @@ class Manager
             $oldDateTimeStamp = strtotime($nextProfileRelation->getScheduledAt());
             $newFullDate = $data['next_payment_date_value'] . ' ' . date('H:i:s', $oldDateTimeStamp);
             $newDateTimeStamp = strtotime($newFullDate);
+            $frequency = (int) $this->getProfile()->getFrequency();
+            $unit = (int) $this->getProfile()->getUnit() === BillingFrequencyUnitType::DAYS
+                ? 'days'
+                : 'month';
+            $maxFullDateStamp = strtotime(date('m/d/Y 23:59:59', strtotime('+1 days +' . $frequency * 2 . $unit)));
             $currentDate = date('m/d/Y', time());
+            $nexPaymentDateStamp  = strtotime($data['next_payment_date_value']);
             if ($newDateTimeStamp <= time()
-                || strtotime($currentDate) == strtotime($data['next_payment_date_value'])
+                || strtotime($currentDate) == $nexPaymentDateStamp
+                || $nexPaymentDateStamp > $maxFullDateStamp
             ) {
                 $this->isNextPaymentDateValid = false;
                 return false;

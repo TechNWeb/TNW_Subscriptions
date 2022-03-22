@@ -35,7 +35,8 @@ class NextPaymentDate extends Base
     {
         $process = $this->profileManager->processNextPaymentDate($data);
         if ($process === false) {
-            $this->errors[] = __('Only future dates are allowed for Next Payment Date');
+            $this->errors[] =
+                __('Only future dates or date less than double billing frequency are allowed for Next Payment Date');
         }
     }
 }
