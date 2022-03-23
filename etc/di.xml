@@ -1508,4 +1508,8 @@
                 type="TNW\Subscriptions\Plugin\Quote\Model\Quote\Validator\MinimumOrderAmount\ValidationMessage"/>
     </type>
     <type name="TNW\Subscriptions\Model\Quote\ValidationState" shared="true" />
+    <type name="Magento\Company\Plugin\Sales\Api\OrderManagementInterfacePlugin">
+        <plugin name="OrigOrderManagementInterfacePlugin"
+                type="TNW\Subscriptions\Plugin\Company\Plugin\Sales\Api\OrigOrderManagementInterfacePlugin"/>
+    </type>
 </config>
