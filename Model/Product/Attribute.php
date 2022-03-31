@@ -31,6 +31,8 @@ class Attribute
     const SUBSCRIPTION_INFINITE_SUBSCRIPTIONS = 'tnw_subscr_inf_subscriptions';
     const SUBSCRIPTION_SCHEDULE = 'tnw_subscr_schedule';
     const SUBSCRIPTION_INHERITANCE = 'tnw_subscr_inheritance';
+    const SUBSCRIPTION_BILLING_FREQUENCY_USED = 'tnw_subscr_billing_frequency_used';
+    const SUBSCRIPTION_BILLING_FREQUENCY = 'tnw_subscr_billing_frequency';
 
     /**
      * @return array
@@ -55,7 +57,9 @@ class Attribute
             self::SUBSCRIPTION_SAVINGS_CALCULATION,
             self::SUBSCRIPTION_INFINITE_SUBSCRIPTIONS,
             self::SUBSCRIPTION_SCHEDULE,
-            self::SUBSCRIPTION_INHERITANCE
+            self::SUBSCRIPTION_INHERITANCE,
+            self::SUBSCRIPTION_BILLING_FREQUENCY_USED,
+            self::SUBSCRIPTION_BILLING_FREQUENCY,
         ];
     }
 }

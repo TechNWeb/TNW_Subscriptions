@@ -53,6 +53,23 @@ class Attributes extends AbstractModifier
                 $meta,
                 false
             );
+
+            $path = $this->arrayManager->findPath(
+                'tnw_subscr_billing_frequency_used', $meta, null, 'children'
+            );
+            $meta = $this->arrayManager->set(
+                "{$path}/arguments/data/config/visible",
+                (array)$meta,
+                false
+            );
+            $path = $this->arrayManager->findPath(
+                'tnw_subscr_billing_frequency', $meta, null, 'children'
+            );
+            $meta = $this->arrayManager->set(
+                "{$path}/arguments/data/config/visible",
+                (array)$meta,
+                false
+            );
         }
         return $meta;
     }
