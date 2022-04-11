@@ -44,7 +44,7 @@ TNW,TNW
 "This Billing Frequency no longer exists.","This Billing Frequency no longer exists."
 "Edit Billing Frequency","Edit Billing Frequency"
 "New Billing Frequency","New Billing Frequency"
-"Billing Frequencys","Billing Frequencys"
+"Billing Frequencies","Billing Frequencies"
 BillingFrequency,BillingFrequency
 "You saved the Billing Frequency.","You saved the Billing Frequency."
 "Something went wrong while saving the Billing Frequency.","Something went wrong while saving the Billing Frequency."
@@ -424,3 +424,7 @@ The number of future quotes to generate at a time for the new subscription profi
 "Cannot unlink product from Billing frequency. Some <a href="%1" target="_blank">subscription profiles</a> use it.", "Cannot unlink product from Billing frequency. Some <a href="%1" target="_blank">subscription profiles</a> use it."
 "Cannot unlink product", "Cannot unlink product"
 "Only future dates are allowed for Next Payment Date","Only future dates are allowed for Next Payment Date"
+"Discount amount can not be equal or less than product price","Discount amount can not be equal or less than product price"
+"Default Billing frequency must be type of bool (1 or 0)", "Default Billing frequency must be type of bool (1 or 0)"
+"Regular price can not be equal or less than 0", "Regular price can not be equal or less than 0"
+"Initial fee can not be less than 0", "Initial fee can not be less than 0"

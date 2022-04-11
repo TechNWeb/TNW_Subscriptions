@@ -56,10 +56,13 @@ class SubscriptionAmount extends BaseAmount
             $result .= $defaultData['frequency_unit_message'];
         }
 
-        if ($defaultData['price'] != $defaultData['old_price']) {
+        $oldPrice = $this->getAmount()->getValue() > $defaultData['old_price']
+            ? $defaultData['old_price']
+            : $this->getAmount()->getValue();
+        if ($defaultData['price'] != $oldPrice) {
             $result .= sprintf(
                 '<span class="old-price "> Regular Price %s</span>',
-                $this->formatCurrency($defaultData['old_price'], false)
+                $this->formatCurrency($oldPrice, false)
             );
         }
         return $result;

@@ -1013,7 +1013,7 @@ class SubscriptionProfile extends AbstractExtensibleModel implements Subscriptio
         $startDate = $profile->getStartDate();
         $totalBillingCycles = $remainingBillingCycles + $this->getCountOrdersSinceStartDate($startDate, $profileOrders);
 
-        if ($profile->getTerm() == 1 && $totalBillingCycles < 2) {
+        if ($profile->getTerm() == 1 || $totalBillingCycles < 2) {
             return null;
         } elseif ($profile->getTerm() == 0) {
             if ($remainingBillingCycles == 1) {
