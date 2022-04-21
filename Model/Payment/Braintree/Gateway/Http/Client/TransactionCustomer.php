@@ -11,7 +11,7 @@ use Magento\Payment\Gateway\Http\ClientException;
 use Magento\Payment\Gateway\Http\TransferInterface;
 use Magento\Payment\Model\Method\Logger;
 use Psr\Log\LoggerInterface;
-use TNW\Subscriptions\Model\Payment\Braintree\Adapter;
+use TNW\Subscriptions\Model\Payment\Braintree\AdapterFactory;
 
 /**
  * Class TransactionCustomer - braintree
@@ -28,23 +28,14 @@ class TransactionCustomer implements ClientInterface
      */
     protected $customLogger;
 
-    /**
-     * @var Adapter
-     */
-    protected $adapter;
+    protected $adapterFactory;
 
-    /**
-     * TransactionCustomer constructor.
-     * @param LoggerInterface $logger
-     * @param Logger $customLogger
-     * @param Adapter $adapter
-     */
     public function __construct(
         LoggerInterface $logger,
         Logger $customLogger,
-        Adapter $adapter
+        AdapterFactory $adapterFactory
     ) {
-        $this->adapter = $adapter;
+        $this->adapterFactory = $adapterFactory;
         $this->logger = $logger;
         $this->customLogger = $customLogger;
     }
@@ -84,11 +75,8 @@ class TransactionCustomer implements ClientInterface
         // sending store id and other additional keys are restricted by Braintree API
         unset($data['store_id']);
 
-        if (property_exists($this, 'adapter')) {
-            return $this->adapter->customer($data);
-        }
 
-        return $this->adapterFactory->create($storeId)
+        return $this->adapterFactory->create(['storeId' => $storeId])
             ->customer($data);
     }
 }
