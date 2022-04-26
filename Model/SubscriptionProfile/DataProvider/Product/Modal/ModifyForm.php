@@ -750,6 +750,11 @@ class ModifyForm extends Form
      */
     protected function getRemoveButton()
     {
+        $isDisable = false;
+        if (count($this->getData()['new_subscription']) <= 1) {
+            $isDisable = true;
+        }
+
         return [
             'arguments' => [
                 'data' => [
@@ -770,6 +775,7 @@ class ModifyForm extends Form
                             'isRemoveButtonVisible' => $this->currentFormName . ':previewMode',
                         ],
                         'buttonVisibility' => $this->getRemoveButtonVisibility(),
+                        'disabled' => $isDisable,
                     ]
                 ]
             ]
