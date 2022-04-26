@@ -114,6 +114,7 @@ class Braintree extends Base
             'firstName' => $customer->getFirstname(),
             'lastName' => $customer->getLastname(),
             'email' => $customerEmail,
+            'phone' => $this->getSubCreateModel()->getShippingAddress()->getTelephone(),
             'paymentMethodNonce' => $data['payment']['braintree']['nonce'],
             'store_id' => $this->getSession()->getStoreId()
         ]);
