@@ -88,6 +88,11 @@ class Trial extends BaseModifier
                 'component' => 'TNW_Subscriptions/js/components/tnw-subscr-trial-length',
                 'elementTmpl' => 'TNW_Subscriptions/form/element/render-binding-input',
                 'default' => $trialLengthValue,
+                'validation' => [
+                    'validate-zero-or-greater' => true,
+                    'validate-number' => true,
+                    'validate-digits' => true,
+                ],
             ]
         );
         $meta = $this->arrayManager->merge(
