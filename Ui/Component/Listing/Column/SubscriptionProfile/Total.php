@@ -63,13 +63,15 @@ class Total extends Column
         if (isset($dataSource['data']['items'])) {
             foreach ($dataSource['data']['items'] as & $item) {
                 $total = $item['grand_total'] ?? null;
-                if ($total) {
+                if ($total != 0) {
                     $currencyCode = $item[SubscriptionProfileInterface::PROFILE_CURRENCY_CODE] ?? null;
                     $currency = $this->priceFormatter->getCurrency(
                         $item['store_id'],
                         $currencyCode
                     );
                     $total = $currency->format($total, false, null);
+                } else {
+                    $total = 'No saleable product';
                 }
                 $item[$this->getData('name')] = $total;
             }
