@@ -170,6 +170,11 @@ class Product
     {
         $oldRecurringOptions = $productModel->getOrigData('recurring_options');
         $newRecurringOptions = $productModel->getData('recurring_options');
+
+        if (!is_array($oldRecurringOptions) || !is_array($newRecurringOptions)) {
+            return [];
+        }
+
         $result = [];
 
         foreach ($oldRecurringOptions as $oldRecurringOption) {
