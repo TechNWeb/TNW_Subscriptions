@@ -37,7 +37,7 @@ $_subscriptionBlock = $block->getChildBlock('helper.compare.products.list');
                         <?php if ($index++ == 0): ?>
                             <th scope="row" class="cell label remove">
                                 <span><?= $escaper->escapeHtml(__('Remove Product')) ?></span>
-                            /th>
+                            </th>
                         <?php endif; ?>
                         <td class="cell remove product hidden-print">
                             <?php $compareHelper = $this->helper(Magento\Catalog\Helper\Product\Compare::class);?>
@@ -79,11 +79,12 @@ $_subscriptionBlock = $block->getChildBlock('helper.compare.products.list');
                             <?php if ($_subscriptionBlock->isAllowedProductType($item)
                                 && $_subscriptionBlock->isSubscriptionPrice($item)): ?>
                                 <div class="price-box price-final_price">
-                                <span class="price-wrapper" data-role="priceBox">
-                                    <span class="price">
-                                        <?= /* @noEscape */ $_subscriptionBlock->getTrialPriceForCategory($item) ?>
+                                    <?= /* @noEscape */ $_subscriptionBlock->getPriceLabel($item) ?>
+                                    <span class="price-wrapper" data-role="priceBox">
+                                        <span class="price">
+                                            <?= /* @noEscape */ $_subscriptionBlock->getTrialPriceForCategory($item) ?>
+                                        </span>
                                     </span>
-                                </span>
                                 </div>
                             <?php else: ?>
                                 <?= /* @noEscape */ $block->getProductPrice($item, '-compare-list-top') ?>

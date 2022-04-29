@@ -87,6 +87,7 @@ $_customerProductsHistoryListViewModel = $block->getData('customerProductsHistor
                             <?php if ($_subscriptionBlock->isAllowedProductType($_product)
                                 && $_subscriptionBlock->isSubscriptionPrice($_product)): ?>
                             <div class="price-box price-final_price">
+                                <?= /* @noEscape */ $_subscriptionBlock->getPriceLabel($_product) ?>
                                 <span class="price-wrapper" data-role="priceBox">
                                     <span class="price">
                                         <?= /* @noEscape */ $_subscriptionBlock->getTrialPriceForCategory($_product) ?>

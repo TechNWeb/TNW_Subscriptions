@@ -4,29 +4,37 @@
  * See TNW_LICENSE.txt for license details.
  */
 
-/** @var \TNW\Subscriptions\Pricing\Render\SubscriptionAmount $block */
+/**
+ * @var \TNW\Subscriptions\Pricing\Render\SubscriptionAmount $block
+ */
+
 ?>
 <?php if ($topMessage = $block->getMessage('top')): ?>
     <div class="subscription-price-top-messages">
-        <?= $block->getMessage('top') ?>
+        <?= /* @noEscape */ $block->getMessage('top') ?>
     </div>
 <?php endif; ?>
-<span class="price-container <?= /* @escapeNotVerified */ $block->getAdjustmentCssClasses() ?>"
+<span class="price-container <?= /* @noEscape */ $block->getAdjustmentCssClasses() ?>"
         <?= $block->getSchema() ? ' itemprop="offers" itemscope itemtype="http://schema.org/Offer"' : '' ?>>
-    <span <?php if ($block->getPriceId()): ?> id="<?= /* @escapeNotVerified */ $block->getPriceId() ?>"<?php endif;?>
-        <?=($block->getPriceDisplayLabel()) ? 'data-label="' . $block->getPriceDisplayLabel() . $block->getPriceDisplayInclExclTaxes() . '"' : '' ?>
-        data-price-amount="<?= /* @escapeNotVerified */ $block->getPrice(); ?>"
-        data-price-type="<?= /* @escapeNotVerified */ $block->getPriceType(); ?>"
-        class="price-wrapper <?= /* @escapeNotVerified */ $block->getPriceWrapperCss(); ?>"
+    <span <?php if ($block->getPriceId()): ?> id="<?= /* @noEscape */ $block->getPriceId() ?>"<?php endif;?>
+        <?= /* @noEscape */ ($block->getPriceDisplayLabel())
+            ? 'data-label="' . $block->getPriceDisplayLabel() . $block->getPriceDisplayInclExclTaxes() . '"'
+            : '' ?>
+        data-price-amount="<?= /* @noEscape */ $block->getPrice(); ?>"
+        data-price-type="<?= /* @noEscape */ $block->getPriceType(); ?>"
+        class="price-wrapper <?= /* @noEscape */ $block->getPriceWrapperCss(); ?>"
         <?= $block->getSchema() ? ' itemprop="price"' : '' ?>>
-        <?= $block->getDisplayPrice() ?>
+        <?= /* @noEscape */ $block->getDisplayPrice() ?>
     </span>
     <?php if ($block->getSchema()): ?>
-        <meta itemprop="priceCurrency" content="<?= /* @escapeNotVerified */ $block->getDisplayCurrencyCode()?>" />
+        <meta itemprop="priceCurrency" content="<?= /* @noEscape */ $block->getDisplayCurrencyCode()?>" />
     <?php endif; ?>
 </span>
 <?php if ($bottomMessage = $block->getMessage('bottom')): ?>
     <div class="subscription-price-bottom-messages">
-        <?= $bottomMessage ?>
+        <?= /* @noEscape */ $bottomMessage ?>
     </div>
+<?php endif; ?>
+<?php if ($block->getOldPrice()): ?>
+    <?= /* @noEscape */ $block->getDisplayOldPrice() ?>
 <?php endif; ?>
