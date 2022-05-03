@@ -101,7 +101,7 @@ $_customerProductsHistoryListViewModel = $block->getData('customerProductsHistor
 
                         <div class="product-item-inner">
                             <div class="product actions product-item-actions"<?= /* @noEscape */
-                                    strpos($pos, $viewMode . '-actions') ? $position : ''; ?>>
+                                    $pos && strpos($pos, $viewMode . '-actions') ? $position : ''; ?>>
                                 <?php
                                 $_subscriptionBlock->prepareParamsToButtonsBlock(
                                     $_product,
@@ -113,7 +113,7 @@ $_customerProductsHistoryListViewModel = $block->getData('customerProductsHistor
                                 echo $_subscriptionBlock->getButtonsHtml();
                                 ?>
                                 <div data-role="add-to-links" class="actions-secondary"<?= /* @noEscape */
-                                        strpos($pos, $viewMode . '-secondary') ? $position : ''; ?>>
+                                        $pos && strpos($pos, $viewMode . '-secondary') ? $position : ''; ?>>
                                     <?php if ($addToBlock = $block->getChildBlock('addto')): ?>
                                         <?= $addToBlock->setProduct($_product)->getChildHtml(); ?>
                                     <?php endif; ?>

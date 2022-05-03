@@ -172,7 +172,7 @@
                 </item>
             </argument>
             <htmlContent name="html_content">
-                <argument name="block" xsi:type="object">SubscriptionProfileCreatePreviewShippingAddress</argument>
+                <block name="shipping_address.block" class="SubscriptionProfileCreatePreviewShippingAddress"/>
             </htmlContent>
         </container>
     </fieldset>
@@ -231,7 +231,7 @@
                 </item>
             </argument>
             <htmlContent name="html_content">
-                <argument name="block" xsi:type="object">SubscriptionProfileCreatePreviewBillingAddress</argument>
+                <block name="billing_address.block" class="SubscriptionProfileCreatePreviewBillingAddress"/>
             </htmlContent>
         </container>
     </fieldset>

@@ -51,13 +51,17 @@ class Admin extends AbstractProcessingHandler
      * @return void
      * @throws \Magento\Framework\Exception\LocalizedException
      */
-    protected function write(array $record)
+    protected function write(array $record): void
     {
-        if (strcasecmp($this->appState->getAreaCode(), \Magento\Framework\App\Area::AREA_ADMINHTML) !== 0) {
+        if ($this->appState->getAreaCode()
+            && strcasecmp($this->appState->getAreaCode(), \Magento\Framework\App\Area::AREA_ADMINHTML) !== 0
+        ) {
             return;
         }
 
-        if (strcasecmp($this->request->getActionName(), 'inlineEdit') === 0) {
+        if ($this->request->getActionName()
+            && strcasecmp($this->request->getActionName(), 'inlineEdit') === 0
+        ) {
             return;
         }
 

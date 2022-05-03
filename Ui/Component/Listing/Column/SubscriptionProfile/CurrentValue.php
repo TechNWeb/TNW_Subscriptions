@@ -54,7 +54,7 @@ class CurrentValue extends Column
                         $item['store_id'],
                         $currencyCode
                     );
-                    $currentValue = $currency->format($currentValue, false, null);
+                    $currentValue = $currency->format($currentValue, [], false);
                 }
                 $item[$this->getData('name')] = $currentValue;
             }

@@ -8,6 +8,6 @@
     <div data-bind="attr: {class: showBottomBorder($row()) ? 'sub-data-row border' : 'sub-data-row '}"
          repeat="foreach: rows, item: '$row'">
         <div outerfasteach="data: getVisible(), as: '$col'"
-             css="getFieldClass($row())" click="getFieldHandler($row())" template="getBody()"/>
+             css="getFieldClass($row())" click="getFieldHandler($row())" template="getBody()"></div>
     </div>
 </div>

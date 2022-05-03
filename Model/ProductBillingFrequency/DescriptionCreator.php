@@ -411,10 +411,17 @@ class DescriptionCreator
         } else {
             $storeCurrency = $this->context->getPriceCurrency();
         }
+        if ($storeCurrency instanceof PriceCurrencyInterface) {
+            return $storeCurrency->format(
+                $price,
+                false,
+                PriceCurrencyInterface::DEFAULT_PRECISION
+            );
+        }
         return $storeCurrency->format(
             $price,
-            false,
-            PriceCurrencyInterface::DEFAULT_PRECISION
+            [],
+            false
         );
     }
 

@@ -121,7 +121,6 @@
                 </item>
             </argument>
             <htmlContent name="html_content">
-                <argument name="block" xsi:type="object">TNW\Subscriptions\Block\Subscription\Summary\Payment\Details</argument>
                 <argument name="data" xsi:type="array">
                     <item name="config" xsi:type="array">
                         <item name="imports" xsi:type="array">
@@ -129,6 +128,7 @@
                         </item>
                     </item>
                 </argument>
+                <block name="payment_method_view.block" class="TNW\Subscriptions\Block\Subscription\Summary\Payment\Details"/>
             </htmlContent>
         </container>
         <fieldset name="payment_information">

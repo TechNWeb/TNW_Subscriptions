@@ -5,6 +5,9 @@
  */
 namespace TNW\Subscriptions\Block\Subscription\Summary;
 
+use Magento\Framework\Exception\NoSuchEntityException;
+use Magento\Framework\View\Element\Template;
+use TNW\Subscriptions\Api\SubscriptionProfileRepositoryInterface;
 use TNW\Subscriptions\Model\SubscriptionProfile;
 
 /**
@@ -15,13 +18,34 @@ use TNW\Subscriptions\Model\SubscriptionProfile;
 class EmailOverview extends \Magento\Framework\View\Element\Template
 {
     /**
+     * @var SubscriptionProfileRepositoryInterface
+     */
+    private $subscriptionProfileRepository;
+
+    /**
+     * @param Template\Context $context
+     * @param SubscriptionProfileRepositoryInterface $subscriptionProfileRepository
+     * @param array $data
+     */
+    public function __construct(
+        Template\Context $context,
+        SubscriptionProfileRepositoryInterface $subscriptionProfileRepository,
+        array $data = []
+    ) {
+        parent::__construct($context, $data);
+        $this->subscriptionProfileRepository = $subscriptionProfileRepository;
+    }
+
+
+    /**
      * Returns shipping info block html.
      *
      * @return string
      */
     public function getShippingInfoHtml()
     {
-        return $this->getChildHtml('shipping-information');
+        return $this->getChildBlock('shipping-information')
+            ->setData('subscription_profiles', $this->getSubscriptionProfiles())->toHtml();
     }
 
     /**
@@ -29,7 +53,8 @@ class EmailOverview extends \Magento\Framework\View\Element\Template
      */
     public function getShippingDetailsHtml()
     {
-        return $this->getChildHtml('shipping-details');
+        return $this->getChildBlock('shipping-details')
+            ->setData('subscription_profiles', $this->getSubscriptionProfiles())->toHtml();
     }
 
     /**
@@ -44,7 +69,7 @@ class EmailOverview extends \Magento\Framework\View\Element\Template
             return false;
         }
         foreach ($this->getSubscriptionProfiles() as $profile) {
-            if (!(bool)$profile->getIsVirtual()) {
+            if (!$profile->getIsVirtual()) {
                 $canShow = true;
             }
         }
@@ -56,9 +81,24 @@ class EmailOverview extends \Magento\Framework\View\Element\Template
      */
     public function getSubscriptionProfiles()
     {
-        $profiles = $this->getData('subscription_profile')
-            ? [$this->getData('subscription_profile')]
-            : null;
+        $profiles = null;
+        if ($this->getData('subscription_profile')) {
+            $profiles = [$this->getData('subscription_profile')];
+        } else if ($this->getSubscriptionProfileId()) {
+            try {
+                $profiles = [$this->subscriptionProfileRepository->getById($this->getSubscriptionProfileId())];
+            } catch (NoSuchEntityException $e) {
+            }
+        } else if ($this->getSubscriptionProfileIds() && is_array($this->getSubscriptionProfileIds())) {
+            $profiles = [];
+            foreach ($this->getSubscriptionProfileIds() as $id) {
+                try {
+                    $profiles[] = $this->subscriptionProfileRepository->getById($id);
+                } catch (NoSuchEntityException $e) {
+                    continue;
+                }
+            }
+        }
         return $this->getData('subscription_profiles') ?? $profiles;
     }
 
@@ -69,7 +109,8 @@ class EmailOverview extends \Magento\Framework\View\Element\Template
      */
     public function getBillingInfoHtml()
     {
-        return $this->getChildHtml('billing-information');
+        return $this->getChildBlock('billing-information')
+            ->setData('subscription_profiles', $this->getSubscriptionProfiles())->toHtml();
     }
 
     /**
@@ -79,7 +120,8 @@ class EmailOverview extends \Magento\Framework\View\Element\Template
      */
     public function getPaymentDetailsHtml()
     {
-        return $this->getChildHtml('payment-details');
+        return $this->getChildBlock('payment-details')
+            ->setData('subscription_profiles', $this->getSubscriptionProfiles())->toHtml();
     }
 
     /**
@@ -89,7 +131,8 @@ class EmailOverview extends \Magento\Framework\View\Element\Template
      */
     public function getProductsHtml()
     {
-        return $this->getChildHtml('products');
+        return $this->getChildBlock('products')
+            ->setData('subscription_profiles', $this->getSubscriptionProfiles())->toHtml();
     }
 
     /**
@@ -97,6 +140,7 @@ class EmailOverview extends \Magento\Framework\View\Element\Template
      */
     public function getCouponDetails()
     {
-        return $this->getChildHtml('coupon-details');
+        return $this->getChildBlock('coupon-details')
+            ->setData('subscription_profiles', $this->getSubscriptionProfiles())->toHtml();
     }
 }

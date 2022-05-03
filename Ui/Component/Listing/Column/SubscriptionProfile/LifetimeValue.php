@@ -54,7 +54,7 @@ class LifetimeValue extends Column
                         $item['store_id'],
                         $currencyCode
                     );
-                    $lifetimeValue = $currency->format($lifetimeValue, false, null);
+                    $lifetimeValue = $currency->format($lifetimeValue, [], false);
                 }
                 $item[$this->getData('name')] = $lifetimeValue;
             }

@@ -64,9 +64,8 @@ class Details extends BaseSummary
             $shippingAmount = $this->priceCurrency->getCurrency()->format(
                 $this->getSubscriptionProfile()->getShipping(),
                 [],
-                2,
-                null,
-                $this->getSubscriptionProfile()->getProfileCurrencyCode()
+                false,
+                false
             );
         }
         return $shippingAmount;

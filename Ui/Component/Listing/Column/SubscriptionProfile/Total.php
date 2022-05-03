@@ -69,7 +69,7 @@ class Total extends Column
                         $item['store_id'],
                         $currencyCode
                     );
-                    $total = $currency->format($total, false, null);
+                    $total = $currency->format($total, [], false, false);
                 } else {
                     $total = 'No saleable product';
                 }

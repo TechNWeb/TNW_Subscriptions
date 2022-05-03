@@ -9,46 +9,46 @@
      css="$data.additionalClasses"
      attr="'data-index': index">
     <label class="field-label label" if="$data.label" visible="$data.labelVisible" attr="for: uid">
-        <span text="label" attr="'data-config-scope': $data.scopeLabel"/>
+        <span text="label" attr="'data-config-scope': $data.scopeLabel"></span>
     </label>
     <div class="field-control"
          css="'_with-tooltip': $data.tooltip, '_with-reset': $data.showFallbackReset && $data.isDifferedFromDefault">
 
         <div class="control-preview" if="$data.showPreview">
-            <render args="previewElementTmpl"/>
+            <render args="previewElementTmpl"></render>
         </div>
 
         <div ifnot="$data.showPreview">
             <div class="field-container" css="'mage-error': $data.error"  ifnot="hasAddons()">
-                <render args="elementTmpl"/>
+                <render args="elementTmpl"></render>
             </div>
 
             <div class="ontrol-addon" if="hasAddons()">
                 <div css="'mage-error': $data.error">
-                    <render args="elementTmpl"/>
+                    <render args="elementTmpl"></render>
                 </div>
 
                 <label class="addon-prefix" if="$data.addbefore" attr="for: uid">
-                    <span text="addbefore"/>
+                    <span text="addbefore"></span>
                 </label>
                 <label class="addon-suffix" if="$data.addafter" attr="for: uid">
-                    <span text="addafter"/>
+                    <span text="addafter"></span>
                 </label>
             </div>
 
-            <render args="tooltipTpl" if="$data.tooltip"/>
+            <render args="tooltipTpl" if="$data.tooltip"></render>
 
-            <render args="fallbackResetTpl" if="$data.showFallbackReset && $data.isDifferedFromDefault"/>
+            <render args="fallbackResetTpl" if="$data.showFallbackReset && $data.isDifferedFromDefault"></render>
 
-            <div class="mage-error" generated="true" if="$data.error" attr="for: uid" text="$data.error"/>
+            <div class="mage-error" generated="true" if="$data.error" attr="for: uid" text="$data.error"></div>
 
             <div class="field-note" if="$data.notice" attr="id: noticeId">
-                <span text="notice"/>
+                <span text="notice"></span>
             </div>
 
             <div class="additional-info" if="$data.additionalInfo" html="$data.additionalInfo"></div>
 
-            <render args="$data.service.template" if="$data.hasService()"/>
+            <render args="$data.service.template" if="$data.hasService()"></render>
         </div>
     </div>
 </div>

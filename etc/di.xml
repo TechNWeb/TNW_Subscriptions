@@ -1508,9 +1508,6 @@
         <plugin name="tnw_prevent_send_invoice_email"
                 type="TNW\Subscriptions\Plugin\Model\Order\Email\Sender\PreventSendInvoiceEmail"/>
     </type>
-    <type name="TNW\Subscriptions\Model\Customer\Attribute\Source\CustomerGroup">
-        <plugin name="shared_catalogs_group" type="Magento\SharedCatalog\Plugin\Source\CustomerGroupPlugin" disabled="true"/>
-    </type>
     <type name="Magento\Quote\Model\Quote\Validator\MinimumOrderAmount\ValidationMessage">
         <plugin name="validate_tnw_billing_frequency"
                 type="TNW\Subscriptions\Plugin\Quote\Model\Quote\Validator\MinimumOrderAmount\ValidationMessage"/>

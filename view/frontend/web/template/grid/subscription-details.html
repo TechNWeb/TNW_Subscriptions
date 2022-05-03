@@ -14,23 +14,23 @@
             }">
         </div>
         <div class="sub-status-label">
-            <strong text="$col.getStatusLabel($row())"data-bind="css: $col.getStatusCssClass($row())"/>
+            <strong text="$col.getStatusLabel($row())"data-bind="css: $col.getStatusCssClass($row())"></strong>
         </div>
     </div>
     <div class="details-wrapper">
         <div class="name-actions-descr-price-wrapper">
             <div class="row-left">
                 <div class="sub-product-name">
-                    <span class="qty" text="$col.getProductQty($row())"/>x&nbsp;
+                    <span class="qty" text="$col.getProductQty($row())"></span>x&nbsp;
                     <a class="name" data-bind="
                         attr: {
                             href: $col.getSubscriptionEditLink($row()),
                         },
                         html:$col.getProductName($row())"
-                    />
+                    ></a>
                 </div>
                 <div class="sub-product-description">
-                    <div html="$col.getProductDescription($row())"/>
+                    <div html="$col.getProductDescription($row())"></div>
                 </div>
             </div>
             <div class="row-right">
@@ -40,19 +40,19 @@
                         attr: { href: action.href },
                         click: $parent.applyAction.bind(action, $col),
                         css: action.type,
-                        text: action.label"/>
+                        text: action.label"></a>
                     <!-- /ko -->
                 </div>
                 <div class="price">
-                    <span text="$col.getPaymentAmount($row())"/>
+                    <span text="$col.getPaymentAmount($row())"></span>
                 </div>
             </div>
             <!-- ko if: $col.getProductOptions($row()) -->
             <div class="sub-configurable-options">
                 <!-- ko foreach: {data: $col.getProductOptions($row()), as: 'option'}-->
                 <div class="option">
-                    <strong text="option.attributeLabel"/>:&nbsp;
-                    <span text="option.optionLabel"/>
+                    <strong text="option.attributeLabel"></strong>:&nbsp;
+                    <span text="option.optionLabel"></span>
                 </div>
                 <!-- /ko -->
             </div>
@@ -60,60 +60,60 @@
         </div>
         <div class="term-frequency-date-wrapper">
             <div class="sub-billing-frequency">
-                <strong><span translate="'Billing Frequency'"/></strong><br/>
-                <span text="$col.getSubBillingFrequency($row())"/>
+                <strong><span translate="'Billing Frequency'"></span></strong><br/>
+                <span text="$col.getSubBillingFrequency($row())"></span>
             </div>
             <div class="sub-term">
-                <strong><span translate="'Term'"/></strong><br/>
-                <span text="$col.getProductTerm($row())"/>
+                <strong><span translate="'Term'"></span></strong><br/>
+                <span text="$col.getProductTerm($row())"></span>
             </div>
             <div class="sub-next-order-on">
-                <span class="title" translate="'Next order on'"/>
-                <span class="date" text="$col.getNextOrderOn($row())"/>
+                <span class="title" translate="'Next order on'"></span>
+                <span class="date" text="$col.getNextOrderOn($row())"></span>
             </div>
         </div>
         <div class="additional-information-wrapper" data-bind="mageInit: {'collapsible':{'openedState':'opened'}}">
             <div class="additional-information-title" data-role="title">
-                <span translate="'More details'"/>
+                <span translate="'More details'"></span>
             </div>
             <div class="additional-information-content" data-role="content">
 
                 <!-- ko ifnot: $col.getIsVirtual($row()) -->
                 <div class="shipping-information-wrapper">
-                    <div class="shipping-address-title" translate="'Shipping address'"/>
-                    <div class="shipping-address" html="$col.getShippingAddress($row())"/>
+                    <div class="shipping-address-title" translate="'Shipping address'"></div>
+                    <div class="shipping-address" html="$col.getShippingAddress($row())"></div>
                 </div>
                 <!-- /ko -->
                 <div class="payment-information-wrapper">
-                    <div class="billing-address-title" translate="'Billing address'"/>
-                    <div class="billing-address" html="$col.getBillingAddress($row())"/>
+                    <div class="billing-address-title" translate="'Billing address'"></div>
+                    <div class="billing-address" html="$col.getBillingAddress($row())"></div>
                 </div>
                 <!-- ko ifnot: $col.getIsVirtual($row()) -->
                 <div class="shipping-method-wrapper">
-                    <div class="shipping-method-title" translate="'Shipping method'"/>
-                    <div class="shipping-method" html="$col.getShippingMethod($row())"/>
+                    <div class="shipping-method-title" translate="'Shipping method'"></div>
+                    <div class="shipping-method" html="$col.getShippingMethod($row())"></div>
                 </div>
                 <!-- /ko -->
                 <div class="payment-method-wrapper">
-                    <div class="payment-method-title" translate="'Payment information'"/>
+                    <div class="payment-method-title" translate="'Payment information'"></div>
                     <dl class="payment-method-table">
-                        <dt class="label" translate="'Payment method'"/>
-                        <dd class="right" html="$col.getPaymentMethodTitle($row())"/>
+                        <dt class="label" translate="'Payment method'"></dt>
+                        <dd class="right" html="$col.getPaymentMethodTitle($row())"></dd>
                         <!-- ko if: $col.getPaymentDescription($row()) -->
                             <!-- ko if: $col.getCcNumber($row()) -->
-                            <dt class="label" translate="'Card Type'"/>
-                            <dd class="right" text="$col.getCcType($row())"/>
-                            <dt class="label" translate="'Card Number'"/>
-                            <dd class="right" text="$col.getCcNumber($row())"/>
-                            <dt class="label" translate="'Exp. Date'"/>
-                            <dd class="right" text="$col.getCcExp($row())"/>
+                            <dt class="label" translate="'Card Type'"></dt>
+                            <dd class="right" text="$col.getCcType($row())"></dd>
+                            <dt class="label" translate="'Card Number'"></dt>
+                            <dd class="right" text="$col.getCcNumber($row())"></dd>
+                            <dt class="label" translate="'Exp. Date'"></dt>
+                            <dd class="right" text="$col.getCcExp($row())"></dd>
                             <!-- /ko -->
                             <!-- ko if: $col.getPoNumber($row()) -->
-                            <dt class="label" translate="'Purchase Order Number'"/>
-                            <dd class="right" text="$col.getPoNumber($row())"/>
+                            <dt class="label" translate="'Purchase Order Number'"></dt>
+                            <dd class="right" text="$col.getPoNumber($row())"></dd>
                             <!-- /ko -->
-                        <dt class="label" translate="'Currency'"/>
-                        <dd class="right" text="$col.getCurrency($row())"/>
+                        <dt class="label" translate="'Currency'"></dt>
+                        <dd class="right" text="$col.getCurrency($row())"></dd>
                         <!-- /ko -->
                     </dl>
                 </div>
