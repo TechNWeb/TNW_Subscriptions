@@ -51,21 +51,34 @@ class SubscriptionAmount extends BaseAmount
             return sprintf('<span class="free">%s</span>', __('Free'));
         }
 
-        $result = $this->formatCurrency($defaultData['price'], true);
+        $result = $this->formatCurrency($defaultData['price']);
         if ($defaultData['frequency_unit_message']) {
             $result .= $defaultData['frequency_unit_message'];
         }
 
-        $oldPrice = $this->getAmount()->getValue() > $defaultData['old_price']
-            ? $defaultData['old_price']
-            : $this->getAmount()->getValue();
-        if ($defaultData['price'] != $oldPrice) {
-            $result .= sprintf(
-                '<span class="old-price "> Regular Price %s</span>',
-                $this->formatCurrency($oldPrice, false)
-            );
-        }
         return $result;
+    }
+
+    /**
+     * @return false|float
+     */
+    public function getOldPrice()
+    {
+        $defaultData = $this->getPriceData();
+        return (float)$defaultData['price'] < (float)$defaultData['old_price']
+            ? (float)$defaultData['old_price']
+            : false;
+    }
+
+    /**
+     * @return string
+     */
+    public function getDisplayOldPrice()
+    {
+        return $this->getOldPrice()
+            ? '<span class="old-price "><span class="price-label">' . __('Regular Price') . '</span> '
+                . '<span class="price-wrapper">' . $this->formatCurrency($this->getOldPrice()) . '</span></span>'
+            : '';
     }
 
     /**

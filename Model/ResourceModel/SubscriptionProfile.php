@@ -9,6 +9,7 @@ namespace TNW\Subscriptions\Model\ResourceModel;
 use Magento\Eav\Model\Entity\AbstractEntity;
 use Magento\Sales\Api\Data\OrderInterface;
 use TNW\Subscriptions\Api\Data\SubscriptionProfileOrderInterface;
+use TNW\Subscriptions\Model\Config\Source\BillingFrequencyUnitType;
 
 /**
  * Resource model for Subscription Profile.
@@ -92,6 +93,11 @@ class SubscriptionProfile extends AbstractEntity
     public function getTotalValue(\Magento\Framework\Model\AbstractModel $object)
     {
         $invoiceItems = $this->getInvoiceItems($object);
+        $profit = 0;
+        $invoicedCount = count($invoiceItems);
+        foreach ($invoiceItems as $invoiceItem) {
+            $profit += $invoiceItem['base_row_total_incl_tax'];
+        }
         $lastInvoiceItem = array_pop($invoiceItems);
         if ($lastInvoiceItem) {
             $profitOfLastItem = $lastInvoiceItem['base_row_total_incl_tax'];
@@ -99,13 +105,15 @@ class SubscriptionProfile extends AbstractEntity
             $profitOfLastItem = 0;
         }
         if ($object->getTerm() == 1) {
-            if ($object->getUnit() == 3) {
-                $profit = $profitOfLastItem * 365 / $object->getFrequency();
+            if ($object->getUnit() == BillingFrequencyUnitType::DAYS) {
+                $invoicedCount %= 365;
+                $profit = $profitOfLastItem * (365 - $invoicedCount) / $object->getFrequency();
             } else {
-                $profit = $profitOfLastItem * 12 / $object->getFrequency();
+                $invoicedCount %= 12;
+                $profit = $profitOfLastItem * (12 - $invoicedCount) / $object->getFrequency();
             }
         } else {
-            $profit = $profitOfLastItem * $object->getStaticTotalBillingCycles();
+            $profit += $profitOfLastItem * ($object->getStaticTotalBillingCycles() - $invoicedCount);
         }
         return $profit;
     }

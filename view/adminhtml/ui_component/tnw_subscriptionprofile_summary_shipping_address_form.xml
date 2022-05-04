@@ -118,7 +118,6 @@
                 </item>
             </argument>
             <htmlContent name="html_content">
-                <argument name="block" xsi:type="object">SubscriptionProfileEditPreviewShippingAddress</argument>
                 <argument name="data" xsi:type="array">
                     <item name="config" xsi:type="array">
                         <item name="imports" xsi:type="array">
@@ -126,6 +125,7 @@
                         </item>
                     </item>
                 </argument>
+                <block name="shipping_address_view.block" class="SubscriptionProfileEditPreviewShippingAddress"/>
             </htmlContent>
         </container>
         <fieldset name="shipping_address_fields">

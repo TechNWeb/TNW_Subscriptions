@@ -62,5 +62,15 @@
                 </argument>
             </arguments>
         </referenceBlock>
+        <referenceBlock name="checkout.cart.crosssell" template="TNW_Subscriptions::product/list/items.phtml">
+            <arguments>
+                <argument name="customerProductsHistoryList" xsi:type="object">
+                    TNW\Subscriptions\Block\Product\CustomerProductsHistoryList
+                </argument>
+            </arguments>
+            <block class="TNW\Subscriptions\Block\Product\ListProduct"
+                   name="helper.checkout.cart.crosssell"
+                   as="helper.products.list"/>
+        </referenceBlock>
     </body>
 </page>

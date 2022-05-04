@@ -31,11 +31,17 @@ define([
          * @returns {Element}
          */
         initialize: function () {
-            return this
+            this
                 ._super()
                 .initMapping()
                 .updateComponents(this.initialValue, true)
                 .updateHeader(this.initialValue);
+
+            if (this.isUsedBySubscriptionProfiles()) {
+                this.disabled(true);
+            }
+
+            return this;
         },
 
         /**
@@ -88,6 +94,10 @@ define([
          */
         updateComponents: function (currentValue, isInitialization) {
             var currentGroup = this.valuesMap[currentValue];
+
+            if (this.isUsedBySubscriptionProfiles()) {
+                this.disabled(true);
+            }
 
             if (currentGroup !== this.previousGroup) {
                 _.each(this.indexesMap, function (groups, index) {
@@ -187,6 +197,24 @@ define([
             if (!this.disabled()) {
                 this._super(data, event)
             }
+        },
+
+        /**
+         * Checks if billing frequency is used by subscription profiles
+         * @return {Boolean}
+         */
+        isUsedBySubscriptionProfiles: function () {
+            var recurringOption = this.source.get(this.parentScope);
+            return recurringOption && !!recurringOption.grid_url;
+        },
+
+        /**
+         * Overrides default method to disallow enabling component if billing frequency is in use
+         * @param {Boolean} val
+         * @return {*}
+         */
+        disabled: function (val) {
+            return this._super(val || this.isUsedBySubscriptionProfiles());
         }
     });
 });

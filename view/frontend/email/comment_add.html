@@ -1,11 +1,12 @@
-<!--@subject {{trans "New comment for %sub_label profile on" sub_label=$subscription.getLabel()}} {{config path="general/store_information/name"}} @-->
+<!--@subject {{trans "New comment for %sub_label profile on" sub_label=$subscription_data.label}} {{config path="general/store_information/name"}} @-->
 <!--@vars {
 "template config_path=\"design\/email\/header_template\"":"Email Header Template",
 "template config_path=\"design\/email\/footer_template\"":"Email Footer Template",
 "var store_email":"Store Email",
 "var customerName":"Customer Name",
 "var comment":"Comment",
-"var subscription":"Subscription Profile"
+"var subscription":"Subscription Profile",
+"var subscription_data":"Subscription Profile Data"
 } @-->
 {{template config_path="design/email/header_template"}}
 <table>
@@ -13,7 +14,7 @@
         <td>
             <p class="greeting">{{trans 'Dear %customerName,' customerName=$customerName}}</p>
             <p>
-                {{trans 'The following comment was added to your subscription profile'}} <a href="{{store url='tnw_subscriptions/subscription/edit' entity_id=$subscription.getId()}}">{{var subscription.getLabel()}}</a>.
+                {{trans 'The following comment was added to your subscription profile'}} <a href="{{store url='tnw_subscriptions/subscription/edit' entity_id=$subscription_data.id}}">{{var subscription_data.label}}</a>.
             </p>
             <p><strong>{{var comment}}</strong></p>
             <p>

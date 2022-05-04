@@ -153,7 +153,7 @@ class NextPayment extends Template
             $currency = $this->priceFormatter->getCurrency(
                 $profile->getStoreId(),
                 $profile->getProfileCurrencyCode());
-            return $currency->format($grandTotal, false, null);
+            return $currency->format($grandTotal, [], false, false);
         }
     }
 

@@ -59,7 +59,7 @@ class ShippingDetails extends Column
                     $shippingPrice = $this->subContext->getPriceCurrency()->format(
                         $item['shipping_and_handling'],
                         false,
-                        null,
+                        2,
                         null,
                         $currencyCode
                     );

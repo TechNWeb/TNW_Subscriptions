@@ -651,7 +651,7 @@ class Manager
                     true
                 );
 
-                if ($quote->getCouponCode() === "") {
+                if ($quote->getCouponCode() === "" && $profile->getCouponCode()) {
                     $this->messageHistoryLogger->message(
                         SubscriptionProfile\MessageHistoryLogger::COUPON_INVALID,
                         [

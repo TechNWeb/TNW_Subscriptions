@@ -106,5 +106,25 @@
                 </arguments>
             </block>
         </referenceBlock>
+        <referenceBlock name="catalog.product.related" template="TNW_Subscriptions::product/list/items.phtml">
+            <arguments>
+                <argument name="customerProductsHistoryList" xsi:type="object">
+                    TNW\Subscriptions\Block\Product\CustomerProductsHistoryList
+                </argument>
+            </arguments>
+            <block class="TNW\Subscriptions\Block\Product\ListProduct"
+                   name="helper.catalog.related.product"
+                   as="helper.products.list"/>
+        </referenceBlock>
+        <referenceBlock name="product.info.upsell" template="TNW_Subscriptions::product/list/items.phtml">
+            <arguments>
+                <argument name="customerProductsHistoryList" xsi:type="object">
+                    TNW\Subscriptions\Block\Product\CustomerProductsHistoryList
+                </argument>
+            </arguments>
+            <block class="TNW\Subscriptions\Block\Product\ListProduct"
+                   name="helper.product.info.upsell"
+                   as="helper.products.list"/>
+        </referenceBlock>
     </body>
 </page>

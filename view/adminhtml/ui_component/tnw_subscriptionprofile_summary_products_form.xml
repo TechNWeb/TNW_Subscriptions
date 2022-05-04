@@ -40,9 +40,9 @@
         </argument>
     </dataSource>
     <htmlContent name="overview_block">
-        <argument name="block" xsi:type="object">TNW\Subscriptions\Block\Subscription\Summary\Overview</argument>
         <settings>
             <visible>false</visible>
         </settings>
+        <block name="overview_block.block" class="TNW\Subscriptions\Block\Subscription\Summary\Overview"/>
     </htmlContent>
 </form>

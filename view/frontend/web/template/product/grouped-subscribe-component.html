@@ -6,19 +6,19 @@
 -->
 <div class="grouped-subscription-wrapper">
     <table class="table data" id="subscription-super-product-table">
-        <caption class="table-caption" translate="'Grouped product items'"/>
+        <caption class="table-caption" translate="'Grouped product items'"></caption>
         <thead>
             <tr>
-                <th class="col item" scope="col" translate="'Product Name'"/>
-                <th class="col frequency" scope="col" translate="'Frequency'"/>
-                <th class="col qty" scope="col" translate="'Qty'"/>
-                <th class="col trial" scope="col" translate="'Trial'" data-bind="visible: hasTrialStatus"/>
+                <th class="col item" scope="col" translate="'Product Name'"></th>
+                <th class="col frequency" scope="col" translate="'Frequency'"></th>
+                <th class="col qty" scope="col" translate="'Qty'"></th>
+                <th class="col trial" scope="col" translate="'Trial'" data-bind="visible: hasTrialStatus"></th>
             </tr>
         </thead>
         <tbody each="data: subscriptionProducts, as: 'product'">
             <tr class="first-row">
                 <td class="col item">
-                    <strong class="product-item-name" text="product.name"/>
+                    <strong class="product-item-name" text="product.name"></strong>
                 </td>
                 <!-- ko if: $parent.canSubscribe(product) -->
                 <td class="col frequency" if="product.is_salable">
@@ -66,12 +66,12 @@
                 </td>
                 <td class="col unavailable" ifnot="product.is_salable"
                     data-bind="attr: {'colspan': $parent.hasTrialStatus ? 3 : 2}">
-                    <span translate="'Out of stock'"/>
+                    <span translate="'Out of stock'"></span>
                 </td>
                 <!-- /ko -->
                 <!-- ko ifnot: $parent.canSubscribe(product) -->
                     <td class="col no-subscription" data-bind="attr: {'colspan': $parent.hasTrialStatus ? 3 : 2}">
-                        <span translate="'Subscription unavailable'"/>
+                        <span translate="'Subscription unavailable'"></span>
                     </td>
                 <!-- /ko -->
             </tr>
@@ -79,17 +79,17 @@
             <!-- ko if: $parent.canSubscribe(product) -->
                 <td class="col item" data-bind="attr: {'colspan': $parent.hasTrialStatus ? 4 : 3}">
                     <span class="subscription-price" html="$parent.getSubscriptionPrice(product)"></span>,
-                    <span class="period-label" translate="'until canceled'" if="$parent.isInfinite(product)"/>
+                    <span class="period-label" translate="'until canceled'" if="$parent.isInfinite(product)"></span>
                     <a ifnot="$parent.isInfinite(product)"
                        class="period-label trigger"
                        href="#"
                        data-bind="attr: {'data-picker-trigger-id': 'period-picker-trigger-' + product.id}"
                        text="$parent.getTermLabel(product)"></a>
 
-                    <span class="start-on-label" translate="'starting'"/>
+                    <span class="start-on-label" translate="'starting'"></span>
                     <span class="start-on-label"
                           ifnot="$parent.isEditableStartOn(product)"
-                          text="product.startOnDateAlt"/>
+                          text="product.startOnDateAlt"></span>
                     <a class="start-on-label"
                        href="#"
                        if="$parent.isEditableStartOn(product)"
@@ -147,7 +147,7 @@
                                             id: $parent.getFieldName(product, 'term')+'1'
                                        }"/>
                                 <label class="label" data-bind="attr:{for: $parent.getFieldName(product, 'term')+'1'}">
-                                    <span translate="'Until canceled'"/>
+                                    <span translate="'Until canceled'"></span>
                                 </label>
                             </div>
                             <div>
@@ -158,14 +158,14 @@
                                             id: $parent.getFieldName(product, 'term')+'0'
                                        }"/>
                                 <label class="label" data-bind="attr:{for: $parent.getFieldName(product, 'term')+'0'}">
-                                    <span translate="'Stop after'"/>
+                                    <span translate="'Stop after'"></span>
                                     <input type="number"
                                            name="period"
                                            class="input-text qty"
                                            data-validate='{"required-number":true, "validate-number-range":"2-9999999999"}'
                                            ko-value="product.period"
                                            data-bind="attr:{name: $parent.getFieldName(product, 'period')}"/>
-                                    <span translate="'payment(s)'"/>
+                                    <span translate="'payment(s)'"></span>
                                 </label>
                             </div>
                         </div>
@@ -178,5 +178,5 @@
     </table>
 </div>
 <button type="submit" id="product-subscribe-button" class="action primary tocart">
-    <span data-role="button-text" text="buttonLabel"/>
+    <span data-role="button-text" text="buttonLabel"></span>
 </button>

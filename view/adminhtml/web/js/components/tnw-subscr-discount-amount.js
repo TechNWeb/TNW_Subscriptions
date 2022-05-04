@@ -81,7 +81,7 @@ define([
             if (discountTypeValue == 1) {
                 // currency
                 var amount = formatPrice.formatPrice(discountAmount, priceFormat);
-                notice = this.currencySymbol + amount;
+                notice = amount;
             } else if (discountTypeValue == 2) {
                 // percent
                 notice = discountAmount + this.percentSymbol;

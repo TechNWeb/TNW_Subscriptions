@@ -7,7 +7,7 @@
 <if args="$row()['extension_attributes']['subs_trial_price'] && isAllowed()">
     <div class="price-box price-final_price">
         <span class="price-wrapper" data-role="priceBox">
-            <span class="price" html="$row()['extension_attributes']['subs_trial_price']"/>
+            <span class="price" html="$row()['extension_attributes']['subs_trial_price']"></span>
         </span>
     </div>
 </if>
@@ -20,7 +20,7 @@
                 <span class="price-wrapper"
                       data-price-amount=""
                       data-price-type=""
-                      html="getPrice($row())['msrp_price']"/>
+                      html="getPrice($row())['msrp_price']"></span>
             </span>
         </span>
 
@@ -29,15 +29,15 @@
                     class="action map-show-info"
                     data-role="msrp-popup-trigger"
                     aria-haspopup="true">
-                <span translate="'Click for price'"/>
+                <span translate="'Click for price'"></span>
             </button>
 
-            <render args="popupTmpl"/>
+            <render args="popupTmpl"></render>
         </if>
 
         <ifnot args="isShowPriceOnGesture($row())">
             <span class="msrp-message"
-                  html="getMsrpPriceMessage($row())" />
+                  html="getMsrpPriceMessage($row())" ></span>
         </ifnot>
     </div>
 
@@ -46,7 +46,7 @@
              if="isAllowed()">
             <each args="data: getPrices($row()), as: '$price'">
                 <with args="$price">
-                    <render args="getBody()"/>
+                    <render args="getBody()"></render>
                 </with>
             </each>
         </div>

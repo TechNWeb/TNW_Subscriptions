@@ -1,4 +1,4 @@
-<!--@subject {{trans "Subscription status change of %sub_label profile on" sub_label=$subscription.getLabel()}} {{config path="general/store_information/name"}} @-->
+<!--@subject {{trans "Subscription status change of %sub_label profile on" sub_label=$subscription_data.label}} {{config path="general/store_information/name"}} @-->
 <!--@vars {
 "template config_path=\"design\/email\/header_template\"":"Email Header Template",
 "template config_path=\"design\/email\/footer_template\"":"Email Footer Template",
@@ -7,7 +7,8 @@
 "var newStatus":"New Subscription Status",
 "var customerName":"Customer Name",
 "var subscription":"Subscription Profile",
-"layout handle=\"subscriptions_email_profile_items\" subscriptionProfile=$subscription":"Subscription Items Grid"
+"var subscription_data":"Subscription Profile Data",
+"layout handle=\"subscriptions_email_profile_items\" subscription_id=$subscription_data.id":"Subscription Items Grid"
 } @-->
 {{template config_path="design/email/header_template"}}
 <table>
@@ -15,7 +16,7 @@
         <td>
             <p class="greeting">{{trans 'Dear %customerName,' customerName=$customerName}}</p>
             <p>
-                {{trans 'The Status of your subscription profile'}} <a href="{{store url='tnw_subscriptions/subscription/edit' entity_id=$subscription.getId()}}">{{var subscription.getLabel()}}</a> {{trans 'has changed to <strong>%newStatus</strong>' newStatus=$newStatus |raw}}
+                {{trans 'The Status of your subscription profile'}} <a href="{{store url='tnw_subscriptions/subscription/edit' entity_id=$subscription_data.id}}">{{var subscription_data.label}}</a> {{trans 'has changed to <strong>%newStatus</strong>' newStatus=$newStatus |raw}}
             </p>
             <p>
                 {{trans '<a href="%account_url">Log into your account</a> to make any changes to your recurring profile. You can find it under the My Subscriptions tab after you authenticate.' account_url=$this.getUrl($store,'customer/account/',[_nosid:1]) |raw}}
@@ -31,7 +32,7 @@
         {{trans 'The next payment will occur on %date.' date=$date}}
     {{/if}}
 </p>
-{{layout handle="subscriptions_email_profile_items" subscriptionProfile=$subscription area="frontend"}}
+{{layout handle="subscriptions_email_profile_items" subscription_profile_id=$subscription_data.id area="frontend"}}
 <p>
     {{trans 'To make changes to your recurring order <a href="%account_url">log into your account</a>' account_url=$this.getUrl($store,'customer/account/',[_nosid:1]) |raw}}
 </p>

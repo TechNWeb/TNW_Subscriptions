@@ -89,7 +89,9 @@ class Discount extends BaseModifier
                 'additionalClasses' => 'admin__field-small long_note',
                 'priceFormat' => $this->getPriceFormatData(),
                 'validation' => [
-                    'discount-less-then-price' => true
+                    'discount-less-then-price' => true,
+                    'validate-zero-or-greater' => true,
+                    'validate-number' => true,
                 ],
                 'default' => $discountAmountValue,
             ]

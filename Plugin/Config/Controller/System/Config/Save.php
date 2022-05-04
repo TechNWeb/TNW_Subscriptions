@@ -34,11 +34,13 @@ class Save
         $groups = $subject->getRequest()->getPost('groups');
         $section = $subject->getRequest()->getParam('section');
         if ($section == 'tnw_subscriptions_payment_methods') {
-            foreach ($groups as $groupName => $fields) {
-                if ($groupName == 'active_methods') {
-                    if (array_key_exists('fields', $fields) && is_array($fields['fields'])) {
-                        foreach ($fields['fields'] as $fieldName => $valueData) {
-                            $this->structure->addDynamicConfigPath($section . '/' . $groupName . '/' . $fieldName);
+            if (is_array($groups)) {
+                foreach ($groups as $groupName => $fields) {
+                    if ($groupName == 'active_methods') {
+                        if (array_key_exists('fields', $fields) && is_array($fields['fields'])) {
+                            foreach ($fields['fields'] as $fieldName => $valueData) {
+                                $this->structure->addDynamicConfigPath($section . '/' . $groupName . '/' . $fieldName);
+                            }
                         }
                     }
                 }

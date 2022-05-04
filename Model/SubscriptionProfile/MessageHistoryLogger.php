@@ -90,7 +90,7 @@ class MessageHistoryLogger
         self::MESSAGE_SUBSCRIPTION_PRODUCT_CHANGED => 'Changed [Product %s] to [Product %s]',
         self::MESSAGE_SUBSCRIPTION_PRODUCT_STOCK => 'Products %s were out of stock and not ordered.',
         self::PAYMENT_METHOD_DATA_CHANGED => 'Payment data changed for %s from %s to %s',
-        self::COUPON_INVALID => 'Applied coupon %1 is not eligible for this order and was skipped.'
+        self::COUPON_INVALID => 'Applied coupon %s is not eligible for this order and was skipped.'
     ];
 
     /**
@@ -177,16 +177,18 @@ class MessageHistoryLogger
         $isVisibleOnFront = true,
         $isAutomatedProcess = false
     ) {
-        array_unshift($params, $this->getMessage($index));
-        $this->log(sprintf(... $params), $subscriptionId, $isComment, $isVisibleOnFront, $isAutomatedProcess);
+        $this->log(
+            vsprintf($this->getMessage($index)->render(), $params),
+            $subscriptionId,
+            $isComment,
+            $isVisibleOnFront,
+            $isAutomatedProcess
+        );
     }
 
     /**
-     * Get message by index.
-     *
-     * @param int $index
-     * @return string
-     * @deprecated
+     * @param $index
+     * @return \Magento\Framework\Phrase|string
      */
     public function getMessage($index)
     {

@@ -6,9 +6,9 @@
 -->
 <strong if="isAllowed()"
         class="product-item-name">
-    <a attr="href: $row().url" html="getNameUnsanitizedHtml($col.getLabel($row()))"/>
+    <a attr="href: $row().url" html="getNameUnsanitizedHtml($col.getLabel($row()))"></a>
 </strong>
 <strong if="isAllowed() && $row()['extension_attributes']['subs_top_message']"
         class="product-item-name">
-    <span html="$row()['extension_attributes']['subs_top_message']"/>
+    <span html="$row()['extension_attributes']['subs_top_message']"></span>
 </strong>

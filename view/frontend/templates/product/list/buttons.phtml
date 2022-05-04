@@ -17,7 +17,7 @@ $position = $block->getCurrentPosition();
 $isTrialAllowedForCustomer = !in_array((int)$_product->getId(), $block->getCurrentCustomerProductsHistoryList(), true);
 ?>
 
-<div class="actions-primary<?= /* @noEscape */ strpos($pos, $viewMode . '-primary') ? $position : ''; ?>">
+<div class="actions-primary<?= /* @noEscape */ $pos && strpos($pos, $viewMode . '-primary') ? $position : ''; ?>">
     <?php if ($_product->isSaleable()): ?>
         <?php if ($block->isSubscribeAvailable($_product) && !$block->isOneTimePurchase($_product) && $block->isBillingFrequencySet()): ?>
             <?php if ($_product->getTypeId() == "configurable"): ?>
