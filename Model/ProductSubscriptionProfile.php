@@ -247,7 +247,12 @@ class ProductSubscriptionProfile extends AbstractExtensibleModel implements Prod
      */
     public function getMagentoProduct()
     {
-        return $this->productRepository->getById($this->getMagentoProductId());
+        try {
+            $ptoduct = $this->productRepository->getById($this->getMagentoProductId());
+        } catch (\Exception $e) {
+            $ptoduct = null;
+        }
+        return $ptoduct;
     }
 
     /**
@@ -266,8 +271,10 @@ class ProductSubscriptionProfile extends AbstractExtensibleModel implements Prod
     {
         try {
             $taxClassKey = $this->taxClassKeyFactory->create();
-            $taxClassKey->setType(TaxClassKeyInterface::TYPE_ID)
-                ->setValue($this->getMagentoProduct()->getTaxClassId());
+            $taxClassKey->setType(TaxClassKeyInterface::TYPE_ID);
+            if ($this->getMagentoProduct()) {
+                $taxClassKey->setValue($this->getMagentoProduct()->getTaxClassId());
+            }
 
             if ($subscriptionProfile->getCustomer()) {
                 $group = $this->groupRepository->getById($subscriptionProfile->getCustomer()->getGroupId());
@@ -284,7 +291,11 @@ class ProductSubscriptionProfile extends AbstractExtensibleModel implements Prod
             $item = $this->quoteDetailsItemFactory->create();
             $item->setQuantity($this->getQty())
                 ->setCode($this->getSku())
-                ->setShortDescription($this->getMagentoProduct()->getShortDescription())
+                ->setShortDescription(
+                    $this->getMagentoProduct()
+                        ? $this->getMagentoProduct()->getShortDescription()
+                        : ''
+                )
                 ->setTaxClassKey($taxClassKey)
                 ->setIsTaxIncluded(false)
                 ->setType('product')

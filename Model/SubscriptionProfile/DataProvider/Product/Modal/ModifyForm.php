@@ -1053,7 +1053,11 @@ class ModifyForm extends Form
                         'dataScope' => 'trial_period',
                         'elementTmpl' => 'TNW_Subscriptions/form/element/simple-label',
                         'additionalClasses' => 'field-wide',
-                        'visible' => $this->getTrialPeriod($this->currentProduct->getId()) ? true : false,
+                        'visible' => $this->getTrialPeriod(
+                            $this->currentProduct
+                                ? $this->currentProduct->getId()
+                                : null
+                        ) ? true : false,
                         'previewLabel' => '%s',
                         'component' => 'TNW_Subscriptions/js/components/field/preview-field',
                         'template' => 'TNW_Subscriptions/form/element/template/field-with-preview',
@@ -1140,11 +1144,14 @@ class ModifyForm extends Form
      */
     protected function canUseQtyDecimals()
     {
-        return $this->stockRegistry->getStockItem(
-            $this->currentProduct->getId(),
-            $this->currentProduct->getStore()->getWebsiteId()
-        )
-            ->getIsQtyDecimal();
+        if ($this->currentProduct) {
+            return $this->stockRegistry->getStockItem(
+                $this->currentProduct->getId(),
+                $this->currentProduct->getStore()->getWebsiteId()
+            )
+                ->getIsQtyDecimal();
+        }
+        return false;
     }
 
     /**
@@ -1344,8 +1351,11 @@ class ModifyForm extends Form
         if ($childProduct) {
             $arguments['child_product'] = $childProduct;
         }
-        $productData = $this->getProductObjectData($this->currentProduct->getId(), $arguments);
-        return $productData->getData($subAttribute);
+        if ($this->currentProduct) {
+            $productData = $this->getProductObjectData($this->currentProduct->getId(), $arguments);
+            return $productData->getData($subAttribute);
+        }
+        return null;
     }
 
     /**
