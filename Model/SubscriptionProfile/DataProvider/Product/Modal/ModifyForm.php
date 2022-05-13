@@ -306,7 +306,7 @@ class ModifyForm extends Form
 
             /** @var ModifierInterface $modifier */
             foreach ($this->pool->getModifiersInstances() as $modifier) {
-                $modifier->setItem($this->currentItem);
+                $modifier->setItem($item);
                 $itemMeta = $modifier->modifyMeta($itemMeta);
             }
 
