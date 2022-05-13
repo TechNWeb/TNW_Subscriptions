@@ -179,10 +179,13 @@ class SummaryProductsForm extends ModifyForm
                 $data[$subQuote->getId()]['item_' . $item->getId()] = [
                     'price' => $itemPrice,
                     'billing_frequency' => $billingFrequencyId,
-                    'frequency_data' => $this->getFrequenciesData(false, $product->getId()),
+                    'frequency_data' => !$isProductDeleted
+                        ? $this->getFrequenciesData(false, $product->getId())
+                        : []
+                    ,
                     'term' => (string)$term,
                     'period' => $subQuote->getTotalBillingCycles(),
-                    'trial_period' => $this->getTrialPeriod($product->getId()),
+                    'trial_period' => $this->getTrialPeriod(!$isProductDeleted ? $product->getId() : null),
                     'unlock_preset_qty' => $presetQty,
                     'start_on' => (new \DateTime($startOn))->format('Y-m-d'),
                     'name' => $isProductDeleted ? $item->getName() : $product->getName(),
@@ -192,7 +195,9 @@ class SummaryProductsForm extends ModifyForm
                     'is_product_deleted' => $isProductDeleted,
                     'price_incl_tax' => $priceInclTax,
                 ];
-                $data[$subQuote->getId()]['locked_price'] = $this->priceCalculator->getProductLockPriceSatus($product);
+                $data[$subQuote->getId()]['locked_price'] = !$isProductDeleted
+                    ? $this->priceCalculator->getProductLockPriceSatus($product)
+                    : false;
 
                 /** @var Base $modifier */
                 foreach ($this->pool->getModifiersInstances() as $modifier) {
@@ -614,7 +619,11 @@ class SummaryProductsForm extends ModifyForm
                         'componentType' => UiForm\Field::NAME,
                         'elementTmpl' => 'ui/form/element/select',
                         'caption' => __('-- Please Select --'),
-                        'options' => $this->getProductBillingFrequenciesAsOptionArray($this->currentProduct->getId()),
+                        'options' => $this->getProductBillingFrequenciesAsOptionArray(
+                            $this->currentProduct
+                                ? $this->currentProduct->getId()
+                                : null
+                        ),
                         'dataScope' => 'billing_frequency',
                         'additionalClasses' => 'field-wide',
                         'additionalForGroup' => false,

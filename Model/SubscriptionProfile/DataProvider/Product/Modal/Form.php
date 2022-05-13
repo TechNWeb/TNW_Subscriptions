@@ -749,8 +749,13 @@ class Form extends AbstractDataProvider
             if (!empty($child)) {
                 $childProductId =  $child->getMagentoProductId() ?? $child->getProductId();
             }
+            try {
+                $childProudct = $this->formContext->getProductRepository()->getById($childProductId);
+            } catch (\Exception $e) {
+                $childProudct = null;
+            }
             return !empty($childProductId)
-                ? $this->formContext->getProductRepository()->getById($childProductId)
+                ? $childProudct
                 : null;
         }
         return null;

@@ -1111,20 +1111,29 @@ class Manager
         //Add products
         foreach ($profile->getVisibleProducts() as $profileProduct) {
             $magentoProduct = $profileProduct->getMagentoProduct();
-            $magentoProduct->getTypeInstance()->setStoreFilter(
-                $profile->getStore(),
-                $magentoProduct
-            );
+            $isProductDelented = !isset($magentoProduct);
+            if (!$isProductDelented) {
+                $magentoProduct->getTypeInstance()->setStoreFilter(
+                    $profile->getStore(),
+                    $magentoProduct
+                );
+            }
             if ($isReBill) {
                 $profileProduct->setTrialStatus(0);
-                $magentoProduct->setTnwSubscrTrialStatus(0);
+                if (!$isProductDelented) {
+                    $magentoProduct->setTnwSubscrTrialStatus(0);
+                }
             }
             $quoteItemCreated = true;
             try {
-                $quoteItem = $quote->addProduct(
-                    $magentoProduct,
-                    $this->getProductAddRequest($profileProduct, $isReBill)
-                );
+                if (!$isProductDelented) {
+                    $quoteItem = $quote->addProduct(
+                        $magentoProduct,
+                        $this->getProductAddRequest($profileProduct, $isReBill)
+                    );
+                } else {
+                    $quoteItemCreated = false;
+                }
             } catch (\Magento\Framework\Exception\LocalizedException $e) {
                 $quoteItemCreated = false;
                 $outOfStockProducts[$magentoProduct->getId()] = $magentoProduct->getName();
