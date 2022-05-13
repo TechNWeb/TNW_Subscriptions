@@ -752,8 +752,10 @@ class ModifyForm extends Form
     {
         $isDisable = false;
         $data = $this->getData();
-
-        if (is_array($data) && in_array('new_subscription', $data) && count($data['new_subscription']) <= 1) {
+        if (is_array($data)
+            && array_key_exists('new_subscription', $data)
+            && count($data['new_subscription']) <= 1
+        ) {
             $isDisable = true;
         }
 
