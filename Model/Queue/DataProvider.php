@@ -11,7 +11,8 @@ use TNW\Subscriptions\Api\Data\SubscriptionProfileQueueInterface;
 use TNW\Subscriptions\Model\Source\Queue\Status as QueueStatus;
 use TNW\Subscriptions\Model\ResourceModel\Queue\Collection;
 use TNW\Subscriptions\Model\ResourceModel\Queue\CollectionFactory;
-use Magento\AdminGws\Model\Collections;
+use Magento\Framework\ObjectManagerInterface as ObjectManager;
+use Magento\Framework\Module\Manager as ModuleManager;
 
 /**
  * Class queue listing data provider
@@ -19,7 +20,7 @@ use Magento\AdminGws\Model\Collections;
 class DataProvider extends AbstractDataProvider
 {
     /**
-     * @var Collections
+     * @var mixed
      */
     private $collectionRoleRestrictor;
 
@@ -29,7 +30,6 @@ class DataProvider extends AbstractDataProvider
      * @param string $primaryFieldName
      * @param string $requestFieldName
      * @param CollectionFactory $collectionFactory
-     * @param Collections $collectionRoleRestrictor
      * @param array $meta
      * @param array $data
      */
@@ -38,11 +38,14 @@ class DataProvider extends AbstractDataProvider
         $primaryFieldName,
         $requestFieldName,
         CollectionFactory $collectionFactory,
-        Collections $collectionRoleRestrictor,
+        ModuleManager $moduleManager,
+        ObjectManager $objectManager,
         array $meta = [],
         array $data = []
     ) {
-        $this->collectionRoleRestrictor = $collectionRoleRestrictor;
+        if ($moduleManager->isEnabled("Magento_AdminGws")) {
+            $this->collectionRoleRestrictor = $objectManager->get(\Magento\AdminGws\Model\Collections::class);
+        }
         $this->collection = $collectionFactory->create();
         $this->addColumnsFiltersToMap();
 
@@ -87,7 +90,9 @@ class DataProvider extends AbstractDataProvider
                 'subscription_profile.website_id'
             ]
         );
-        $this->collectionRoleRestrictor->addStoreFilter($collection);
+        if (isset($this->collectionRoleRestrictor)) {
+            $this->collectionRoleRestrictor->addStoreFilter($collection);
+        }
         return $collection->toArray();
     }
 
