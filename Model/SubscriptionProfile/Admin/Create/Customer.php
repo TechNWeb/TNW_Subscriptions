@@ -226,11 +226,13 @@ class Customer extends Create
             case MagentoQuote\Address::ADDRESS_TYPE_BILLING:
                 if ($customer->getDefaultBilling() === null) {
                     $customerAddress->setIsDefaultBilling(true);
+                    $isDefaultBilling = true;
                 }
                 break;
             case MagentoQuote\Address::ADDRESS_TYPE_SHIPPING:
                 if ($customer->getDefaultShipping() === null) {
                     $customerAddress->setIsDefaultShipping(true);
+                    $isDefaultShipping = true;
                 }
                 break;
             default:
@@ -238,7 +240,17 @@ class Customer extends Create
         }
         //save address to customer.
         $addresses = (array)$customer->getAddresses();
-        $addresses[] = $customerAddress;
+        if ($customer->getId()) {
+            $customerAddress->setCustomerId($customer->getId());
+            $customerAddress = $this->addressRepository->save($customerAddress);
+            if (isset($isDefaultBilling)) {
+                $customer->setDefaultBilling($customerAddress->getId());
+            }
+            if (isset($isDefaultShipping)) {
+                $customer->setDefaultShipping($customerAddress->getId());
+            }
+            $addresses[] = $customerAddress;
+        }
         $customer->setAddresses($addresses);
         return $this->customerRepository->save($customer);
     }
