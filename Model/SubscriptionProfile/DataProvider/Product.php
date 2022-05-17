@@ -197,14 +197,19 @@ class Product extends AbstractDataProvider
                     $fullSubscriptionData = $item->getBuyRequest()->getDataByPath(
                         Create::SUBSCRIPTION_BUY_REQUEST_PARAM_NAME
                     );
+                    $fullProductPrice = $fullSubscriptionData[Create::NON_UNIQUE]['price'];
                     $fullSubscriptionData[Create::NON_UNIQUE]['price'] = 0;
                 }
                 $qty = !empty($fullSubscriptionData[Create::UNIQUE]['use_preset_qty']) ? 1 : $item->getQty();
-                $price = isset($nonUniqueData['current_price']) ? $nonUniqueData['current_price'] * $qty : 0;
-                if (!$price) {
-                    $price = isset($nonUniqueData['price']) ? $nonUniqueData['price'] * $qty : 0;
+                if ($fullSubscriptionData[Create::UNIQUE]['is_trial'] && isset($fullProductPrice)) {
+                    $fullSubscriptionData[Create::NON_UNIQUE]['price'] = $fullProductPrice * $qty;
+                } else {
+                    $price = isset($nonUniqueData['current_price']) ? $nonUniqueData['current_price'] * $qty : 0;
+                    if (!$price) {
+                        $price = isset($nonUniqueData['price']) ? $nonUniqueData['price'] * $qty : 0;
+                    }
+                    $fullSubscriptionData[Create::NON_UNIQUE]['price'] += $price;
                 }
-                $fullSubscriptionData[Create::NON_UNIQUE]['price'] += $price;
 
                 $imageHelper = $this->formContext->getImageHelperForQuoteItem($item, $this::LISTING_IMAGE_ID);
 
