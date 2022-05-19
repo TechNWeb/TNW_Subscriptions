@@ -821,6 +821,10 @@
                     <item name="class" xsi:type="string">TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Modifier\Product\Configurable</item>
                     <item name="sortOrder" xsi:type="number">10</item>
                 </item>
+                <item name="trial" xsi:type="array">
+                    <item name="class" xsi:type="string">TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Modifier\Product\Trial</item>
+                    <item name="sortOrder" xsi:type="number">15</item>
+                </item>
                 <item name="bundle" xsi:type="array">
                     <item name="class" xsi:type="string">TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Modifier\Product\Bundle</item>
                     <item name="sortOrder" xsi:type="number">20</item>

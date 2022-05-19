@@ -166,7 +166,9 @@ class Form extends AbstractDataProvider
             unset($additionalData['bundle_option']['qty']);
         }
         $data[self::FORM_DATA_VALUE] = $this->getFrequenciesData(true, $productId, $additionalData);
-
+        foreach ($this->pool->getModifiersInstances() as $modifier) {
+            $data = $modifier->modifyData($data);
+        }
         return $data;
     }
 
