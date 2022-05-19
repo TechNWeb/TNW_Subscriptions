@@ -362,6 +362,8 @@ class CreateProfile extends BaseCreate
                 $this->productModifier->getPreparedBuyRequest()
             );
             if ($item instanceof Item) {
+                $this->productModifier->setData($productData);
+                $this->productModifier->setProduct($product);
                 $this->productModifier->setInitialFeeToItem($item);
                 $quote->setTotalsCollectedFlag(false);
                 $quote->getShippingAddress()->setCollectShippingRates(true);

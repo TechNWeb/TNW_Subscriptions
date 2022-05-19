@@ -193,28 +193,47 @@ define(
             /**
              * update product options on current form and save form.
              */
-            updateProductOptions: function() {
+            updateProductOptions: function () {
                 var data,
                     itemId,
-                    productOptionsData = registry.get('index=' + this.source.editOptionsForm).source.data,
+                    productOptionsForm = registry.get('index=' + this.source.editOptionsForm),
+                    productOptionsData = productOptionsForm.source.data,
+                    editOptionsModal = registry.get('index=' + this.source.editOptionsModal),
                     currentItemData;
 
-                if (typeof productOptionsData != 'undefined'
-                    && typeof productOptionsData.super_attribute != 'undefined'
+                productOptionsForm.validate();
+
+                if (!productOptionsForm.additionalInvalid
+                    && !productOptionsForm.source.get('params.invalid')
+                    && typeof productOptionsData != 'undefined'
                     && typeof productOptionsData.item_data != 'undefined'
                 ) {
                     itemId = productOptionsData.item_data.item_id;
 
                     if (itemId && typeof this.source.data['item_' + itemId] != 'undefined') {
                         currentItemData = this.source.data['item_' + itemId];
-                        currentItemData['super_attribute'] = productOptionsData.super_attribute;
+
+                        if (typeof productOptionsData.super_attribute != 'undefined') {
+                            currentItemData['super_attribute'] = productOptionsData.super_attribute;
+                        }
+
+                        if (typeof productOptionsData.bundle_option != 'undefined'
+                            && typeof productOptionsData.bundle_option.qty != 'undefined') {
+                            currentItemData['bundle_option'] = productOptionsData.bundle_option;
+                            currentItemData['bundle_option_qty'] = productOptionsData.bundle_option.qty;
+                        }
 
                         data = {
                             'objectId': productOptionsData.item_data.quote_id,
                             'objectItemId': itemId
                         };
+
+                        if (editOptionsModal) {
+                            editOptionsModal.closeModal();
+                        }
+
+                        this.save('', data);
                     }
-                    this.save('', data);
                 }
             }
         });

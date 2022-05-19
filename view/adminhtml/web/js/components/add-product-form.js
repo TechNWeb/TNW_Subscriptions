@@ -122,17 +122,18 @@ define(
              * Updates Configurable data and renders modal form
              */
             setConfigurableData: function () {
-                var data;
+                var configurableForm = registry.get('index=' + this.source.configurableForm),
+                    data = configurableForm.source.data;
 
-                data = registry.get('index=' + this.source.configurableForm).source.data;
+                configurableForm.validate();
 
-                this.getModalForm().configurableData = $.extend(this.getModalForm().configurableData, data);
-
-                this.updateModalGrid();
-
-                this.setAdditionalData(this.getModalForm().configurableData);
-
-                this.renderForm(this.getModalForm(), this.getModalForm().configurableData);
+                if (!configurableForm.additionalInvalid && !configurableForm.source.get('params.invalid')) {
+                    this.getModalForm().configurableData = $.extend(this.getModalForm().configurableData, data);
+                    this.updateModalGrid();
+                    this.setAdditionalData(this.getModalForm().configurableData);
+                    this.renderForm(this.getModalForm(), this.getModalForm().configurableData);
+                    this.getConfigurableModal().closeModal();
+                }
             },
 
             /**
@@ -176,7 +177,7 @@ define(
                 _.each(grid.externalSource().data.items, function (item, key) {
                     grid.externalSource().set('data.items.' + key + '.input_qty', null);
 
-                    if (item.type_id === 'configurable') {
+                    if (item.type_id === 'configurable' || item.type_id === 'bundle') {
                         grid.externalSource().set(
                             'data.items.' + key + '.actions.view.label',
                             '[' + $.mage.__('Configure & Add') + ']'
@@ -206,7 +207,7 @@ define(
                 this.resetQtyAndActions();
                 rowIndex = this.getProductRowIndex(productId);
 
-                if (rowIndex !== undefined){
+                if (rowIndex !== undefined) {
                     grid.externalSource().set(
                         'data.items.' + rowIndex + '.input_qty',
                         this.getModalForm().configurableData.subscribe_qty
@@ -222,7 +223,7 @@ define(
              * Finds and returns in uiRegistry Configurable modal window
              */
             getConfigurableModal: function () {
-                if (!this.configurableModal){
+                if (!this.configurableModal) {
                     this.configurableModal = registry.get('index=' + this.source.configurableModal);
                 }
 
@@ -230,7 +231,7 @@ define(
             },
 
             getModalForm: function () {
-                if (!this.modalForm){
+                if (!this.modalForm) {
                     this.modalForm = registry.get('index=' + this.source.insertForm);
                 }
 

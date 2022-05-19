@@ -245,6 +245,7 @@ class Context implements ContextInterface
             case \Magento\Catalog\Model\Product\Type::TYPE_SIMPLE:
             case \Magento\Catalog\Model\Product\Type::TYPE_VIRTUAL:
             case \Magento\Downloadable\Model\Product\Type::TYPE_DOWNLOADABLE:
+            case \Magento\Catalog\Model\Product\Type::TYPE_BUNDLE:
                 $currentProduct = $quoteItem->getProduct();
                 $imageHelper->init(
                     $currentProduct,
@@ -295,6 +296,7 @@ class Context implements ContextInterface
                 case \Magento\Catalog\Model\Product\Type::TYPE_SIMPLE:
                 case \Magento\Catalog\Model\Product\Type::TYPE_VIRTUAL:
                 case \Magento\Downloadable\Model\Product\Type::TYPE_DOWNLOADABLE:
+                case \Magento\Bundle\Model\Product\Type::TYPE_CODE:
                     $currentProduct = $item->getMagentoProduct();
                     $imageHelper->init(
                         $currentProduct,

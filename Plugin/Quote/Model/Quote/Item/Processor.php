@@ -5,39 +5,45 @@
  */
 namespace TNW\Subscriptions\Plugin\Quote\Model\Quote\Item;
 
+use Magento\Bundle\Model\Product\Type as TypeBundle;
+use Magento\Catalog\Model\Product as ProductModel;
+use Magento\Framework\DataObject;
+use Magento\Quote\Model\Quote\Item;
+use TNW\Subscriptions\Model\SubscriptionProfile\Admin\Create\Product;
+
 /**
  * Class Processor - plugin to add additional logic for Magento\Quote\Model\Quote\Item\Processor::prepare method
  */
 class Processor
 {
     /**
-     * @var \TNW\Subscriptions\Model\SubscriptionProfile\Admin\Create\Product
+     * @var Product
      */
     private $productModifier;
 
     /**
      * Processor constructor.
-     * @param \TNW\Subscriptions\Model\SubscriptionProfile\Admin\Create\Product $productModifier
+     * @param Product $productModifier
      */
     public function __construct(
-        \TNW\Subscriptions\Model\SubscriptionProfile\Admin\Create\Product $productModifier
+        Product $productModifier
     ) {
         $this->productModifier = $productModifier;
     }
 
     /**
-     * @param \Magento\Quote\Model\Quote\Item\Processor $subject
+     * @param Item\Processor $subject
      * @param callable $callback
-     * @param \Magento\Quote\Model\Quote\Item $item
-     * @param \Magento\Framework\DataObject $request
-     * @param \Magento\Catalog\Model\Product $candidate
+     * @param Item $item
+     * @param DataObject $request
+     * @param ProductModel $candidate
      */
     public function aroundPrepare(
-        \Magento\Quote\Model\Quote\Item\Processor $subject,
+        Item\Processor $subject,
         callable $callback,
-        \Magento\Quote\Model\Quote\Item $item,
-        \Magento\Framework\DataObject $request,
-        \Magento\Catalog\Model\Product $candidate
+        Item $item,
+        DataObject $request,
+        ProductModel $candidate
     ) {
         $callback($item, $request, $candidate);
 
@@ -47,14 +53,20 @@ class Processor
             $this->productModifier->setData($buyRequest->getData());
             $this->productModifier->setProduct($candidate);
 
-            // Set initial fee
-            $this->productModifier->setInitialFeeToItem($item);
+            // Set initial fee to item, except bundle children
+            if (!isset($request['bundle_option'])
+                || $candidate->getTypeId() === TypeBundle::TYPE_CODE
+            ) {
+                $this->productModifier->setInitialFeeToItem($item);
+            }
 
             // In case of grouped product child items, we need to set custom price from their buyRequest
-            $customPrice = $buyRequest->getCustomPrice();
-            if (!empty($customPrice) && !$item->getCustomPrice()) {
-                $item->setCustomPrice($customPrice);
-                $item->setOriginalCustomPrice($customPrice);
+            if (isset($request['subs_group'])) {
+                $customPrice = $buyRequest->getCustomPrice();
+                if (!empty($customPrice) && !$item->getCustomPrice()) {
+                    $item->setCustomPrice($customPrice);
+                    $item->setOriginalCustomPrice($customPrice);
+                }
             }
         }
     }

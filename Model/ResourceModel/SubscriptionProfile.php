@@ -62,29 +62,6 @@ class SubscriptionProfile extends AbstractEntity
     }
 
     /**
-     * Get sum of all paid subscription profile orders.
-     *
-     * @param \Magento\Framework\Model\AbstractModel $object
-     * @return string
-     */
-    public function getCurrentValue(\Magento\Framework\Model\AbstractModel $object)
-    {
-        if ($profileProducts = $object->getProducts()) {
-            $product = array_shift($profileProducts);
-            $profit = $product->getData('initial_fee') ? : 0;
-        } else {
-            $profit = 0;
-        }
-        $invoiceItems = $this->getInvoiceItems($object);
-
-        foreach ($invoiceItems as $item) {
-            $profit += $item['base_row_total_incl_tax'];
-        }
-
-        return (float) $profit;
-    }
-
-    /**
      * Get sum of all generated non-paid quotes for subscription profile.
      *
      * @param \Magento\Framework\Model\AbstractModel $object
@@ -96,11 +73,13 @@ class SubscriptionProfile extends AbstractEntity
         $profit = 0;
         $invoicedCount = count($invoiceItems);
         foreach ($invoiceItems as $invoiceItem) {
-            $profit += $invoiceItem['base_row_total_incl_tax'];
+            $profit += $invoiceItem['base_row_total_incl_tax']
+                ?? $invoiceItem['qty'] * $invoiceItem['base_price_incl_tax'];
         }
         $lastInvoiceItem = array_pop($invoiceItems);
         if ($lastInvoiceItem) {
-            $profitOfLastItem = $lastInvoiceItem['base_row_total_incl_tax'];
+            $profitOfLastItem = $lastInvoiceItem['base_row_total_incl_tax']
+                ?? $lastInvoiceItem['qty'] * $lastInvoiceItem['base_price_incl_tax'];
         } else {
             $profitOfLastItem = 0;
         }
@@ -213,7 +192,7 @@ class SubscriptionProfile extends AbstractEntity
      * @param \Magento\Framework\Model\AbstractModel $object
      * @return array
      */
-    private function getInvoiceItems(\Magento\Framework\Model\AbstractModel $object)
+    public function getInvoiceItems(\Magento\Framework\Model\AbstractModel $object)
     {
         if (!array_key_exists($object->getId(), $this->invoiceItems)) {
             $select = $this->getConnection()->select()
@@ -229,6 +208,11 @@ class SubscriptionProfile extends AbstractEntity
                     ['profileItem' => $this->getTable('tnw_subscriptions_product_subscription_profile_entity')],
                     'salesRelative.profile_item_id = profileItem.entity_id',
                     []
+                )
+                ->joinInner(
+                    ['orderItem' => $this->getTable('sales_order_item')],
+                    'invoiceItem.order_item_id = orderItem.item_id',
+                    ['product_type']
                 )
                 ->where('profileItem.subscription_profile_id = ?', $object->getId());
             $this->invoiceItems[$object->getId()] = $this->getConnection()->fetchAll($select);
@@ -256,32 +240,21 @@ class SubscriptionProfile extends AbstractEntity
     }
 
     /**
-     * @param $profile
+     * Get children invoice items by sales_order item_id
+     * @param $orderItemId
      * @return array
      */
-    public function getProfileInvoicedOrders($profile)
+    public function getInvoiceItemChildren($orderItemId)
     {
-        $connection = $this->getConnection();
-        $select = $connection->select()
-            ->from(
-                ['invoiceItem' => $this->getTable('sales_invoice_item')]
-            )
-            ->joinInner(
-                ['salesRelative' => $this->getTable(
-                    'tnw_subscriptions_profile_item_sales_item'
-                )],
-                'invoiceItem.order_item_id = salesRelative.order_item_id',
-                []
-            )
-            ->joinInner(
-                ['profileItem' => $this->getTable(
-                    'tnw_subscriptions_product_subscription_profile_entity'
-                )],
-                'salesRelative.profile_item_id = profileItem.entity_id',
-                []
-            )
-            ->where('profileItem.subscription_profile_id = ?', $profile->getId());
+        $select = $this->getConnection()->select()
+            ->from(['orderItem' => $this->getTable('sales_order_item')])
+            ->where('orderItem.parent_item_id = ?', $orderItemId);
+        $bundleOrderItems = $this->getConnection()->fetchCol($select);
 
-        return $connection->fetchAll($select);
+        $select = $this->getConnection()->select()
+            ->from(['invoiceItem' => $this->getTable('sales_invoice_item')])
+            ->where('invoiceItem.order_item_id IN (?)', $bundleOrderItems);
+
+        return $this->getConnection()->fetchAll($select);
     }
 }

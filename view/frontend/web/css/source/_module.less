@@ -293,11 +293,23 @@
 
                 .subscription-price-with-savings,
                 .onetime-final-price {
-                    padding-left: 2.2rem;
-                    padding-top: 0.5rem;
+                    padding-left: 0;
+                    padding-top: 0;
                     padding-bottom: 1.5rem;
                     font-weight: bold;
                     color: #b30000;
+                    .minimal-price,
+                    .price-from,
+                    .price-to {
+                        display: none;
+                    }
+                }
+                input[name="addtocart_type"] {
+                    ~.subscription-price-with-savings,
+                    ~.onetime-final-price {
+                        padding-left: 2.2rem;
+                        padding-top: 0.5rem;
+                    }
                 }
 
                 .addtocart-wrapper {
@@ -2157,23 +2169,28 @@
             display: block;
             width: 100%;
 
+            ~.price-final_price {
+                display: none;
+            }
+            .minimal-price,
+            .price-from {
+                ~.price-container,
+                ~.old-price.main,
+                ~.subscription-price-top-messages,
+                ~.subscription-price-bottom-messages {
+                    display: none!important;
+                }
+            }
             .free {
                 font-size: 36px;
                 line-height: 36px;
                 font-weight: 600;
                 text-transform: uppercase;
             }
-
             .old-price {
                 display: block;
             }
         }
-    }
-}
-
-.product-info-main .product-info-price .price-box {
-    &.price-subscription_price ~ .price-final_price {
-        display: none;
     }
 }
 

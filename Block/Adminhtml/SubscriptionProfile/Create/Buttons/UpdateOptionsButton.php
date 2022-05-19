@@ -26,10 +26,6 @@ class UpdateOptionsButton extends GenericButton implements ButtonProviderInterfa
                     'Magento_Ui/js/form/button-adapter' => [
                         'actions' => [
                             [
-                                'targetName' => $this->getEditOptionsModalName(),
-                                'actionName' => 'toggleModal',
-                            ],
-                            [
                                 'targetName' => $this->getFormName(),
                                 'actionName' => 'updateProductOptions',
                             ]

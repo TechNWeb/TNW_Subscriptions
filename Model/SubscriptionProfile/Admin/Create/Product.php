@@ -7,6 +7,7 @@ namespace TNW\Subscriptions\Model\SubscriptionProfile\Admin\Create;
 
 use Magento\Catalog\Api\ProductRepositoryInterface;
 use Magento\Catalog\Model\Product as MagentoProduct;
+use Magento\Catalog\Model\Product\Type;
 use Magento\ConfigurableProduct\Model\Product\Type\Configurable;
 use Magento\Framework\Api\SearchCriteriaBuilder;
 use Magento\Framework\DataObject;
@@ -247,6 +248,13 @@ class Product extends Create
                 if ($childProduct instanceof MagentoProduct) {
                     $this->setChildProduct($childProduct);
                 }
+            }
+            if ($this->getProduct()->getTypeId() === Type::TYPE_BUNDLE
+                && isset($productData['bundle_option'])
+                && isset($productData['bundle_option']['qty'])
+            ) {
+                $productData['bundle_option_qty'] = $productData['bundle_option']['qty'];
+                unset($productData['bundle_option']['qty']);
             }
             // add preset qty param to product request array
             $productData['use_preset_qty'] = $this->getChildProduct()

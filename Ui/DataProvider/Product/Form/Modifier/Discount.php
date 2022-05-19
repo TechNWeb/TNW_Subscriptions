@@ -5,6 +5,7 @@
  */
 namespace  TNW\Subscriptions\Ui\DataProvider\Product\Form\Modifier;
 
+use Magento\Bundle\Model\Product\Type as TypeBundle;
 use Magento\Catalog\Model\Locator\LocatorInterface;
 use Magento\Framework\Stdlib\ArrayManager;
 use Magento\Store\Model\StoreManagerInterface;
@@ -121,6 +122,9 @@ class Discount extends BaseModifier
                 'default' => $discountTypeValue,
             ]
         );
+        if ($this->locator->getProduct()->getTypeId() === TypeBundle::TYPE_CODE) {
+            $meta = $this->arrayManager->remove($discountTypePath . self::META_CONFIG_PATH . '/options/0', $meta);
+        }
         $meta = $this->arrayManager->set(
             $discountAmountContainerPath . '/children/' . Attribute::SUBSCRIPTION_DISCOUNT_TYPE,
             $meta,
@@ -136,6 +140,15 @@ class Discount extends BaseModifier
      */
     public function modifyData(array $data)
     {
+        /**
+         * If bundle product, we need to restrict discount type to percent only
+         */
+        $productId = $this->locator->getProduct()->getId();
+        if ($this->locator->getProduct()->getTypeId() === TypeBundle::TYPE_CODE
+            && isset($data[$productId]['product'][Attribute::SUBSCRIPTION_DISCOUNT_TYPE])
+        ) {
+            $data[$productId]['product'][Attribute::SUBSCRIPTION_DISCOUNT_TYPE] = '2';
+        }
         return $data;
     }
 }

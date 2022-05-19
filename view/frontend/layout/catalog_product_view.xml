@@ -5,22 +5,110 @@
  * See TNW_LICENSE.txt for license details.
  */
 -->
-
 <page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
     <body>
         <referenceContainer name="product.info.form.content">
-            <block name="product.info.addtocart"  as="addtocart" class="TNW\Subscriptions\Block\Product\View\Subscribe" template="TNW_Subscriptions::product/view/addtocart-tabs.phtml">
-                <block class="TNW\Subscriptions\Block\Product\View\Subscribe" name="product.info.addtocart.subscription" as="addtocart_subscribe" template="TNW_Subscriptions::product/view/addtocart/subscribe.phtml"/>
-                <block class="Magento\Catalog\Block\Product\View" name="product.info.addtocart.orig" as="addtocart_orig" template="product/view/addtocart.phtml"/>
+            <block name="product.info.addtocart"  as="addtocart"
+                   class="TNW\Subscriptions\Block\Product\View\Subscribe"
+                   template="TNW_Subscriptions::product/view/addtocart-tabs.phtml">
+                <block class="TNW\Subscriptions\Block\Product\View\Subscribe"
+                       name="product.info.addtocart.subscription" as="addtocart_subscribe"
+                       template="TNW_Subscriptions::product/view/addtocart/subscribe.phtml">
+                    <arguments>
+                        <argument name="customerProductsHistoryList" xsi:type="object">
+                            TNW\Subscriptions\Block\Product\CustomerProductsHistoryList
+                        </argument>
+                    </arguments>
+                    <block name="product.info.addtocart.instantPurchase.subscription"
+                           class="Magento\InstantPurchase\Block\Button"
+                           template="Magento_InstantPurchase::button.phtml" before="-">
+                        <arguments>
+                            <argument name="jsLayout" xsi:type="array">
+                                <item name="components" xsi:type="array">
+                                    <item name="instant-purchase" xsi:type="array">
+                                        <item name="component" xsi:type="string">Magento_InstantPurchase/js/view/instant-purchase</item>
+                                        <item name="config" xsi:type="array">
+                                            <item name="template" xsi:type="string">Magento_InstantPurchase/instant-purchase</item>
+                                        </item>
+                                    </item>
+                                </item>
+                            </argument>
+                        </arguments>
+                    </block>
+                </block>
+                <block class="Magento\Catalog\Block\Product\View"
+                       name="product.info.addtocart.orig" as="addtocart_orig"
+                       template="product/view/addtocart.phtml">
+                    <block name="product.info.addtocart.instantPurchase.orig"
+                           class="Magento\InstantPurchase\Block\Button"
+                           template="Magento_InstantPurchase::button.phtml" before="-">
+                        <arguments>
+                            <argument name="jsLayout" xsi:type="array">
+                                <item name="components" xsi:type="array">
+                                    <item name="instant-purchase" xsi:type="array">
+                                        <item name="component" xsi:type="string">Magento_InstantPurchase/js/view/instant-purchase</item>
+                                        <item name="config" xsi:type="array">
+                                            <item name="template" xsi:type="string">Magento_InstantPurchase/instant-purchase</item>
+                                        </item>
+                                    </item>
+                                </item>
+                            </argument>
+                        </arguments>
+                    </block>
+                </block>
             </block>
         </referenceContainer>
         <referenceBlock name="product.info.options.wrapper.bottom" >
-            <block name="product.info.addtocart.additional" class="TNW\Subscriptions\Block\Product\View\Subscribe" template="TNW_Subscriptions::product/view/addtocart-tabs.phtml">
-                <block class="TNW\Subscriptions\Block\Product\View\Subscribe" name="product.info.addtocart.additional.subscription" as="addtocart_subscribe" template="TNW_Subscriptions::product/view/addtocart/subscribe.phtml"/>
-                <block class="Magento\Catalog\Block\Product\View" name="product.info.addtocart.additional.orig" as="addtocart_orig" template="product/view/addtocart.phtml"/>
+            <block name="product.info.addtocart.additional"
+                   class="TNW\Subscriptions\Block\Product\View\Subscribe"
+                   template="TNW_Subscriptions::product/view/addtocart-tabs.phtml">
+                <block class="TNW\Subscriptions\Block\Product\View\Subscribe"
+                       name="product.info.addtocart.additional.subscription" as="addtocart_subscribe"
+                       template="TNW_Subscriptions::product/view/addtocart/subscribe.phtml">
+                    <arguments>
+                        <argument name="customerProductsHistoryList" xsi:type="object">
+                            TNW\Subscriptions\Block\Product\CustomerProductsHistoryList
+                        </argument>
+                    </arguments>
+                    <block name="product.info.addtocart.instantPurchase.additional.subscription"
+                           class="Magento\InstantPurchase\Block\Button"
+                           template="Magento_InstantPurchase::button.phtml" before="-">
+                        <arguments>
+                            <argument name="jsLayout" xsi:type="array">
+                                <item name="components" xsi:type="array">
+                                    <item name="instant-purchase" xsi:type="array">
+                                        <item name="component" xsi:type="string">Magento_InstantPurchase/js/view/instant-purchase</item>
+                                        <item name="config" xsi:type="array">
+                                            <item name="template" xsi:type="string">Magento_InstantPurchase/instant-purchase</item>
+                                        </item>
+                                    </item>
+                                </item>
+                            </argument>
+                        </arguments>
+                    </block>
+                </block>
+                <block class="Magento\Catalog\Block\Product\View"
+                       name="product.info.addtocart.additional.orig" as="addtocart_orig"
+                       template="product/view/addtocart.phtml">
+                    <block name="product.info.addtocart.instantPurchase.additional.orig"
+                           class="Magento\InstantPurchase\Block\Button"
+                           template="Magento_InstantPurchase::button.phtml" before="-">
+                        <arguments>
+                            <argument name="jsLayout" xsi:type="array">
+                                <item name="components" xsi:type="array">
+                                    <item name="instant-purchase" xsi:type="array">
+                                        <item name="component" xsi:type="string">Magento_InstantPurchase/js/view/instant-purchase</item>
+                                        <item name="config" xsi:type="array">
+                                            <item name="template" xsi:type="string">Magento_InstantPurchase/instant-purchase</item>
+                                        </item>
+                                    </item>
+                                </item>
+                            </argument>
+                        </arguments>
+                    </block>
+                </block>
             </block>
         </referenceBlock>
-
         <referenceContainer name="product.info.price">
             <block class="Magento\Catalog\Pricing\Render" name="product.subscription.price.final" before="product.price.final">
                 <arguments>
@@ -31,81 +119,6 @@
                 </arguments>
             </block>
         </referenceContainer>
-
-        <referenceBlock name="product.info.addtocart.orig">
-            <block name="product.info.addtocart.instantPurchase.orig" class="Magento\InstantPurchase\Block\Button" template="Magento_InstantPurchase::button.phtml" before="-">
-                <arguments>
-                    <argument name="jsLayout" xsi:type="array">
-                        <item name="components" xsi:type="array">
-                            <item name="instant-purchase" xsi:type="array">
-                                <item name="component" xsi:type="string">Magento_InstantPurchase/js/view/instant-purchase</item>
-                                <item name="config" xsi:type="array">
-                                    <item name="template" xsi:type="string">Magento_InstantPurchase/instant-purchase</item>
-                                </item>
-                            </item>
-                        </item>
-                    </argument>
-                </arguments>
-            </block>
-        </referenceBlock>
-        <referenceBlock name="product.info.addtocart.subscription">
-            <arguments>
-                <argument name="customerProductsHistoryList" xsi:type="object">
-                    TNW\Subscriptions\Block\Product\CustomerProductsHistoryList
-                </argument>
-            </arguments>
-            <block name="product.info.addtocart.instantPurchase.subscription" class="Magento\InstantPurchase\Block\Button" template="Magento_InstantPurchase::button.phtml" before="-">
-                <arguments>
-                    <argument name="jsLayout" xsi:type="array">
-                        <item name="components" xsi:type="array">
-                            <item name="instant-purchase" xsi:type="array">
-                                <item name="component" xsi:type="string">Magento_InstantPurchase/js/view/instant-purchase</item>
-                                <item name="config" xsi:type="array">
-                                    <item name="template" xsi:type="string">Magento_InstantPurchase/instant-purchase</item>
-                                </item>
-                            </item>
-                        </item>
-                    </argument>
-                </arguments>
-            </block>
-        </referenceBlock>
-        <referenceBlock name="product.info.addtocart.additional.orig">
-            <block name="product.info.addtocart.instantPurchase.additional.orig" class="Magento\InstantPurchase\Block\Button" template="Magento_InstantPurchase::button.phtml" before="-">
-                <arguments>
-                    <argument name="jsLayout" xsi:type="array">
-                        <item name="components" xsi:type="array">
-                            <item name="instant-purchase" xsi:type="array">
-                                <item name="component" xsi:type="string">Magento_InstantPurchase/js/view/instant-purchase</item>
-                                <item name="config" xsi:type="array">
-                                    <item name="template" xsi:type="string">Magento_InstantPurchase/instant-purchase</item>
-                                </item>
-                            </item>
-                        </item>
-                    </argument>
-                </arguments>
-            </block>
-        </referenceBlock>
-        <referenceBlock name="product.info.addtocart.additional.subscription">
-            <arguments>
-                <argument name="customerProductsHistoryList" xsi:type="object">
-                    TNW\Subscriptions\Block\Product\CustomerProductsHistoryList
-                </argument>
-            </arguments>
-            <block name="product.info.addtocart.instantPurchase.additional.subscription" class="Magento\InstantPurchase\Block\Button" template="Magento_InstantPurchase::button.phtml" before="-">
-                <arguments>
-                    <argument name="jsLayout" xsi:type="array">
-                        <item name="components" xsi:type="array">
-                            <item name="instant-purchase" xsi:type="array">
-                                <item name="component" xsi:type="string">Magento_InstantPurchase/js/view/instant-purchase</item>
-                                <item name="config" xsi:type="array">
-                                    <item name="template" xsi:type="string">Magento_InstantPurchase/instant-purchase</item>
-                                </item>
-                            </item>
-                        </item>
-                    </argument>
-                </arguments>
-            </block>
-        </referenceBlock>
         <referenceBlock name="catalog.product.related" template="TNW_Subscriptions::product/list/items.phtml">
             <arguments>
                 <argument name="customerProductsHistoryList" xsi:type="object">

@@ -5,6 +5,7 @@
  */
 namespace TNW\Subscriptions\Model\ProductSubscriptionProfile;
 
+use Magento\Bundle\Model\Product\Type;
 use Magento\Framework\DataObject;
 use Magento\Framework\Registry;
 use Magento\Framework\Serialize\SerializerInterface;
@@ -218,14 +219,15 @@ class Manager
                 case \Magento\Catalog\Model\Product\Type::TYPE_VIRTUAL:
                 case \Magento\Downloadable\Model\Product\Type::TYPE_DOWNLOADABLE:
                     break;
+                case \Magento\Bundle\Model\Product\Type::TYPE_CODE:
                 case \Magento\ConfigurableProduct\Model\Product\Type\Configurable::TYPE_CODE:
                     /** @var ProductSubscriptionProfileInterface $profileProduct */
                     $profileProduct = $this->getItemProfileProduct($item, $products);
                     if ($profileProduct) {
-                        $configurableProducts = $this->getConfigurableProducts($item, $profileProduct);
-                        if (!empty($configurableProducts)) {
-                            $profileProduct->setChildren($configurableProducts);
-                            $childProducts[] = $configurableProducts;
+                        $childProducts = $this->getChildProducts($item, $profileProduct);
+                        if (!empty($childProducts)) {
+                            $profileProduct->setChildren($childProducts);
+                            $childProducts[] = $childProducts;
                         }
                     }
                     break;
@@ -235,9 +237,9 @@ class Manager
         }
         $result = [];
         if ($childProducts) {
-            foreach ($childProducts as $configurableProducts) {
-                foreach ($configurableProducts as $configurableProduct) {
-                    $result[] = $configurableProduct;
+            foreach ($childProducts as $children) {
+                foreach ($children as $child) {
+                    $result[] = $child;
                 }
             }
         }
@@ -745,7 +747,7 @@ class Manager
      * @param ProductSubscriptionProfileInterface $subscriptionProduct
      * @return array
      */
-    private function getConfigurableProducts(
+    private function getChildProducts(
         Item $item,
         ProductSubscriptionProfileInterface $subscriptionProduct
     ) {
@@ -761,6 +763,9 @@ class Manager
             $product = $this->reset()
                 ->populateProductDataFromQuoteItem($child, $productObject, true)
                 ->getProfileProduct();
+            if ($item->getProductType() === Type::TYPE_CODE) {
+                $product->setName($child->getName())->setSku($child->getSku());
+            }
             $products[] = $product;
         }
 

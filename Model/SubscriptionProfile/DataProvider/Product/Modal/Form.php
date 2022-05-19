@@ -6,6 +6,7 @@
 namespace TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Modal;
 
 use Magento\Catalog\Api\Data\ProductInterface;
+use Magento\Catalog\Model\Product\Type;
 use Magento\ConfigurableProduct\Model\Product\Type\Configurable as Configurable;
 use Magento\Directory\Model\Currency;
 use Magento\Framework\Api\Filter;
@@ -155,9 +156,16 @@ class Form extends AbstractDataProvider
     public function getData()
     {
         $productId = $this->getRequestProductId();
-        $data[self::FORM_DATA_VALUE] = $this->getFrequenciesData(true, $productId, [
+        $additionalData = [
             'super_attribute' => $this->formContext->getRequest()->getParam('super_attribute'),
-        ]);
+            'bundle_option' => $this->formContext->getRequest()->getParam('bundle_option'),
+            'bundle_option_qty' => $this->formContext->getRequest()->getParam('bundle_option_qty'),
+        ];
+        if (!$additionalData['bundle_option_qty'] && !empty($additionalData['bundle_option']['qty'])) {
+            $additionalData['bundle_option_qty'] = $additionalData['bundle_option']['qty'];
+            unset($additionalData['bundle_option']['qty']);
+        }
+        $data[self::FORM_DATA_VALUE] = $this->getFrequenciesData(true, $productId, $additionalData);
 
         return $data;
     }
@@ -230,11 +238,13 @@ class Form extends AbstractDataProvider
             return $result;
         }
 
-        $childProduct = $this->getChildProductFromRequest();
-        $childProduct = $childProduct ?: $this->getChildProductFromCurrentItem();
-        if ($childProduct) {
-            foreach ($this->getProductBillingFrequencies($childProduct->getId()) as $childFrequency) {
-                $childFrequencies[$childFrequency->getBillingFrequencyId()] = $childFrequency;
+        if ($this->getProductObjectData($productId)->getTypeId() !== Type::TYPE_BUNDLE) {
+            $childProduct = $this->getChildProductFromRequest();
+            $childProduct = $childProduct ?: $this->getChildProductFromCurrentItem();
+            if ($childProduct) {
+                foreach ($this->getProductBillingFrequencies($childProduct->getId()) as $childFrequency) {
+                    $childFrequencies[$childFrequency->getBillingFrequencyId()] = $childFrequency;
+                }
             }
         }
         try {
@@ -672,6 +682,12 @@ class Form extends AbstractDataProvider
                         $productDataObject,
                         $productFrequencies[$billingFrequencyId]
                     );
+            }
+            if ($productDataObject->getTypeId() === Type::TYPE_BUNDLE) {
+                $typeResolver = $this->productTypeResolver->resolve(Type::TYPE_BUNDLE);
+                $product = $this->formContext->getProductRepository()->getById($productId);
+                $data['product_frequencies'][$billingFrequencyId]['price']
+                    = $typeResolver->getSubscriptionCustomPrice($product, $additionalData);
             }
             if ($needProductValues
                 && !empty($data['product_frequencies'][$billingFrequencyId])

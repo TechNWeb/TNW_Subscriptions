@@ -5,6 +5,7 @@
  */
 namespace TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Customer\Account;
 
+use Magento\Catalog\Model\Product\Type;
 use Magento\CatalogInventory\Api\Data\StockItemInterface;
 use Magento\CatalogInventory\Api\StockRegistryInterface;
 use Magento\Framework\Exception\InputException;
@@ -244,10 +245,13 @@ class ProductsForm extends SummaryProductsForm
             $product = $item->getChildren() ? $item->getChildren() : $item;
         }
         $stockId = $this->stockResolver->execute(SalesChannelInterface::TYPE_WEBSITE, $websiteCode)->getStockId();
-        $productSalableQty = $this->productSalableQty->execute(
-            $product->getSku(),
-            $stockId
-        );
+        $productSalableQty = 0;
+        if ($stockItem->getTypeId() !== Type::TYPE_BUNDLE) {
+            $productSalableQty = $this->productSalableQty->execute(
+                $product->getSku(),
+                $stockId
+            );
+        }
 
         if ($product->getMagentoProductId() != $productId) {
             /** @var StockItemInterface $stockItem */

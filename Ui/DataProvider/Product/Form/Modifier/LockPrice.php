@@ -5,6 +5,7 @@
  */
 namespace TNW\Subscriptions\Ui\DataProvider\Product\Form\Modifier;
 
+use Magento\Bundle\Model\Product\Price;
 use Magento\Catalog\Model\Locator\LocatorInterface;
 use Magento\Catalog\Ui\DataProvider\Product\Form\Modifier\AbstractModifier;
 use Magento\Framework\Stdlib\ArrayManager;
@@ -60,9 +61,18 @@ class LockPrice extends AbstractModifier
             ) . static::META_CONFIG_PATH,
             $meta,
             [
+                'component' => 'TNW_Subscriptions/js/components/lock-product-price',
                 'notice' =>  __('Recurring option price will always match the product price.'),
                 'elementTmpl' => 'TNW_Subscriptions/form/element/switcher',
                 'default' => $lockProductPriceValue ? '1' : '0',
+                'imports' => [
+                    'disabled'=> 'ns = ${ $.ns }, index = price_type:checked',
+                    'onPriceTypeChange' => 'ns = ${ $.ns }, index = price_type:value',
+                    '__disableTmpl' => [
+                        'disabled' => false,
+                        'onPriceTypeChange' => false
+                    ]
+                ]
             ]
         );
 
@@ -95,6 +105,15 @@ class LockPrice extends AbstractModifier
      */
     public function modifyData(array $data)
     {
+        /**
+         * If bundle product has dynamic price type, we should lock product price
+         */
+        $productId = $this->locator->getProduct()->getId();
+        if (isset($data[$productId]['product']['price_type'])
+            && $data[$productId]['product']['price_type'] == Price::PRICE_TYPE_DYNAMIC
+        ) {
+            $data[$productId]['product'][Attribute::SUBSCRIPTION_LOCK_PRODUCT_PRICE] = '1';
+        }
         return $data;
     }
 }

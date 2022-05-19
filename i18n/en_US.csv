@@ -412,6 +412,7 @@ The number of future quotes to generate at a time for the new subscription profi
 "Could not delete the CustomerProductHistory: %1","Could not delete the CustomerProductHistory: %1"
 "Already registered customer should be logged in to purchase subscription product.","Already registered customer should be logged in to purchase subscription product."
 "Product %1 or its child product has been ordered by you with trial option earlier. If you would like to buy it again use non-trial purchase option instead.","Product %1 or its child product has been ordered by you with trial option earlier. If you would like to buy it again use non-trial purchase option instead."
+"%1 x %2 - <b>%3</b>","%1 x %2 - <b>%3</b>"
 "%1 linked product(s) with active subscription profiles were not unlinked", "%1 linked product(s) with active subscription profiles were not unlinked"
 "%1 product(s) successfully unlinked.", "%1 product(s) successfully unlinked."
 "%1 selected products were added to queue", "%1 selected products were added to queue"

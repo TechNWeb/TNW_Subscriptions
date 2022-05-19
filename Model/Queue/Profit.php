@@ -5,23 +5,24 @@
  */
 namespace TNW\Subscriptions\Model\Queue;
 
+use Magento\AsynchronousOperations\Api\Data\OperationInterface;
+use Magento\AsynchronousOperations\Api\Data\OperationListInterface;
+use Magento\Bundle\Model\Product\Type;
+use Magento\Framework\Api\SearchCriteriaBuilder;
+use Magento\Framework\EntityManager\EntityManager;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\Exception\TemporaryStateExceptionInterface;
+use Magento\Framework\Serialize\Serializer\Json as Serializer;
 use Psr\Log\LoggerInterface;
 use TNW\Subscriptions\Api\Data\ProductBillingFrequencyInterface;
 use TNW\Subscriptions\Api\Data\ProductSubscriptionProfileInterface;
-use Magento\AsynchronousOperations\Api\Data\OperationListInterface;
-use Magento\AsynchronousOperations\Api\Data\OperationInterface;
-use Magento\Framework\Serialize\Serializer\Json as Serializer;
-use TNW\Subscriptions\Api\SubscriptionProfileRepositoryInterface;
-use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfileProfit;
-use Magento\Framework\Api\SearchCriteriaBuilder;
 use TNW\Subscriptions\Api\ProductBillingFrequencyRepositoryInterface;
-use TNW\Subscriptions\Model\SubscriptionProfile\ProfitCalculator;
+use TNW\Subscriptions\Api\SubscriptionProfileRepositoryInterface;
 use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfile;
-use Magento\Framework\EntityManager\EntityManager;
+use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfileProfit;
 use TNW\Subscriptions\Model\Source\ProfileStatus;
+use TNW\Subscriptions\Model\SubscriptionProfile\ProfitCalculator;
 
 /**
  * Class Profit - calculates profit and set it in table
@@ -77,6 +78,7 @@ class Profit
      * @param SearchCriteriaBuilder $searchCriteriaBuilder
      * @param ProductBillingFrequencyRepositoryInterface $recurringOptionRepository
      * @param SubscriptionProfile $subscriptionProfileResource
+     * @param EntityManager $entityManager
      */
     public function __construct(
         LoggerInterface $logger,
@@ -162,7 +164,6 @@ class Profit
     {
         $profit = 0;
         $lifetimeValue = 0;
-        $invoiceItems = [];
         if ($profile->getStatus() == ProfileStatus::STATUS_CANCELED
         ) {
             return $profit;
@@ -186,37 +187,54 @@ class Profit
 
             if (!empty($children)
                 && $this->searchRecurringOption($recurringOptions, \reset($children)->getMagentoProductId())
+                && $profileProduct->getMagentoProduct()->getTypeId() !== Type::TYPE_CODE
             ) {
                 $profileProduct = \reset($children);
             }
 
-            $product = $profileProduct->getMagentoProduct();
-            $recurringOption = $this->searchRecurringOption($recurringOptions, $product->getId());
+            $recurringOption = $this->searchRecurringOption($recurringOptions, $profileProduct->getMagentoProductId());
 
             if (empty($recurringOption)) {
                 continue;
             }
 
-            $invoiceItems = $this->subscriptionProfileResource->getProfileInvoicedOrders($profile);
+            $invoiceItems = $this->subscriptionProfileResource->getInvoiceItems($profile);
             $initialFeeAdded = false;
             foreach ($invoiceItems as $item) {
-                if (!$initialFeeAdded && isset($recurringOption['initial_fee']) && $recurringOption['initial_fee']) {
+                if (!$initialFeeAdded
+                    && isset($recurringOption['initial_fee'])
+                    && (float)$recurringOption['initial_fee']
+                ) {
                     $initialFeeAdded = true;
                     $profit += $recurringOption['initial_fee'];
                     $lifetimeValue += $recurringOption['initial_fee'];
                 }
-                $profit += ($item['base_price'] - $item['base_cost']) * $item['qty'];
-                $lifetimeValue += $item['base_price'] * $item['qty'];
+                $profit += ($item['base_price_incl_tax'] - $item['base_cost']) * $item['qty'];
+                $lifetimeValue += $item['base_price_incl_tax'] * $item['qty'];
+
+                // Bundle products store cost in their children
+                if ($item['product_type'] === Type::TYPE_CODE) {
+                    $bundleChildrenInvoiceItems = $this->subscriptionProfileResource->getInvoiceItemChildren(
+                        $item['order_item_id'],
+                    );
+                    $lastChildrenCost = 0;
+                    foreach ($bundleChildrenInvoiceItems as $bundleChildrenInvoiceItem) {
+                        $cost = $bundleChildrenInvoiceItem['base_cost'] * $bundleChildrenInvoiceItem['qty'];
+                        $profit -= $cost;
+                        $lastChildrenCost += $cost;
+                    }
+                }
             }
         }
 
         $this->setProfitData($profile, $profit, ProfitCalculator::AS_OF_TODAY);
         $this->setProfitData($profile, $lifetimeValue, ProfitCalculator::LIFETIME);
 
-        $lastInvoiceItem = array_pop($invoiceItems);
-        if ($lastInvoiceItem) {
-            $profitOfLastItem = ($item['base_price'] - $item['base_cost'])
-                * $lastInvoiceItem['qty'];
+        if (isset($item)) {
+            $profitOfLastItem = ($item['base_price_incl_tax'] - $item['base_cost']) * $item['qty'];
+            if (isset($lastChildrenCost)) {
+                $profitOfLastItem -= $lastChildrenCost;
+            }
         } else {
             $profitOfLastItem = 0;
         }
@@ -232,7 +250,6 @@ class Profit
         } else {
             $profit += ($profitOfLastItem * $profile->getTotalBillingCycles()) - $asTodayProfit;
         }
-
 
         $this->setProfitData($profile, $profit, ProfitCalculator::REMAINING);
 

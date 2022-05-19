@@ -28,6 +28,7 @@ use TNW\Subscriptions\Model\Source\ProfileStatus;
 use Magento\Framework\Serialize\Serializer\Json;
 use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfileProfit;
 use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfileOrder;
+use TNW\Subscriptions\Model\SubscriptionProfile\ProfitCalculator;
 
 /**
  * Subscription Profile model.
@@ -780,7 +781,7 @@ class SubscriptionProfile extends AbstractExtensibleModel implements Subscriptio
      */
     public function getCurrentValue()
     {
-        return $this->getResource()->getCurrentValue($this);
+        return $this->getTotalProfit($this->getId(), ProfitCalculator::LIFETIME);
     }
 
     /**

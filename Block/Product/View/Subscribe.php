@@ -8,7 +8,6 @@ namespace TNW\Subscriptions\Block\Product\View;
 
 use IntlDateFormatter;
 use InvalidArgumentException;
-use Magento\Bundle\Model\Product\Type as TypeBundle;
 use Magento\Catalog\Api\Data\ProductInterface;
 use Magento\Catalog\Api\ProductRepositoryInterface;
 use Magento\Catalog\Block\Product\Context;
@@ -261,9 +260,6 @@ class Subscribe extends View
     public function isSubscribeAvailable()
     {
         $typeId = $this->getProduct()->getTypeId();
-        if ($typeId === TypeBundle::TYPE_CODE) {
-            return false;
-        }
         if (empty($this->getProductBillingFrequencies()) && $typeId !== Grouped::TYPE_CODE) {
             return false;
         }
@@ -428,7 +424,8 @@ class Subscribe extends View
                     'frequency_unit_type' => $frequency->getUnit(),
                     'is_default' => $productBillingFrequency->getDefaultBillingFrequency(),
                     'price' => $frequencyPrice,
-                    'preset_qty' => $productBillingFrequency->getPresetQty()
+                    'preset_qty' => $productBillingFrequency->getPresetQty(),
+                    'initial_fee' => (float)$productBillingFrequency->getInitialFee()
                 ];
                 $result[] = $data;
             }
@@ -721,7 +718,10 @@ class Subscribe extends View
             case \Magento\Catalog\Model\Product\Type::TYPE_VIRTUAL:
             case Type::TYPE_DOWNLOADABLE:
                 break;
-            case Grouped::TYPE_CODE:
+            case \Magento\Bundle\Model\Product\Type::TYPE_CODE:
+                $result['product']['bundle_price_type'] = (int)$productData->getData('price_type');
+                break;
+            case \Magento\GroupedProduct\Model\Product\Type\Grouped::TYPE_CODE:
                 $childProducts = $this->subscriptionTypeResolver
                     ->resolve($type)->getChildProducts($this->getProduct());
                 $childArray = [];
@@ -814,7 +814,11 @@ class Subscribe extends View
             Attribute::SUBSCRIPTION_UNLOCK_PRESET_QTY,
             Attribute::SUBSCRIPTION_HIDE_QTY,
             Attribute::SUBSCRIPTION_SAVINGS_CALCULATION,
-            Attribute::SUBSCRIPTION_INFINITE_SUBSCRIPTIONS
+            Attribute::SUBSCRIPTION_INFINITE_SUBSCRIPTIONS,
+            Attribute::SUBSCRIPTION_LOCK_PRODUCT_PRICE,
+            Attribute::SUBSCRIPTION_OFFER_FLAT_DISCOUNT,
+            Attribute::SUBSCRIPTION_DISCOUNT_AMOUNT,
+            Attribute::SUBSCRIPTION_DISCOUNT_TYPE
         ];
         $result = [];
         foreach ($productData->getData() as $key => $attribute) {

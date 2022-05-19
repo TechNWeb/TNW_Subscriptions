@@ -220,6 +220,15 @@ class Product extends AbstractDataProvider
                         $confOptions[] = ucfirst($confOption['label']) . ': ' . $confOption['value'];
                     }
                 }
+                if (isset($options['bundle_options']) && is_array($options['bundle_options'])) {
+                    foreach ($options['bundle_options'] as $bundle_option) {
+                        $optionStr = '<b>' . ucfirst($bundle_option['label']) . ':</b><br>';
+                        foreach ($bundle_option['value'] as $optionValue) {
+                            $optionStr .= $optionValue['qty'] . ' x ' . $optionValue['title'] . '<br>';
+                        }
+                        $confOptions[] = $optionStr;
+                    }
+                }
                 $products[] = [
                     'thumbnail_alt' => $imageHelper->getLabel(),
                     'thumbnail_src' => $imageHelper->getUrl(),

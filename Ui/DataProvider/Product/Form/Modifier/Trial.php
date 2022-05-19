@@ -57,6 +57,12 @@ class Trial extends BaseModifier
      */
     public function modifyMeta(array $meta)
     {
+        $trialStatusPath = $this->arrayManager->findPath(
+            Attribute::SUBSCRIPTION_TRIAL_STATUS,
+            $meta,
+            null,
+            'children'
+        );
         $trialLengthPath = $this->arrayManager->findPath(
             Attribute::SUBSCRIPTION_TRIAL_LENGTH,
             $meta,
@@ -73,6 +79,21 @@ class Trial extends BaseModifier
         $trialLengthUnitContainerPath = $this->arrayManager->slicePath($trialLengthUnitPath, 0, -2);
 
         $trialLengthValue = $this->config->getTrialLength();
+        $meta = $this->arrayManager->merge(
+            $trialStatusPath . static::META_CONFIG_PATH,
+            $meta,
+            [
+                'component' => 'TNW_Subscriptions/js/components/trial-status',
+                'imports' => [
+                    'disabled'=> 'ns = ${ $.ns }, index = shipment_type:value', //In case of bundle product
+                    'onPriceTypeChange' => 'ns = ${ $.ns }, index = price_type:value',
+                    '__disableTmpl' => [
+                        'disabled' => false,
+                        'onPriceTypeChange' => false
+                    ]
+                ]
+            ]
+        );
         $meta = $this->arrayManager->merge(
             $trialLengthPath . static::META_CONFIG_PATH,
             $meta,

@@ -6,7 +6,7 @@
 namespace TNW\Subscriptions\Plugin\Checkout\Model;
 
 /**
- * Class UpdateCartItems - plugin to modify update itens logic
+ * Class UpdateCartItems - plugin to modify update items logic
  */
 class UpdateCartItems
 {

@@ -5,6 +5,8 @@
  */
 namespace TNW\Subscriptions\Block\Product;
 
+use Magento\Bundle\Model\Product\Type as TypeBundle;
+use Magento\Bundle\Pricing\Price\FinalPrice;
 use Magento\Catalog\Api\CategoryRepositoryInterface;
 use Magento\Catalog\Block\Product\Context;
 use Magento\Catalog\Block\Product\ListProduct as OrigListProduct;
@@ -258,7 +260,9 @@ class ListProduct extends OrigListProduct
      */
     public function getPriceLabel($product)
     {
-        if ($product->getTypeId() === Configurable::TYPE_CODE && $this->getTopMessage($product) === '') {
+        if (($product->getTypeId() === Configurable::TYPE_CODE || $product->getTypeId() === TypeBundle::TYPE_CODE)
+            && $this->getTopMessage($product) === ''
+        ) {
             return sprintf('<span class="price-label">%s</span>', __('As low as'));
         }
         return '';
@@ -314,6 +318,18 @@ class ListProduct extends OrigListProduct
             $trialAllowed
         );
         $price = $subscriptionPrice + $initialFee;
+        if ($product->getTypeId() === TypeBundle::TYPE_CODE) {
+            $priceModel = $product->getPriceInfo()->getPrice(FinalPrice::PRICE_CODE);
+            $bundleMinOptionsPrice = $priceModel->getMinimalPrice()->getValue()
+                - $priceModel->getPriceWithoutOption()->getValue();
+            if ($product->getData(Attribute::SUBSCRIPTION_LOCK_PRODUCT_PRICE) === '1'
+                && $product->getData(Attribute::SUBSCRIPTION_OFFER_FLAT_DISCOUNT) === '1'
+                && $product->getData(Attribute::SUBSCRIPTION_DISCOUNT_TYPE) === '2'
+            ) {
+                $bundleMinOptionsPrice *= (100 - (float)$product->getData(Attribute::SUBSCRIPTION_DISCOUNT_AMOUNT))/100;
+            }
+            $price += $bundleMinOptionsPrice;
+        }
         if ($trialStatus == 1 && $price == 0) {
             $result = sprintf('<span class="free">%s</span>', __('Free'));
         } else {
@@ -428,7 +444,8 @@ class ListProduct extends OrigListProduct
             || $product->getTypeId() == Type::TYPE_VIRTUAL
             || $product->getTypeId() == Configurable::TYPE_CODE
             || $product->getTypeId() == Grouped::TYPE_CODE
-            || $product->getTypeId() == DownloadableType::TYPE_DOWNLOADABLE;
+            || $product->getTypeId() == DownloadableType::TYPE_DOWNLOADABLE
+            || $product->getTypeId() == TypeBundle::TYPE_CODE;
     }
 
     /**

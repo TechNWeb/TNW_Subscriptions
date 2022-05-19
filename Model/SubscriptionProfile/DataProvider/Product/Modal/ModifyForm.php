@@ -96,6 +96,8 @@ class ModifyForm extends Form
         'start_on',
         'qty',
         'super_attribute',
+        'bundle_option',
+        'bundle_option_qty',
         'additional_attribute',
         'use_trial',
     ];
@@ -496,7 +498,7 @@ class ModifyForm extends Form
         $hideQty = $this->getSubAttributeFromItem(Attribute::SUBSCRIPTION_HIDE_QTY);
         $qty = false;
         if (!$hideQty) {
-            $qty = (float)$this->currentItem->getQty() . 'x';
+            $qty = (float)$this->currentItem->getQty() . ' x ';
         }
         $result =  [
             'arguments' => [
