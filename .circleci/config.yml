@@ -9,7 +9,21 @@ jobs:
           name: Deploy Over SSH
           command: |
             ssh $SSH_USER@$SSH_HOST "./release"
- 
+
+  marketplace-submit:
+    docker:
+      - image: circleci/php:7.1-apache-stretch-node-browsers
+    working_directory: ~/tnw_extension/
+    steps:
+      - checkout
+      - run:
+          name: Submit code to Magento Marketplace
+          command: |
+            cd ~/tnw_extension/
+            cd .circleci
+            chmod +x submit_code.sh
+            ./submit_code.sh
+
   tag-release:
     machine:
       enabled: true
@@ -101,7 +115,7 @@ jobs:
             cd /var/www/html/magento
             php bin/magento setup:di:compile
             php bin/magento deploy:mode:set developer
-  
+
   m242-open_source-php74:
     <<: *base-image
     docker:
@@ -124,7 +138,7 @@ jobs:
           - discovery.type: single-node
           - xpack.security.enabled: false
           - ES_JAVA_OPTS: -Xms1500m -Xmx1500m
-  
+
   m241-commerce-php74:
     <<: *base-image
     docker:
@@ -193,7 +207,7 @@ jobs:
           - discovery.type: single-node
           - xpack.security.enabled: false
           - ES_JAVA_OPTS: -Xms750m -Xmx750m
- 
+
   m240-open_source-php74:
     <<: *base-image
     docker:
@@ -216,7 +230,7 @@ jobs:
           - discovery.type: single-node
           - xpack.security.enabled: false
           - ES_JAVA_OPTS: -Xms750m -Xmx750m
-  
+
   magento-coding-standard:
     docker:
       - image: powersync/magento-builds:m242-commerce-php74
@@ -252,7 +266,7 @@ jobs:
           - http.port: 9200
           - discovery.type: single-node
           - xpack.security.enabled: false
-          - ES_JAVA_OPTS: -Xms750m -Xmx750m          
+          - ES_JAVA_OPTS: -Xms750m -Xmx750m
     steps:
       - run:
           name: Wait for DB
@@ -314,7 +328,7 @@ jobs:
               NEW_MODULE_VERSION=(`composer show -al $package |grep '^latest '|awk '{print $3}'|sed 's/,//'`);
               PAGE_TITLE='_'
               PAGE_TITLE+=`echo "$package" | sed 's/\//_/'`
-              PAGE_TITLE+='_m24'             
+              PAGE_TITLE+='_m24'
 
               PAGE_SEARCH_DATA=`curl -u $JIRA_LOGIN:$JIRA_TOKEN -X GET "https://technweb.atlassian.net/wiki/rest/api/content?title=$PAGE_TITLE&limit=1&expand=version.number,body.view,body.storage"`
 
@@ -356,7 +370,7 @@ workflows:
 
   test-deploy-wiki:
     jobs:
-     
+
       - m240-commerce-php74:
           context: powersync
           requires:
@@ -427,6 +441,11 @@ workflows:
               only:
                 - master-2.4.x
 
+      - marketplace-submit:
+          context: powersync
+          requires:
+            - tag-release
+
       - tag-release:
           context: powersync
           requires:
@@ -437,7 +456,7 @@ workflows:
             - m241-open_source-php74
   #          - m242-commerce-php74
   #          - m242-open_source-php74
-            
+
       - check-composer-installation:
           context: powersync
           requires:
