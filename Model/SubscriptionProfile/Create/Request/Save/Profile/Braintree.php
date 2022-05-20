@@ -105,12 +105,18 @@ class Braintree extends Base
         /** @var \Magento\Quote\Model\Quote[] $subQuotes */
         $subQuotes = $this->getSubCreateModel()->getSubQuotes();
 
-        $customer = reset($subQuotes)->getCustomer();
+        $customer = reset($subQuotes)->getCustomer()->getId()
+            ? reset($subQuotes)->getCustomer()
+            : $this->getSubCreateModel()->getShippingAddress();
+
+        $customerEmail = $customer->getEmail() ? $customer->getEmail() : $this->getSession()->getCustomerEmail();
         $transfer = $this->transferFactory->create([
             'firstName' => $customer->getFirstname(),
             'lastName' => $customer->getLastname(),
-            'email' => $customer->getEmail(),
-            'paymentMethodNonce' => $data['payment']['braintree']['nonce']
+            'email' => $customerEmail,
+            'phone' => $this->getSubCreateModel()->getShippingAddress()->getTelephone(),
+            'paymentMethodNonce' => $data['payment']['braintree']['nonce'],
+            'store_id' => $this->getSession()->getStoreId()
         ]);
 
         /** @var \Braintree\Result\Error|\Braintree\Result\Successful $response */

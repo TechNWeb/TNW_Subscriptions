@@ -1,4 +1,4 @@
-<!--@subject {{trans "Upcoming recurring order for %sub_label profile from" sub_label=$subscription.getLabel()}} {{config path="general/store_information/name"}} @-->
+<!--@subject {{trans "Upcoming recurring order for %sub_label profile(s) from" sub_label=$subscriptions_labels}} {{config path="general/store_information/name"}} @-->
 <!--@vars {
 "template config_path=\"design\/email\/header_template\"":"Email Header Template",
 "template config_path=\"design\/email\/footer_template\"":"Email Footer Template",
@@ -6,6 +6,8 @@
 "var date":"Upcoming Subscription Renewal Date",
 "var customerName":"Customer Name",
 "var subscriptions":"Subscription Profiles",
+"var subscription_profile_ids":"Subscription Profile Ids",
+"var subscriptions_labels":"Subscription Profile Labels",
 "layout handle=\"subscriptions_email_profile_stock_items\" subscriptionProfiles=$subscriptions":"Subscription Items Grid"
 } @-->
 {{template config_path="design/email/header_template"}}
@@ -28,7 +30,7 @@
 <p>
     {{trans 'The next payment will occur on %date.' date=$date}}
 </p>
-{{layout handle="subscriptions_email_profile_stock_items" subscriptionProfiles=$subscriptions area="frontend"}}
+{{layout handle="subscriptions_email_profile_stock_items" subscription_profile_ids=$subscription_profile_ids area="frontend"}}
 <p>
     {{trans 'To make changes to your recurring order <a href="%account_url">log into your account</a>' account_url=$this.getUrl($store,'customer/account/',[_nosid:1]) |raw}}
 </p>

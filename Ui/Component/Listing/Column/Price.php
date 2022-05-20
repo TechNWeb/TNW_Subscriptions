@@ -65,7 +65,7 @@ class Price extends Column
                 if ($total) {
                     $currencyCode = $item[SubscriptionProfileInterface::PROFILE_CURRENCY_CODE] ?? null;
                     $currency = $this->priceFormatter->getCurrency($item['store_id'], $currencyCode);
-                    $total = $currency->format($total, false, null);
+                    $total = $currency->format($total, [], false);
                 }
                 $item[$this->getData('name')] = $total;
             }

@@ -36,6 +36,7 @@ use Magento\InventorySalesApi\Api\StockResolverInterface;
 use Magento\Store\Model\StoreManagerInterface;
 use Magento\Framework\Message\ManagerInterface as MessageManager;
 use Magento\Sales\Model\Order\Email\Sender\OrderSender;
+use Magento\Backend\Model\Session\Quote as SessionQuote;
 
 /**
  * Class for creating subscription profile.
@@ -180,6 +181,11 @@ class CreateProfile extends BaseCreate
     private $orderSender;
 
     /**
+     * @var SessionQuote
+     */
+    private $sessionQuote;
+
+    /**
      * CreateProfile constructor.
      * @param Context $context
      * @param QuoteSessionInterface $session
@@ -204,6 +210,7 @@ class CreateProfile extends BaseCreate
      * @param StoreManagerInterface $storeManager
      * @param MessageManager $messageManager
      * @param OrderSender $orderSender
+     * @param SessionQuote $sessionQuote
      */
     public function __construct(
         Context $context,
@@ -228,8 +235,10 @@ class CreateProfile extends BaseCreate
         StockResolverInterface $stock,
         StoreManagerInterface $storeManager,
         MessageManager $messageManager,
-        OrderSender $orderSender
+        OrderSender $orderSender,
+        SessionQuote $sessionQuote
     ) {
+        $this->sessionQuote = $sessionQuote;
         $this->addressRepository = $addressRepository;
         $this->addressCreator = $addressCreator;
         $this->quoteCreator = $quoteCreator;
@@ -623,6 +632,7 @@ class CreateProfile extends BaseCreate
         $itemsRelationData = [];
         /** @var ModelQuote $subQuote */
         foreach ($this->getSubQuotes() as $subQuote) {
+            $this->sessionQuote->setStoreId($subQuote->getStoreId());
             $this->quoteCreator->fillCustomerData($customer, $subQuote);
             $this->quoteCreator->validate($subQuote);
 

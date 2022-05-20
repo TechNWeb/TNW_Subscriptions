@@ -1,4 +1,4 @@
-<!--@subject {{trans "Could not process recurring order for %sub_label profile from" sub_label=$subscription.getLabel()}} {{config path="general/store_information/name"}} @-->
+<!--@subject {{trans "Could not process recurring order for %sub_label profile from" sub_label=$subscription_data.label}} {{config path="general/store_information/name"}} @-->
 <!--@vars {
 "template config_path=\"design\/email\/header_template\"":"Email Header Template",
 "template config_path=\"design\/email\/footer_template\"":"Email Footer Template",
@@ -7,7 +7,8 @@
 "var attempt_interval":"Next payment attempt interval",
 "var verification_token":"Payment Verification Token",
 "var subscription":"Subscription Profile",
-"layout handle=\"subscriptions_email_profile_items\" subscriptionProfile=$subscription":"Subscription Items Grid"
+"var subscription_data":"Subscription Profile Data",
+"layout handle=\"subscriptions_email_profile_items\" subscription_id=$subscription_data.id":"Subscription Items Grid"
 } @-->
 {{template config_path="design/email/header_template"}}
 <table>
@@ -15,14 +16,14 @@
         <td>
             <p class="greeting">{{trans 'Dear %customerName,' customerName=$customerName}}</p>
             <p>
-                {{trans 'We were unable to process payment for the recurring order under'}} <a href="{{store url='tnw_subscriptions/subscription/edit' entity_id=$subscription.getId()}}">{{var subscription.getLabel()}}</a> {{trans 'profile. The 3DS card verification is required to process re-bill. Please follow the '}}
+                {{trans 'We were unable to process payment for the recurring order under'}} <a href="{{store url='tnw_subscriptions/subscription/edit' entity_id=$subscription_data.id}}">{{var subscription_data.label}}</a> {{trans 'profile. The 3DS card verification is required to process re-bill. Please follow the '}}
                 <a href="{{store url='tnw_subscriptions/subscription_queue/process' token=$verification_token}}">{{trans 'link'}}</a>
             </p>
             <p>
-                {{trans 'If this issue remains unresolved your recurring orders will stop and the profile %sub_label will be suspended.' sub_label=$subscription.getLabel()}}
+                {{trans 'If this issue remains unresolved your recurring orders will stop and the profile %sub_label will be suspended.' sub_label=$subscription_data.label}}
             </p>
         </td>
     </tr>
 </table>
-{{layout handle="subscriptions_email_profile_items" subscriptionProfile=$subscription area="frontend"}}
+{{layout handle="subscriptions_email_profile_items" subscription_profile_id=$subscription_data.id area="frontend"}}
 {{template config_path="design/email/footer_template"}}

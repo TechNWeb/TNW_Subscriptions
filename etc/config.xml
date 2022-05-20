@@ -84,6 +84,8 @@
                 <unlock_preset_qty_status>0</unlock_preset_qty_status> <!--Off-->
                 <savings_calculation>0</savings_calculation> <!--Off-->
                 <infinite_subscriptions>0</infinite_subscriptions> <!--Off-->
+                <billing_frequency>0</billing_frequency> <!--Off-->
+                <billing_frequency_used>0</billing_frequency_used>
             </general>
             <trial>
                 <trial_status>0</trial_status> <!--Off-->

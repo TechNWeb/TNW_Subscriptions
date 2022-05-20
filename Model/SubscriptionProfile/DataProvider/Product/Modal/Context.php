@@ -290,39 +290,40 @@ class Context implements ContextInterface
     ) {
         $imageHelper = $this->getImageHelper();
         $currentProduct = null;
-        switch ($item->getMagentoProduct()->getTypeId()) {
-            case \Magento\Catalog\Model\Product\Type::TYPE_SIMPLE:
-            case \Magento\Catalog\Model\Product\Type::TYPE_VIRTUAL:
-            case \Magento\Downloadable\Model\Product\Type::TYPE_DOWNLOADABLE:
-                $currentProduct = $item->getMagentoProduct();
-                $imageHelper->init(
-                    $currentProduct,
-                    $imageId,
-                    ['type' => 'small_image', 'width' => '240', 'height' => '240']
-                );
-                break;
-            case \Magento\ConfigurableProduct\Model\Product\Type\Configurable::TYPE_CODE:
-                $quoteItemChildrens = $item->getChildren();
-                $currentProduct = reset($quoteItemChildrens)->getMagentoProduct();
-                $imageHelper->init(
-                    $currentProduct,
-                    $imageId,
-                    ['type' => 'small_image', 'width' => '240', 'height' => '240']
-                );
-
-                if ($imageHelper->getUrl() == $imageHelper->getDefaultPlaceholderUrl()) {
+        if ($item->getMagentoProduct()) {
+            switch ($item->getMagentoProduct()->getTypeId()) {
+                case \Magento\Catalog\Model\Product\Type::TYPE_SIMPLE:
+                case \Magento\Catalog\Model\Product\Type::TYPE_VIRTUAL:
+                case \Magento\Downloadable\Model\Product\Type::TYPE_DOWNLOADABLE:
+                    $currentProduct = $item->getMagentoProduct();
                     $imageHelper->init(
-                        $item->getMagentoProduct(),
+                        $currentProduct,
                         $imageId,
                         ['type' => 'small_image', 'width' => '240', 'height' => '240']
                     );
-                }
+                    break;
+                case \Magento\ConfigurableProduct\Model\Product\Type\Configurable::TYPE_CODE:
+                    $quoteItemChildrens = $item->getChildren();
+                    $currentProduct = reset($quoteItemChildrens)->getMagentoProduct();
+                    $imageHelper->init(
+                        $currentProduct,
+                        $imageId,
+                        ['type' => 'small_image', 'width' => '240', 'height' => '240']
+                    );
 
-                break;
-            default:
-                throw new \InvalidArgumentException(__('Unsupported product type - %1', $item->getTypeId()));
+                    if ($imageHelper->getUrl() == $imageHelper->getDefaultPlaceholderUrl()) {
+                        $imageHelper->init(
+                            $item->getMagentoProduct(),
+                            $imageId,
+                            ['type' => 'small_image', 'width' => '240', 'height' => '240']
+                        );
+                    }
+
+                    break;
+                default:
+                    throw new \InvalidArgumentException(__('Unsupported product type - %1', $item->getTypeId()));
+            }
         }
-
         return $imageHelper;
     }
 

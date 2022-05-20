@@ -174,6 +174,10 @@ class EmailNotifier
                     $storeId,
                     [
                         'subscription' => $subscriptionProfile,
+                        'subscription_data' => [
+                            'id' => $subscriptionProfile->getId(),
+                            'label' => $subscriptionProfile->getLabel()
+                        ],
                         'oldStatus' => $statusModel->getLabelByValue($oldStatus),
                         'newStatus' => $statusModel->getLabelByValue($newStatus),
                         'date' => $date,
@@ -230,6 +234,10 @@ class EmailNotifier
                         $storeId,
                         [
                             'subscription' => $subscriptionProfile,
+                            'subscription_data' => [
+                                'id' => $subscriptionProfile->getId(),
+                                'label' => $subscriptionProfile->getLabel()
+                            ],
                             'comment' => $comment,
                             'customerName' => $customerName
                         ],
@@ -277,6 +285,10 @@ class EmailNotifier
                     $storeId,
                     [
                         'subscription' => $subscriptionProfile,
+                        'subscription_data' => [
+                            'id' => $subscriptionProfile->getId(),
+                            'label' => $subscriptionProfile->getLabel()
+                        ],
                         'customerName' => $customerName,
                         'date' => date('F jS, Y', strtotime($date))
                     ],
@@ -322,6 +334,10 @@ class EmailNotifier
                     $storeId,
                     [
                         'subscription' => $subscriptionProfile,
+                        'subscription_data' => [
+                            'id' => $subscriptionProfile->getId(),
+                            'label' => $subscriptionProfile->getLabel()
+                        ],
                         'customerName' => $customerName,
                         'attempt_interval' => $this->scopeConfig->getValue(
                             'tnw_subscriptions_profile_options/past_due_profile_options/attempt_interval',
@@ -372,6 +388,10 @@ class EmailNotifier
                     $storeId,
                     [
                         'subscription' => $subscriptionProfile,
+                        'subscription_data' => [
+                            'id' => $subscriptionProfile->getId(),
+                            'label' => $subscriptionProfile->getLabel()
+                        ],
                         'customerName' => $customerName,
                         'attempt_interval' => $this->scopeConfig->getValue(
                             'tnw_subscriptions_profile_options/past_due_profile_options/attempt_interval',
@@ -423,6 +443,10 @@ class EmailNotifier
                     $storeId,
                     [
                         'subscription' => $subscriptionProfile,
+                        'subscription_data' => [
+                            'id' => $subscriptionProfile->getId(),
+                            'label' => $subscriptionProfile->getLabel()
+                        ],
                         'customerName' => $customerName,
                         'products' => implode(', ', $products)
                     ],
@@ -438,34 +462,31 @@ class EmailNotifier
     }
 
     /**
-     * @param $subscriptionProfile
+     * @param $profileIds
      * @param $date
      * @throws \Magento\Framework\Exception\LocalizedException
      * @throws \Magento\Framework\Exception\MailException
      */
-    public function renewal($subscriptionProfile, $date)
+    public function renewal($profileIds, $date)
     {
         if ($this->checkEmailTemplateSetting(self::XML_PATH_RENEWAL)) {
             $subscriptionProfiles = [];
-            if (is_numeric($subscriptionProfile)) {
-                try {
-                    $subscriptionProfiles[] = $this->subscriptionProfileRepository->getById($subscriptionProfile);
-                } catch (\Exception $e) {
-                    $subscriptionProfiles = [];
-                }
-            } elseif (is_array($subscriptionProfile)) {
-                foreach ($subscriptionProfile as $profileId) {
+            $labels = [];
+            $subscriptionProfilesLabels = '';
+            if (is_array($profileIds)) {
+                foreach ($profileIds as $profileId) {
                     try {
-                        $subscriptionProfiles[] = $this->subscriptionProfileRepository->getById($profileId);
+                        $profile = $this->subscriptionProfileRepository->getById($profileId);
+                        $subscriptionProfiles[] = $profile;
+                        $labels[] = $profile->getLabel();
                     } catch (\Exception $e) {
                         continue;
                     }
                 }
-            } else {
-                $subscriptionProfiles[] = $subscriptionProfile;
+                $subscriptionProfilesLabels = implode(', ', $labels);
             }
 
-            if ($subscriptionProfiles) {
+            if (!empty($subscriptionProfiles)) {
                 $subscriptionProfile = reset($subscriptionProfiles);
                 list($storeId, $customerEmail, $customerName) = $this->getCustomerVars($subscriptionProfile);
                 $enableEmailNotification = $this->scopeConfig->getValue(
@@ -492,6 +513,8 @@ class EmailNotifier
                         $storeId,
                         [
                             'subscriptions' => $subscriptionProfiles,
+                            'subscriptions_labels' => $subscriptionProfilesLabels,
+                            'subscription_profile_ids' => $profileIds,
                             'customerName' => $customerName,
                             'date' => date('F jS, Y', strtotime($date))
                         ],

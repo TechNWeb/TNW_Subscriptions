@@ -13,12 +13,12 @@
         </div>
 
         <div class="sub-data-product">
-            <span class="sub-data-product-name" html="$product.name"/>
-            <span class="sub-data-product-qty" html="$product.qty"/>
+            <span class="sub-data-product-name" html="$product.name"></span>
+            <span class="sub-data-product-qty" html="$product.qty"></span>
 
             <!-- renders configurable options -->
             <div class="sub-data-conf-options" each="data: $col.getConfOptions($product), as: '$option'">
-                <div class="sub-data-content" html="$option"/>
+                <div class="sub-data-content" html="$option"></div>
             </div>
         </div>
     </div>

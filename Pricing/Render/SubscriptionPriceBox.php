@@ -272,7 +272,7 @@ class SubscriptionPriceBox extends BasePriceBox
                         'top_message' => $topMessage,
                         'bottom_message' => $bottomMessage,
                         'trial_price_status' => $trialPriceStatus,
-                        'old_price' => $billingFrequency->getPrice(),
+                        'old_price' => $product->getData('child_product_price') ?? $billingFrequency->getPrice(),
                     ];
                     if (isset($trialPrice) && isset($topTrialMessage) && isset($bottomTrialMessage)) {
                         $result[$billingFrequencyId]['trial_price_data'] = [
@@ -281,7 +281,7 @@ class SubscriptionPriceBox extends BasePriceBox
                             'top_message' => $topTrialMessage,
                             'bottom_message' => $bottomTrialMessage,
                             'trial_price_status' => $trialPriceStatus,
-                            'old_price' => $billingFrequency->getPrice(),
+                            'old_price' => $product->getData('child_product_price') ?? $billingFrequency->getPrice(),
                         ];
                     }
                 }

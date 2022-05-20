@@ -352,7 +352,7 @@ class Form extends AbstractDataProvider
                                     'imports' => [
                                         'changeValue' => 'index = billing_frequency:value',
                                     ],
-                                    'disabled' => (bool) $this->getTrialPeriod() && $this->isTrialAllowed(),
+                                    'disabled' => (bool) $this->getTrialPeriod() && $this->isTrialAllowed() || $this->getLockProductPrice(),
                                     'label' => $this->getTrialPeriod() && $this->isTrialAllowed()
                                         ? __('Post trial price:')
                                         : __('Price') . ':',
@@ -749,8 +749,13 @@ class Form extends AbstractDataProvider
             if (!empty($child)) {
                 $childProductId =  $child->getMagentoProductId() ?? $child->getProductId();
             }
+            try {
+                $childProudct = $this->formContext->getProductRepository()->getById($childProductId);
+            } catch (\Exception $e) {
+                $childProudct = null;
+            }
             return !empty($childProductId)
-                ? $this->formContext->getProductRepository()->getById($childProductId)
+                ? $childProudct
                 : null;
         }
         return null;
@@ -1020,5 +1025,18 @@ class Form extends AbstractDataProvider
         }
 
         return $trialCanSkip ?? null;
+    }
+
+    /**
+     * @return false|mixed|null
+     * @throws NoSuchEntityException
+     */
+    protected function getLockProductPrice()
+    {
+        $productId = $this->getRequestProductId();
+        if ($productId) {
+            return $this->getProductObjectData($productId)->getDataByKey('tnw_subscr_lock_product_price');
+        }
+        return false;
     }
 }

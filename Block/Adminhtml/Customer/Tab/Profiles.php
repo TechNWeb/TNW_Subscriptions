@@ -97,22 +97,30 @@ class Profiles extends \Magento\Backend\Block\Widget\Grid\Extended
 
         $this->addColumn(
             'label',
-            ['header' => __('Label'), 'index' => 'label']
+            [
+                'header' => __('Label'),
+                'index' => 'label',
+                'filter_index' => 'main_table.entity_id'
+            ]
         );
 
         $this->addColumn(
             'frequency_label',
-            ['header' => __('Billing Frequency'), 'index' => 'frequency_label']
-        );
-
-        $this->addColumn(
-            'start_date',
-            ['header' => __('Trial End Date'), 'index' => 'start_date', 'type' => 'date']
+            [
+                'header' => __('Billing Frequency'),
+                'index' => 'frequency_label',
+                'filter_index' => 'frequency.label'
+            ]
         );
 
         $this->addColumn(
             'next_billing_cycle_date',
-            ['header' => __('Next Bill Date'), 'index' => 'next_billing_cycle_date', 'type' => 'date']
+            [
+                'header' => __('Next Bill Date'),
+                'index' => 'next_billing_cycle_date',
+                'type' => 'date',
+                'filter_index' => 'relation.scheduled_at'
+            ]
         );
 
         $this->addColumn(
@@ -122,7 +130,13 @@ class Profiles extends \Magento\Backend\Block\Widget\Grid\Extended
 
         $this->addColumn(
             'current_value',
-            ['header' => __('Current Value'), 'index' => 'current_value', 'type' => 'currency', 'sortable' => false]
+            [
+                'header' => __('Current Value'),
+                'index' => 'current_value',
+                'type' => 'currency',
+                'sortable' => false,
+                'filter_index' => 'profit.total_profit'
+            ]
         );
 
         $this->addColumn(
@@ -132,13 +146,19 @@ class Profiles extends \Magento\Backend\Block\Widget\Grid\Extended
                 'index' => 'status',
                 'type' => 'options',
                 'source' =>\TNW\Subscriptions\Ui\Component\Listing\Column\SubscriptionProfile\Status\Options::class,
-                'options' => $this->profileStatusOption->getAllOptions()
+                'options' => $this->profileStatusOption->getAllOptions(),
+                'filter_index' => 'main_table.status'
             ]
         );
 
         $this->addColumn(
             'created_at',
-            ['header' => __('Purchased'), 'index' => 'created_at', 'type' => 'date']
+            [
+                'header' => __('Purchased'),
+                'index' => 'created_at',
+                'type' => 'date',
+                'filter_index' => 'main_table.created_at'
+            ]
         );
 
         return parent::_prepareColumns();

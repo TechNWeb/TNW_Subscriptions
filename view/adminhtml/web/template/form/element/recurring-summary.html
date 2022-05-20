@@ -14,13 +14,12 @@
          click="toggleOpened"
          keyboard="13: toggleOpened"
          if="label">
-
         <strong if="frequencyRecords && frequencyRecords.length" css="'admin__collapsible-title': collapsible,
                       title: !collapsible,
                       '_changed': changed,
                       '_loading': loading,
                       '_error': error">
-            <span translate="label"/>
+            <span translate="label"></span>
         </strong>
     </div>
 
@@ -28,41 +27,41 @@
          css="'admin__collapsible-content': collapsible, '_show': opened, '_hide': !opened()">
         <fieldset if="opened() || _wasOpened || initializeFieldsetDataByDefault" class="admin__fieldset">
             <p ifnot="frequencyRecords && frequencyRecords.length">
-                <span translate="'Please add billing frequencies by clicking \'manage\' button!'"/>
+                <span translate="'Please add billing frequencies by clicking \'manage\' button!'"></span>
             </p>
             <p if="frequencyRecords && frequencyRecords.length">
-                <span if="getTrialDescription()" text="getTrialDescription()"/>
-                <span if="getDiscountDescription()" text="getDiscountDescription()"/>
-                <span if="getBillingDescription()" text="getBillingDescription()"/>
+                <span if="getTrialDescription()" text="getTrialDescription()"></span>
+                <span if="getDiscountDescription()" text="getDiscountDescription()"></span>
+                <span if="getBillingDescription()" text="getBillingDescription()"></span>
             </p>
             <table if="frequencyRecords && frequencyRecords.length" class="data-grid">
                 <thead>
                     <tr>
-                        <th class="data-grid-th" translate="'Billing Frequency'"/>
+                        <th class="data-grid-th" translate="'Billing Frequency'"></th>
                         <!-- ko if: !getIsConfigurableProduct()-->
-                        <th class="data-grid-th" translate="'Recurring Price'"/>
-                        <th class="data-grid-th" translate="'Original Price'"/>
-                        <th width="90" class="data-grid-th column-centered" translate="'Is Disabled'"/>
+                        <th class="data-grid-th" translate="'Recurring Price'"></th>
+                        <th class="data-grid-th" translate="'Original Price'"></th>
+                        <th width="90" class="data-grid-th column-centered" translate="'Is Disabled'"></th>
                         <!-- /ko -->
-                        <th width="90" class="data-grid-th column-centered" translate="'Is Default'"/>
+                        <th width="90" class="data-grid-th column-centered" translate="'Is Default'"></th>
                     </tr>
                 </thead>
                 <tbody>
                     <!-- ko foreach: {data: frequencyRecords, as: 'record'} -->
                         <tr data-bind="css: {'_odd-row': $index() % 2}">
-                            <td text="$parent.getFrequencyLabel(record)"/>
+                            <td text="$parent.getFrequencyLabel(record)"></td>
                             <!-- ko if: !$parent.getIsConfigurableProduct()-->
                             <td>
-                                <span text="$parent.getRecurringPrice(record)"/><br>
-                                <span text="$parent.getInitialFee(record)"/><br>
+                                <span text="$parent.getRecurringPrice(record)"></span><br>
+                                <span text="$parent.getInitialFee(record)"></span><br>
                             </td>
-                            <td text="$parent.getOriginalPrice()"/>
+                            <td text="$parent.getOriginalPrice()"></td>
                             <td class="column-centered">
-                                <strong css="'icon-checkmark': $parent.getIsDisabled(record)"/>
+                                <strong css="'icon-checkmark': $parent.getIsDisabled(record)"></strong>
                             </td>
                             <!-- /ko -->
                             <td class="column-centered">
-                                <strong css="'icon-checkmark': $parent.getIsDefault(record)"/>
+                                <strong css="'icon-checkmark': $parent.getIsDefault(record)"></strong>
                             </td>
                         </tr>
                     <!-- /ko -->

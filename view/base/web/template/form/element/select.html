@@ -12,8 +12,14 @@
         'aria-describedby': noticeId
     },
     hasFocus: focused,
+    optgroup: options,
     value: value,
-    foreach: options"
->
-    <option data-bind="attr: { disabled: disabled, value: value }, text: label"></option>
-</select>
+    optionsCaption: caption,
+    optionsValue: 'value',
+    optionsText: 'label',
+    optionsAfterRender: function(option, item) {
+        if (item && item.disabled) {
+            ko.applyBindingsToNode(option, {attr: {disabled: true}}, item);
+        }
+    }"
+></select>

@@ -11,6 +11,7 @@ use Magento\Framework\UrlInterface;
 use Magento\Framework\View\Element\UiComponent\ContextInterface;
 use Magento\Framework\View\Element\UiComponentFactory;
 use Magento\Ui\Component\Listing\Columns\Column;
+use Magento\Framework\Exception\LocalizedException;
 
 /**
  * Class ProductThumbnail - ui component
@@ -69,10 +70,16 @@ class ProductThumbnail extends Column
             $fieldName = $this->getData('name');
             foreach ($dataSource['data']['items'] as & $item) {
                 if (isset($item['product_id'])) {
-                    $product = $this->productRepository->getById($item['product_id']);
-                    $imageHelper = $this->imageHelper->init($product, 'product_listing_thumbnail');
-                    $item[$fieldName . '_src'] = $imageHelper->getUrl();
-                    $item[$fieldName . '_alt'] = $product->getName();
+                    try {
+                        $product = $this->productRepository->getById($item['product_id']);
+                    } catch (LocalizedException $e) {
+                        $product = null;
+                    }
+                    if ($product) {
+                        $imageHelper = $this->imageHelper->init($product, 'product_listing_thumbnail');
+                        $item[$fieldName . '_src'] = $imageHelper->getUrl();
+                        $item[$fieldName . '_alt'] = $product->getName();
+                    }
                 }
             }
         }

@@ -27,6 +27,7 @@ use TNW\Subscriptions\Model\Payment\DataBuilder;
 use TNW\Subscriptions\Model\QuoteSessionInterface;
 use TNW\Subscriptions\Model\SubscriptionProfileOrder\Manager as OrderRelationManager;
 use TNW\Subscriptions\Model\SubscriptionProfileRepository;
+use TNW\Subscriptions\Model\SubscriptionProfile\Manager as SubscriptionProfileManager;
 
 /**
  * Class Vault modifier
@@ -119,6 +120,11 @@ class Vault extends Base
     private $storeManager;
 
     /**
+     * @var SubscriptionProfileManager
+     */
+    private $subscriptionProfileManager;
+
+    /**
      * Vault constructor.
      * @param ObjectManagerInterface $objectManager
      * @param CcConfig $ccConfig
@@ -155,6 +161,7 @@ class Vault extends Base
         AdapterFactory $braintreeAdapterFactory,
         UrlInterface $urlBuilder,
         StoreManagerInterface $storeManager,
+        SubscriptionProfileManager $subscriptionProfileManager,
         $tokensConfigClass = ''
     ) {
         parent::__construct($config, $session, $profileRepository, $relationManager, $cartRepository, $storeManager);
@@ -177,6 +184,7 @@ class Vault extends Base
         $this->braintreeAdapterFactory = $braintreeAdapterFactory;
         $this->urlBuilder = $urlBuilder;
         $this->storeManager = $storeManager;
+        $this->subscriptionProfileManager = $subscriptionProfileManager;
     }
 
     /**
@@ -200,8 +208,13 @@ class Vault extends Base
         $storeId = $this->getProfile()
             ? $this->getProfile()->getStoreId()
             : $this->session->getStoreId();
-        $this->storeManager->setCurrentStore($storeId);
 
+        if (!$storeId) {
+            $profileOrder = $this->subscriptionProfileManager->getLastProfileOrder($this->getProfile());
+            $storeId = $profileOrder->getStoreId();
+        }
+
+        $this->storeManager->setCurrentStore($storeId);
         foreach ($this->vaultConfigProvider->getConfig()['vault'] as $vaultCode => $enabledConfig) {
             if ($this->config->isPaymentMethodAvailableForSubscription(
                 str_replace(['_cc_vault', '_vault'], '', $vaultCode),

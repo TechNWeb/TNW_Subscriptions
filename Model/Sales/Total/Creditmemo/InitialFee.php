@@ -69,7 +69,7 @@ class InitialFee extends AbstractTotal
                     $baseTotalInitialFee = $this->priceCurrency->round($orderBaseInitialFeeAmount * $ratio);
                 }
             } else {
-                $baseAllowedAmount = $order->getBaseCurrency()->format($baseAllowedAmount, null, false);
+                $baseAllowedAmount = $order->getBaseCurrency()->format($baseAllowedAmount, [], false);
                 throw new LocalizedException(__('Maximum initial fee allowed to refund is: %1', $baseAllowedAmount));
             }
         } else {

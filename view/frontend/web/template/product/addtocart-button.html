@@ -13,7 +13,7 @@
                             attr="'data-mage-init': getDataMageInit($row()),
                               'data-post': getSubsAddToCartParams($row())"
                             class="action primary subscribe">
-                        <span data-role="button-text" translate="'Auto-Ship'"/>
+                        <span data-role="button-text" translate="'Auto-Ship'"></span>
                     </button>
                 </div>
             </if>
@@ -25,7 +25,7 @@
                                 attr="'data-mage-init': getDataMageInit($row()),
                               'data-post': getSubsAddToCartParams($row())"
                                 class="action primary subscribe">
-                            <span data-role="button-text" translate="'Auto-Ship'"/>
+                            <span data-role="button-text" translate="'Auto-Ship'"></span>
                         </button>
                     </div>
                     <div class="product-subscribe-button-dropdown">
@@ -40,7 +40,7 @@
                               'data-post': getDataPost($row()),
                                title: getLabel()"
                                 type="button">
-                            <span text="getLabel()"/>
+                            <span text="getLabel()"></span>
                         </button>
                     </div>
                 </div>
@@ -52,14 +52,14 @@
                               'data-post': getDataPost($row()),
                                title: getLabel()"
                     type="button">
-                <span text="getLabel()"/>
+                <span text="getLabel()"></span>
             </button>
         </if>
     </if>
     <ifnot args="isSalable($row())">
         <div class="stock unavailable">
-            <text args="$t('Availability')"/>
-            <span translate="'Out of stock'"/>
+            <text args="$t('Availability')"></text>
+            <span translate="'Out of stock'"></span>
         </div>
     </ifnot>
 </if>

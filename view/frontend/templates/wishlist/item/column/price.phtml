@@ -19,6 +19,7 @@ $product = $block->getProductItem();
 <?php if ($_subscriptionBlock->isAllowedProductType($product)
     && $_subscriptionBlock->isSubscriptionPrice($product)): ?>
     <div class="price-box price-final_price">
+        <?= /* @noEscape */ $_subscriptionBlock->getPriceLabel($product) ?>
         <span class="price-wrapper" data-role="priceBox">
             <span class="price">
                 <?= /* @noEscape */ $_subscriptionBlock->getTrialPriceForCategory($product) ?>

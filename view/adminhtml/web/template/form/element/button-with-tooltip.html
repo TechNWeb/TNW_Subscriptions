@@ -5,13 +5,13 @@
  */
 -->
 
-<render args="tooltipTpl" if="$data.tooltip && $data.tooltip.description"/>
+<render args="tooltipTpl" if="$data.tooltip && $data.tooltip.description"></render>
 <button type="button"
         css="buttonClasses"
         click="action"
         disable="disabled"
         attr="'data-index': index">
-    <span text="title"/>
+    <span text="title"></span>
 </button>
 
 <if args="childError">
