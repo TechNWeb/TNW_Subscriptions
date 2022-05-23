@@ -16,7 +16,8 @@ use Magento\Framework\Serialize\SerializerInterface;
  */
 class Validation extends Validator
 {
-    const ERROR_INVALID_DISCOUNT_AMOUNT = 'Discount amount can not be equal or less than product price';
+    const ERROR_INVALID_DISCOUNT_AMOUNT = 'Discount amount can not be equal or greater than product price';
+    const ERROR_INVALID_DISCOUNT_AMOUNT_NEGATIVE = 'Discount amount can not be negative';
     const ERROR_INVALID_DEFAULT_BILLING_FREQUENCY = 'Default Billing frequency must be type of bool (1 or 0)';
     const ERROR_INVALID_REGULAR_PRICE = 'Regular price can not be equal or less than 0';
     const ERROR_INVALID_INITIAL_FEE = 'Initial fee can not be less than 0';
@@ -141,20 +142,22 @@ class Validation extends Validator
 
         if ($attrCode == 'tnw_subscr_discount_amount') {
             if ($rowData['tnw_subscr_discount_type'] == 'Flat Fee') {
-                if ($rowData['price'] == $rowData['tnw_subscr_discount_amount']
-                    || $rowData['tnw_subscr_discount_amount'] < 0
-                ) {
+                if ($rowData['tnw_subscr_discount_amount'] >= $rowData['price']) {
                     $valid = false;
                     $this->_addMessages([self::ERROR_INVALID_DISCOUNT_AMOUNT]);
+                } elseif ($rowData['tnw_subscr_discount_amount'] < 0) {
+                    $valid = false;
+                    $this->_addMessages([self::ERROR_INVALID_DISCOUNT_AMOUNT_NEGATIVE]);
                 }
             }
 
             if ($rowData['tnw_subscr_discount_type'] == 'Percent') {
-                if ($rowData['tnw_subscr_discount_amount'] == 100
-                    || $rowData['tnw_subscr_discount_amount'] < 0
-                ) {
+                if ($rowData['tnw_subscr_discount_amount'] >= 100) {
                     $valid = false;
                     $this->_addMessages([self::ERROR_INVALID_DISCOUNT_AMOUNT]);
+                } elseif ($rowData['tnw_subscr_discount_amount'] < 0) {
+                    $valid = false;
+                    $this->_addMessages([self::ERROR_INVALID_DISCOUNT_AMOUNT_NEGATIVE]);
                 }
             }
 

@@ -291,6 +291,11 @@ class Product extends ExportProduct
                 $data = $item->getData();
                 unset($data['magento_product_id']);
                 unset($data['id']);
+                try {
+                    $data['subscription_profile_ids'] = $this->json->unserialize($data['subscription_profile_ids']);
+                } catch (\InvalidArgumentException $e) {
+                    $data['subscription_profile_ids'] = [];
+                }
                 $result[] = $data;
             }
         } catch (LocalizedException $exception) {
