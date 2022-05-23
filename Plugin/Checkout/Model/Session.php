@@ -3,9 +3,9 @@
  *  Copyright © 2021 TechNWeb, Inc. All rights reserved.
  *  See TNW_LICENSE.txt for license details.
  */
+
 namespace TNW\Subscriptions\Plugin\Checkout\Model;
 
-use ArrayObject;
 use Magento\Checkout\Model\Session as CheckoutSession;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Exception\NoSuchEntityException;
@@ -55,7 +55,7 @@ class Session
         }
 
         try {
-            $addProductList = new ArrayObject();
+            $addProductList = [];
             $quote = $result->getQuote();
             foreach ($quote->getAllItems() as $item) {
                 if ($item->getChildren()) {
@@ -82,27 +82,25 @@ class Session
                         }
 
                         $quote->deleteItem($itemToDelete);
-                        $addProductList->append([
+                        $addProductList[] = [
                             'item' => clone $itemToDelete,
                             'itemProduct' => clone $itemToDelete->getProduct(),
                             'buyRequest' => clone $buyRequest,
-                        ]);
+                        ];
                     }
                 }
             }
-            if ($addProductList->count()) {
-                foreach ($addProductList->getIterator() as $itemToAdd) {
-                    $quote->addProduct($itemToAdd['itemProduct'], $itemToAdd['buyRequest']);
-                }
-                $this->quoteRepository->save($quote);
-
-                /** @var Quote $quote */
-                $quote = $this->quoteRepository->get($quote->getId());
-                $quote->setTotalsCollectedFlag(false)->collectTotals();
-                $this->quoteRepository->save($quote);
-                $result->replaceQuote($quote);
+            foreach ($addProductList as $itemToAdd) {
+                $quote->addProduct($itemToAdd['itemProduct'], $itemToAdd['buyRequest']);
             }
-        } catch (NoSuchEntityException | LocalizedException $e) {
+            $this->quoteRepository->save($quote);
+
+            /** @var Quote $quote */
+            $quote = $this->quoteRepository->get($quote->getId());
+            $quote->setTotalsCollectedFlag(false)->collectTotals();
+            $this->quoteRepository->save($quote);
+            $result->replaceQuote($quote);
+        } catch (NoSuchEntityException|LocalizedException $e) {
             return $result;
         }
         return $result;

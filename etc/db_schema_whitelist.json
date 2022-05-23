@@ -1,0 +1,657 @@
+{
+    "tnw_subscriptions_billing_frequency": {
+        "column": {
+            "id": true,
+            "unit": true,
+            "label": true,
+            "status": true,
+            "frequency": true
+        },
+        "constraint": {
+            "PRIMARY": true
+        }
+    },
+    "tnw_subscriptions_creditmemo_extension_entity": {
+        "column": {
+            "entity_id": true,
+            "subscription_initial_fee": true,
+            "base_subscription_initial_fee": true
+        },
+        "constraint": {
+            "FK_C288C999B2D629B686C76229A87A7076": true,
+            "TNW_SUBSCRIPTIONS_CREDITMEMO_EXTENSION_ENTITY_ENTITY_ID": true
+        }
+    },
+    "tnw_subscriptions_creditmemo_item_extension_entity": {
+        "column": {
+            "item_id": true,
+            "subs_initial_fee": true,
+            "base_subs_initial_fee": true
+        },
+        "constraint": {
+            "PRIMARY": true
+        }
+    },
+    "tnw_subscriptions_customer_product_history": {
+        "column": {
+            "id": true,
+            "subscription_profile_id": true,
+            "customer_id": true,
+            "magento_product_id": true
+        },
+        "index": {
+            "TNW_SUBSCRIPTIONS_CSTR_PRD_HISTORY_CSTR_ID_MAGENTO_PRD_ID": true
+        },
+        "constraint": {
+            "PRIMARY": true
+        }
+    },
+    "tnw_subscriptions_customer_quote": {
+        "column": {
+            "id": true,
+            "customer_id": true,
+            "quote_id": true
+        },
+        "index": {
+            "TNW_SUBSCRIPTIONS_CUSTOMER_QUOTE_QUOTE_ID": true,
+            "TNW_SUBSCRIPTIONS_CUSTOMER_QUOTE_CUSTOMER_ID": true
+        },
+        "constraint": {
+            "TNW_SUBSCRIPTIONS_CSTR_QUOTE_CSTR_ID_CSTR_ENTT_ENTT_ID": true,
+            "TNW_SUBSCRIPTIONS_CUSTOMER_QUOTE_QUOTE_ID_QUOTE_ENTITY_ID": true,
+            "PRIMARY": true
+        }
+    },
+    "tnw_subscriptions_invoice_item_extension_entity": {
+        "column": {
+            "item_id": true,
+            "subs_initial_fee": true,
+            "base_subs_initial_fee": true
+        },
+        "constraint": {
+            "PRIMARY": true
+        }
+    },
+    "tnw_subscriptions_message": {
+        "column": {
+            "message_id": true,
+            "transaction_uid": true,
+            "level": true,
+            "website_id": true,
+            "message": true,
+            "created_at": true
+        },
+        "index": {
+            "TNW_SUBSCRIPTIONS_MESSAGE_WEBSITE_ID": true
+        },
+        "constraint": {
+            "TNW_SUBSCRIPTIONS_MESSAGE_WEBSITE_ID_STORE_WEBSITE_WEBSITE_ID": true,
+            "PRIMARY": true
+        }
+    },
+    "tnw_subscriptions_order_extension_entity": {
+        "column": {
+            "entity_id": true,
+            "subscription_initial_fee_refunded": true,
+            "base_subscription_initial_fee_refunded": true
+        },
+        "constraint": {
+            "FK_7C9D020D5E5B0E3FF5F782C507CD283D": true,
+            "TNW_SUBSCRIPTIONS_ORDER_EXTENSION_ENTITY_ENTITY_ID": true
+        }
+    },
+    "tnw_subscriptions_order_item_extension_entity": {
+        "column": {
+            "magento_item_id": true,
+            "subs_initial_fee": true,
+            "base_subs_initial_fee": true,
+            "subs_initial_fee_invoiced": true,
+            "base_subs_initial_fee_invoiced": true,
+            "subs_initial_fee_refunded": true,
+            "base_subs_initial_fee_refunded": true
+        },
+        "constraint": {
+            "PRIMARY": true
+        }
+    },
+    "tnw_subscriptions_product_billing_frequency": {
+        "column": {
+            "id": true,
+            "billing_frequency_id": true,
+            "magento_product_id": true,
+            "default_billing_frequency": true,
+            "price": true,
+            "initial_fee": true,
+            "sort_order": true,
+            "preset_qty": true,
+            "is_disabled": true,
+            "subscription_profile_ids": true
+        },
+        "index": {
+            "TNW_SUBSCRIPTIONS_PRODUCT_BILLING_FREQUENCY_MAGENTO_PRODUCT_ID": true
+        },
+        "constraint": {
+            "FK_875B313E0C614D70CE41BAB3D151649A": true,
+            "PRIMARY": true,
+            "UNQ_5088FC29991DE924B3B092F10816140D": true
+        }
+    },
+    "tnw_subscriptions_product_subscription_profile_eav_attribute": {
+        "column": {
+            "attribute_id": true,
+            "is_visible_on_front": true
+        },
+        "constraint": {
+            "FK_40DE8D2CC668D85D73133060958FA204": true,
+            "PRIMARY": true
+        }
+    },
+    "tnw_subscriptions_product_subscription_profile_entity": {
+        "column": {
+            "entity_id": true,
+            "parent_id": true,
+            "subscription_profile_id": true,
+            "magento_product_id": true,
+            "name": true,
+            "sku": true,
+            "tnw_subscr_unlock_preset_qty": true,
+            "price": true,
+            "initial_fee": true,
+            "qty": true,
+            "purchase_type": true,
+            "trial_status": true,
+            "trial_price": true,
+            "lock_product_price_status": true,
+            "offer_flat_discount_status": true,
+            "discount_amount": true,
+            "discount_type": true,
+            "need_recollect": true,
+            "custom_options": true,
+            "created_at": true,
+            "updated_at": true
+        },
+        "index": {
+            "IDX_59E387A6AEC7FBCFB156D5BE4E77EDF8": true,
+            "TNW_SUBSCRIPTIONS_PRD_SUBSCRIPTION_PROFILE_ENTT_MAGENTO_PRD_ID": true
+        },
+        "constraint": {
+            "FK_10D1E5EA7B3D387D37D55C6A25C2D9E9": true,
+            "PRIMARY": true
+        }
+    },
+    "tnw_subscriptions_product_subscription_profile_entity_datetime": {
+        "column": {
+            "value_id": true,
+            "attribute_id": true,
+            "store_id": true,
+            "entity_id": true,
+            "value": true
+        },
+        "index": {
+            "TNW_SUBSCRIPTIONS_PRD_SUBSCRIPTION_PROFILE_ENTT_DTIME_ENTT_ID": true,
+            "TNW_SUBSCRIPTIONS_PRD_SUBSCRIPTION_PROFILE_ENTT_DTIME_ATTR_ID": true,
+            "TNW_SUBSCRIPTIONS_PRD_SUBSCRIPTION_PROFILE_ENTT_DTIME_STORE_ID": true
+        },
+        "constraint": {
+            "FK_E4CD96AB6AD1075394F5F87ECBBC1700": true,
+            "FK_E6E60093DE17E596752D4C59FE6DB583": true,
+            "FK_F9C0E822268F490F99AD72C9F114A8B6": true,
+            "PRIMARY": true,
+            "UNQ_2EDB54BBFEF4D1F01DFB20C1491F426D": true
+        }
+    },
+    "tnw_subscriptions_product_subscription_profile_entity_decimal": {
+        "column": {
+            "value_id": true,
+            "attribute_id": true,
+            "store_id": true,
+            "entity_id": true,
+            "value": true
+        },
+        "index": {
+            "TNW_SUBSCRIPTIONS_PRD_SUBSCRIPTION_PROFILE_ENTT_DEC_ENTT_ID": true,
+            "TNW_SUBSCRIPTIONS_PRD_SUBSCRIPTION_PROFILE_ENTT_DEC_ATTR_ID": true,
+            "TNW_SUBSCRIPTIONS_PRD_SUBSCRIPTION_PROFILE_ENTT_DEC_STORE_ID": true
+        },
+        "constraint": {
+            "FK_07246D5E59F901260D6E82A99874FC36": true,
+            "FK_3801BE3CFB1A79C812D933868EE970A7": true,
+            "FK_789906A40FF8A7722D32E8E34CBB293D": true,
+            "PRIMARY": true,
+            "UNQ_738380F7890C1E371453D3AC636A9D83": true
+        }
+    },
+    "tnw_subscriptions_product_subscription_profile_entity_int": {
+        "column": {
+            "value_id": true,
+            "attribute_id": true,
+            "store_id": true,
+            "entity_id": true,
+            "value": true
+        },
+        "index": {
+            "TNW_SUBSCRIPTIONS_PRD_SUBSCRIPTION_PROFILE_ENTT_INT_ENTT_ID": true,
+            "TNW_SUBSCRIPTIONS_PRD_SUBSCRIPTION_PROFILE_ENTT_INT_ATTR_ID": true,
+            "TNW_SUBSCRIPTIONS_PRD_SUBSCRIPTION_PROFILE_ENTT_INT_STORE_ID": true
+        },
+        "constraint": {
+            "FK_7625DC5675D97C2F0E8D5E93A9805E14": true,
+            "FK_BD045D3D60C3F81004022AE02367C62E": true,
+            "FK_9116FD66CAFA58556DFF2DADE59D6080": true,
+            "PRIMARY": true,
+            "UNQ_95C3833FAA7232C16FA00D98CD7857E5": true
+        }
+    },
+    "tnw_subscriptions_product_subscription_profile_entity_text": {
+        "column": {
+            "value_id": true,
+            "attribute_id": true,
+            "store_id": true,
+            "entity_id": true,
+            "value": true
+        },
+        "index": {
+            "TNW_SUBSCRIPTIONS_PRD_SUBSCRIPTION_PROFILE_ENTT_TEXT_ENTT_ID": true,
+            "TNW_SUBSCRIPTIONS_PRD_SUBSCRIPTION_PROFILE_ENTT_TEXT_ATTR_ID": true,
+            "TNW_SUBSCRIPTIONS_PRD_SUBSCRIPTION_PROFILE_ENTT_TEXT_STORE_ID": true
+        },
+        "constraint": {
+            "FK_0A338D0D577389796E3A82203D28613E": true,
+            "FK_665651D0722F852E008AF46CB9DC40DD": true,
+            "FK_B15C178A28D81D4D47F79654891E56F6": true,
+            "PRIMARY": true,
+            "UNQ_343C86E0FE8EF4EE79887D358A58A645": true
+        }
+    },
+    "tnw_subscriptions_product_subscription_profile_entity_varchar": {
+        "column": {
+            "value_id": true,
+            "attribute_id": true,
+            "store_id": true,
+            "entity_id": true,
+            "value": true
+        },
+        "index": {
+            "TNW_SUBSCRIPTIONS_PRD_SUBSCRIPTION_PROFILE_ENTT_VCHR_ENTT_ID": true,
+            "TNW_SUBSCRIPTIONS_PRD_SUBSCRIPTION_PROFILE_ENTT_VCHR_ATTR_ID": true,
+            "TNW_SUBSCRIPTIONS_PRD_SUBSCRIPTION_PROFILE_ENTT_VCHR_STORE_ID": true
+        },
+        "constraint": {
+            "FK_57AA4F9598FBABCAB5E489C5F8AC62BE": true,
+            "FK_9A5DD43BB13F571224B10A53D0A146FB": true,
+            "FK_B6E16A4AD4F7345E909458B6CB9AEE93": true,
+            "PRIMARY": true,
+            "UNQ_66AE22609295F8AF00D1F98A4ADFA383": true
+        }
+    },
+    "tnw_subscriptions_profile_item_sales_item": {
+        "column": {
+            "profile_item_id": true,
+            "quote_item_id": true,
+            "order_item_id": true
+        },
+        "index": {
+            "TNW_SUBSCRIPTIONS_PROFILE_ITEM_SALES_ITEM_QUOTE_ITEM_ID": true,
+            "TNW_SUBSCRIPTIONS_PROFILE_ITEM_SALES_ITEM_ORDER_ITEM_ID": true
+        },
+        "constraint": {
+            "FK_0E4CAC2D18991122D2E114BE36211EE1": true,
+            "FK_90E9801AECDBB4A7B7DA6BE695DD78F0": true,
+            "FK_FFB4A0B130B1F361FE39512EC4B4CA2B": true,
+            "UNQ_121D5D108FA29C58071294AE01EEC4D8": true
+        }
+    },
+    "tnw_subscriptions_profile_profit": {
+        "column": {
+            "entity_id": true,
+            "profile_id": true,
+            "profit_type": true,
+            "total_profit": true
+        },
+        "constraint": {
+            "PRIMARY": true
+        }
+    },
+    "tnw_subscriptions_quote_item_extension_entity": {
+        "column": {
+            "item_id": true,
+            "subs_initial_fee": true,
+            "base_subs_initial_fee": true
+        },
+        "constraint": {
+            "PRIMARY": true
+        }
+    },
+    "tnw_subscriptions_rebill_profiles": {
+        "column": {
+            "id": true,
+            "customer_id": true,
+            "subscription_profiles": true,
+            "queues": true,
+            "token": true
+        },
+        "constraint": {
+            "PRIMARY": true
+        }
+    },
+    "tnw_subscriptions_sales_order_aggregated_created": {
+        "column": {
+            "id": true,
+            "period": true,
+            "store_id": true,
+            "order_status": true,
+            "orders_count": true,
+            "total_qty_ordered": true,
+            "total_qty_invoiced": true,
+            "total_income_amount": true,
+            "total_revenue_amount": true,
+            "total_profit_amount": true,
+            "total_invoiced_amount": true,
+            "total_canceled_amount": true,
+            "total_paid_amount": true,
+            "total_refunded_amount": true,
+            "total_tax_amount": true,
+            "total_tax_amount_actual": true,
+            "total_shipping_amount": true,
+            "total_shipping_amount_actual": true,
+            "total_discount_amount": true,
+            "total_discount_amount_actual": true
+        },
+        "index": {
+            "TNW_SUBSCRIPTIONS_SALES_ORDER_AGGREGATED_CREATED_STORE_ID": true
+        },
+        "constraint": {
+            "FK_ADF36C3E576A43B23E1B70C5DE7CE045": true,
+            "PRIMARY": true,
+            "UNQ_A8BDF14278BF22743930A37F07D00B0C": true
+        }
+    },
+    "tnw_subscriptions_sales_order_aggregated_updated": {
+        "column": {
+            "id": true,
+            "period": true,
+            "store_id": true,
+            "order_status": true,
+            "orders_count": true,
+            "total_qty_ordered": true,
+            "total_qty_invoiced": true,
+            "total_income_amount": true,
+            "total_revenue_amount": true,
+            "total_profit_amount": true,
+            "total_invoiced_amount": true,
+            "total_canceled_amount": true,
+            "total_paid_amount": true,
+            "total_refunded_amount": true,
+            "total_tax_amount": true,
+            "total_tax_amount_actual": true,
+            "total_shipping_amount": true,
+            "total_shipping_amount_actual": true,
+            "total_discount_amount": true,
+            "total_discount_amount_actual": true
+        },
+        "index": {
+            "TNW_SUBSCRIPTIONS_SALES_ORDER_AGGREGATED_UPDATED_STORE_ID": true
+        },
+        "constraint": {
+            "FK_C75D12134522F5DDB815BA2F0263B681": true,
+            "PRIMARY": true,
+            "UNQ_969B44313E38650AF8E51298B047041E": true
+        }
+    },
+    "tnw_subscriptions_subscription_profile_address": {
+        "column": {
+            "id": true,
+            "profile_id": true,
+            "created_at": true,
+            "updated_at": true,
+            "customer_address_id": true,
+            "address_type": true,
+            "prefix": true,
+            "firstname": true,
+            "middlename": true,
+            "lastname": true,
+            "suffix": true,
+            "company": true,
+            "street": true,
+            "city": true,
+            "region": true,
+            "region_id": true,
+            "postcode": true,
+            "country_id": true,
+            "telephone": true,
+            "fax": true
+        },
+        "index": {
+            "TNW_SUBSCRIPTIONS_SUBSCRIPTION_PROFILE_ADDRESS_PROFILE_ID": true
+        },
+        "constraint": {
+            "FK_D920CC425DD533D8114F473F4A55EAA6": true,
+            "PRIMARY": true
+        }
+    },
+    "tnw_subscriptions_subscription_profile_entity": {
+        "column": {
+            "entity_id": true,
+            "customer_id": true,
+            "billing_frequency_id": true,
+            "unit": true,
+            "website_id": true,
+            "status": true,
+            "frequency": true,
+            "trial_start_date": true,
+            "start_date": true,
+            "term": true,
+            "total_billing_cycles": true,
+            "shipping_method": true,
+            "shipping_description": true,
+            "profile_currency_code": true,
+            "trial_length": true,
+            "trial_length_unit": true,
+            "is_virtual": true,
+            "generate_quotes_state": true,
+            "need_recollect": true,
+            "cancel_before_next_cycle": true,
+            "created_at": true,
+            "updated_at": true,
+            "subtotal": true,
+            "shipping": true,
+            "discount": true,
+            "tax": true,
+            "grand_total": true,
+            "original_start_date": true,
+            "billing_cycles_to_skip": true,
+            "coupon_code": true,
+            "subscription_total_static_billing_cycles": true,
+            "store_id": true
+        },
+        "constraint": {
+            "PRIMARY": true
+        }
+    },
+    "tnw_subscriptions_subscription_profile_entity_datetime": {
+        "column": {
+            "value_id": true,
+            "attribute_id": true,
+            "entity_id": true,
+            "value": true
+        },
+        "index": {
+            "TNW_SUBSCRIPTIONS_SUBSCRIPTION_PROFILE_ENTT_DTIME_ATTR_ID": true,
+            "TNW_SUBSCRIPTIONS_SUBSCRIPTION_PROFILE_ENTITY_DATETIME_ENTITY_ID": true
+        },
+        "constraint": {
+            "FK_5E44719E2E3BDBBF1133D80688F5BBF0": true,
+            "FK_D7D3BC5F903429621DD79A8846A7C031": true,
+            "PRIMARY": true
+        }
+    },
+    "tnw_subscriptions_subscription_profile_entity_decimal": {
+        "column": {
+            "value_id": true,
+            "attribute_id": true,
+            "entity_id": true,
+            "value": true
+        },
+        "index": {
+            "TNW_SUBSCRIPTIONS_SUBSCRIPTION_PROFILE_ENTT_DEC_ATTR_ID": true,
+            "TNW_SUBSCRIPTIONS_SUBSCRIPTION_PROFILE_ENTITY_DECIMAL_ENTITY_ID": true
+        },
+        "constraint": {
+            "FK_526446F57E6D46B7092AAF67E4B0BE0C": true,
+            "FK_91F08345F5A85BB65B28E51AD54C31D2": true,
+            "PRIMARY": true
+        }
+    },
+    "tnw_subscriptions_subscription_profile_entity_int": {
+        "column": {
+            "value_id": true,
+            "attribute_id": true,
+            "entity_id": true,
+            "value": true
+        },
+        "index": {
+            "TNW_SUBSCRIPTIONS_SUBSCRIPTION_PROFILE_ENTITY_INT_ATTRIBUTE_ID": true,
+            "TNW_SUBSCRIPTIONS_SUBSCRIPTION_PROFILE_ENTITY_INT_ENTITY_ID": true
+        },
+        "constraint": {
+            "FK_23D695FE51690B7682E447591E557FEC": true,
+            "FK_42DCD6527998E54831A3BBE90788CEF4": true,
+            "PRIMARY": true
+        }
+    },
+    "tnw_subscriptions_subscription_profile_entity_text": {
+        "column": {
+            "value_id": true,
+            "attribute_id": true,
+            "entity_id": true,
+            "value": true
+        },
+        "index": {
+            "TNW_SUBSCRIPTIONS_SUBSCRIPTION_PROFILE_ENTITY_TEXT_ATTRIBUTE_ID": true,
+            "TNW_SUBSCRIPTIONS_SUBSCRIPTION_PROFILE_ENTITY_TEXT_ENTITY_ID": true
+        },
+        "constraint": {
+            "FK_232C9DAC4DCE4F2A9236B6095AC1AB7A": true,
+            "FK_8E894C4D93820B03D40565E192AB12CE": true,
+            "PRIMARY": true
+        }
+    },
+    "tnw_subscriptions_subscription_profile_entity_varchar": {
+        "column": {
+            "value_id": true,
+            "attribute_id": true,
+            "entity_id": true,
+            "value": true
+        },
+        "index": {
+            "TNW_SUBSCRIPTIONS_SUBSCRIPTION_PROFILE_ENTT_VCHR_ATTR_ID": true,
+            "TNW_SUBSCRIPTIONS_SUBSCRIPTION_PROFILE_ENTITY_VARCHAR_ENTITY_ID": true
+        },
+        "constraint": {
+            "FK_03851CC7BDEA782C2056967FD6004DCF": true,
+            "FK_518352CBA02658DFDA277487321C7721": true,
+            "PRIMARY": true
+        }
+    },
+    "tnw_subscriptions_subscription_profile_message_history": {
+        "column": {
+            "entity_id": true,
+            "parent_id": true,
+            "is_visible_on_front": true,
+            "message": true,
+            "is_comment": true,
+            "created_at": true,
+            "user_id": true,
+            "customer_id": true
+        },
+        "index": {
+            "TNW_SUBSCRIPTIONS_SUBSCRIPTION_PROFILE_MESSAGE_HISTORY_PARENT_ID": true
+        },
+        "constraint": {
+            "FK_BDBA6A9FC5E7E9D376ADA5166CE92556": true,
+            "PRIMARY": true
+        }
+    },
+    "tnw_subscriptions_subscription_profile_order": {
+        "column": {
+            "id": true,
+            "subscription_profile_id": true,
+            "magento_order_id": true,
+            "magento_quote_id": true,
+            "scheduled_at": true
+        },
+        "index": {
+            "IDX_3C3947F9C69C13CA65AE6DBE67D9D59B": true
+        },
+        "constraint": {
+            "FK_974724824020F917A3017B41E95DE77D": true,
+            "PRIMARY": true
+        }
+    },
+    "tnw_subscriptions_subscription_profile_payment": {
+        "column": {
+            "payment_id": true,
+            "subscription_profile_id": true,
+            "engine_code": true,
+            "token_hash": true,
+            "payment_additional_info": true,
+            "created_at": true,
+            "updated_at": true,
+            "sent_mail": true
+        },
+        "index": {
+            "IDX_18BBF6450B87ECA14B013E3143E8BA6E": true
+        },
+        "constraint": {
+            "FK_A83CC81915B56821ED740CA8F26B0889": true,
+            "PRIMARY": true
+        }
+    },
+    "tnw_subscriptions_subscription_profile_queue": {
+        "column": {
+            "id": true,
+            "profile_order_id": true,
+            "status": true,
+            "attempt_count": true,
+            "message": true,
+            "created_at": true,
+            "updated_at": true
+        },
+        "index": {
+            "TNW_SUBSCRIPTIONS_SUBSCRIPTION_PROFILE_QUEUE_CREATED_AT": true,
+            "TNW_SUBSCRIPTIONS_SUBSCRIPTION_PROFILE_QUEUE_UPDATED_AT": true,
+            "TNW_SUBSCRIPTIONS_SUBSCRIPTION_PROFILE_QUEUE_STATUS": true,
+            "TNW_SUBSCRIPTIONS_SUBSCRIPTION_PROFILE_QUEUE_ATTEMPT_COUNT": true
+        },
+        "constraint": {
+            "FK_15AC8190AB05E1E61241C395A1F7E411": true,
+            "PRIMARY": true,
+            "TNW_SUBSCRIPTIONS_SUBSCRIPTION_PROFILE_QUEUE_PROFILE_ORDER_ID": true
+        }
+    },
+    "tnw_subscriptions_subscription_profile_status_history": {
+        "column": {
+            "id": true,
+            "subscription_profile_id": true,
+            "status_old": true,
+            "status_new": true,
+            "user_id": true,
+            "customer_id": true,
+            "changed_at": true,
+            "changed_at_micro": true
+        },
+        "index": {
+            "IDX_DE07DA2CCF3E16715A8FAAB4B917E8DA": true,
+            "TNW_SUBSCRIPTIONS_SUBSCRIPTION_PROFILE_STATUS_HISTORY_STATUS_OLD": true,
+            "TNW_SUBSCRIPTIONS_SUBSCRIPTION_PROFILE_STATUS_HISTORY_STATUS_NEW": true,
+            "TNW_SUBSCRIPTIONS_SUBSCRIPTION_PROFILE_STATUS_HISTORY_USER_ID": true,
+            "TNW_SUBSCRIPTIONS_SUBSCRIPTION_PROFILE_STS_HISTORY_CSTR_ID": true,
+            "TNW_SUBSCRIPTIONS_SUBSCRIPTION_PROFILE_STATUS_HISTORY_CHANGED_AT": true,
+            "IDX_EC3C5C0C790881F5F7E8BD3E9ED5AABD": true
+        },
+        "constraint": {
+            "FK_D1FFB23DB58D24DB6FB55A39445D7EF7": true,
+            "PRIMARY": true
+        }
+    }
+}

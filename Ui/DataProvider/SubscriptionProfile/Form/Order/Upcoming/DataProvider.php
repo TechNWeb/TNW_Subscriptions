@@ -6,6 +6,7 @@
 namespace TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Form\Order\Upcoming;
 
 use Magento\Framework\App\RequestInterface;
+use Magento\Framework\DB\Select;
 use Magento\Framework\Pricing\PriceCurrencyInterface;
 use Magento\Quote\Model\ResourceModel\Quote\CollectionFactory;
 use Magento\Ui\DataProvider\AbstractDataProvider;
@@ -116,7 +117,7 @@ class DataProvider extends AbstractDataProvider
             )->where(
                 'relation.' . SubscriptionProfileOrderInterface::MAGENTO_ORDER_ID . ' is NULL'
             )->reset(
-                \Zend_Db_Select::COLUMNS
+                Select::COLUMNS
             )->columns(
                 $columns
             );

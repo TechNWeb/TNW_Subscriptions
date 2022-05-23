@@ -7,6 +7,7 @@ namespace TNW\Subscriptions\Block\Subscription\Summary\Overview;
 
 use Magento\Backend\Block\Template;
 use Magento\Backend\Block\Template\Context;
+use Magento\Framework\DB\Select;
 use TNW\Subscriptions\Model\ResourceModel\Queue\Collection as ProfileQueueCollection;
 use TNW\Subscriptions\Model\SubscriptionProfile;
 use TNW\Subscriptions\Model\SubscriptionProfileOrder;
@@ -63,7 +64,7 @@ class MissedPayments extends Template
                 $this->countOfMissedPayments = 0;
             } else {
                 $select = $this->profileQueueCollection->getSelect()
-                    ->reset(\Zend_Db_Select::COLUMNS)
+                    ->reset(Select::COLUMNS)
                     ->columns(['attempt_count'])
                     ->where('profile_order_id = ?', $nextOrder->getId());
                 $this->countOfMissedPayments = (int) $this->profileQueueCollection->getConnection()->fetchOne($select);
