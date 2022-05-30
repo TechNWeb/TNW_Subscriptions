@@ -74,7 +74,7 @@ class AddComment extends Action
         $response = new DataObject();
         $response->setData('result', true);
 
-        $subscriptionId = $this->dataPersistor->get('subscription_id');
+        $subscriptionId = (int) $this->_request->getParam('subscription_id');
 
         if ($subscriptionId) {
             $comment = $this->_request->getParam('comment') ?: false;

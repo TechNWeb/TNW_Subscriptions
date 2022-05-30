@@ -236,6 +236,13 @@
                 <item name="tabLabel" translate="true" xsi:type="string">Change History</item>
             </item>
         </argument>
+        <hidden name="subscription_id">
+            <settings>
+                <imports>
+                    <link name="value">${ $.provider}:data.subscription_profile_id</link>
+                </imports>
+            </settings>
+        </hidden>
         <field name="comment_area">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">

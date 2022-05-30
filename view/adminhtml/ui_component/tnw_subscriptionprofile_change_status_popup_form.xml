@@ -26,6 +26,11 @@
         </argument>
         <settings>
             <submitUrl path="tnw_subscriptions/subscriptionprofile/updatestatus"/>
+            <imports>
+                <link name="data.subscription_profile_id">
+                    tnw_subscriptionprofile_form.subscriptionprofile_form_data_source:data.subscription_profile_id
+                </link>
+            </imports>
         </settings>
         <dataProvider class="TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Modal\ChangeStatusPopup" name="tnw_subscriptionprofile_change_status_popup_form_data_source">
             <settings>

@@ -72,7 +72,7 @@ class UpdateStatus extends Action
      */
     public function execute()
     {
-        $profileId = $this->getRequest()->getParam('entity_id');
+        $profileId = $this->getRequest()->getPost()->get('subscription_profile_id');
         $newStatus = $this->getRequest()->getParam('status');
         $response = new DataObject();
         $response->setData('result', true);

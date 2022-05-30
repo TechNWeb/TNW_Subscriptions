@@ -79,7 +79,7 @@ class CancelSubscription extends Action
     public function execute()
     {
         $option = $this->getRequest()->getPost()->get('cancel_button_popup_options');
-        $subscriptionId = $this->dataPersistor->get('subscription_id');
+        $subscriptionId = $this->getRequest()->getPost()->get('subscription_profile_id');
 
         $response = new DataObject();
         $response->setData('result', true);
