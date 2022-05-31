@@ -24,6 +24,7 @@ use TNW\Subscriptions\Model\SubscriptionProfile\Create;
 use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product;
 use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product as ProductDataProvider;
 use TNW\Subscriptions\Api\SubscriptionProfileRepositoryInterface;
+use Magento\Framework\App\State;
 
 /**
  * Class ModifyForm - form modification modal
@@ -119,6 +120,7 @@ class ModifyForm extends Form
      * @param ProductTypeManagerResolver $productTypeResolver
      * @param StockRegistryInterface $stockRegistry
      * @param SubscriptionProfileRepositoryInterface $profileRepository
+     * @param State $state
      * @param string $scope
      * @param array $meta
      * @param array $data
@@ -135,6 +137,7 @@ class ModifyForm extends Form
         ProductTypeManagerResolver $productTypeResolver,
         StockRegistryInterface $stockRegistry,
         SubscriptionProfileRepositoryInterface $profileRepository,
+        State $state,
         $scope = '',
         array $meta = [],
         array $data = []
@@ -151,6 +154,7 @@ class ModifyForm extends Form
             $pool,
             $productTypeResolver,
             $profileRepository,
+            $state,
             $scope,
             $meta,
             $data

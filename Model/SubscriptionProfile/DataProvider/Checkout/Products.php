@@ -22,6 +22,7 @@ use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Modal\Conte
 use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Modal\ModifyForm;
 use TNW\Subscriptions\Model\ProductSubscriptionProfile\ProductTypeManagerResolver;
 use TNW\Subscriptions\Api\SubscriptionProfileRepositoryInterface;
+use Magento\Framework\App\State;
 
 /**
  * DataProvider to show products on subscription checkout.
@@ -72,6 +73,7 @@ class Products extends ModifyForm
      * @param ProductTypeManagerResolver $productTypeResolver
      * @param SubscriptionProfileRepositoryInterface $profileRepository
      * @param StockRegistryInterface $stockRegistry
+     * @param State $state
      * @param string $scope
      * @param array $meta
      * @param array $data
@@ -89,6 +91,7 @@ class Products extends ModifyForm
         ProductTypeManagerResolver $productTypeResolver,
         SubscriptionProfileRepositoryInterface $profileRepository,
         StockRegistryInterface $stockRegistry,
+        State $state,
         $scope = '',
         array $meta = [],
         array $data = []
@@ -107,6 +110,7 @@ class Products extends ModifyForm
             $productTypeResolver,
             $stockRegistry,
             $profileRepository,
+            $state,
             $scope,
             $meta,
             $data

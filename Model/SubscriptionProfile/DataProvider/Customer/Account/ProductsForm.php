@@ -32,6 +32,7 @@ use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Modal\Conte
 use TNW\Subscriptions\Model\SubscriptionProfile\Manager;
 use Magento\InventorySalesApi\Api\StockResolverInterface;
 use Magento\Store\Model\StoreManagerInterface;
+use Magento\Framework\App\State;
 
 /**
  * Subscription items form data provider for customer account dashboard page.
@@ -81,6 +82,7 @@ class ProductsForm extends SummaryProductsForm
      * @param StockResolverInterface $stockResolver
      * @param StoreManagerInterface $storeManager
      * @param SubscriptionProfileRepositoryInterface $profileRepository
+     * @param State $state
      * @param string $scope
      * @param array $meta
      * @param array $data
@@ -103,6 +105,7 @@ class ProductsForm extends SummaryProductsForm
         StockResolverInterface $stockResolver,
         StoreManagerInterface $storeManager,
         SubscriptionProfileRepositoryInterface $profileRepository,
+        State $state,
         $scope = '',
         array $meta = [],
         array $data = []
@@ -125,6 +128,7 @@ class ProductsForm extends SummaryProductsForm
             $productTypeResolver,
             $stockRegistry,
             $profileRepository,
+            $state,
             $scope,
             $meta,
             $data

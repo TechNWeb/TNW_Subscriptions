@@ -25,6 +25,7 @@ use TNW\Subscriptions\Model\ProductBillingFrequency\PriceCalculator;
 use TNW\Subscriptions\Model\ProductSubscriptionProfile\ProductTypeManagerResolver;
 use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product;
 use TNW\Subscriptions\Api\SubscriptionProfileRepositoryInterface;
+use Magento\Framework\App\State;
 
 /**
  * Modal form for adding single product to subscription.
@@ -110,6 +111,11 @@ class Form extends AbstractDataProvider
     private $profileRepository;
 
     /**
+     * @var State
+     */
+    private $state;
+
+    /**
      * @param string $name
      * @param string $primaryFieldName
      * @param string $requestFieldName
@@ -119,6 +125,7 @@ class Form extends AbstractDataProvider
      * @param PoolInterface $pool
      * @param ProductTypeManagerResolver $productTypeResolver
      * @param SubscriptionProfileRepositoryInterface $profileRepository
+     * @param State $state
      * @param string $scope
      * @param array $meta
      * @param array $data
@@ -133,10 +140,12 @@ class Form extends AbstractDataProvider
         PoolInterface $pool,
         ProductTypeManagerResolver $productTypeResolver,
         SubscriptionProfileRepositoryInterface $profileRepository,
+        State $state,
         $scope = '',
         array $meta = [],
         array $data = []
     ) {
+        $this->state = $state;
         $this->priceCalculator = $priceCalculator;
         $this->context = $context;
         $this->formContext = $formContext;
@@ -519,6 +528,14 @@ class Form extends AbstractDataProvider
         $quote = $this->formContext->getSession();
         $customerId = $quote->getCustomerId() ?? null;
         if (!$customerId) {
+            try {
+                $areaCode = $this->state->getAreaCode();
+            } catch (\Exception $e) {
+                $areaCode = 'not set';
+            }
+            if ($areaCode == 'adminhtml') {
+                return true;
+            }
             return false;
         }
 

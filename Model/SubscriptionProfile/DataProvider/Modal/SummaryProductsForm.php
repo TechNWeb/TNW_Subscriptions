@@ -32,6 +32,7 @@ use TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Edit\Modifier\EditProd
 use TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Form\Modifier\SummaryInsertForm;
 use TNW\Subscriptions\Model\ProductSubscriptionProfile\ProductTypeManagerResolver;
 use TNW\Subscriptions\Model\Source\ProfileStatus;
+use Magento\Framework\App\State;
 
 /**
  * Subscription items form data provider for subscription admin edit page.
@@ -103,6 +104,7 @@ class SummaryProductsForm extends ModifyForm
      * @param ProductTypeManagerResolver $productTypeResolver
      * @param StockRegistryInterface $stockRegistry
      * @param SubscriptionProfileRepositoryInterface $profileRepository
+     * @param State $state
      * @param string $scope
      * @param array $meta
      * @param array $data
@@ -121,6 +123,7 @@ class SummaryProductsForm extends ModifyForm
         ProductTypeManagerResolver $productTypeResolver,
         StockRegistryInterface $stockRegistry,
         SubscriptionProfileRepositoryInterface $profileRepository,
+        State $state,
         $scope = '',
         array $meta = [],
         array $data = []
@@ -139,6 +142,7 @@ class SummaryProductsForm extends ModifyForm
             $productTypeResolver,
             $stockRegistry,
             $profileRepository,
+            $state,
             $scope,
             $meta,
             $data
