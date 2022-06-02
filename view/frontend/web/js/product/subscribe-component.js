@@ -62,6 +62,7 @@ define([
             if (
                 this.products.type === 'simple' ||
                 this.products.type === 'virtual' ||
+                this.products.type === 'bundle' ||
                 this.products.type === 'downloadable'
             ) {
                 this.currentProduct = this.products.product;
@@ -90,6 +91,51 @@ define([
             });
 
             $(this.purchaseTypeRadio).on('change', this.togglePriceBoxes.bind(this));
+            $('#subscribe-container').on('updateBundlePrice', this.updateBundlePriceBox.bind(this));
+        },
+
+        updateBundlePriceBox: function (event, data) {
+            var price = 0,
+                oldPrice = 0,
+                frequencies = _.indexBy(this.getFrequencyOptions(), 'value'),
+                priceWidget = $('.product-info-price').data('mageTnwSubscribePrice')
+            _.each(data.selected, function (optionValue, optionIndex) {
+                if (_.isArray(optionValue)) {
+                    _.each(optionValue, function (optionValueId) {
+                        if (optionValueId !== null
+                            && data.options[optionIndex]
+                            && data.options[optionIndex].selections[optionValueId]
+                        ) {
+                            price += data.options[optionIndex]
+                                    .selections[optionValueId].prices.finalPrice.amount
+                                * data.options[optionIndex].selections[optionValueId].qty
+                        }
+                    })
+                }
+            })
+
+            oldPrice = price + data.prices.finalPrice.amount;
+
+            // In case of dynamic price or static price + lock product price and flat discount
+            if ((this.currentProduct.bundle_price_type === 0
+                    || (this.currentProduct.bundle_price_type === 1
+                        && this.currentProduct.recurring_settings.lock_product_price === '1')
+                )
+                && this.currentProduct.recurring_settings.offer_flat_discount === '1'
+            ) {
+                if (this.currentProduct.recurring_settings.discount_type === '2') {
+                    price *= (100 - parseFloat(this.currentProduct.recurring_settings.discount_amount))/100;
+                } else {
+                    price -= parseFloat(this.currentProduct.recurring_settings.discount_amount);
+                }
+            }
+            priceWidget.updateBundlePrices(
+                price,
+                oldPrice,
+                frequencies,
+                this.currentProduct.trial_data
+            );
+            this.togglePriceBoxes();
         },
 
         togglePriceBoxes: function () {
@@ -114,7 +160,9 @@ define([
             }
 
             if (this.oneTimePurchaseAllowed()) {
-                $(this.altPriceBox).html($(this.priceBox).html());
+                if (this.products.type !== 'bundle') {
+                    $(this.altPriceBox).html($(this.priceBox).html());
+                }
                 $(this.onetimeFields).removeAttr('disabled');
             } else {
                 $(this.priceBox).hide();
@@ -230,6 +278,9 @@ define([
                 saving,
                 priceWithSaving;
 
+            if (this.products.type === 'bundle') {
+                return '';
+            }
             if (type === 2) {
                 //formula for service
                 if (unitType === '5') {

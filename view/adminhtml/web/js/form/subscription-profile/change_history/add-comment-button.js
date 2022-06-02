@@ -34,9 +34,10 @@ define([
         action: function () {
             var url = typeof this.imports.url === "undefined" ? '' : this.imports.url,
                 comment = this.source.get(this.parentScope + '.comment_area'),
-                notify = this.source.get(this.parentScope + '.comment_notify');
+                notify = this.source.get(this.parentScope + '.comment_notify'),
+                subscription_id = this.source.get(this.parentScope + '.subscription_id');
 
-            this.sendAjaxAddComment(url, comment, notify)
+            this.sendAjaxAddComment(url, comment, notify, subscription_id)
         },
 
         /**
@@ -44,11 +45,12 @@ define([
          *
          * @param url
          * @param comment
+         * @param subscription_id
          *
          * @param notify
          * @return void
          */
-        sendAjaxAddComment: function (url, comment, notify) {
+        sendAjaxAddComment: function (url, comment, notify, subscription_id) {
             var _self = this;
             $.ajax({
                 showLoader: true,
@@ -56,7 +58,8 @@ define([
                 data: {
                     form_key: window.FORM_KEY,
                     comment: comment,
-                    notify: notify
+                    notify: notify,
+                    subscription_id: subscription_id
                 },
                 type: "POST",
                 dataType: 'json'

@@ -1,0 +1,100 @@
+<?php
+/**
+ * Copyright © 2018 TechNWeb, Inc. All rights reserved.
+ * See TNW_LICENSE.txt for license details.
+ */
+
+/**
+ * @var \TNW\Subscriptions\Pricing\Render\SubscriptionAmount $block
+ * @var \Magento\Framework\Escaper $escaper
+ */
+
+?>
+<?php if ($block->getSaleableItem()->getPriceView()): ?>
+    <p class="minimal-price">
+        <span class="price-container">
+            <span class="price-label"><?= $escaper->escapeHtml(__('As low as')) ?></span>
+            <span class="price-wrapper ">
+                <span class="price"><?= /* @noEscape */ $block->getDisplayMinimalPrice() ?></span>
+                <span><?= $escaper->escapeHtml($block->getMessage('frequency_unit')) ?></span>
+            </span>
+        </span>
+        <?php if ($block->getDisplayMinimalOnetimePrice()): ?>
+            <span class="old-price">
+                <span class="price-label"><?= $escaper->escapeHtml(__('Regular Price')) ?></span>
+                <span class="price-wrapper">
+                    <?= /* @noEscape */ $block->getDisplayMinimalOnetimePrice() ?>
+                </span>
+            </span>
+        <?php endif ?>
+    </p>
+<?php else: ?>
+    <?php if ($block->showRangePrice()): ?>
+        <p class="price-from">
+            <span class="price-container">
+                <span class="price-label"><?= $escaper->escapeHtml(__('From')) ?></span>
+                <span class="price-wrapper ">
+                    <span class="price"><?= /* @noEscape */ $block->getDisplayMinimalPrice() ?></span>
+                    <span><?= $escaper->escapeHtml($block->getMessage('frequency_unit')) ?></span>
+
+                </span>
+            </span>
+            <?php if ($block->getDisplayMinimalOnetimePrice()): ?>
+                <span class="old-price">
+                    <span class="price-label"><?= $escaper->escapeHtml(__('Regular Price')) ?></span>
+                    <span class="price-wrapper">
+                        <?= /* @noEscape */ $block->getDisplayMinimalOnetimePrice() ?>
+                    </span>
+                </span>
+            <?php endif ?>
+        </p>
+        <p class="price-to">
+            <span class="price-container">
+                <span class="price-label"><?= $escaper->escapeHtml(__('To')) ?></span>
+                <span class="price-wrapper ">
+                    <span class="price"><?= /* @noEscape */ $block->getDisplayMaximalPrice() ?></span>
+                    <span><?= $escaper->escapeHtml($block->getMessage('frequency_unit')) ?></span>
+
+                </span>
+            </span>
+            <?php if ($block->getDisplayMaximalOnetimePrice()): ?>
+                <span class="old-price">
+                    <span class="price-label"><?= $escaper->escapeHtml(__('Regular Price')) ?></span>
+                    <span class="price-wrapper">
+                        <?= /* @noEscape */ $block->getDisplayMaximalOnetimePrice() ?>
+                    </span>
+                </span>
+            <?php endif ?>
+        </p>
+    <?php endif; ?>
+<?php endif; ?>
+
+<?php if ($topMessage = $block->getMessage('top')): ?>
+    <div class="subscription-price-top-messages">
+        <?= /* @noEscape */ $block->getMessage('top') ?>
+    </div>
+<?php endif; ?>
+<span class="price-container <?= /* @noEscape */ $block->getAdjustmentCssClasses() ?>"
+        <?= $block->getSchema() ? ' itemprop="offers" itemscope itemtype="http://schema.org/Offer"' : '' ?>>
+    <span <?php if ($block->getPriceId()): ?> id="<?= /* @noEscape */ $block->getPriceId() ?>"<?php endif;?>
+        <?= /* @noEscape */ ($block->getPriceDisplayLabel())
+            ? 'data-label="' . $block->getPriceDisplayLabel() . $block->getPriceDisplayInclExclTaxes() . '"'
+            : '' ?>
+        data-price-amount="<?= /* @noEscape */ $block->getPrice(); ?>"
+        data-price-type="<?= /* @noEscape */ $block->getPriceType(); ?>"
+        class="price-wrapper <?= /* @noEscape */ $block->getPriceWrapperCss(); ?>"
+        <?= $block->getSchema() ? ' itemprop="price"' : '' ?>>
+        <?= /* @noEscape */ $block->getDisplayPrice() ?>
+    </span>
+    <?php if ($block->getSchema()): ?>
+        <meta itemprop="priceCurrency" content="<?= /* @noEscape */ $block->getDisplayCurrencyCode()?>" />
+    <?php endif; ?>
+</span>
+<?php if ($bottomMessage = $block->getMessage('bottom')): ?>
+    <div class="subscription-price-bottom-messages">
+        <?= /* @noEscape */ $bottomMessage ?>
+    </div>
+<?php endif; ?>
+<?php if ($block->getOldPrice()): ?>
+    <?= /* @noEscape */ $block->getDisplayOldPrice() ?>
+<?php endif; ?>

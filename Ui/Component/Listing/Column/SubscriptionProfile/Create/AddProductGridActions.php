@@ -5,6 +5,8 @@
  */
 namespace TNW\Subscriptions\Ui\Component\Listing\Column\SubscriptionProfile\Create;
 
+use Magento\Catalog\Model\Product\Type;
+use Magento\ConfigurableProduct\Model\Product\Type\Configurable;
 use Magento\Framework\View\Element\UiComponent\ContextInterface;
 use Magento\Framework\View\Element\UiComponentFactory;
 use Magento\Ui\Component\Listing\Columns\Column;
@@ -46,7 +48,9 @@ class AddProductGridActions extends Column
         if (isset($dataSource['data']['items'])) {
             foreach ($dataSource['data']['items'] as & $item) {
                 if (isset($item['entity_id'])) {
-                    $label = ($item['type_id'] == 'configurable') ? '[' . __('Configure & Add') . ']' : __('[Add]');
+                    $label = ($item['type_id'] == Configurable::TYPE_CODE || $item['type_id'] == Type::TYPE_BUNDLE)
+                        ? '[' . __('Configure & Add') . ']'
+                        : __('[Add]');
                     $item[$this->getData('name')] = [
                         'view' => [
                             'label' => $label,

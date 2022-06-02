@@ -5,6 +5,7 @@
  */
 namespace TNW\Subscriptions\Plugin\Quote\Model;
 
+use Magento\Bundle\Model\Product\Type as TypeBundle;
 use ArrayObject;
 use Magento\Catalog\Model\Product;
 use Magento\Catalog\Model\Product\Type\AbstractType;
@@ -127,11 +128,22 @@ class UpdateQuoteItem
                 );
             }
         }
+        $currentConfig = $request->getDataByPath('_processing_params/current_config');
+        // In case of bundle product edit in cart, we need to add original bundle options from original request
+        if ($product->getTypeId() === TypeBundle::TYPE_CODE
+            && $currentConfig
+            && $currentConfig->getBundleOption()
+            && !$request->hasBundleOption()
+        ) {
+            $request->setData('bundle_option', $currentConfig->getBundleOption());
+            if ($currentConfig->hasBundleOptionQty()) {
+                $request->setData('bundle_option_qty', $currentConfig->getBundleOptionQty());
+            }
+        }
         if ($request->getAddtocartType() !== null) {
             return [$product, $request, $processMode];
         }
         $modifiedRequest = $request;
-        $currentConfig = $request->getDataByPath('_processing_params/current_config');
         if ($currentConfig && $currentConfig->getSubscriptionData()) {
             $modifiedRequest->setSubscribeActive($currentConfig->getSubscribeActive())
                 ->setBillingFrequency($currentConfig->getBillingFrequency())

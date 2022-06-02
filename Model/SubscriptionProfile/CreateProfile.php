@@ -37,6 +37,8 @@ use Magento\Store\Model\StoreManagerInterface;
 use Magento\Framework\Message\ManagerInterface as MessageManager;
 use Magento\Sales\Model\Order\Email\Sender\OrderSender;
 use Magento\Backend\Model\Session\Quote as SessionQuote;
+use TNW\Subscriptions\Api\Data\CustomerProductHistoryInterfaceFactory;
+use TNW\Subscriptions\Api\CustomerProductHistoryRepositoryInterface;
 
 /**
  * Class for creating subscription profile.
@@ -186,6 +188,16 @@ class CreateProfile extends BaseCreate
     private $sessionQuote;
 
     /**
+     * @var CustomerProductHistoryInterfaceFactory
+     */
+    private $customerProductHistoryInterfaceFactory;
+
+    /**
+     * @var CustomerProductHistoryRepositoryInterface
+     */
+    private $customerProductHistoryRepository;
+
+    /**
      * CreateProfile constructor.
      * @param Context $context
      * @param QuoteSessionInterface $session
@@ -211,6 +223,8 @@ class CreateProfile extends BaseCreate
      * @param MessageManager $messageManager
      * @param OrderSender $orderSender
      * @param SessionQuote $sessionQuote
+     * @param CustomerProductHistoryInterfaceFactory $customerProductHistoryInterfaceFactory
+     * @param CustomerProductHistoryRepositoryInterface $customerProductHistoryRepository
      */
     public function __construct(
         Context $context,
@@ -236,8 +250,12 @@ class CreateProfile extends BaseCreate
         StoreManagerInterface $storeManager,
         MessageManager $messageManager,
         OrderSender $orderSender,
-        SessionQuote $sessionQuote
+        SessionQuote $sessionQuote,
+        CustomerProductHistoryInterfaceFactory $customerProductHistoryInterfaceFactory,
+        CustomerProductHistoryRepositoryInterface $customerProductHistoryRepository
     ) {
+        $this->customerProductHistoryInterfaceFactory = $customerProductHistoryInterfaceFactory;
+        $this->customerProductHistoryRepository = $customerProductHistoryRepository;
         $this->sessionQuote = $sessionQuote;
         $this->addressRepository = $addressRepository;
         $this->addressCreator = $addressCreator;
@@ -362,6 +380,8 @@ class CreateProfile extends BaseCreate
                 $this->productModifier->getPreparedBuyRequest()
             );
             if ($item instanceof Item) {
+                $this->productModifier->setData($productData);
+                $this->productModifier->setProduct($product);
                 $this->productModifier->setInitialFeeToItem($item);
                 $quote->setTotalsCollectedFlag(false);
                 $quote->getShippingAddress()->setCollectShippingRates(true);
@@ -672,6 +692,27 @@ class CreateProfile extends BaseCreate
 
             // Save profile
             $profile = $this->profileManager->saveProfile();
+            $customerProductHistoryItems = [];
+            foreach ($profile->getProducts() as $product) {
+                if (!$product->getParentId()) {
+                    $customerProductHistoryItems[$product->getMagentoProductId()] =
+                        $this->customerProductHistoryInterfaceFactory->create()
+                            ->setProfileId($profile->getId())
+                            ->setCustomerId($profile->getCustomerId())
+                            ->setMagentoProductId($product->getMagentoProductId());
+
+                    foreach ($product->getChildren() as $child) {
+                        $customerProductHistoryItems[$child->getMagentoProductId()] =
+                            $this->customerProductHistoryInterfaceFactory->create()
+                                ->setProfileId($profile->getId())
+                                ->setCustomerId($profile->getCustomerId())
+                                ->setMagentoProductId($child->getMagentoProductId());
+                    }
+                }
+            }
+            array_walk($customerProductHistoryItems, function ($item) {
+                $this->customerProductHistoryRepository->save($item);
+            });
 
             $newStatus = $this->profileManager->getProfile()->getStatus();
             if ($oldStatus != $newStatus) {

@@ -5,6 +5,8 @@
  */
 namespace TNW\Subscriptions\Model\ProductBillingFrequency;
 
+use Magento\Bundle\Model\Product\Price;
+use Magento\Bundle\Model\Product\Type;
 use Magento\Catalog\Model\Product;
 use Magento\Catalog\Model\ProductRepository;
 use Magento\Framework\DataObject;
@@ -275,6 +277,11 @@ class PriceCalculator
      */
     public function getProductLockPriceSatus(DataObject $product)
     {
+        if ($product->getTypeId() === Type::TYPE_CODE
+            && (int)$product->getPriceType() === Price::PRICE_TYPE_DYNAMIC
+        ) {
+            return true;
+        }
         return $product->hasData(Attribute::SUBSCRIPTION_LOCK_PRODUCT_PRICE)
             ? (bool)$product->getData(Attribute::SUBSCRIPTION_LOCK_PRODUCT_PRICE)
             : false;

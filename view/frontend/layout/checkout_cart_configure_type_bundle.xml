@@ -1,0 +1,46 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © 2018 TechNWeb, Inc. All rights reserved.
+ * See TNW_LICENSE.txt for license details.
+ */
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <update handle="catalog_product_view"/>
+    <body>
+        <referenceBlock name="product.info.addtocart.bundle">
+            <action method="setTemplate">
+                <argument name="template" xsi:type="string">TNW_Subscriptions::product/view/type_bundle/addtocart-tabs.phtml</argument>
+            </action>
+        </referenceBlock>
+        <referenceBlock name="product.info.addtocart.bundle.additional">
+            <action method="setTemplate">
+                <argument name="template" xsi:type="string">TNW_Subscriptions::product/view/type_bundle/addtocart-tabs.phtml</argument>
+            </action>
+        </referenceBlock>
+        <referenceBlock name="product.info.addtocart.bundle.subscription">
+            <action method="setTemplate">
+                <argument name="template" xsi:type="string">TNW_Subscriptions::product/view/updatecart/subscribe.phtml</argument>
+            </action>
+        </referenceBlock>
+        <referenceBlock name="product.info.addtocart.bundle.orig">
+            <action method="setTemplate">
+                <argument name="template" xsi:type="string">Magento_Checkout::cart/item/configure/updatecart.phtml</argument>
+            </action>
+        </referenceBlock>
+        <referenceBlock name="product.info.addtocart.bundle.additional.subscription">
+            <action method="setTemplate">
+                <argument name="template" xsi:type="string">TNW_Subscriptions::product/view/updatecart/subscribe.phtml</argument>
+            </action>
+        </referenceBlock>
+        <referenceBlock name="product.info.addtocart.bundle.additional.orig">
+            <action method="setTemplate">
+                <argument name="template" xsi:type="string">Magento_Checkout::cart/item/configure/updatecart.phtml</argument>
+            </action>
+        </referenceBlock>
+        <referenceBlock name="content">
+            <block name="disableCache" cacheable="false"/>
+        </referenceBlock>
+    </body>
+</page>

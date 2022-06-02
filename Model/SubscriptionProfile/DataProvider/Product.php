@@ -197,14 +197,19 @@ class Product extends AbstractDataProvider
                     $fullSubscriptionData = $item->getBuyRequest()->getDataByPath(
                         Create::SUBSCRIPTION_BUY_REQUEST_PARAM_NAME
                     );
+                    $fullProductPrice = $fullSubscriptionData[Create::NON_UNIQUE]['price'];
                     $fullSubscriptionData[Create::NON_UNIQUE]['price'] = 0;
                 }
                 $qty = !empty($fullSubscriptionData[Create::UNIQUE]['use_preset_qty']) ? 1 : $item->getQty();
-                $price = isset($nonUniqueData['current_price']) ? $nonUniqueData['current_price'] * $qty : 0;
-                if (!$price) {
-                    $price = isset($nonUniqueData['price']) ? $nonUniqueData['price'] * $qty : 0;
+                if ($fullSubscriptionData[Create::UNIQUE]['is_trial'] && isset($fullProductPrice)) {
+                    $fullSubscriptionData[Create::NON_UNIQUE]['price'] = $fullProductPrice * $qty;
+                } else {
+                    $price = isset($nonUniqueData['current_price']) ? $nonUniqueData['current_price'] * $qty : 0;
+                    if (!$price) {
+                        $price = isset($nonUniqueData['price']) ? $nonUniqueData['price'] * $qty : 0;
+                    }
+                    $fullSubscriptionData[Create::NON_UNIQUE]['price'] += $price;
                 }
-                $fullSubscriptionData[Create::NON_UNIQUE]['price'] += $price;
 
                 $imageHelper = $this->formContext->getImageHelperForQuoteItem($item, $this::LISTING_IMAGE_ID);
 
@@ -213,6 +218,15 @@ class Product extends AbstractDataProvider
                 if (isset($options['attributes_info']) && is_array($options['attributes_info'])) {
                     foreach ($options['attributes_info'] as $confOption) {
                         $confOptions[] = ucfirst($confOption['label']) . ': ' . $confOption['value'];
+                    }
+                }
+                if (isset($options['bundle_options']) && is_array($options['bundle_options'])) {
+                    foreach ($options['bundle_options'] as $bundle_option) {
+                        $optionStr = '<b>' . ucfirst($bundle_option['label']) . ':</b><br>';
+                        foreach ($bundle_option['value'] as $optionValue) {
+                            $optionStr .= $optionValue['qty'] . ' x ' . $optionValue['title'] . '<br>';
+                        }
+                        $confOptions[] = $optionStr;
                     }
                 }
                 $products[] = [

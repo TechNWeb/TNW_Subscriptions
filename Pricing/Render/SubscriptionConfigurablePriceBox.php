@@ -27,7 +27,7 @@ use TNW\Subscriptions\Model\Config\Product\SubscriptionProductView;
 /**
  * Class for subscription price rendering for configurable products.
  */
-class SubcsriptionConfigurablePriceBox extends SubscriptionPriceBox
+class SubscriptionConfigurablePriceBox extends SubscriptionPriceBox
 {
     /**
      * @var HelperProduct
@@ -45,7 +45,7 @@ class SubcsriptionConfigurablePriceBox extends SubscriptionPriceBox
     private $swatchHelper;
 
     /**
-     * SubcsriptionConfigurablePriceBox constructor.
+     * SubscriptionConfigurablePriceBox constructor.
      *
      * @param Template\Context $context
      * @param SaleableInterface $saleableItem

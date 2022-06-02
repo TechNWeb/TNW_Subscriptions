@@ -5,6 +5,7 @@
  */
 namespace TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Customer\Account;
 
+use Magento\Catalog\Model\Product\Type;
 use Magento\CatalogInventory\Api\Data\StockItemInterface;
 use Magento\CatalogInventory\Api\StockRegistryInterface;
 use Magento\Framework\Exception\InputException;
@@ -31,6 +32,7 @@ use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Modal\Conte
 use TNW\Subscriptions\Model\SubscriptionProfile\Manager;
 use Magento\InventorySalesApi\Api\StockResolverInterface;
 use Magento\Store\Model\StoreManagerInterface;
+use Magento\Framework\App\State;
 
 /**
  * Subscription items form data provider for customer account dashboard page.
@@ -80,6 +82,7 @@ class ProductsForm extends SummaryProductsForm
      * @param StockResolverInterface $stockResolver
      * @param StoreManagerInterface $storeManager
      * @param SubscriptionProfileRepositoryInterface $profileRepository
+     * @param State $state
      * @param string $scope
      * @param array $meta
      * @param array $data
@@ -102,6 +105,7 @@ class ProductsForm extends SummaryProductsForm
         StockResolverInterface $stockResolver,
         StoreManagerInterface $storeManager,
         SubscriptionProfileRepositoryInterface $profileRepository,
+        State $state,
         $scope = '',
         array $meta = [],
         array $data = []
@@ -124,6 +128,7 @@ class ProductsForm extends SummaryProductsForm
             $productTypeResolver,
             $stockRegistry,
             $profileRepository,
+            $state,
             $scope,
             $meta,
             $data
@@ -244,10 +249,13 @@ class ProductsForm extends SummaryProductsForm
             $product = $item->getChildren() ? $item->getChildren() : $item;
         }
         $stockId = $this->stockResolver->execute(SalesChannelInterface::TYPE_WEBSITE, $websiteCode)->getStockId();
-        $productSalableQty = $this->productSalableQty->execute(
-            $product->getSku(),
-            $stockId
-        );
+        $productSalableQty = 0;
+        if ($stockItem->getTypeId() !== Type::TYPE_BUNDLE) {
+            $productSalableQty = $this->productSalableQty->execute(
+                $product->getSku(),
+                $stockId
+            );
+        }
 
         if ($product->getMagentoProductId() != $productId) {
             /** @var StockItemInterface $stockItem */

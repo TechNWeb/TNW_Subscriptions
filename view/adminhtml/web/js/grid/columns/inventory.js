@@ -101,7 +101,7 @@ define([
                 currentQty = this.defaultQty,
                 productType = row.type_id;
 
-            if (typeof productType != 'undefined' && productType != 'configurable') {
+            if (typeof productType != 'undefined' && productType !== 'configurable' && productType !== 'bundle') {
                 if (typeof row.input_qty != 'undefined' && row.input_qty) {
                     currentQty = row.input_qty * 1;
                 }
@@ -131,7 +131,9 @@ define([
                         return message;
                     }
 
-                    if ((productStockData.qty - productStockData.min_qty - currentQty < 0) && !productStockData.backorders) {
+                    if ((productStockData.qty - productStockData.min_qty - currentQty < 0)
+                        && !productStockData.backorders
+                    ) {
                         message = $.mage.__(this.warningMessages['too_much'])
                             .replace('%1', row.name);
 
@@ -145,7 +147,7 @@ define([
 
         /** @inheritDoc */
         getLabel: function (record) {
-            if (record.type_id == 'configurable') {
+            if (record.type_id === 'configurable' || record.type_id === 'bundle') {
                 return '';
             }
 

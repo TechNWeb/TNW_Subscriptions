@@ -194,12 +194,6 @@ class DataBuilder extends \TNW\Subscriptions\Model\Payment\DataBuilder
                 continue;
             }
 
-            if (in_array($type, [
-                \Magento\Catalog\Model\Product\Type::TYPE_BUNDLE
-            ])) {
-                continue;
-            }
-
             //getQtyOrdered used for order items, getQty for invoice, creditmemo
             $qty = $item->getQty() ?: $item->getQtyOrdered();
 

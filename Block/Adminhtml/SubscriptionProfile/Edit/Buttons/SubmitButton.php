@@ -25,10 +25,6 @@ class SubmitButton implements ButtonProviderInterface
                     'Magento_Ui/js/form/button-adapter' => [
                         'actions' => [
                             [
-                                'targetName' => 'index = configurableModal',
-                                'actionName' => 'toggleModal',
-                            ],
-                            [
                                 'targetName' => 'tnw_subscriptionprofile_summary_add_product_modal_form.'
                                     . 'tnw_subscriptionprofile_summary_add_product_modal_form',
                                 'actionName' => 'setConfigurableData',

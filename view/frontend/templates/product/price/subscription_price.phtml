@@ -11,12 +11,6 @@
 <?php
 /** @var \TNW\Subscriptions\Pricing\Render\SubscriptionPriceBox $block */
 
-$productId = $block->getSaleableItem()->getId();
-
-/** ex: \Magento\Catalog\Pricing\Price\RegularPrice */
-/** @var \Magento\Framework\Pricing\Price\PriceInterface $priceModel */
-$priceModel = $block->getPriceType('regular_price');
-
 /** ex: \Magento\Catalog\Pricing\Price\FinalPrice */
 /** @var \Magento\Framework\Pricing\Price\PriceInterface $finalPriceModel */
 $finalPriceModel = $block->getPriceType('final_price');

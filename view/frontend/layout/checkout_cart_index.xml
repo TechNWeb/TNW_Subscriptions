@@ -1,4 +1,10 @@
 <?xml version="1.0"?>
+<!--
+/**
+ * Copyright © 2018 TechNWeb, Inc. All rights reserved.
+ * See TNW_LICENSE.txt for license details.
+ */
+-->
 <page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" layout="1column" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
     <body>
         <referenceBlock name="checkout.cart.form" template="TNW_Subscriptions::cart/form.phtml" >
@@ -41,6 +47,12 @@
                 <argument xsi:type="object" name="groups_view_model">TNW\Subscriptions\Block\Cart\Groups</argument>
             </arguments>
             <block name="checkout.cart.item.renderers.grouped.subscribe" as="subscribe-renderer" class="TNW\Subscriptions\Block\Product\View\Subscribe" template="TNW_Subscriptions::cart/item/subscribe.phtml" ifconfig="tnw_subscriptions_general/general/allow_edit_cart"/>
+        </referenceBlock>
+        <referenceBlock name="checkout.cart.item.renderers.bundle" template="TNW_Subscriptions::cart/item/default.phtml">
+            <arguments>
+                <argument xsi:type="object" name="groups_view_model">TNW\Subscriptions\Block\Cart\Groups</argument>
+            </arguments>
+            <block name="checkout.cart.item.renderers.bundle.subscribe" as="subscribe-renderer" class="TNW\Subscriptions\Block\Product\View\Subscribe" template="TNW_Subscriptions::cart/item/subscribe.phtml" ifconfig="tnw_subscriptions_general/general/allow_edit_cart"/>
         </referenceBlock>
         <referenceBlock name="checkout.cart.totals">
             <arguments>

@@ -1,3 +1,7 @@
+/**
+ * Copyright © 2018 TechNWeb, Inc. All rights reserved.
+ * See TNW_LICENSE.txt for license details.
+ */
 define([
     'jquery',
     'Magento_Ui/js/grid/columns/column',
@@ -68,8 +72,8 @@ define([
         },
 
         getProductOptions: function (row) {
-            if (!row.subscription_product || _.isEmpty(row.subscription_product.configurable_options)) return false;
-            return row.subscription_product.configurable_options;
+            if (!row.subscription_product || _.isEmpty(row.subscription_product.product_options)) return false;
+            return row.subscription_product.product_options;
         },
 
         getIsVirtual: function(row) {

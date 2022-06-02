@@ -6,6 +6,7 @@
 namespace TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product\Modal;
 
 use Magento\Catalog\Api\Data\ProductInterface;
+use Magento\Catalog\Model\Product\Type;
 use Magento\ConfigurableProduct\Model\Product\Type\Configurable as Configurable;
 use Magento\Directory\Model\Currency;
 use Magento\Framework\Api\Filter;
@@ -24,6 +25,7 @@ use TNW\Subscriptions\Model\ProductBillingFrequency\PriceCalculator;
 use TNW\Subscriptions\Model\ProductSubscriptionProfile\ProductTypeManagerResolver;
 use TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Product;
 use TNW\Subscriptions\Api\SubscriptionProfileRepositoryInterface;
+use Magento\Framework\App\State;
 
 /**
  * Modal form for adding single product to subscription.
@@ -109,6 +111,11 @@ class Form extends AbstractDataProvider
     private $profileRepository;
 
     /**
+     * @var State
+     */
+    private $state;
+
+    /**
      * @param string $name
      * @param string $primaryFieldName
      * @param string $requestFieldName
@@ -118,6 +125,7 @@ class Form extends AbstractDataProvider
      * @param PoolInterface $pool
      * @param ProductTypeManagerResolver $productTypeResolver
      * @param SubscriptionProfileRepositoryInterface $profileRepository
+     * @param State $state
      * @param string $scope
      * @param array $meta
      * @param array $data
@@ -132,10 +140,12 @@ class Form extends AbstractDataProvider
         PoolInterface $pool,
         ProductTypeManagerResolver $productTypeResolver,
         SubscriptionProfileRepositoryInterface $profileRepository,
+        State $state,
         $scope = '',
         array $meta = [],
         array $data = []
     ) {
+        $this->state = $state;
         $this->priceCalculator = $priceCalculator;
         $this->context = $context;
         $this->formContext = $formContext;
@@ -155,10 +165,19 @@ class Form extends AbstractDataProvider
     public function getData()
     {
         $productId = $this->getRequestProductId();
-        $data[self::FORM_DATA_VALUE] = $this->getFrequenciesData(true, $productId, [
+        $additionalData = [
             'super_attribute' => $this->formContext->getRequest()->getParam('super_attribute'),
-        ]);
-
+            'bundle_option' => $this->formContext->getRequest()->getParam('bundle_option'),
+            'bundle_option_qty' => $this->formContext->getRequest()->getParam('bundle_option_qty'),
+        ];
+        if (!$additionalData['bundle_option_qty'] && !empty($additionalData['bundle_option']['qty'])) {
+            $additionalData['bundle_option_qty'] = $additionalData['bundle_option']['qty'];
+            unset($additionalData['bundle_option']['qty']);
+        }
+        $data[self::FORM_DATA_VALUE] = $this->getFrequenciesData(true, $productId, $additionalData);
+        foreach ($this->pool->getModifiersInstances() as $modifier) {
+            $data = $modifier->modifyData($data);
+        }
         return $data;
     }
 
@@ -230,11 +249,13 @@ class Form extends AbstractDataProvider
             return $result;
         }
 
-        $childProduct = $this->getChildProductFromRequest();
-        $childProduct = $childProduct ?: $this->getChildProductFromCurrentItem();
-        if ($childProduct) {
-            foreach ($this->getProductBillingFrequencies($childProduct->getId()) as $childFrequency) {
-                $childFrequencies[$childFrequency->getBillingFrequencyId()] = $childFrequency;
+        if ($this->getProductObjectData($productId)->getTypeId() !== Type::TYPE_BUNDLE) {
+            $childProduct = $this->getChildProductFromRequest();
+            $childProduct = $childProduct ?: $this->getChildProductFromCurrentItem();
+            if ($childProduct) {
+                foreach ($this->getProductBillingFrequencies($childProduct->getId()) as $childFrequency) {
+                    $childFrequencies[$childFrequency->getBillingFrequencyId()] = $childFrequency;
+                }
             }
         }
         try {
@@ -507,6 +528,14 @@ class Form extends AbstractDataProvider
         $quote = $this->formContext->getSession();
         $customerId = $quote->getCustomerId() ?? null;
         if (!$customerId) {
+            try {
+                $areaCode = $this->state->getAreaCode();
+            } catch (\Exception $e) {
+                $areaCode = 'not set';
+            }
+            if ($areaCode == 'adminhtml') {
+                return true;
+            }
             return false;
         }
 
@@ -672,6 +701,12 @@ class Form extends AbstractDataProvider
                         $productDataObject,
                         $productFrequencies[$billingFrequencyId]
                     );
+            }
+            if ($productDataObject->getTypeId() === Type::TYPE_BUNDLE) {
+                $typeResolver = $this->productTypeResolver->resolve(Type::TYPE_BUNDLE);
+                $product = $this->formContext->getProductRepository()->getById($productId);
+                $data['product_frequencies'][$billingFrequencyId]['price']
+                    = $typeResolver->getSubscriptionCustomPrice($product, $additionalData);
             }
             if ($needProductValues
                 && !empty($data['product_frequencies'][$billingFrequencyId])

@@ -5,6 +5,7 @@
  */
 namespace TNW\Subscriptions\Model\Backend\Product\Attribute;
 
+use Magento\Bundle\Model\Product\Type;
 use Magento\Catalog\Api\Data\ProductInterface;
 use Magento\ConfigurableProduct\Model\Product\Type\Configurable;
 use TNW\Subscriptions\Model\Product\Attribute;
@@ -29,6 +30,7 @@ class DiscountAmount extends \Magento\Catalog\Model\Product\Attribute\Backend\Pr
         if ($object->hasData($attrCode) && $object->getData($attrCode)
             && $object instanceof ProductInterface
             && $object->getTypeId() !== Configurable::TYPE_CODE
+            && $object->getTypeId() !== Type::TYPE_CODE
         ) {
             $validated = $this->checkDiscountLessProductPrice($object, $attrCode);
             if (!$validated) {

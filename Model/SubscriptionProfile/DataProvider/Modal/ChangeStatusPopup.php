@@ -75,7 +75,6 @@ class ChangeStatusPopup extends AbstractDataProvider
     public function getData()
     {
         $profileId = $this->dataPersistor->get('subscription_id');
-        $data['change_status_popup']['entity_id'] = $profileId;
         $data['change_status_popup']['cycles_count'] = 0;
         $data['change_status_popup']['disableCheckbox'] = $this->getConfigValue($profileId) ? false : true;
 

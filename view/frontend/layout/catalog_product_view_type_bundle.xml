@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © 2018 TechNWeb, Inc. All rights reserved.
+ * See TNW_LICENSE.txt for license details.
+ */
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <referenceBlock name="product.info.addtocart.additional" remove="true" />
+        <move element="product.price.render.bundle.customization" destination="product.info.addtocart.bundle"/>
+        <referenceBlock name="bundle.summary">
+            <block name="product.info.addtocart.bundle" as="addtocart" after="product.price.render.bundle.customization"
+                   class="TNW\Subscriptions\Block\Product\View\Subscribe"
+                   template="TNW_Subscriptions::product/view/type_bundle/addtocart-tabs.phtml">
+                <block class="TNW\Subscriptions\Block\Product\View\Subscribe"
+                       name="product.info.addtocart.bundle.subscription"
+                       as="addtocart_subscribe"
+                       template="TNW_Subscriptions::product/view/addtocart/subscribe.phtml">
+                    <arguments>
+                        <argument name="customerProductsHistoryList" xsi:type="object">
+                            TNW\Subscriptions\Block\Product\CustomerProductsHistoryList
+                        </argument>
+                    </arguments>
+                </block>
+                <block class="Magento\Catalog\Block\Product\View" name="product.info.addtocart.bundle.orig"
+                       as="addtocart_orig" template="Magento_Catalog::product/view/addtocart.phtml"/>
+            </block>
+        </referenceBlock>
+    </body>
+</page>

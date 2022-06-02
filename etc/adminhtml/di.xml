@@ -60,6 +60,7 @@
                 <item name="virtual" xsi:type="const">Magento\Catalog\Model\Product\Type::TYPE_VIRTUAL</item>
                 <item name="downloadable" xsi:type="const">Magento\Downloadable\Model\Product\Type::TYPE_DOWNLOADABLE</item>
                 <item name="configurable" xsi:type="const">Magento\ConfigurableProduct\Model\Product\Type\Configurable::TYPE_CODE</item>
+                <item name="bundle" xsi:type="const">Magento\Bundle\Model\Product\Type::TYPE_CODE</item>
             </argument>
             <argument name="scopeName" xsi:type="string">product_form.product_form</argument>
         </arguments>
@@ -71,6 +72,7 @@
                 <item name="virtual" xsi:type="const">Magento\Catalog\Model\Product\Type::TYPE_VIRTUAL</item>
                 <item name="downloadable" xsi:type="const">Magento\Downloadable\Model\Product\Type::TYPE_DOWNLOADABLE</item>
                 <item name="configurable" xsi:type="const">Magento\ConfigurableProduct\Model\Product\Type\Configurable::TYPE_CODE</item>
+                <item name="bundle" xsi:type="const">Magento\Bundle\Model\Product\Type::TYPE_CODE</item>
             </argument>
             <argument name="modifiers" xsi:type="array">
                 <!--Add modifier to set default values for subscription product attributes-->
@@ -477,6 +479,10 @@
                     <item name="class" xsi:type="string">TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Modifier\ConfigureProduct\Configurable</item>
                     <item name="sortOrder" xsi:type="number">10</item>
                 </item>
+                <item name="bundle" xsi:type="array">
+                    <item name="class" xsi:type="string">TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Modifier\ConfigureProduct\Bundle</item>
+                    <item name="sortOrder" xsi:type="number">20</item>
+                </item>
             </argument>
         </arguments>
     </virtualType>
@@ -491,6 +497,10 @@
                 <item name="configurable" xsi:type="array">
                     <item name="class" xsi:type="string">TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Modifier\ConfigureProduct\Configurable</item>
                     <item name="sortOrder" xsi:type="number">10</item>
+                </item>
+                <item name="bundle" xsi:type="array">
+                    <item name="class" xsi:type="string">TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Modifier\ConfigureProduct\Bundle</item>
+                    <item name="sortOrder" xsi:type="number">20</item>
                 </item>
             </argument>
         </arguments>

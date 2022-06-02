@@ -19,27 +19,26 @@
         <item name="template" xsi:type="string">templates/form/collapsible</item>
     </argument>
     <dataSource name="tnw_subscriptionprofile_cancel_button_popup_form_data_source">
-        <argument name="dataProvider" xsi:type="configurableObject">
-            <argument name="class" xsi:type="string">TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Modal\CancelButtonPopup</argument>
-            <argument name="name" xsi:type="string">tnw_subscriptionprofile_cancel_button_popup_form_data_source</argument>
-            <argument name="primaryFieldName" xsi:type="string">tnw_subscriptionprofile_cancel_button_popup_form</argument>
-            <argument name="requestFieldName" xsi:type="string">namespace</argument>
-            <argument name="data" xsi:type="array">
-                <item name="config" xsi:type="array">
-                    <item name="submit_url" path="tnw_subscriptions/subscriptionprofile/cancelsubscription" xsi:type="url"/>
-                </item>
-            </argument>
-        </argument>
         <argument name="data" xsi:type="array">
             <item name="js_config" xsi:type="array">
                 <item name="component" xsi:type="string">Magento_Ui/js/form/provider</item>
             </item>
         </argument>
-        <argument name="data" xsi:type="array">
-            <item name="config" xsi:type="array">
-                <item name="submit_url" path="tnw_subscriptions/subscriptionprofile/cancelsubscription" xsi:type="url"/>
-            </item>
-        </argument>
+        <settings>
+            <submitUrl path="tnw_subscriptions/subscriptionprofile/cancelsubscription"/>
+            <imports>
+                <link name="data.subscription_profile_id">
+                    tnw_subscriptionprofile_form.subscriptionprofile_form_data_source:data.subscription_profile_id
+                </link>
+            </imports>
+        </settings>
+        <dataProvider name="tnw_subscriptionprofile_cancel_button_popup_form_data_source"
+                      class="TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\Modal\CancelButtonPopup">
+            <settings>
+                <primaryFieldName>tnw_subscriptionprofile_cancel_button_popup_form</primaryFieldName>
+                <requestFieldName>namespace</requestFieldName>
+            </settings>
+        </dataProvider>
     </dataSource>
     <fieldset name="general">
         <settings>

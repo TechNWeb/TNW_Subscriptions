@@ -375,6 +375,7 @@
                 <item name="tnw_subscriptions_process_command" xsi:type="object">TNW\Subscriptions\Console\Command\ProcessCommand</item>
                 <item name="tnw_subscriptions_renewal_notify" xsi:type="object">TNW\Subscriptions\Console\Command\ProcessRenewalCommand</item>
                 <item name="tnw_subscriptions_expire_notify" xsi:type="object">TNW\Subscriptions\Console\Command\ProcessExpiredCardCommand</item>
+                <item name="tnw_subscriptions_recalculate_profit" xsi:type="object">TNW\Subscriptions\Console\Command\RecalculateProfitCommand</item>
             </argument>
         </arguments>
     </type>
@@ -820,6 +821,14 @@
                     <item name="class" xsi:type="string">TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Modifier\Product\Configurable</item>
                     <item name="sortOrder" xsi:type="number">10</item>
                 </item>
+                <item name="trial" xsi:type="array">
+                    <item name="class" xsi:type="string">TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Modifier\Product\Trial</item>
+                    <item name="sortOrder" xsi:type="number">15</item>
+                </item>
+                <item name="bundle" xsi:type="array">
+                    <item name="class" xsi:type="string">TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Modifier\Product\Bundle</item>
+                    <item name="sortOrder" xsi:type="number">20</item>
+                </item>
             </argument>
         </arguments>
     </virtualType>
@@ -853,6 +862,10 @@
         <plugin name="prepare_for_cart_advanced_type_grouped"
                 type="TNW\Subscriptions\Plugin\Catalog\Model\Product\Type\Grouped"/>
     </type>
+    <type name="Magento\Bundle\Model\Product\Type">
+        <plugin name="prepare_for_cart_advanced_type_bundle"
+                type="TNW\Subscriptions\Plugin\Catalog\Model\Product\Type\AbstractType"/>
+    </type>
     <type name="Magento\Quote\Model\Quote\Item\Processor">
         <plugin name="tnw_subscriptions" type="TNW\Subscriptions\Plugin\Quote\Model\Quote\Item\Processor" />
     </type>
@@ -862,6 +875,10 @@
                 <item name="configurable" xsi:type="array">
                     <item name="class" xsi:type="string">TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Modifier\EditProduct\Configurable</item>
                     <item name="sortOrder" xsi:type="number">10</item>
+                </item>
+                <item name="bundle" xsi:type="array">
+                    <item name="class" xsi:type="string">TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Modifier\EditProduct\Bundle</item>
+                    <item name="sortOrder" xsi:type="number">20</item>
                 </item>
             </argument>
         </arguments>
@@ -881,6 +898,10 @@
                 <item name="attributes" xsi:type="array">
                     <item name="class" xsi:type="string">TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Edit\Modifier\EditProduct\Attributes</item>
                     <item name="sortOrder" xsi:type="number">20</item>
+                </item>
+                <item name="bundle" xsi:type="array">
+                    <item name="class" xsi:type="string">TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Edit\Modifier\EditProduct\Bundle</item>
+                    <item name="sortOrder" xsi:type="number">30</item>
                 </item>
             </argument>
         </arguments>
@@ -1453,6 +1474,10 @@
     <type name="Magento\Shipping\Model\Shipping">
         <plugin name="tnw_shipping_rates"
                 type="TNW\Subscriptions\Plugin\Shipping\Model\ShippingRates"/>
+    </type>
+    <type name="Magento\Bundle\Model\Product\Price">
+        <plugin name="tnw_bundle_apply_flat_discount"
+                type="TNW\Subscriptions\Plugin\Quote\Bundle\Price\ApplyFlatDiscount"/>
     </type>
     <type name="Magento\Catalog\Ui\DataProvider\Product\ProductRenderCollectorComposite">
         <arguments>

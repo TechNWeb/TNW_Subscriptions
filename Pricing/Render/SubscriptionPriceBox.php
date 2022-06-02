@@ -249,14 +249,14 @@ class SubscriptionPriceBox extends BasePriceBox
                             );
                             $bottomTrialMessage = __(
                                 'then %1 / every %2',
-                                $this->formatCurrency($price, false),
+                                $this->formatCurrency($price, true),
                                 $frequencyUnit
                             );
                             $trialPrice = $trialPrice + $initialFee;
                         }
                     }
                     if ($initialFee) {
-                        $customPrice = $this->formatCurrency($price, false);
+                        $customPrice = $this->formatCurrency($price, true);
                         $topMessage = __('Initial charge');
                         $price = (float) $price + $initialFee;
                         $bottomMessage = __('then %1 / every %2', $customPrice, $frequencyUnit);

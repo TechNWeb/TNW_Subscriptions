@@ -26,10 +26,6 @@ class SubmitButton extends GenericButton implements ButtonProviderInterface
                     'Magento_Ui/js/form/button-adapter' => [
                         'actions' => [
                             [
-                                'targetName' => 'index = configurableModal',
-                                'actionName' => 'toggleModal',
-                            ],
-                            [
                                 'targetName' => Form::DATA_SCOPE_MODAL_FORM . '.' . Form::DATA_SCOPE_MODAL_FORM,
                                 'actionName' => 'setConfigurableData',
                             ]

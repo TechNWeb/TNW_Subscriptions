@@ -5,8 +5,10 @@
  */
 namespace TNW\Subscriptions\Ui\Component\Listing\Column\SubscriptionProfile;
 
+use Magento\Bundle\Model\Product\Type;
 use Magento\Catalog\Api\ProductRepositoryInterface;
 use Magento\Catalog\Helper\Image;
+use Magento\ConfigurableProduct\Model\Product\Type\Configurable;
 use Magento\Customer\Model\Address\Config;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\UrlInterface;
@@ -19,6 +21,7 @@ use Magento\Ui\Component\Listing\Columns\Column;
 use TNW\Subscriptions\Api\Data\SubscriptionProfileInterface;
 use TNW\Subscriptions\Api\SubscriptionProfileRepositoryInterface;
 use TNW\Subscriptions\Block\Subscription\History;
+use TNW\Subscriptions\Model\ProductSubscriptionProfile\ManagerBundle;
 use TNW\Subscriptions\Model\ProductSubscriptionProfile\ManagerConfigurable;
 use TNW\Subscriptions\Model\Source\ProfileStatus;
 use TNW\Subscriptions\Model\SubscriptionProfile\StatusManager;
@@ -67,14 +70,21 @@ class Details extends Column
      * @var ManagerConfigurable
      */
     private $managerConfigurable;
+
     /**
      * @var StatusManager
      */
     private $statusManager;
+
     /**
      * @var UrlInterface
      */
     private $urlBuilder;
+
+    /**
+     * @var ManagerBundle
+     */
+    private $managerBundle;
 
     /**
      * Details constructor.
@@ -82,6 +92,7 @@ class Details extends Column
      * @param ProductRepositoryInterface $productRepository
      * @param ScopeConfigInterface $scopeConfig
      * @param ManagerConfigurable $managerConfigurable
+     * @param ManagerBundle $managerBundle
      * @param StatusManager $statusManager
      * @param ProfileStatus $profileStatus
      * @param PaymentConfig $paymentConfig
@@ -98,6 +109,7 @@ class Details extends Column
         ProductRepositoryInterface $productRepository,
         ScopeConfigInterface $scopeConfig,
         ManagerConfigurable $managerConfigurable,
+        ManagerBundle $managerBundle,
         StatusManager $statusManager,
         ProfileStatus $profileStatus,
         PaymentConfig $paymentConfig,
@@ -120,6 +132,7 @@ class Details extends Column
         $this->imageHelper = $imageHelper;
         $this->statusManager = $statusManager;
         $this->urlBuilder = $urlBuilder;
+        $this->managerBundle = $managerBundle;
     }
 
     /**
@@ -147,9 +160,14 @@ class Details extends Column
                         'short_description' => $product->getShortDescription(),
                         'img_src' => $imageHelper->getUrl(),
                         'img_alt' => $profileProduct->getName(),
-                        'configurable_options' => $this->managerConfigurable
-                            ->getConfigurableOptionsData($profileProduct)
                     ];
+                    if ($product->getTypeId() === Type::TYPE_CODE) {
+                        $item['subscription_product']['product_options']
+                            = $this->managerBundle->getBundleOptionsData($profileProduct);
+                    } elseif ($product->getTypeId() === Configurable::TYPE_CODE) {
+                        $item['subscription_product']['product_options']
+                            = $this->managerConfigurable->getConfigurableOptionsData($profileProduct);
+                    }
                     $item['term_label'] = $this->getTerm($itemId);
                     $item['status_label'] = $this->profileStatus->getLabelByValue($item['status']);
                     if ($this->getIsVirtual($itemId)) {

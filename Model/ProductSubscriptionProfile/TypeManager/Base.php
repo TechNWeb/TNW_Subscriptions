@@ -47,12 +47,12 @@ abstract class Base implements TypeInterface
     /**
      * @var null
      */
-    private $profileProduct = null;
+    protected $profileProduct = null;
 
     /**
      * @var Config
      */
-    private $config;
+    protected $config;
 
     /**
      * @var null

@@ -5,6 +5,7 @@
  */
 namespace TNW\Subscriptions\Plugin\Catalog\Model\Product\Type;
 
+use Magento\Bundle\Model\Product\Type;
 use Magento\Catalog\Model\Product;
 use Magento\Framework\Controller\ResultFactory;
 use Magento\Framework\DataObject;
@@ -81,7 +82,10 @@ class AbstractType
         ) {
             return __('Product is not available for purchase at this time')->render();
         }
-        if (isset($buyRequest['subscribe_active']) && $buyRequest['subscribe_active']) {
+        if (isset($buyRequest['subscribe_active'])
+            && $buyRequest['subscribe_active']
+            && !($buyRequest->getBundleOption() && $product->getTypeId() !== Type::TYPE_CODE)
+        ) {
             if (isset($buyRequest['subscribe_qty'])) {
                 $buyRequest['qty'] = \Zend_Filter::filterStatic(
                     (string)$buyRequest['subscribe_qty'],

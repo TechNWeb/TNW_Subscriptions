@@ -60,6 +60,7 @@ use Magento\Quote\Model\Quote\TotalsCollector;
 use TNW\Subscriptions\Api\SubscriptionProfileQueueRepositoryInterface;
 use TNW\Subscriptions\Model\Queue as ProfileQueueModel;
 use TNW\Subscriptions\Model\Config\Source\BillingFrequencyUnitType;
+use TNW\Subscriptions\Model\Quote\ItemGroup;
 use Magento\Backend\Model\Session\Quote as SessionQuote;
 
 /**
@@ -298,6 +299,11 @@ class Manager
     private $queueRepository;
 
     /**
+     * @var ItemGroup
+     */
+    private $itemGroup;
+  
+    /**
      * @var SessionQuote
      */
     private $sessionQuote;
@@ -338,6 +344,7 @@ class Manager
      * @param ProfitManager $profitManager
      * @param ProfileOrderManager $profileOrderManager
      * @param SubscriptionProfileQueueRepositoryInterface $queueRepository
+     * @param ItemGroup $itemGroup
      * @param SessionQuote $sessionQuote
      */
     public function __construct(
@@ -375,6 +382,7 @@ class Manager
         ProfitManager $profitManager,
         ProfileOrderManager $profileOrderManager,
         SubscriptionProfileQueueRepositoryInterface $queueRepository,
+        ItemGroup $itemGroup,
         SessionQuote $sessionQuote
     ) {
         $this->sessionQuote = $sessionQuote;
@@ -412,6 +420,7 @@ class Manager
         $this->subscriptionProfileOrder = $subscriptionProfileOrder;
         $this->profitManager = $profitManager;
         $this->profileOrderManager = $profileOrderManager;
+        $this->itemGroup = $itemGroup;
     }
 
     /**
@@ -917,7 +926,9 @@ class Manager
         $paymentChange = false,
         $tempProfile = false
     ) {
-        $request = $this->getUniqueBuyRequest($quoteItems);
+        $items = $this->itemGroup->groups($quoteItems);
+        $items = reset($items);
+        $request = $this->getUniqueBuyRequest($items);
         if (empty($request)) {
             return $this;
         }

@@ -46,30 +46,21 @@ class Attributes extends AbstractModifier
      */
     public function modifyMeta(array $meta)
     {
-        $path = $this->arrayManager->findPath('billing_cycle', $meta, null, 'children');
-        if ($path) {
-            $meta = $this->arrayManager->set(
-                "{$path}/arguments/data/config/visible",
-                $meta,
-                false
-            );
+        $keys = [
+            'billing_cycle',
+            'tnw_subscr_billing_frequency_used',
+            'tnw_subscr_billing_frequency'
+        ];
 
-            $path = $this->arrayManager->findPath(
-                'tnw_subscr_billing_frequency_used', $meta, null, 'children'
-            );
-            $meta = $this->arrayManager->set(
-                "{$path}/arguments/data/config/visible",
-                (array)$meta,
-                false
-            );
-            $path = $this->arrayManager->findPath(
-                'tnw_subscr_billing_frequency', $meta, null, 'children'
-            );
-            $meta = $this->arrayManager->set(
-                "{$path}/arguments/data/config/visible",
-                (array)$meta,
-                false
-            );
+        foreach ($keys as $key) {
+            $path = $this->arrayManager->findPath($key, $meta, null, 'children');
+            if ($path) {
+                $meta = $this->arrayManager->set(
+                    "{$path}/arguments/data/config/visible",
+                    $meta,
+                    false
+                );
+            }
         }
         return $meta;
     }

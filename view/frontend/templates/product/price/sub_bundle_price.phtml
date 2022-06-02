@@ -1,0 +1,49 @@
+<?php
+/**
+ *  Copyright © 2018 TechNWeb, Inc. All rights reserved.
+ *  See TNW_LICENSE.txt for license details.
+ */
+
+// @codingStandardsIgnoreFile
+
+?>
+
+<?php
+/** @var \TNW\Subscriptions\Pricing\Render\SubscriptionBundlePriceBox $block */
+
+/** @var \Magento\Bundle\Pricing\Price\FinalPrice $finalPriceModel */
+$finalPriceModel = $block->getPriceType('final_price');
+$minimalPrice = $finalPriceModel->getMinimalPrice()->getValue();
+$maximalPrice = $finalPriceModel->getMaximalPrice()->getValue();
+
+$idSuffix = $block->getIdSuffix() ? $block->getIdSuffix() : '';
+$schema = ($block->getZone() == 'item_view') ? true : false;
+?>
+<?php
+    $data = $block->renderSubscriptionAmounts(
+        $finalPriceModel->getAmount(),
+        $block->getProduct(),
+        [
+            'price_id'          => $block->getPriceId('product-price-' . $idSuffix),
+            'price_type'        => 'finalPrice',
+            'include_container' => true,
+            'schema' => $schema,
+            'show_range_price' => $block->showRangePrice(),
+            'onetime_minimal_price' => $minimalPrice,
+            'onetime_maximal_price' => $maximalPrice,
+            'minimal_option_price' => $block->getMinimalOptionPrice(),
+            'maximal_option_price' => $block->getMaximalOptionPrice(),
+        ]
+    );
+    $data = $block->getEncodedData($data);
+?>
+<script type="text/x-magento-init">
+{
+    ".product-info-price": {
+        "tnwSubscribePrice": {
+            "subscriptionPricesData" : <?= /* @noEscape */ $data ?>,
+            "subBillingFrequencyId" : <?= /* @noEscape */ $block->getBillingFrequencyId() ?>
+        }
+    }
+}
+</script>
