@@ -69,10 +69,12 @@
             "unit": true,
             "label": true,
             "status": true,
-            "frequency": true
+            "frequency": true,
+            "website_id": true
         },
         "constraint": {
-            "PRIMARY": true
+            "PRIMARY": true,
+            "TNW_SUBSCRIPTIONS_BILLING_FREQUENCY_WS_ID_STORE_WS_WS_ID": true
         }
     },
     "tnw_subscriptions_product_billing_frequency": {
