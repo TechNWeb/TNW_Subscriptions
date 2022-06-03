@@ -119,7 +119,6 @@
                 </item>
             </argument>
             <htmlContent name="html_content">
-                <argument name="block" xsi:type="object">TNW\Subscriptions\Block\Adminhtml\SubscriptionProfile\Edit\Summary\ShippingDetails</argument>
                 <argument name="data" xsi:type="array">
                     <item name="config" xsi:type="array">
                         <item name="imports" xsi:type="array">
@@ -127,6 +126,8 @@
                         </item>
                     </item>
                 </argument>
+                <block name="shipping_method_view.block"
+                       class="TNW\Subscriptions\Block\Adminhtml\SubscriptionProfile\Edit\Summary\ShippingDetails"/>
             </htmlContent>
         </container>
         <fieldset name="shipping_method_edit">

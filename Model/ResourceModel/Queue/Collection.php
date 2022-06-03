@@ -26,4 +26,14 @@ class Collection extends AbstractCollection
             Resource::class
         );
     }
+
+    /**
+     * @param $storeIds
+     * @return $this
+     */
+    public function addStoreFilter($storeIds)
+    {
+        $this->addFieldToFilter('store_id', ['in' => $storeIds]);
+        return $this;
+    }
 }

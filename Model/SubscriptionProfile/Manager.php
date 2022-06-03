@@ -59,6 +59,8 @@ use TNW\Subscriptions\Model\Shipping\Free;
 use Magento\Quote\Model\Quote\TotalsCollector;
 use TNW\Subscriptions\Api\SubscriptionProfileQueueRepositoryInterface;
 use TNW\Subscriptions\Model\Queue as ProfileQueueModel;
+use TNW\Subscriptions\Model\Config\Source\BillingFrequencyUnitType;
+use Magento\Backend\Model\Session\Quote as SessionQuote;
 
 /**
  * Class Manager - used for managing the subscription profiles
@@ -296,6 +298,11 @@ class Manager
     private $queueRepository;
 
     /**
+     * @var SessionQuote
+     */
+    private $sessionQuote;
+
+    /**
      * Manager constructor.
      * @param EnginePool $enginePool
      * @param SubscriptionProfileRepository $subscriptionProfileRepository
@@ -331,6 +338,7 @@ class Manager
      * @param ProfitManager $profitManager
      * @param ProfileOrderManager $profileOrderManager
      * @param SubscriptionProfileQueueRepositoryInterface $queueRepository
+     * @param SessionQuote $sessionQuote
      */
     public function __construct(
         EnginePool $enginePool,
@@ -366,8 +374,10 @@ class Manager
         SubscriptionProfileOrder $subscriptionProfileOrder,
         ProfitManager $profitManager,
         ProfileOrderManager $profileOrderManager,
-        SubscriptionProfileQueueRepositoryInterface $queueRepository
+        SubscriptionProfileQueueRepositoryInterface $queueRepository,
+        SessionQuote $sessionQuote
     ) {
+        $this->sessionQuote = $sessionQuote;
         $this->queueRepository = $queueRepository;
         $this->orderCollectionFactory = $orderCollectionFactory;
         $this->totalsCollector = $totalsCollector;
@@ -1101,20 +1111,29 @@ class Manager
         //Add products
         foreach ($profile->getVisibleProducts() as $profileProduct) {
             $magentoProduct = $profileProduct->getMagentoProduct();
-            $magentoProduct->getTypeInstance()->setStoreFilter(
-                $profile->getStore(),
-                $magentoProduct
-            );
+            $isProductDelented = !isset($magentoProduct);
+            if (!$isProductDelented) {
+                $magentoProduct->getTypeInstance()->setStoreFilter(
+                    $profile->getStore(),
+                    $magentoProduct
+                );
+            }
             if ($isReBill) {
                 $profileProduct->setTrialStatus(0);
-                $magentoProduct->setTnwSubscrTrialStatus(0);
+                if (!$isProductDelented) {
+                    $magentoProduct->setTnwSubscrTrialStatus(0);
+                }
             }
             $quoteItemCreated = true;
             try {
-                $quoteItem = $quote->addProduct(
-                    $magentoProduct,
-                    $this->getProductAddRequest($profileProduct, $isReBill)
-                );
+                if (!$isProductDelented) {
+                    $quoteItem = $quote->addProduct(
+                        $magentoProduct,
+                        $this->getProductAddRequest($profileProduct, $isReBill)
+                    );
+                } else {
+                    $quoteItemCreated = false;
+                }
             } catch (\Magento\Framework\Exception\LocalizedException $e) {
                 $quoteItemCreated = false;
                 $outOfStockProducts[$magentoProduct->getId()] = $magentoProduct->getName();
@@ -1151,11 +1170,10 @@ class Manager
                 $quote->getBillingAddress()->setCustomerId(
                     $profile->getCustomerId()
                 );
-
+                $this->sessionQuote->setStoreId($quote->getStoreId());
                 if ($isReBill && method_exists($this->getEngine(), 'setRebillProcessFlag')) {
                     $this->getEngine()->setRebillProcessFlag();
                 }
-
                 if (!$this->tempQuote) {
                     //Set payment method
                     if (!$this->customPaymentData) {
@@ -1488,7 +1506,9 @@ class Manager
         if (!$this->isNextPaymentDateValid) {
             $messages[] = [
                 'index' => 'index = next_payment_date_message',
-                'message' => __('Only future dates are allowed for Next Payment Date')
+                'message' => __('Only future dates or date less than double billing frequency '
+                    . 'are allowed for Next Payment Date'
+                )
             ];
         }
         return $messages;
@@ -1861,9 +1881,16 @@ class Manager
             $oldDateTimeStamp = strtotime($nextProfileRelation->getScheduledAt());
             $newFullDate = $data['next_payment_date_value'] . ' ' . date('H:i:s', $oldDateTimeStamp);
             $newDateTimeStamp = strtotime($newFullDate);
+            $frequency = (int) $this->getProfile()->getFrequency();
+            $unit = (int) $this->getProfile()->getUnit() === BillingFrequencyUnitType::DAYS
+                ? 'days'
+                : 'month';
+            $maxFullDateStamp = strtotime(date('m/d/Y 23:59:59', strtotime('+1 days +' . $frequency * 2 . $unit)));
             $currentDate = date('m/d/Y', time());
+            $nexPaymentDateStamp  = strtotime($data['next_payment_date_value']);
             if ($newDateTimeStamp <= time()
-                || strtotime($currentDate) == strtotime($data['next_payment_date_value'])
+                || strtotime($currentDate) == $nexPaymentDateStamp
+                || $nexPaymentDateStamp > $maxFullDateStamp
             ) {
                 $this->isNextPaymentDateValid = false;
                 return false;

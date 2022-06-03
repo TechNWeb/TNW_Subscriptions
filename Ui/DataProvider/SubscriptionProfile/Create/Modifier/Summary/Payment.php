@@ -130,6 +130,7 @@ class Payment implements ModifierInterface
                 $storeCurrency = $this->priceCurrency->getCurrency($storeId);
                 $data['new_subscription'][$key] = $storeCurrency->format(
                     $total['value'],
+                    [],
                     false,
                     false
                 );

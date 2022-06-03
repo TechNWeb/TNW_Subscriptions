@@ -10,6 +10,7 @@ use Magento\Catalog\Block\Product\Context;
 use Magento\Catalog\Block\Product\ListProduct as OrigListProduct;
 use Magento\Catalog\Model\Layer\Resolver;
 use Magento\Catalog\Model\Product;
+use Magento\ConfigurableProduct\Model\Product\Type\Configurable;
 use Magento\Framework\App\ActionInterface;
 use Magento\Framework\Data\Helper\PostHelper;
 use Magento\Framework\DataObject;
@@ -26,7 +27,6 @@ use TNW\Subscriptions\Api\ProductBillingFrequencyRepositoryInterface as Frequenc
 use TNW\Subscriptions\Block\Product\ListProduct\ListProductButtons;
 use TNW\Subscriptions\Model\Config\Source\TrialLengthUnitType;
 use TNW\Subscriptions\Model\Product\Attribute;
-use TNW\Subscriptions\Model\Product\Attribute as SubscriptionProductAttributes;
 use TNW\Subscriptions\Model\ProductBillingFrequency\PriceCalculator;
 use TNW\Subscriptions\Model\Config\Source\PurchaseType;
 use TNW\Subscriptions\Model\Config\Product\SubscriptionProductView;
@@ -34,6 +34,7 @@ use Magento\Catalog\Model\Product\Type;
 use Magento\Downloadable\Model\Product\Type as DownloadableType;
 use Magento\Directory\Model\CurrencyFactory;
 use Magento\Store\Model\StoreManagerInterface;
+use TNW\Subscriptions\Model\ProductSubscriptionProfile\ProductTypeManagerResolver;
 
 /**
  *  Subscription Product list.
@@ -98,6 +99,11 @@ class ListProduct extends OrigListProduct
     private $storeManager;
 
     /**
+     * @var ProductTypeManagerResolver
+     */
+    private $typeManagerResolver;
+
+    /**
      * ListProduct constructor.
      * @param Context $context
      * @param PostHelper $postDataHelper
@@ -113,6 +119,7 @@ class ListProduct extends OrigListProduct
      * @param SerializerInterface $serializer
      * @param CurrencyFactory $currencyFactory
      * @param StoreManagerInterface $storeManager
+     * @param ProductTypeManagerResolver $typeManagerResolver
      * @param array $data
      */
     public function __construct(
@@ -130,6 +137,7 @@ class ListProduct extends OrigListProduct
         SerializerInterface $serializer,
         CurrencyFactory $currencyFactory,
         StoreManagerInterface $storeManager,
+        ProductTypeManagerResolver $typeManagerResolver,
         array $data = []
     ) {
         parent::__construct($context, $postDataHelper, $layerResolver, $categoryRepository, $urlHelper, $data);
@@ -142,7 +150,8 @@ class ListProduct extends OrigListProduct
         $this->serializer = $serializer;
         $this->currencyFactory = $currencyFactory;
         $this->storeManager = $storeManager;
-    }   
+        $this->typeManagerResolver = $typeManagerResolver;
+    }
 
     /**
      * Prepare params too add button block.
@@ -222,20 +231,37 @@ class ListProduct extends OrigListProduct
      */
     public function getTopMessage($product)
     {
-        $productArray = $product->getData();
-        if (isset($productArray['tnw_subscr_trial_status'])
-            && $productArray['tnw_subscr_trial_status'] != 0
-            && $productArray['tnw_subscr_purchase_type'] != PurchaseType::ONE_TIME_PURCHASE_TYPE
+        $productArray = $this->getBestMatchProductDataObject($product);
+        if (!$this->isAllowedProductType($product) || !$productArray) {
+            return '';
+        }
+        if (isset($productArray[Attribute::SUBSCRIPTION_TRIAL_STATUS])
+            && $productArray[Attribute::SUBSCRIPTION_TRIAL_STATUS] != 0
+            && $productArray[Attribute::SUBSCRIPTION_PURCHASE_TYPE] != PurchaseType::ONE_TIME_PURCHASE_TYPE
             && $this->isProductTrialAvailableForCurrentCustomer($product)
         ) {
             $topMessage = __('Try for %1', $this->getFrequencyTrialWithUnit(
-                $productArray['tnw_subscr_trial_length'],
-                $productArray['tnw_subscr_trial_length_unit']
+                $productArray[Attribute::SUBSCRIPTION_TRIAL_LENGTH],
+                $productArray[Attribute::SUBSCRIPTION_TRIAL_LENGTH_UNIT]
             ));
         } else {
             $topMessage = '';
         }
         return $topMessage;
+    }
+
+    /**
+     * @param $product
+     * @return string
+     * @throws LocalizedException
+     * @throws NoSuchEntityException
+     */
+    public function getPriceLabel($product)
+    {
+        if ($product->getTypeId() === Configurable::TYPE_CODE && $this->getTopMessage($product) === '') {
+            return sprintf('<span class="price-label">%s</span>', __('As low as'));
+        }
+        return '';
     }
 
     /**
@@ -265,40 +291,94 @@ class ListProduct extends OrigListProduct
             ->getListByProductId($product->getId())
             ->getItems();
 
+        $productData = $this->getBestMatchProductDataObject($product);
         if (empty($productBillingFrequencies)
-            || $product->getData(Attribute::SUBSCRIPTION_PURCHASE_TYPE) == PurchaseType::ONE_TIME_PURCHASE_TYPE
+            || !$productData
+            || $product->getData(Attribute::SUBSCRIPTION_PURCHASE_TYPE)
+                == PurchaseType::ONE_TIME_PURCHASE_TYPE
         ) {
             return $product->getTypeId() === Grouped::TYPE_CODE
                 ? null
-                : $this->formatCurrency($this->getConvertedPrice($product->getPrice()), false);
+                : $this->formatCurrency(
+                    $this->getConvertedPrice($product->getPriceInfo()->getPrice('final_price')->getAmount()->getValue())
+                );
         }
 
-        $result = null;
-        $trialStatus = $product->getData(SubscriptionProductAttributes::SUBSCRIPTION_TRIAL_STATUS);
-        $trialPrice = $product->getData(SubscriptionProductAttributes::SUBSCRIPTION_TRIAL_PRICE);
-        if (!$this->isProductTrialAvailableForCurrentCustomer($product)) {
-            $trialStatus = 0;
-        }
-        if ($trialStatus == 1) {
+        $trialAllowed = $this->isProductTrialAvailableForCurrentCustomer($product);
+        $trialStatus = !$trialAllowed ? 0 : $productData->getData(Attribute::SUBSCRIPTION_TRIAL_STATUS);
+        $initialFee = $this->getInitialFee($productData->getData('matched_billing_frequency'), $productData);
+        $subscriptionPrice = (float)$this->priceCalculator->getUnitPrice(
+            $productData,
+            $productData->getData('matched_billing_frequency')->getBillingFrequencyId(),
+            null,
+            $trialAllowed
+        );
+        $price = $subscriptionPrice + $initialFee;
+        if ($trialStatus == 1 && $price == 0) {
             $result = sprintf('<span class="free">%s</span>', __('Free'));
+        } else {
+            $result = $this->formatCurrency($this->getConvertedPrice($price));
         }
-        foreach ($productBillingFrequencies as $productBillingFrequency) {
-            $initialFee = $this->getInitialFee($productBillingFrequency, $product);
 
-            if ($trialStatus == 0 && $productBillingFrequency['default_billing_frequency'] == 1) {
-                $subscriptionPrice = $productBillingFrequency['price'] + $initialFee;
-                $result = $this->formatCurrency($this->getConvertedPrice($subscriptionPrice), false);
-            } elseif ($trialStatus == 1 && $productBillingFrequency['default_billing_frequency'] == 1) {
-                $price = $trialPrice + $initialFee;
-                $customPrice = $this->formatCurrency($this->getConvertedPrice($price), false);
+        return $result;
+    }
 
-                if ($price != 0 && $trialStatus == 1) {
-                    $result = $customPrice;
+    /**
+     * @param $product
+     * @return DataObject
+     */
+    public function getBestMatchProductDataObject($product)
+    {
+        try {
+            $productBillingFrequencies = $this->frequencyOptionRepository
+                ->getListByProductId($product->getId())
+                ->getItems();
+        } catch (LocalizedException $e) {
+            $productBillingFrequencies = [];
+        }
+        $trialAllowed = $this->isProductTrialAvailableForCurrentCustomer($product);
+        $products = $product->getTypeId() === Configurable::TYPE_CODE
+            ? $product->getTypeInstance()->getUsedProducts($product, null)
+            : [$product];
+        $typeManager = $this->typeManagerResolver->resolve($product->getTypeId());
+        $bestMatch = null;
+        foreach ($products as $childProduct) {
+            $productData = $typeManager->getProductDataObject($product, ['child_product' => $childProduct]);
+            foreach ($productBillingFrequencies as $productBillingFrequency) {
+                if ($productBillingFrequency['default_billing_frequency'] != 1) {
+                    continue;
+                }
+                $billingFrequencyId = $productBillingFrequency->getBillingFrequencyId();
+                if ($typeManager->checkFrequencyExistanse(
+                    $billingFrequencyId,
+                    $productData->getData('child_product_id')
+                )
+                ) {
+                    try {
+                        if (null === $bestMatch
+                            || (float)$this->priceCalculator->getUnitPrice(
+                                $bestMatch,
+                                $billingFrequencyId,
+                                null,
+                                $trialAllowed
+                            )
+                            > (float)$this->priceCalculator->getUnitPrice(
+                                $productData,
+                                $billingFrequencyId,
+                                null,
+                                $trialAllowed
+                            )
+                        ) {
+                            $bestMatch = $productData;
+                            $bestMatch->setData('matched_billing_frequency', $productBillingFrequency);
+                        }
+                    } catch (NoSuchEntityException $e) {
+                        continue;
+                    }
                 }
             }
-
         }
-        return $result;
+        return $bestMatch;
     }
 
     /**
@@ -325,8 +405,15 @@ class ListProduct extends OrigListProduct
      */
     public function isSubscriptionPrice($product)
     {
-        return $this->productView->getCustomerGroupLimitation($product)
-            && $product->getTypeId() !== Grouped::TYPE_CODE;
+        $purchaseType = $this->typeManagerResolver->resolve($product->getTypeId())->getProductDataObject($product)
+            ->getData(Attribute::SUBSCRIPTION_PURCHASE_TYPE);
+        if ($purchaseType == PurchaseType::RECURRING_PURCHASE_TYPE
+            || $purchaseType == PurchaseType::ONE_TIME_AND_RECURRING_PURCHASE_TYPE
+        ) {
+            return $this->productView->getCustomerGroupLimitation($product)
+                && $product->getTypeId() !== Grouped::TYPE_CODE;
+        }
+        return false;
     }
 
     /**
@@ -339,6 +426,7 @@ class ListProduct extends OrigListProduct
     {
         return $product->getTypeId() == Type::TYPE_SIMPLE
             || $product->getTypeId() == Type::TYPE_VIRTUAL
+            || $product->getTypeId() == Configurable::TYPE_CODE
             || $product->getTypeId() == Grouped::TYPE_CODE
             || $product->getTypeId() == DownloadableType::TYPE_DOWNLOADABLE;
     }
@@ -395,5 +483,15 @@ class ListProduct extends OrigListProduct
         $baseCurrency = $this->storeManager->getStore()->getBaseCurrency()->getCode();
         $rate = $this->currencyFactory->create()->load($baseCurrency)->getAnyRate($currentCurrency);
         return $price * $rate;
+    }
+
+    /**
+     * Identities array is empty, because parent block returns needed product identities.
+     *
+     * @return array
+     */
+    public function getIdentities()
+    {
+        return [];
     }
 }

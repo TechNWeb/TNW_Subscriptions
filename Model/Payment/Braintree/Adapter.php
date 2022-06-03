@@ -48,10 +48,21 @@ class Adapter
     private $storeManager;
 
     /**
+     * @var null
+     */
+    private $storeId;
+
+    /**
      * Adapter constructor.
      * @param LoggerInterface $logger
      * @param Manager $moduleManager
      * @param ObjectManagerInterface $objectManager
+     * @param RequestHttp $http
+     * @param SubscriptionProfileRepositoryInterface $profileRepository
+     * @param ScopeConfigInterface $scopeConfig
+     * @param StoreManagerInterface $storeManager
+     * @param null $storeId
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
     public function __construct(
         LoggerInterface $logger,
@@ -60,12 +71,14 @@ class Adapter
         RequestHttp $http,
         SubscriptionProfileRepositoryInterface $profileRepository,
         ScopeConfigInterface $scopeConfig,
-        StoreManagerInterface $storeManager
+        StoreManagerInterface $storeManager,
+        $storeId = null
     ) {
         if ($moduleManager->isEnabled("PayPal_Braintree")) {
             $this->config = $objectManager->get(\PayPal\Braintree\Gateway\Config\Config::class);
             $this->storeConfigResolver = $objectManager->get(\PayPal\Braintree\Model\StoreConfigResolver::class);
         }
+        $this->storeId = $storeId;
         $this->logger = $logger;
         $this->http = $http;
         $this->profileRepository = $profileRepository;
@@ -137,6 +150,9 @@ class Adapter
             $websiteId = null;
             if ($subscriptionProfileId) {
                 $websiteId = $this->profileRepository->getById($subscriptionProfileId)->getWebsiteId();
+            }
+            if (!$websiteId && $this->storeId) {
+                $websiteId = $this->storeManager->getStore($this->storeId)->getWebsiteId();
             }
             $this->environment(Environment::ENVIRONMENT_SANDBOX);
 

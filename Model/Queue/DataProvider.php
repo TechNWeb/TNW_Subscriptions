@@ -11,12 +11,19 @@ use TNW\Subscriptions\Api\Data\SubscriptionProfileQueueInterface;
 use TNW\Subscriptions\Model\Source\Queue\Status as QueueStatus;
 use TNW\Subscriptions\Model\ResourceModel\Queue\Collection;
 use TNW\Subscriptions\Model\ResourceModel\Queue\CollectionFactory;
+use Magento\Framework\ObjectManagerInterface as ObjectManager;
+use Magento\Framework\Module\Manager as ModuleManager;
 
 /**
  * Class queue listing data provider
  */
 class DataProvider extends AbstractDataProvider
 {
+    /**
+     * @var mixed
+     */
+    private $collectionRoleRestrictor;
+
     /**
      * DataProvider constructor.
      * @param string $name
@@ -31,9 +38,14 @@ class DataProvider extends AbstractDataProvider
         $primaryFieldName,
         $requestFieldName,
         CollectionFactory $collectionFactory,
+        ModuleManager $moduleManager,
+        ObjectManager $objectManager,
         array $meta = [],
         array $data = []
     ) {
+        if ($moduleManager->isEnabled("Magento_AdminGws")) {
+            $this->collectionRoleRestrictor = $objectManager->get(\Magento\AdminGws\Model\Collections::class);
+        }
         $this->collection = $collectionFactory->create();
         $this->addColumnsFiltersToMap();
 
@@ -74,10 +86,13 @@ class DataProvider extends AbstractDataProvider
             ],
             'subscription_profile.entity_id = relation.subscription_profile_id',
             [
-                'subscription_profile.store_id'
+                'subscription_profile.store_id',
+                'subscription_profile.website_id'
             ]
         );
-
+        if (isset($this->collectionRoleRestrictor)) {
+            $this->collectionRoleRestrictor->addStoreFilter($collection);
+        }
         return $collection->toArray();
     }
 

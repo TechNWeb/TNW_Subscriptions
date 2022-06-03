@@ -4,3 +4,7 @@
 .data-grid td .action-menu._active {
     right: auto;
 }
+.admin__menu .submenu .column:only-of-type .submenu-group-title,
+.admin__menu .level-0 > .submenu > ul > .level-1:only-of-type > .submenu-group-title {
+    display: block !important;
+}

@@ -12,7 +12,7 @@
             <each args="data: elems, as: 'element'">
                 <li data-role="collapsible"
                     data-bind="css: { 'active': $parent.isSelectedStep(element.name) }">
-                    <a data-bind="text:element.caption, click: $parent.showSpecificStep.bind($parent), attr: {href: '#'+element.name}"/>
+                    <a data-bind="text:element.caption, click: $parent.showSpecificStep.bind($parent), attr: {href: '#'+element.name}"></a>
                 </li>
             </each>
         </ul>
@@ -20,20 +20,20 @@
             <div class="action-wrap" data-role="closeBtn">
                 <button type="button"
                         class="action-cancel action-tertiary" data-bind="click: cancel">
-                    <span translate="'Cancel'"/>
+                    <span translate="'Cancel'"></span>
                 </button>
             </div>
             <div class="action-wrap action-wrap-prev" data-role="step-wizard-prev">
                 <button type="button"
                         class="action-default action-back-step"
                         data-bind="click: back, css: { 'disabled': disabled}">
-                    <span translate="'Back'"/>
+                    <span translate="'Back'"></span>
                 </button>
             </div>
             <div class="action-wrap action-wrap-next" data-role="step-wizard-next">
                 <button type="button"
                         class="action-default action-primary action-next-step" data-bind="click: next">
-                    <span translate="'Next'"/>
+                    <span translate="'Next'"></span>
                 </button>
             </div>
         </div>
@@ -46,7 +46,7 @@
                     attr:{id: element.name}"
                      class="content no-display"
                      data-role="content">
-                        <render if="hasTemplate()"/>
+                        <render if="hasTemplate()"></render>
                 </div>
             </each>
     </div>

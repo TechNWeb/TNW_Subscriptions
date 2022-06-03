@@ -763,4 +763,7 @@ button.action-editor.active:before {
 .tnw-tooltip-content {
   white-space: normal;
 }
+.tnw-field-control.admin__field-control._with-tooltip .admin__field-option {
+    display: block;
+}
 /*# sourceMappingURL=create-subscription.css.map */

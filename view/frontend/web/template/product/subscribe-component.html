@@ -5,11 +5,11 @@
  */
 -->
 <div class="fieldset" data-bind="visible: !currentProduct">
-    <span translate="'Please select options'"/>
+    <span translate="'Please select options'"></span>
 </div>
 <div class="fieldset" data-bind="visible: (currentProduct && getFrequencyOptions())">
     <div class="field" data-bind="visible: getCanSkipTrial() && isTrialAvailableForUser">
-        <label class="label"><span translate="'Use Trial'"/>:</label>
+        <label class="label"><span translate="'Use Trial'"></span>:</label>
         <div class="control">
             <input type="checkbox"
                    id="use_trial"
@@ -21,7 +21,7 @@
         </div>
     </div>
     <div class="field required">
-        <label class="label"><span translate="'Billing Frequency'"/>:</label>
+        <label class="label"><span translate="'Billing Frequency'"></span>:</label>
         <div class="control">
             <div class="options-list nested">
                 <select name="billing_frequency"
@@ -39,21 +39,21 @@
     </div>
     <div class="fieldset">
         <div class="field term required">
-            <label class="label"><span translate="'Term'"/>:</label>
+            <label class="label"><span translate="'Term'"></span>:</label>
             <div class="control">
 
-                <span translate="'Until canceled'" data-bind="visible: isInfinite()"/>
+                <span translate="'Until canceled'" data-bind="visible: isInfinite()"></span>
 
                 <div data-bind="visible: !isInfinite()">
                     <input type="radio" id="term1" name="term" value="1" ko-checked="getDefaultUntilCancelled()"/>
                     <label class="label" for="term1">
-                        <span translate="'Until canceled'"/>
+                        <span translate="'Until canceled'"></span>
                     </label>
                 </div>
                 <div data-bind="visible: !isInfinite()">
                     <input type="radio" id="term0" name="term" value="0" ko-checked="getDefaultUntilCancelled()"/>
                     <label class="label" for="term0">
-                        <span translate="'Stop after'"/>
+                        <span translate="'Stop after'"></span>
                         <input type="number"
                                name="period"
                                id="period"
@@ -61,7 +61,7 @@
                                data-validate='{"required-number":true, "validate-number-range":"2-9999999999"}'
                                ko-value="defaultPeriod"
                         >
-                        <span translate="'payment(s)'"/>
+                        <span translate="'payment(s)'"></span>
                     </label>
                 </div>
             </div>
@@ -69,14 +69,14 @@
     </div>
     <div class="fieldset" data-bind="visible: getIsVisibleStartOn(), afterRender: setupCalendar()">
         <div class="field date required">
-            <label class="label"><span translate="'Delivery Schedule'"/>:</label>
+            <label class="label"><span translate="'Delivery Schedule'"></span>:</label>
             <div class="control delivery-schedule">
-                <span translate="'First delivery on'"/>
-                <span class="delivery-schedule-date"/>
+                <span translate="'First delivery on'"></span>
+                <span class="delivery-schedule-date"></span>
                 <input type="hidden" name="start_on_alt" id="start_on_alt"/>
                 <a href="#" class="action change-delivery-date"
                    translate="'change'"
-                   data-bind="visible: !scheduleDateInputVisible, click: manageStartOn"/>
+                   data-bind="visible: !scheduleDateInputVisible, click: manageStartOn"></a>
                 <span class="start-on-wrapper" data-bind="visible: scheduleDateInputVisible">
                     <input type="text"
                            name="start_on"
@@ -86,14 +86,14 @@
                     />
                     <a href="#" class="action update-delivery-date"
                        translate="'Update'"
-                       data-bind="click: manageStartOn"/>
+                       data-bind="click: manageStartOn"></a>
                 </span>
             </div>
         </div>
     </div>
     <div class="fieldset" data-bind="visible: getAllowDisplaySubscribeQty()">
         <div class="field required">
-            <label class="label" for="subscribe_qty"><span translate="'Qty'"/>:</label>
+            <label class="label" for="subscribe_qty"><span translate="'Qty'"></span>:</label>
             <div class="control">
                 <input type="number"
                        name="subscribe_qty"
@@ -112,6 +112,6 @@
         </div>
     </div>
     <button type="submit" id="product-subscribe-button" class="action primary tocart">
-        <span data-role="button-text" text="buttonLabel"/>
+        <span data-role="button-text" text="buttonLabel"></span>
     </button>
 </div>

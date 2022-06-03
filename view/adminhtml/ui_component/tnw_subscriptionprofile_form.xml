@@ -103,7 +103,7 @@
                 </item>
             </argument>
             <htmlContent name="html_content">
-                <argument name="block" xsi:type="object">TNW\Subscriptions\Block\Subscription\Summary\Overview</argument>
+                <block name="overview.block" class="TNW\Subscriptions\Block\Subscription\Summary\Overview"/>
             </htmlContent>
         </container>
         <fieldset name="profit_fieldset">
@@ -159,7 +159,8 @@
                     </argument>
                 </container>
                 <htmlContent name="html_content">
-                    <argument name="block" xsi:type="object">TNW\Subscriptions\Block\Adminhtml\SubscriptionProfile\Edit\Dashboard\SubscriptionDetails</argument>
+                    <block name="subscription_details.block"
+                           class="TNW\Subscriptions\Block\Adminhtml\SubscriptionProfile\Edit\Dashboard\SubscriptionDetails"/>
                 </htmlContent>
             </container>
         </fieldset>

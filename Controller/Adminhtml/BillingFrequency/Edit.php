@@ -79,7 +79,7 @@ class Edit extends \TNW\Subscriptions\Controller\Adminhtml\BillingFrequency
             $id ? __('Edit Billing Frequency') : __('New Billing Frequency'),
             $id ? __('Edit Billing Frequency') : __('New Billing Frequency')
         );
-        $resultPage->getConfig()->getTitle()->prepend(__('Billing Frequencys'));
+        $resultPage->getConfig()->getTitle()->prepend(__('Billing Frequencies'));
         $resultPage->getConfig()->getTitle()->prepend(
             $model->getId() ? $model->getTitle() : __('New Billing Frequency')
         );

@@ -10,11 +10,11 @@
      css="$data.additionalClasses"
      attr="'data-config-scope': $data.scopeLabel, 'data-index': index">
     <legend class="field-label label" if="$data.label" attr="for: uid">
-        <span text="label" ifnot="$data.tooltip"/>
+        <span text="label" ifnot="$data.tooltip"></span>
         <span class="tnw-tooltip field-tooltip" if="$data.tooltip">
             <span class="tooltip-toggle">Term:</span>
             <span class="field-tooltip-action"></span>
-            <span class="tooltip-content" html="tooltip.description"/>
+            <span class="tooltip-content" html="tooltip.description"></span>
         </span>
     </legend>
 
@@ -22,7 +22,7 @@
          css="'_with-tooltip': $data.tooltip">
 
         <div class="control-preview" if="$data.showPreview">
-            <render args="previewElementTmpl"/>
+            <render args="previewElementTmpl"></render>
         </div>
 
         <div ifnot="$data.showPreview">
@@ -38,18 +38,18 @@
                     value: value,
                     type: $parent.multiple ? 'checkbox' : 'radio'"/>
 
-                <label class="field-label" text="label" attr="for: ko.uid"/>
+                <label class="field-label" text="label" attr="for: ko.uid"></label>
             </div>
 
-            <div class="mage-error" generated="true" if="error" attr="for: uid" text="error"/>
+            <div class="mage-error" generated="true" if="error" attr="for: uid" text="error"></div>
 
             <div class="field-note" if="$data.notice" attr="id: noticeId">
-                <span html="notice"/>
+                <span html="notice"></span>
             </div>
 
             <div class="additional-info" if="$data.additionalInfo" html="$data.additionalInfo"></div>
 
-            <render args="$data.service.template" if="$data.hasService()"/>
+            <render args="$data.service.template" if="$data.hasService()"></render>
         </div>
     </div>
 </fieldset>

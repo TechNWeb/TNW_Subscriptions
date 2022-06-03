@@ -10,35 +10,35 @@
      css="$data.additionalClasses"
      attr="'data-config-scope': $data.scopeLabel, 'data-index': index">
     <legend class="field-label" if="$data.label" attr="for: uid">
-        <span text="label"/>
+        <span text="label"></span>
     </legend>
 
     <div class="field-control"
          css="'_with-tooltip': $data.tooltip">
         <div class="field field-option" outereach="options">
-            <input 
+            <input
                 ko-checked="$parent.value"
                 ko-disabled="$parent.disabled"
                 css="
                     'control-radio': !$parent.multiple,
                     'control-checkbox': $parent.multiple"
                 attr="
-                    id: ++ko.uid, 
+                    id: ++ko.uid,
                     value: value,
                     type: $parent.multiple ? 'checkbox' : 'radio'"/>
 
-            <label class="field-label" text="label" attr="for: ko.uid"/>
-            <div attr="'data-title': title" css="css"/>
+            <label class="field-label" text="label" attr="for: ko.uid"></label>
+            <div attr="'data-title': title" css="css"></div>
         </div>
 
-        <label class=field-error" if="error" attr="for: uid" text="error"/>
+        <label class=field-error" if="error" attr="for: uid" text="error"></label>
 
         <div class="field-note" if="$data.notice" attr="id: noticeId">
-            <span html="notice"/>
+            <span html="notice"></span>
         </div>
 
         <div class="additional-info" if="$data.additionalInfo" html="$data.additionalInfo"></div>
 
-        <render args="$data.service.template" if="$data.hasService()"/>
+        <render args="$data.service.template" if="$data.hasService()"></render>
     </div>
 </fieldset>

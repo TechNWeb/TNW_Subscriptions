@@ -21,7 +21,7 @@
                       '_changed': changed,
                       '_loading': loading,
                       '_error': error">
-            <span translate="label"/>
+            <span translate="label"></span>
         </strong>
     </div>
 
@@ -39,9 +39,8 @@
                 name="iframeTransparent"
                 style="display: none; width: 100%; background-color: transparent;">
         </iframe>
-        <fieldset
-                if="opened() || _wasOpened"
+        <fieldset                 if="opened() || _wasOpened"
                 class="fieldset"
-                each="data: elems, as: 'element'" render=""/>
+                each="data: elems, as: 'element'" render=""></fieldset>
     </div>
 </div>

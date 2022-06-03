@@ -4,9 +4,9 @@
  * See TNW_LICENSE.txt for license details.
  */
 -->
-<div if="$col.hasLabel($row())||$col.hasOptions($row())" class="data-grid-cell-content subscription-shipping-title" translate="'Shipping Method'"/>
+<div if="$col.hasLabel($row())||$col.hasOptions($row())" class="data-grid-cell-content subscription-shipping-title" translate="'Shipping Method'"></div>
 
-<div if="$col.hasLabel($row())" class="data-grid-cell-content subscription-shipping-method" html="$col.getLabel($row())"/>
+<div if="$col.hasLabel($row())" class="data-grid-cell-content subscription-shipping-method" html="$col.getLabel($row())"></div>
 
 <div if="$col.hasOptions($row())" >
 <select class="control-select" data-bind="
@@ -21,7 +21,7 @@
     optionsCaption: false,
     optionsValue: 'value',
     optionsText: 'label'",
-/>
+></select>
 </div>
 
 <div if="$col.needShowAttention($row())" class="data-grid-cell-content subscription-shipping-attention" data-bind="
@@ -30,4 +30,4 @@
      },
      css: { 'hidden': $col.showAttention($row())}"
      html="$col.getAttentionMessage()"
-/>
+></div>

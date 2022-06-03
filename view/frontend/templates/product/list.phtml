@@ -87,6 +87,7 @@ $_customerProductsHistoryListViewModel = $block->getData('customerProductsHistor
                             <?php if ($_subscriptionBlock->isAllowedProductType($_product)
                                 && $_subscriptionBlock->isSubscriptionPrice($_product)): ?>
                             <div class="price-box price-final_price">
+                                <?= /* @noEscape */ $_subscriptionBlock->getPriceLabel($_product) ?>
                                 <span class="price-wrapper" data-role="priceBox">
                                     <span class="price">
                                         <?= /* @noEscape */ $_subscriptionBlock->getTrialPriceForCategory($_product) ?>
@@ -100,7 +101,7 @@ $_customerProductsHistoryListViewModel = $block->getData('customerProductsHistor
 
                         <div class="product-item-inner">
                             <div class="product actions product-item-actions"<?= /* @noEscape */
-                                    strpos($pos, $viewMode . '-actions') ? $position : ''; ?>>
+                                    $pos && strpos($pos, $viewMode . '-actions') ? $position : ''; ?>>
                                 <?php
                                 $_subscriptionBlock->prepareParamsToButtonsBlock(
                                     $_product,
@@ -112,7 +113,7 @@ $_customerProductsHistoryListViewModel = $block->getData('customerProductsHistor
                                 echo $_subscriptionBlock->getButtonsHtml();
                                 ?>
                                 <div data-role="add-to-links" class="actions-secondary"<?= /* @noEscape */
-                                        strpos($pos, $viewMode . '-secondary') ? $position : ''; ?>>
+                                        $pos && strpos($pos, $viewMode . '-secondary') ? $position : ''; ?>>
                                     <?php if ($addToBlock = $block->getChildBlock('addto')): ?>
                                         <?= $addToBlock->setProduct($_product)->getChildHtml(); ?>
                                     <?php endif; ?>
