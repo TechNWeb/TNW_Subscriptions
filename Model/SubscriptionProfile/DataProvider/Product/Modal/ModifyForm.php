@@ -853,6 +853,15 @@ class ModifyForm extends Form
         $infiniteSubscriptions = (bool)$this->getSubAttributeFromItem(
             Attribute::SUBSCRIPTION_INFINITE_SUBSCRIPTIONS
         );
+        if (isset($this->profileManager)) {
+            $defaultTerm = $this->profileManager->getProfile()->getTerm();
+        } elseif (isset($this->currentItem)) {
+            $subBuyRequest = $this->currentItem->getBuyRequest()
+                ->getDataByPath(Create::SUBSCRIPTION_BUY_REQUEST_PARAM_NAME);
+            $defaultTerm = (string)$subBuyRequest[Create::UNIQUE]['term'] ?? '1';
+        } else {
+            $defaultTerm = '1';
+        }
         return [
             'arguments' => [
                 'data' => [
@@ -865,7 +874,7 @@ class ModifyForm extends Form
                             ['value' => 1, 'label' => __('until canceled')],
                             ['value' => 0, 'label' => __('stop after')],
                         ],
-                        'default' => '1',
+                        'default' => $defaultTerm,
                         'disabled' => $infiniteSubscriptions,
                         'description' => __('until canceled'),
                         'label' => __('Term:'),
