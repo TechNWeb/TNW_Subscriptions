@@ -240,6 +240,9 @@ class Manager
                 QueueStatus::QUEUE_STATUS_ERROR,
                 QueueStatus::QUEUE_STATUS_SKIPPED
             ]),
+            $connection->prepareSqlCondition('relation.scheduled_at', [
+                'to' => date('Y-m-d 00:00:00')
+            ]),
             $connection->quoteInto('main_table.attempt_count <= ?', $this->config->getAttemptCount()),
             $connection->prepareSqlCondition('relation.magento_order_id', ["null" => true]),
         ]);
