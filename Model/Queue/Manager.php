@@ -708,26 +708,28 @@ class Manager
      */
     private function createNewRelation($queue, $profile)
     {
-        /** @var BillingCyclesManager $billingCyclesManager */
-        $billingCyclesManager = $this->billingCyclesManagerFactory->create();
-        try {
-            list($cycles, $needMore, $existingCycles) =
-                $billingCyclesManager->getBillingCycles($profile, 1, true);
-            if ($needMore && $cycles) {
-                $relations = [];
-                foreach ($cycles as $cycle) {
-                    $newRelation = $this->relationManager->getNewProfileOrderRelation()
-                        ->setSubscriptionProfileId($profile->getId())
-                        ->setMagentoQuoteId($queue->getData('magento_quote_id'))
-                        ->setScheduledAt($cycle);
-                    $relations[] = $this->relationManager->saveRelation($newRelation)->getId();
+        if ($profile->getStatus() != ProfileStatus::STATUS_COMPLETE) {
+            /** @var BillingCyclesManager $billingCyclesManager */
+            $billingCyclesManager = $this->billingCyclesManagerFactory->create();
+            try {
+                list($cycles, $needMore, $existingCycles) =
+                    $billingCyclesManager->getBillingCycles($profile, 1, true);
+                if ($needMore && $cycles) {
+                    $relations = [];
+                    foreach ($cycles as $cycle) {
+                        $newRelation = $this->relationManager->getNewProfileOrderRelation()
+                            ->setSubscriptionProfileId($profile->getId())
+                            ->setMagentoQuoteId($queue->getData('magento_quote_id'))
+                            ->setScheduledAt($cycle);
+                        $relations[] = $this->relationManager->saveRelation($newRelation)->getId();
+                    }
+                    if ($relations) {
+                        $this->insertItems($relations);
+                    }
                 }
-                if ($relations) {
-                    $this->insertItems($relations);
-                }
+            } catch (\Exception $e) {
+                throw new NewRelationException(__('Could not create new relation.'));
             }
-        } catch (\Exception $e) {
-            throw new NewRelationException(__('Could not create new relation.'));
         }
     }
 

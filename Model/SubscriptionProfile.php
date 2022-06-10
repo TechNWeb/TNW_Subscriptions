@@ -1026,8 +1026,19 @@ class SubscriptionProfile extends AbstractExtensibleModel implements Subscriptio
                 return $this->getFinalOrderScheduledAt($profileOrders);
             }
         }
+        $activationData = [];
+        if ($profileOrders && $remainingBillingCycles) {
+            $activationData = [
+                'billing_cycles_to_process' => $remainingBillingCycles,
+                'next_scheduled_order_date' => array_shift($profileOrders)['scheduled_at']
+            ];
+        }
 
-        return $this->calculateFinalDate($profile, $totalBillingCycles);
+        return $this->calculateFinalDate(
+            $profile,
+            $totalBillingCycles,
+            $activationData
+        );
     }
 
     /**
@@ -1043,11 +1054,12 @@ class SubscriptionProfile extends AbstractExtensibleModel implements Subscriptio
     }
 
     /**
-     * @param SubscriptionProfile $profile
-     * @param int $totalBillingCycles
-     * @return string|null
+     * @param $profile
+     * @param $totalBillingCycles
+     * @param array $activationData
+     * @return false|string|null
      */
-    private function calculateFinalDate($profile, $totalBillingCycles)
+    private function calculateFinalDate($profile, $totalBillingCycles, $activationData = [])
     {
         try {
             $billingFrequency = $this->billingFrequencyRepository->getById(
@@ -1058,8 +1070,13 @@ class SubscriptionProfile extends AbstractExtensibleModel implements Subscriptio
             return null;
         }
 
-        $startDate = $profile->getStartDate();
-        $total = $billingFrequency->getFrequency() * ($totalBillingCycles - 1);
+        if ($activationData) {
+            $startDate = $activationData['next_scheduled_order_date'];
+            $total = $billingFrequency->getFrequency() * ($activationData['billing_cycles_to_process']);
+        } else {
+            $startDate = $profile->getStartDate();
+            $total = $billingFrequency->getFrequency() * ($totalBillingCycles - 1);
+        }
         switch ($billingFrequency->getUnit()) {
             case BillingFrequencyUnitType::DAYS:
                 $billingCycles = "+" . $total . " days";
