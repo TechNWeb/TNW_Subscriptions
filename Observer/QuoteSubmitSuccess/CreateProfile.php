@@ -9,6 +9,22 @@ use Magento\Customer\Api\CustomerRepositoryInterface;
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
 use Magento\Vault\Api\Data\PaymentTokenInterface;
+use Magento\Backend\Model\Session\Quote as SessionQuote;
+use TNW\Subscriptions\Model\SubscriptionProfile\Manager;
+use TNW\Subscriptions\Model\Quote\ItemGroup;
+use Magento\Sales\Api\OrderCustomerManagementInterface;
+use TNW\Subscriptions\Cron\Quote\Creator;
+use TNW\Subscriptions\Model\ResourceModel\SalesItemRelation;
+use Magento\Customer\Model\CustomerFactory;
+use Magento\Vault\Api\PaymentTokenManagementInterface;
+use Magento\Framework\Encryption\EncryptorInterface;
+use TNW\Subscriptions\Plugin\Quote\Model\ChangeQuoteControl;
+use Magento\Framework\Exception\CouldNotSaveException;
+use Magento\Framework\Exception\LocalizedException;
+use Magento\Framework\Exception\NoSuchEntityException;
+use Magento\Sales\Model\Order\Item;
+use Magento\Quote\Model\Quote;
+use Magento\Sales\Model\Order;
 
 /**
  * Class CreateProfile - observer
@@ -16,32 +32,32 @@ use Magento\Vault\Api\Data\PaymentTokenInterface;
 class CreateProfile implements ObserverInterface
 {
     /**
-     * @var \TNW\Subscriptions\Model\SubscriptionProfile\Manager
+     * @var Manager
      */
     private $profileManager;
 
     /**
-     * @var \TNW\Subscriptions\Model\Quote\ItemGroup
+     * @var ItemGroup
      */
     private $quoteItemGroup;
 
     /**
-     * @var \Magento\Sales\Api\OrderCustomerManagementInterface
+     * @var OrderCustomerManagementInterface
      */
     private $orderCustomerService;
 
     /**
-     * @var \TNW\Subscriptions\Cron\Quote\Creator
+     * @var Creator
      */
     private $quoteGenerator;
 
     /**
-     * @var \TNW\Subscriptions\Model\ResourceModel\SalesItemRelation
+     * @var SalesItemRelation
      */
     private $relationResource;
 
     /**
-     * @var \Magento\Customer\Model\CustomerFactory
+     * @var CustomerFactory
      */
     private $customerFactory;
 
@@ -51,23 +67,29 @@ class CreateProfile implements ObserverInterface
     private $trialPaymentData = [];
 
     /**
-     * @var \Magento\Vault\Api\PaymentTokenManagementInterface
+     * @var PaymentTokenManagementInterface
      */
     private $paymentTokenManagement;
 
     /**
-     * @var \Magento\Framework\Encryption\EncryptorInterface
+     * @var EncryptorInterface
      */
     private $encryptor;
 
     /**
-     * @var \TNW\Subscriptions\Plugin\Quote\Model\ChangeQuoteControl
+     * @var ChangeQuoteControl
      */
     private $changeQuoteControl;
+
     /**
      * @var CustomerRepositoryInterface
      */
     private $customerRepository;
+
+    /**
+     * @var SessionQuote
+     */
+    private $sessionQuote;
 
     /**
      * @var array
@@ -81,29 +103,32 @@ class CreateProfile implements ObserverInterface
 
     /**
      * CreateProfile constructor.
-     * @param \TNW\Subscriptions\Model\SubscriptionProfile\Manager $profileManager
-     * @param \TNW\Subscriptions\Model\Quote\ItemGroup $quoteItemGroup
-     * @param \Magento\Sales\Api\OrderCustomerManagementInterface $orderCustomerService
-     * @param \TNW\Subscriptions\Cron\Quote\Creator $quoteGenerator
-     * @param \TNW\Subscriptions\Model\ResourceModel\SalesItemRelation $relationResource
-     * @param \Magento\Customer\Model\CustomerFactory $customerFactory
-     * @param \Magento\Vault\Api\PaymentTokenManagementInterface $paymentTokenManagement
-     * @param \Magento\Framework\Encryption\EncryptorInterface $encryptor
-     * @param \TNW\Subscriptions\Plugin\Quote\Model\ChangeQuoteControl $changeQuoteControl
+     * @param Manager $profileManager
+     * @param ItemGroup $quoteItemGroup
+     * @param OrderCustomerManagementInterface $orderCustomerService
+     * @param Creator $quoteGenerator
+     * @param SalesItemRelation $relationResource
+     * @param CustomerFactory $customerFactory
+     * @param PaymentTokenManagementInterface $paymentTokenManagement
+     * @param EncryptorInterface $encryptor
+     * @param ChangeQuoteControl $changeQuoteControl
      * @param CustomerRepositoryInterface $customerRepository
+     * @param SessionQuote $sessionQuote
      */
     public function __construct(
-        \TNW\Subscriptions\Model\SubscriptionProfile\Manager $profileManager,
-        \TNW\Subscriptions\Model\Quote\ItemGroup $quoteItemGroup,
-        \Magento\Sales\Api\OrderCustomerManagementInterface $orderCustomerService,
-        \TNW\Subscriptions\Cron\Quote\Creator $quoteGenerator,
-        \TNW\Subscriptions\Model\ResourceModel\SalesItemRelation $relationResource,
-        \Magento\Customer\Model\CustomerFactory $customerFactory,
-        \Magento\Vault\Api\PaymentTokenManagementInterface $paymentTokenManagement,
-        \Magento\Framework\Encryption\EncryptorInterface $encryptor,
-        \TNW\Subscriptions\Plugin\Quote\Model\ChangeQuoteControl $changeQuoteControl,
-        CustomerRepositoryInterface $customerRepository
+        Manager $profileManager,
+        ItemGroup $quoteItemGroup,
+        OrderCustomerManagementInterface $orderCustomerService,
+        Creator $quoteGenerator,
+        SalesItemRelation $relationResource,
+        CustomerFactory $customerFactory,
+        PaymentTokenManagementInterface $paymentTokenManagement,
+        EncryptorInterface $encryptor,
+        ChangeQuoteControl $changeQuoteControl,
+        CustomerRepositoryInterface $customerRepository,
+        SessionQuote $sessionQuote
     ) {
+        $this->sessionQuote = $sessionQuote;
         $this->changeQuoteControl = $changeQuoteControl;
         $this->encryptor = $encryptor;
         $this->paymentTokenManagement = $paymentTokenManagement;
@@ -118,23 +143,19 @@ class CreateProfile implements ObserverInterface
 
     /**
      * @param Observer $observer
-     *
-     * @return void
-     * @throws \Magento\Framework\Exception\AlreadyExistsException
-     * @throws \Magento\Framework\Exception\CouldNotSaveException
-     * @throws \Magento\Framework\Exception\LocalizedException
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
-     * @throws \Zend_Json_Exception
+     * @throws CouldNotSaveException
+     * @throws LocalizedException
+     * @throws NoSuchEntityException
      */
     public function execute(Observer $observer)
     {
         $quote = $observer->getData('quote');
-        if (!$quote instanceof \Magento\Quote\Model\Quote) {
+        if (!$quote instanceof Quote) {
             return;
         }
 
         $order = $observer->getData('order');
-        if (!$order instanceof \Magento\Sales\Model\Order || !$order->getEntityId()) {
+        if (!$order instanceof Order || !$order->getEntityId()) {
             return;
         }
 
@@ -222,7 +243,7 @@ class CreateProfile implements ObserverInterface
                 }
 
                 $orderItem = $order->getItemByQuoteItemId($quoteItemId);
-                if (!$orderItem instanceof \Magento\Sales\Model\Order\Item) {
+                if (!$orderItem instanceof Item) {
                     continue;
                 }
 
@@ -240,6 +261,7 @@ class CreateProfile implements ObserverInterface
         // Save Items Relation
         $this->relationResource->insertSales($insertData);
         $this->profileManager->setProfilesToCalculateProfit($order);
+        $this->sessionQuote->setStoreId(0);
     }
 
     /**

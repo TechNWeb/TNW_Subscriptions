@@ -117,13 +117,11 @@ class BillingCyclesManager
         $nowDate = new \DateTime();
         $formattedNowDate = $this->format($nowDate);
         $startDate = new \DateTime($profile->getStartDate());
-        $startDay = $startDate->format('j');
         $formattedStartDate = $this->format($startDate);
         //Add to list start date.
         $neededDates[] = $formattedStartDate;
         //Profile has a infinite count of cycles
         if ($profile->getTerm()) {
-            //Generate quotes for the year ahead
             $endDate = new \DateTime($formattedNowDate);
             if (strtotime($formattedStartDate) > strtotime($formattedNowDate)) {
                 $endDate = new \DateTime($formattedStartDate);
@@ -156,15 +154,22 @@ class BillingCyclesManager
         $products = $profile->getProducts();
         $product = array_shift($products);
         //Calculate the list of dates for profile
-        for ($i = 1; $i <= $cyclesCount; $i++) {
-            $date = $this->calculateScheduledDate(
-                $startDate,
-                $profile->getUnit(),
-                $profile->getFrequency(),
-                $product->getMagentoProduct()->getData('tnw_subscr_start_date'),
-                $startDay
-            );
-            $neededDates[] = $this->format($date);
+        $neededDates = $this->calculateRequiredDates($cyclesCount, $startDate, $profile, $product);
+        if ($neededDates) {
+            $existDatesSortedAsc = $existDates;
+            usort($existDatesSortedAsc, function ($date1, $date2) {
+                return strtotime($date1) - strtotime($date2);
+            });
+            $firstRequiredDate = strtotime(reset($neededDates));
+            $lastSuccessDate = strtotime(end($existDatesSortedAsc));
+
+            if ($lastSuccessDate > $firstRequiredDate) {
+                $startDate = new \DateTime(end($existDatesSortedAsc));
+                $neededDates = $this->calculateRequiredDates($cyclesCount - 1, $startDate, $profile, $product);
+            }
+            if (count($existDates) == $cyclesCount) {
+                $neededDates = [];
+            }
         }
         if (!$getAllFutureCycles) {
             $neededDates = array_diff($neededDates, $existDates);
@@ -190,6 +195,22 @@ class BillingCyclesManager
         }
 
         return $result;
+    }
+
+    private function calculateRequiredDates($cyclesCount, $startDate, $profile, $product)
+    {
+        $neededDates = [];
+        for ($i = 1; $i <= $cyclesCount; $i++) {
+            $date = $this->calculateScheduledDate(
+                $startDate,
+                $profile->getUnit(),
+                $profile->getFrequency(),
+                $product->getMagentoProduct()->getData('tnw_subscr_start_date'),
+                $startDate->format('j')
+            );
+            $neededDates[] = $this->format($date);
+        }
+        return $neededDates;
     }
 
     /**

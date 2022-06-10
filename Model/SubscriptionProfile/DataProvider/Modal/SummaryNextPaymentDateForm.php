@@ -219,6 +219,11 @@ class SummaryNextPaymentDateForm extends AbstractDataProvider
                 $maxDate = $this->localeDate->date($lastOrderDate)
                     ->add(new \DateInterval('P1D'))
                     ->add(new \DateInterval('P' . $frequency * 2 . $unit))->format('m/d/Y');
+                if (strtotime($maxDate) < strtotime($minDate)) {
+                    $maxDate = $this->localeDate->date()
+                        ->add(new \DateInterval('P1D'))
+                        ->add(new \DateInterval('P' . $frequency * 2 . $unit))->format('m/d/Y');
+                }
             }
         } catch (\Exception $e) {
             $maxDate = null;

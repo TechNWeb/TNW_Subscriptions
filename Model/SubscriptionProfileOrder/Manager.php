@@ -241,7 +241,7 @@ class Manager
             }
         }
 
-        if (array_key_exists('magento_order_id', $relation->getData())) {
+        if (array_key_exists('magento_order_id', $relation->getData()) && $relation->getMagentoOrderId()) {
             if (!$relation->getData('email_sent')) {
                 $this->sender->send($this->orderRepository->get(
                     $relation->getMagentoOrderId()

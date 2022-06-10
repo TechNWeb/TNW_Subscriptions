@@ -180,6 +180,7 @@ class UpdateStatus
         ) {
             $billingCyclesToSkip = $subscriptionProfile->getSkipBillingCycles();
             $this->processSaveRelation($billingCyclesToSkip, $subscriptionProfile, $billingCyclesToSkip + 1);
+
         } elseif ($newStatus == ProfileStatus::STATUS_ACTIVE && $oldStatus) {
             $this->processSaveRelation(0, $subscriptionProfile, 1);
         }
