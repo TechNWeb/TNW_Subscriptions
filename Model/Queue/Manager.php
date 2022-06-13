@@ -671,14 +671,14 @@ class Manager
                     ->getRelationById($queue->getProfileOrderId())
                     ->setMagentoQuoteId($quote->getId())
                     ->setMagentoOrderId($order->getId());
-
+                $profile->setTotalBillingCycles($profile->getTotalBillingCycles() - 1);
+                $this->profileRepository->save($profile);
                 try {
                     $this->relationManager->saveRelation($relation);
                 } catch (\Exception $e) {
                     throw new AssignOrderToRelationException(__('Could not assign order id to profile relation.'));
                 }
                 $this->createNewRelation($queue, $profile);
-                $profile->setTotalBillingCycles($profile->getTotalBillingCycles() - 1);
                 $profile->setNeedRecollect(false);
                 foreach ($profile->getProducts() as $product) {
                     $product->setNeedRecollect(false);

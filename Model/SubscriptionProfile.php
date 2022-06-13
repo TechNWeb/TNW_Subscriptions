@@ -979,13 +979,7 @@ class SubscriptionProfile extends AbstractExtensibleModel implements Subscriptio
      */
     public function getFinalDateForInstallmentData($profile, $profileOrders)
     {
-        $remainingBillingCycles = (int) $profile->getTotalBillingCycles() - 1;
-
-        if ($profileOrders && count($profileOrders) == 1) {
-            $remainingBillingCycles++;
-        }
-
-        return $this->getFinalDate($profile, $remainingBillingCycles, $profileOrders);
+        return $this->getFinalDate($profile, (int) $profile->getTotalBillingCycles(), $profileOrders);
     }
 
     /**

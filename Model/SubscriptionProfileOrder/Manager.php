@@ -190,7 +190,7 @@ class Manager
     /**
      * Saves profile to order relation.
      *
-     * @param null|SubscriptionProfileOrderInterface $relation
+     * @param SubscriptionProfileOrderInterface|null $relation
      * @return SubscriptionProfileOrderInterface
      * @throws LocalizedException
      */

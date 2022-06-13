@@ -153,11 +153,20 @@ class BillingCyclesManager
         $cyclesCount = $cyclesCount + count($existDates);
         $products = $profile->getProducts();
         $product = array_shift($products);
+        $totalRequiredCycles = (int)$profile->getStaticTotalBillingCycles();
         //Calculate the list of dates for profile
-        $neededDates = $this->calculateRequiredDates($cyclesCount, $startDate, $profile, $product);
+        $neededDates = $this->calculateRequiredDates(
+            $totalRequiredCycles,
+            $startDate,
+            $profile,
+            $product
+        );
         if ($neededDates) {
             $existDatesSortedAsc = $existDates;
             usort($existDatesSortedAsc, function ($date1, $date2) {
+                return strtotime($date1) - strtotime($date2);
+            });
+            usort($neededDates, function ($date1, $date2) {
                 return strtotime($date1) - strtotime($date2);
             });
             $firstRequiredDate = strtotime(reset($neededDates));
@@ -167,7 +176,7 @@ class BillingCyclesManager
                 $startDate = new \DateTime(end($existDatesSortedAsc));
                 $neededDates = $this->calculateRequiredDates($cyclesCount - 1, $startDate, $profile, $product);
             }
-            if (count($existDates) == $cyclesCount) {
+            if (count($existDates) == $totalRequiredCycles) {
                 $neededDates = [];
             }
         }
