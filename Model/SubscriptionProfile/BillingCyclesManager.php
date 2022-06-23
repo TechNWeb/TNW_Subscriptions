@@ -162,8 +162,11 @@ class BillingCyclesManager
             });
             $firstRequiredDate = strtotime(reset($neededDates));
             $lastSuccessDate = strtotime(end($existDatesSortedAsc));
-
-            if ($lastSuccessDate > $firstRequiredDate) {
+            $needToReschedule = false;
+            if (count($existDates)> 1 && $lastSuccessDate < $firstRequiredDate) {
+                $needToReschedule = true;
+            }
+            if ($lastSuccessDate > $firstRequiredDate || $needToReschedule) {
                 $startDate = new \DateTime(end($existDatesSortedAsc));
                 $neededDates = $this->calculateRequiredDates($cyclesCount - 1, $startDate, $profile, $product);
             }
