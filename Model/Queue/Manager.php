@@ -606,7 +606,12 @@ class Manager
                     __('Could not Link Profile Item ID with order item ID.')
                 );
             }
-
+            $processedProfiles = [];
+            foreach ($groupQueue as $queue) {
+                $processedProfiles[] = clone $this->profileRepository
+                    ->getById($queue->getData('subscription_profile_id'));
+            }
+            $this->relationManager->setReBillProfiles($processedProfiles);
             foreach ($groupQueue as $queue) {
                 $profile = $this->profileRepository->getById($queue->getData('subscription_profile_id'));
 

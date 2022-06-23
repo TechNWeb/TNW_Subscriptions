@@ -104,6 +104,11 @@ class Manager
     private $serializer;
 
     /**
+     * @var array
+     */
+    private $reBilledProfiles = [];
+
+    /**
      * Manager constructor.
      * @param SubscriptionProfileOrderFactory $profileFactory
      * @param RelationRepository $profileOrderRepository
@@ -214,7 +219,8 @@ class Manager
                 $installRecurringData = $this->getRecurringInstallmentData(
                     $profileOrders,
                     $subscriptionProfile,
-                    $profileIds
+                    $profileIds,
+                    $this->reBilledProfiles
                 );
 
                 if ($profileIds) {
@@ -250,6 +256,16 @@ class Manager
         }
 
         return $relation;
+    }
+
+    /**
+     * @param $profiles
+     * @return $this
+     */
+    public function setReBillProfiles($profiles)
+    {
+        $this->reBilledProfiles = $profiles;
+        return $this;
     }
 
     /**
@@ -419,14 +435,13 @@ class Manager
     }
 
     /**
-     * Get data for recurring installment columns
-     *
      * @param $profileOrders
      * @param $subscriptionProfile
      * @param $profileIds
+     * @param array $profiles
      * @return array
      */
-    private function getRecurringInstallmentData($profileOrders, $subscriptionProfile, $profileIds)
+    private function getRecurringInstallmentData($profileOrders, $subscriptionProfile, $profileIds, $profiles = [])
     {
         $result = [];
         $profileStatus = $subscriptionProfile->getStatus();
@@ -436,7 +451,11 @@ class Manager
             || $profileStatus !== ProfileStatus::STATUS_CANCELED
         ) {
             if (strpos($profileIds, ',') !== false) {
-                $result = $this->getInstallmentDataForMultipleProfiles($profileIds);
+                if ($profiles) {
+                    $result = $this->getInstallmentDataForMultipleProfilesByProfile($profiles);
+                } else {
+                    $result = $this->getInstallmentDataForMultipleProfiles($profileIds);
+                }
             } else {
                 $result = $this->getInstallmentDataForSingleProfile(
                     $profileOrders,
@@ -472,6 +491,40 @@ class Manager
                 $profileOrders = null;
                 $this->logger->error($e->getMessage());
             }
+            $static = $profile->getStaticTotalBillingCycles();
+            if (isset($static)) {
+                $paid[] = implode(",", [count($profileOrders), $static]);
+            } else {
+                $paid[] = implode(",", [count($profileOrders)]);
+            }
+            $firstRecurring[] = $profile->getStartDate();
+            $ccFinal = $profile->getFinalDateForInstallmentData($profile, $profileOrders);
+            $ccExpiration[] = $profile->getCcEcpirationStatus($profile, $ccFinal);
+            $finalRecurring[] = $ccFinal;
+        }
+
+        return [
+            'paidRecurring' => $this->serializer->serialize($paid),
+            'firstRecurring' => $this->serializer->serialize($firstRecurring),
+            'finalRecurring' => $this->serializer->serialize($finalRecurring),
+            'expirationCc' => $this->serializer->serialize($ccExpiration),
+        ];
+    }
+
+    /**
+     * @param $profiles
+     * @return array
+     */
+    private function getInstallmentDataForMultipleProfilesByProfile($profiles)
+    {
+        $paid = [];
+        $firstRecurring = [];
+        $finalRecurring = [];
+        $ccExpiration = [];
+        foreach ($profiles as $profile) {
+            $profileOrders = $this->resource->getProfileOrdersByProfileId(
+                $profile->getId()
+            );
             $static = $profile->getStaticTotalBillingCycles();
             if (isset($static)) {
                 $paid[] = implode(",", [count($profileOrders), $static]);
