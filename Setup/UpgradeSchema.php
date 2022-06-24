@@ -196,6 +196,11 @@ class UpgradeSchema implements UpgradeSchemaInterface
                 );
             }
         }
+        if (version_compare($context->getVersion(), '2.3.72', '<')) {
+            if ($setup->tableExists('tnw_subscriptions_profile_item_sales_item')) {
+                $this->removeCascadeFkFromSalesItem($setup);
+            }
+        }
 
         $setup->endSetup();
     }
@@ -694,6 +699,38 @@ class UpgradeSchema implements UpgradeSchemaInterface
             );
 
         $setup->getConnection()->createTable($table);
+    }
+
+    /**
+     * @param SchemaSetupInterface $setup
+     *
+     * @throws \Zend_Db_Exception
+     */
+    private function removeCascadeFkFromSalesItem(SchemaSetupInterface $setup)
+    {
+        $setup->getConnection()
+            ->dropForeignKey(
+                $setup->getTable('tnw_subscriptions_profile_item_sales_item'),
+                $setup->getFkName(
+                    'tnw_subscriptions_profile_item_sales_item',
+                    'quote_item_id',
+                    'quote_item',
+                    'item_id'
+                )
+            );
+        $setup->getConnection()->addForeignKey(
+            $setup->getFkName(
+                'tnw_subscriptions_profile_item_sales_item',
+                'quote_item_id',
+                'quote_item',
+                'item_id'
+            ),
+            $setup->getTable('tnw_subscriptions_profile_item_sales_item'),
+            'quote_item_id',
+            $setup->getTable('quote_item'),
+            'item_id',
+            Table::ACTION_SET_NULL
+        );
     }
 
     /**
