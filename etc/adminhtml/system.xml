@@ -161,6 +161,12 @@
                     <frontend_class>validate-number validate-number-range number-range-1-</frontend_class>
                     <comment>The number of days before suspending a profile due to a failed payment.</comment>
                 </field>
+                <field id="reschedule" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="0"
+                       showInStore="0">
+                    <label>Reschedule Next Payment on the failed subsequent payment.</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>Should the next payment and final date for subscription be rescheduled against successful re-bill date.</comment>
+                </field>
             </group>
             <group id="emails" translate="label" sortOrder="80" showInDefault="1" showInWebsite="1" showInStore="0">
                 <label>Email Config</label>

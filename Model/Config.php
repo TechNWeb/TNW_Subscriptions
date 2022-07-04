@@ -57,6 +57,7 @@ class Config
     private $xmlAttemptCount = 'tnw_subscriptions_profile_options/past_due_profile_options/attempt_count';
     private $xmlAttemptInterval = 'tnw_subscriptions_profile_options/past_due_profile_options/attempt_interval';
     private $xmlGracePeriod = 'tnw_subscriptions_profile_options/past_due_profile_options/grace_period';
+    private $xmlRescheduleFailed = 'tnw_subscriptions_profile_options/past_due_profile_options/reschedule';
     /**#@-*/
 
     /**#@+
@@ -278,6 +279,17 @@ class Config
     public function getGracePeriod($websiteId = null)
     {
         return  $this->getStoreConfig($this->xmlGracePeriod, $websiteId);
+    }
+
+    /**
+     * Get "Reschedule on Fail" config value.
+     *
+     * @param bool|int|string|WebsiteInterface|null $websiteId
+     * @return string|null
+     */
+    public function getRescheduleOnFailEnabled($websiteId = null)
+    {
+        return  $this->getStoreConfig($this->xmlRescheduleFailed, $websiteId);
     }
 
     /**

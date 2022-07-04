@@ -30,6 +30,7 @@
                 <attempt_count>10</attempt_count>
                 <attempt_interval>1</attempt_interval>
                 <grace_period>14</grace_period>
+                <reschedule>0</reschedule>
             </past_due_profile_options>
             <emails>
                 <email_identity>support</email_identity>

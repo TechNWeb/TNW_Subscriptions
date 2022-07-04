@@ -629,8 +629,13 @@ class Manager
                     throw new ChangeProfileStatusException(__('Could not change profile status.'));
                 }
 
-
+                $changedToActiveStatus = false;
                 if ($oldStatus != $profile->getStatus()) {
+                    if ($oldStatus != ProfileStatus::STATUS_TRIAL
+                        && $profile->getStatus() == ProfileStatus::STATUS_ACTIVE
+                    ) {
+                        $changedToActiveStatus = true;
+                    }
                     //Add comment profile place.
                     $this->messageHistoryLogger->message(
                         SubscriptionProfile\MessageHistoryLogger::MESSAGE_SUBSCRIPTION_STATUS_CHANGED,
@@ -673,8 +678,20 @@ class Manager
                 }
 
                 $relation = $this->relationManager
-                    ->getRelationById($queue->getProfileOrderId())
-                    ->setMagentoQuoteId($quote->getId())
+                    ->getRelationById($queue->getProfileOrderId());
+                $scheduledDate = strtotime($relation->getScheduledAt());
+                if (date('Ymd', strtotime($scheduledDate)) != date('Ymd')
+                    && strtotime($relation->getScheduledAt()) < time()
+                    && $changedToActiveStatus
+                    && $this->config->getRescheduleOnFailEnabled()
+                ) {
+                    $time = date('H:i:s', $scheduledDate);
+                    $relation->setScheduledAt(
+                        date('Y-m-d ' . $time)
+                    );
+                }
+
+                $relation->setMagentoQuoteId($quote->getId())
                     ->setMagentoOrderId($order->getId());
 
                 try {
