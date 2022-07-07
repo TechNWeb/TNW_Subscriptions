@@ -166,13 +166,18 @@ class BillingCyclesManager
             });
             $firstRequiredDate = strtotime(reset($neededDates));
             $lastSuccessDate = strtotime(end($existDatesSortedAsc));
-            $needToReschedule = false;
-            if (count($existDates) > 1 && $lastSuccessDate < $firstRequiredDate) {
-                $needToReschedule = true;
-            }
-            if ($lastSuccessDate > $firstRequiredDate || $needToReschedule) {
+            if ($lastSuccessDate > $firstRequiredDate
+                || (count($existDates) > 1 && $lastSuccessDate < $firstRequiredDate)
+                || $nowDate->getTimestamp() > strtotime(end($neededDates))
+            ) {
                 $startDate = new \DateTime(end($existDatesSortedAsc));
-                $neededDates = $this->calculateRequiredDates($cyclesCount - 1, $startDate, $profile, $product);
+                $neededDates =$this->calculateFutureRequiredDates(
+                    $cyclesCount - 1,
+                    $startDate,
+                    $profile,
+                    $product,
+                    $nowDate
+                );
             }
         }
         if (!$getAllFutureCycles) {
@@ -221,6 +226,25 @@ class BillingCyclesManager
                 $startDate->format('j')
             );
             $neededDates[] = $this->format($date);
+        }
+        return $neededDates;
+    }
+
+    /**
+     * @param $cyclesCount
+     * @param $startDate
+     * @param $profile
+     * @param $product
+     * @param $nowDate
+     * @return array
+     * @throws \Exception
+     */
+    private function calculateFutureRequiredDates($cyclesCount, $startDate, $profile, $product, $nowDate)
+    {
+        $neededDates = $this->calculateRequiredDates($cyclesCount, $startDate, $profile, $product);
+        if (strtotime(reset($neededDates)) <= $nowDate->getTimestamp()) {
+            $startDate = new \DateTime(reset($neededDates));
+            $neededDates = $this->calculateFutureRequiredDates($cyclesCount, $startDate, $profile, $product, $nowDate);
         }
         return $neededDates;
     }
