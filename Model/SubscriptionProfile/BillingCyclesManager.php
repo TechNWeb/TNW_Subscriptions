@@ -174,9 +174,6 @@ class BillingCyclesManager
                 $startDate = new \DateTime(end($existDatesSortedAsc));
                 $neededDates = $this->calculateRequiredDates($cyclesCount - 1, $startDate, $profile, $product);
             }
-            if (count($existDates) == $cyclesCount) {
-                $neededDates = [];
-            }
         }
         if (!$getAllFutureCycles) {
             $neededDates = array_diff($neededDates, $existDates);
