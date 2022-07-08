@@ -16,6 +16,7 @@ use TNW\Subscriptions\Model\Context;
 use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfile\CollectionFactory;
 use TNW\Subscriptions\Model\SubscriptionProfileOrder\Manager as RelationManager;
 use TNW\Subscriptions\Model\SubscriptionProfileRepository;
+use TNW\Subscriptions\Model\Source\ProfileStatus;
 
 /**
  * Class BillingCyclesManager- billing cycles managing model
@@ -153,22 +154,30 @@ class BillingCyclesManager
         $cyclesCount = $cyclesCount + count($existDates);
         $products = $profile->getProducts();
         $product = array_shift($products);
-        //Calculate the list of dates for profile
-        $neededDates = $this->calculateRequiredDates($cyclesCount, $startDate, $profile, $product);
-        if ($neededDates) {
+        if ($profile->getStatus() == ProfileStatus::STATUS_TRIAL) {
+            $neededDates = $this->calculateRequiredDates($cyclesCount, $startDate, $profile, $product, $neededDates);
+        } else {
+            $neededDates = $this->calculateRequiredDates($cyclesCount, $startDate, $profile, $product);
+        }
+        if ($neededDates && $profile->getStatus() != ProfileStatus::STATUS_TRIAL) {
             $existDatesSortedAsc = $existDates;
             usort($existDatesSortedAsc, function ($date1, $date2) {
                 return strtotime($date1) - strtotime($date2);
             });
             $firstRequiredDate = strtotime(reset($neededDates));
             $lastSuccessDate = strtotime(end($existDatesSortedAsc));
-
-            if ($lastSuccessDate > $firstRequiredDate) {
+            if ($lastSuccessDate > $firstRequiredDate
+                || (count($existDates) > 1 && $lastSuccessDate < $firstRequiredDate)
+                || $nowDate->getTimestamp() > strtotime(end($neededDates))
+            ) {
                 $startDate = new \DateTime(end($existDatesSortedAsc));
-                $neededDates = $this->calculateRequiredDates($cyclesCount - 1, $startDate, $profile, $product);
-            }
-            if (count($existDates) == $cyclesCount) {
-                $neededDates = [];
+                $neededDates =$this->calculateFutureRequiredDates(
+                    $cyclesCount - 1,
+                    $startDate,
+                    $profile,
+                    $product,
+                    $nowDate
+                );
             }
         }
         if (!$getAllFutureCycles) {
@@ -197,9 +206,17 @@ class BillingCyclesManager
         return $result;
     }
 
-    private function calculateRequiredDates($cyclesCount, $startDate, $profile, $product)
+    /**
+     * @param $cyclesCount
+     * @param $startDate
+     * @param $profile
+     * @param $product
+     * @param array $neededDates
+     * @return array
+     * @throws \Exception
+     */
+    private function calculateRequiredDates($cyclesCount, $startDate, $profile, $product, $neededDates = [])
     {
-        $neededDates = [];
         for ($i = 1; $i <= $cyclesCount; $i++) {
             $date = $this->calculateScheduledDate(
                 $startDate,
@@ -209,6 +226,25 @@ class BillingCyclesManager
                 $startDate->format('j')
             );
             $neededDates[] = $this->format($date);
+        }
+        return $neededDates;
+    }
+
+    /**
+     * @param $cyclesCount
+     * @param $startDate
+     * @param $profile
+     * @param $product
+     * @param $nowDate
+     * @return array
+     * @throws \Exception
+     */
+    private function calculateFutureRequiredDates($cyclesCount, $startDate, $profile, $product, $nowDate)
+    {
+        $neededDates = $this->calculateRequiredDates($cyclesCount, $startDate, $profile, $product);
+        if (strtotime(reset($neededDates)) <= $nowDate->getTimestamp()) {
+            $startDate = new \DateTime(reset($neededDates));
+            $neededDates = $this->calculateFutureRequiredDates($cyclesCount, $startDate, $profile, $product, $nowDate);
         }
         return $neededDates;
     }

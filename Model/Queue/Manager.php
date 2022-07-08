@@ -606,7 +606,12 @@ class Manager
                     __('Could not Link Profile Item ID with order item ID.')
                 );
             }
-
+            $processedProfiles = [];
+            foreach ($groupQueue as $queue) {
+                $processedProfiles[] = clone $this->profileRepository
+                    ->getById($queue->getData('subscription_profile_id'));
+            }
+            $this->relationManager->setReBillProfiles($processedProfiles);
             foreach ($groupQueue as $queue) {
                 $profile = $this->profileRepository->getById($queue->getData('subscription_profile_id'));
 
@@ -624,8 +629,13 @@ class Manager
                     throw new ChangeProfileStatusException(__('Could not change profile status.'));
                 }
 
-
+                $changedToActiveStatus = false;
                 if ($oldStatus != $profile->getStatus()) {
+                    if ($oldStatus != ProfileStatus::STATUS_TRIAL
+                        && $profile->getStatus() == ProfileStatus::STATUS_ACTIVE
+                    ) {
+                        $changedToActiveStatus = true;
+                    }
                     //Add comment profile place.
                     $this->messageHistoryLogger->message(
                         SubscriptionProfile\MessageHistoryLogger::MESSAGE_SUBSCRIPTION_STATUS_CHANGED,
@@ -668,8 +678,20 @@ class Manager
                 }
 
                 $relation = $this->relationManager
-                    ->getRelationById($queue->getProfileOrderId())
-                    ->setMagentoQuoteId($quote->getId())
+                    ->getRelationById($queue->getProfileOrderId());
+                $scheduledDate = strtotime($relation->getScheduledAt());
+                if (date('Ymd', strtotime($scheduledDate)) != date('Ymd')
+                    && strtotime($relation->getScheduledAt()) < time()
+                    && $changedToActiveStatus
+                    && $this->config->getRescheduleOnFailEnabled()
+                ) {
+                    $time = date('H:i:s', $scheduledDate);
+                    $relation->setScheduledAt(
+                        date('Y-m-d ' . $time)
+                    );
+                }
+
+                $relation->setMagentoQuoteId($quote->getId())
                     ->setMagentoOrderId($order->getId());
 
                 try {

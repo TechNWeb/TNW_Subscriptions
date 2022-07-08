@@ -1027,7 +1027,7 @@ class SubscriptionProfile extends AbstractExtensibleModel implements Subscriptio
             }
         }
         $activationData = [];
-        if ($profileOrders && $remainingBillingCycles) {
+        if ($profileOrders && $remainingBillingCycles && $profile->getStatus() != ProfileStatus::STATUS_TRIAL) {
             $activationData = [
                 'billing_cycles_to_process' => $remainingBillingCycles,
                 'next_scheduled_order_date' => array_shift($profileOrders)['scheduled_at']
