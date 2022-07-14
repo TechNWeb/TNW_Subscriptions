@@ -38,6 +38,8 @@ class RemoveItems implements ObserverInterface
     }
 
     /**
+     * Executes the observer
+     *
      * @param Observer $observer
      *
      * @return void

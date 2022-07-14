@@ -14,7 +14,10 @@ use Magento\Framework\Event\ObserverInterface;
 class SalesQuoteSaveBefore implements ObserverInterface
 {
     /**
+     * Executes the observer
+     *
      * @param Observer $observer
+     *
      * @return void
      */
     public function execute(Observer $observer)
