@@ -6,7 +6,6 @@
 
 namespace TNW\Subscriptions\Setup\Patch\Data;
 
-use Magento\Catalog\Model\Product\Type;
 use Magento\Framework\Setup\ModuleDataSetupInterface;
 use Magento\Framework\Setup\Patch\DataPatchInterface;
 use TNW\Subscriptions\Model\Config\Source\PurchaseType;
@@ -86,7 +85,7 @@ class AddDefaultValueForPurchaseType implements DataPatchInterface
      */
     public static function getDependencies()
     {
-        return [];
+        return [InitData::class];
     }
 
     /**

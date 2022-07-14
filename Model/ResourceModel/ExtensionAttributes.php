@@ -8,6 +8,7 @@ namespace TNW\Subscriptions\Model\ResourceModel;
 use Magento\Framework\Api\ExtensionAttribute;
 use Magento\Framework\Api\ExtensionAttributesFactory;
 use Magento\Framework\Api\SimpleDataObjectConverter;
+use Magento\Framework\DB\Select;
 
 /**
  * Class ExtensionAttributes - ResourceModel
@@ -119,7 +120,7 @@ class ExtensionAttributes
             );
         }
 
-        $columns = $select->getPart(\Zend_Db_Select::COLUMNS);
+        $columns = $select->getPart(Select::COLUMNS);
         if (empty($columns)) {
             return;
         }

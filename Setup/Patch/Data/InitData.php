@@ -1,26 +1,33 @@
 <?php
 /**
- *  Copyright © 2018 TechNWeb, Inc. All rights reserved.
+ *  Copyright © 2022 TechNWeb, Inc. All rights reserved.
  *  See TNW_LICENSE.txt for license details.
  */
-namespace TNW\Subscriptions\Setup;
+namespace TNW\Subscriptions\Setup\Patch\Data;
 
-use Magento\Eav\Setup\EavSetupFactory;
-use Magento\Framework\Setup\ModuleContextInterface;
-use Magento\Eav\Setup\EavSetup;
-use Magento\Framework\Setup\ModuleDataSetupInterface;
-use Magento\Framework\Setup\InstallDataInterface;
-use Magento\Eav\Model\Entity\Attribute\ScopedAttributeInterface;
 use Magento\Catalog\Model\Product;
+use Magento\Eav\Model\Entity\Attribute\ScopedAttributeInterface;
+use Magento\Eav\Setup\EavSetup;
+use Magento\Eav\Setup\EavSetupFactory;
+use Magento\Framework\Setup\ModuleDataSetupInterface;
+use Magento\Framework\Setup\Patch\DataPatchInterface;
+use Magento\Framework\Setup\Patch\PatchVersionInterface;
 use TNW\Subscriptions\Model\Product\Attribute;
 use TNW\Subscriptions\Model\ProductSubscriptionProfile;
 use TNW\Subscriptions\Model\SubscriptionProfile;
+use TNW\Subscriptions\Setup\SubscriptionSetup;
+use TNW\Subscriptions\Setup\SubscriptionSetupFactory;
 
 /**
- * Class InstallData - install data required for proper extension functioning
+ * Class InitData - install data required for proper extension functioning
  */
-class InstallData implements InstallDataInterface
+class InitData implements DataPatchInterface, PatchVersionInterface
 {
+    /**
+     * @var ModuleDataSetupInterface
+     */
+    private $setup;
+
     /**
      * @var EavSetupFactory
      */
@@ -32,29 +39,28 @@ class InstallData implements InstallDataInterface
     private $subscriptionSetupFactory;
 
     /**
-     * InstallData constructor.
+     * @param ModuleDataSetupInterface $setup
      * @param EavSetupFactory $eavSetupFactory
      * @param SubscriptionSetupFactory $subscriptionSetupFactory
      */
     public function __construct(
+        ModuleDataSetupInterface $setup,
         EavSetupFactory $eavSetupFactory,
         SubscriptionSetupFactory $subscriptionSetupFactory
     ) {
         $this->eavSetupFactory = $eavSetupFactory;
         $this->subscriptionSetupFactory = $subscriptionSetupFactory;
+        $this->setup = $setup;
     }
 
     /**
      * @inheritdoc
      */
-    public function install(
-        ModuleDataSetupInterface $setup,
-        ModuleContextInterface $context
-    ) {
+    public function apply() {
         /** @var EavSetup $eavSetup */
-        $eavSetup = $this->eavSetupFactory->create(['setup' => $setup]);
+        $eavSetup = $this->eavSetupFactory->create(['setup' => $this->setup]);
         $this->addProductAttributes($eavSetup);
-        $this->addEntitiesAndAttributeGroups($setup);
+        $this->addEntitiesAndAttributeGroups($this->setup);
     }
 
     /**
@@ -440,5 +446,20 @@ class InstallData implements InstallDataInterface
             'Default',
             'Additional information'
         );
+    }
+
+    public static function getDependencies()
+    {
+        return [];
+    }
+
+    public function getAliases()
+    {
+        return [];
+    }
+
+    public static function getVersion()
+    {
+        return '0.0.1';
     }
 }

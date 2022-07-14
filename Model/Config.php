@@ -17,6 +17,7 @@ use TNW\Subscriptions\Block\Adminhtml\System\Config\PaymentMethods\ActiveMethods
 use Magento\Framework\Module\Manager;
 use Magento\Framework\ObjectManagerInterface;
 use Magento\Customer\Model\ResourceModel\Group\Collection;
+use Magento\Framework\Filesystem;
 
 /**
  * Class Config - config model for subscriptions
@@ -126,6 +127,8 @@ class Config
      */
     private $profileRepository;
 
+    private $filesystem;
+
     /**
      * Config constructor.
      * @param ScopeConfigInterface $scopeConfig
@@ -135,6 +138,7 @@ class Config
      * @param ObjectManagerInterface $objectManager
      * @param Collection $customerGroupCollection
      * @param SubscriptionProfileRepository $profileRepository
+     * @param Filesystem $filesystem
      */
     public function __construct(
         ScopeConfigInterface $scopeConfig,
@@ -143,11 +147,13 @@ class Config
         Manager $moduleManager,
         ObjectManagerInterface $objectManager,
         Collection $customerGroupCollection,
-        SubscriptionProfileRepository $profileRepository
+        SubscriptionProfileRepository $profileRepository,
+        Filesystem $filesystem
     ) {
         if ($moduleManager->isEnabled("Magento_Paypal")) {
              $this->paypalConfig = $objectManager->get(\Magento\Paypal\Model\Config::class);
         }
+        $this->filesystem = $filesystem;
         $this->scopeConfig = $scopeConfig;
         $this->storeManager = $storeManager;
         $this->request = $request;
@@ -814,5 +820,27 @@ class Config
                 ScopeInterface::SCOPE_STORE,
                 $storeId
             ) . self::BLANK;
+    }
+
+    /**
+     * @return string
+     */
+    public function getComposerDataVersion()
+    {
+        static $version = '';
+
+        if (!$version) {
+            try {
+                $json = $this->filesystem->getDirectoryReadByPath(__DIR__ . '/..')->readFile('composer.json');
+                $data = \Zend_Json::decode($json);
+                if (array_key_exists('version', $data)) {
+                    $version = $data['version'];
+                }
+            } catch (\Throwable $e) {
+                $version = '0.0.0';
+            }
+        }
+
+        return $version;
     }
 }

@@ -32,7 +32,7 @@ class UpdateBundleProductAttributes implements DataPatchInterface
      */
     public static function getDependencies()
     {
-        return [];
+        return [InitData::class];
     }
 
     /**

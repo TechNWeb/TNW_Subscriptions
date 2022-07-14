@@ -6,7 +6,6 @@
 namespace TNW\Subscriptions\Plugin\Quote\Model;
 
 use Magento\Bundle\Model\Product\Type as TypeBundle;
-use ArrayObject;
 use Magento\Catalog\Model\Product;
 use Magento\Catalog\Model\Product\Type\AbstractType;
 use Magento\ConfigurableProduct\Model\Product\Type\Configurable;
@@ -187,7 +186,7 @@ class UpdateQuoteItem
         Quote $subject,
         Quote $result
     ) {
-        $addProductList = new ArrayObject();
+        $addProductList = [];
         foreach ($result->getAllItems() as $item) {
             if ($item->getChildren()) {
                 continue;
@@ -212,15 +211,15 @@ class UpdateQuoteItem
                     }
 
                     $result->deleteItem($itemToDelete);
-                    $addProductList->append([
+                    $addProductList[] = [
                         'item' => clone $itemToDelete,
                         'itemProduct' => clone $itemToDelete->getProduct(),
                         'buyRequest' => clone $buyRequest,
-                    ]);
+                    ];
                 }
             }
         }
-        foreach ($addProductList->getIterator() as $itemToAdd) {
+        foreach ($addProductList as $itemToAdd) {
             try {
                 $result->addProduct($itemToAdd['itemProduct'], $itemToAdd['buyRequest']);
             } catch (LocalizedException $e) {

@@ -10,6 +10,7 @@ use Magento\Backend\Block\Template\Context;
 use Magento\Config\Block\System\Config\Form\Field;
 use Magento\Framework\Data\Form\Element\AbstractElement;
 use Magento\Framework\Module\ModuleList;
+use TNW\Subscriptions\Model\Config;
 
 /**
  * Class Version - block to get the config version
@@ -22,16 +23,24 @@ class Version extends Field
     protected $moduleList;
 
     /**
+     * @var Config
+     */
+    private $config;
+
+    /**
      * Version constructor.
      * @param Context $context
      * @param ModuleList $moduleList
+     * @param Config $config
      * @param array $data
      */
     public function __construct(
         Context $context,
         ModuleList $moduleList,
+        Config $config,
         array $data = []
     ) {
+        $this->config = $config;
         $this->moduleList = $moduleList;
         parent::__construct($context, $data);
     }
@@ -44,8 +53,8 @@ class Version extends Field
     {
         $element->setReadonly(1);
         $module = $this->moduleList->getOne('TNW_Subscriptions');
-        if ($module && isset($module['setup_version'])) {
-            $element->setValue($module['setup_version']);
+        if ($module) {
+            $element->setValue($this->config->getComposerDataVersion());
         }
 
         return $element->getElementHtml();

@@ -1,51 +1,30 @@
 <?xml version="1.0"?>
-<schema xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xsi:noNamespaceSchemaLocation="urn:magento:framework:Setup/Declaration/Schema/etc/schema.xsd">
-    <table name="tnw_subscriptions_sales_order_aggregated_created" resource="sales" engine="innodb"
-           comment="TNW Subscriptions Sales Order Aggregated Created">
+<schema xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Setup/Declaration/Schema/etc/schema.xsd">
+    <table name="tnw_subscriptions_sales_order_aggregated_created" resource="sales" engine="innodb" comment="TNW Subscriptions Sales Order Aggregated Created">
         <column xsi:type="int" name="id" unsigned="true" nullable="false" identity="true" comment="ID"/>
         <column xsi:type="date" name="period" comment="Period"/>
-        <column xsi:type="smallint" name="store_id" unsigned="true" nullable="true" identity="false"
-                comment="Store ID"/>
+        <column xsi:type="smallint" name="store_id" unsigned="true" nullable="true" identity="false" comment="Store ID"/>
         <column xsi:type="varchar" name="order_status" nullable="false" length="50" comment="Order Status"/>
-        <column xsi:type="int" name="orders_count" unsigned="false" nullable="false" identity="false"
-                default="0" comment="Orders Count"/>
-        <column xsi:type="decimal" name="total_qty_ordered" scale="4" precision="12" unsigned="false" nullable="false"
-                default="0" comment="Total Qty Ordered"/>
-        <column xsi:type="decimal" name="total_qty_invoiced" scale="4" precision="12" unsigned="false" nullable="false"
-                default="0" comment="Total Qty Invoiced"/>
-        <column xsi:type="decimal" name="total_income_amount" scale="4" precision="20" unsigned="false"
-                nullable="false" default="0" comment="Total Income Amount"/>
-        <column xsi:type="decimal" name="total_revenue_amount" scale="4" precision="20" unsigned="false"
-                nullable="false" default="0" comment="Total Revenue Amount"/>
-        <column xsi:type="decimal" name="total_profit_amount" scale="4" precision="20" unsigned="false"
-                nullable="false" default="0" comment="Total Profit Amount"/>
-        <column xsi:type="decimal" name="total_invoiced_amount" scale="4" precision="20" unsigned="false"
-                nullable="false" default="0" comment="Total Invoiced Amount"/>
-        <column xsi:type="decimal" name="total_canceled_amount" scale="4" precision="20" unsigned="false"
-                nullable="false" default="0" comment="Total Canceled Amount"/>
-        <column xsi:type="decimal" name="total_paid_amount" scale="4" precision="20" unsigned="false" nullable="false"
-                default="0" comment="Total Paid Amount"/>
-        <column xsi:type="decimal" name="total_refunded_amount" scale="4" precision="20" unsigned="false"
-                nullable="false" default="0" comment="Total Refunded Amount"/>
-        <column xsi:type="decimal" name="total_tax_amount" scale="4" precision="20" unsigned="false" nullable="false"
-                default="0" comment="Total Tax Amount"/>
-        <column xsi:type="decimal" name="total_tax_amount_actual" scale="4" precision="20" unsigned="false"
-                nullable="false" default="0" comment="Total Tax Amount Actual"/>
-        <column xsi:type="decimal" name="total_shipping_amount" scale="4" precision="20" unsigned="false"
-                nullable="false" default="0" comment="Total Shipping Amount"/>
-        <column xsi:type="decimal" name="total_shipping_amount_actual" scale="4" precision="20" unsigned="false"
-                nullable="false" default="0" comment="Total Shipping Amount Actual"/>
-        <column xsi:type="decimal" name="total_discount_amount" scale="4" precision="20" unsigned="false"
-                nullable="false" default="0" comment="Total Discount Amount"/>
-        <column xsi:type="decimal" name="total_discount_amount_actual" scale="4" precision="20" unsigned="false"
-                nullable="false" default="0" comment="Total Discount Amount Actual"/>
+        <column xsi:type="int" name="orders_count" unsigned="false" nullable="false" identity="false" default="0" comment="Orders Count"/>
+        <column xsi:type="decimal" name="total_qty_ordered" scale="4" precision="12" unsigned="false" nullable="false" default="0" comment="Total Qty Ordered"/>
+        <column xsi:type="decimal" name="total_qty_invoiced" scale="4" precision="12" unsigned="false" nullable="false" default="0" comment="Total Qty Invoiced"/>
+        <column xsi:type="decimal" name="total_income_amount" scale="4" precision="20" unsigned="false" nullable="false" default="0" comment="Total Income Amount"/>
+        <column xsi:type="decimal" name="total_revenue_amount" scale="4" precision="20" unsigned="false" nullable="false" default="0" comment="Total Revenue Amount"/>
+        <column xsi:type="decimal" name="total_profit_amount" scale="4" precision="20" unsigned="false" nullable="false" default="0" comment="Total Profit Amount"/>
+        <column xsi:type="decimal" name="total_invoiced_amount" scale="4" precision="20" unsigned="false" nullable="false" default="0" comment="Total Invoiced Amount"/>
+        <column xsi:type="decimal" name="total_canceled_amount" scale="4" precision="20" unsigned="false" nullable="false" default="0" comment="Total Canceled Amount"/>
+        <column xsi:type="decimal" name="total_paid_amount" scale="4" precision="20" unsigned="false" nullable="false" default="0" comment="Total Paid Amount"/>
+        <column xsi:type="decimal" name="total_refunded_amount" scale="4" precision="20" unsigned="false" nullable="false" default="0" comment="Total Refunded Amount"/>
+        <column xsi:type="decimal" name="total_tax_amount" scale="4" precision="20" unsigned="false" nullable="false" default="0" comment="Total Tax Amount"/>
+        <column xsi:type="decimal" name="total_tax_amount_actual" scale="4" precision="20" unsigned="false" nullable="false" default="0" comment="Total Tax Amount Actual"/>
+        <column xsi:type="decimal" name="total_shipping_amount" scale="4" precision="20" unsigned="false" nullable="false" default="0" comment="Total Shipping Amount"/>
+        <column xsi:type="decimal" name="total_shipping_amount_actual" scale="4" precision="20" unsigned="false" nullable="false" default="0" comment="Total Shipping Amount Actual"/>
+        <column xsi:type="decimal" name="total_discount_amount" scale="4" precision="20" unsigned="false" nullable="false" default="0" comment="Total Discount Amount"/>
+        <column xsi:type="decimal" name="total_discount_amount_actual" scale="4" precision="20" unsigned="false" nullable="false" default="0" comment="Total Discount Amount Actual"/>
         <constraint xsi:type="primary" referenceId="PRIMARY">
             <column name="id"/>
         </constraint>
-        <constraint xsi:type="foreign" referenceId="TNW_SUBSCRIPTIONS_SALES_ORDER_AGGREGATED_CREATED_STORE_ID_STORE_STORE_ID"
-                    table="tnw_subscriptions_sales_order_aggregated_created" column="store_id" referenceTable="store"
-                    referenceColumn="store_id" onDelete="SET NULL"/>
+        <constraint xsi:type="foreign" referenceId="TNW_SUBSCRIPTIONS_SALES_ORDER_AGGREGATED_CREATED_STORE_ID_STORE_STORE_ID" table="tnw_subscriptions_sales_order_aggregated_created" column="store_id" referenceTable="store" referenceColumn="store_id" onDelete="SET NULL"/>
         <constraint xsi:type="unique" referenceId="TNW_SUBSCRIPTIONS_SALES_ORDER_AGGREGATED_CREATED_PERIOD_STORE_ID_ORDER_STATUS">
             <column name="period"/>
             <column name="store_id"/>
@@ -55,51 +34,31 @@
             <column name="store_id"/>
         </index>
     </table>
-    <table name="tnw_subscriptions_sales_order_aggregated_updated" resource="sales" engine="innodb"
-           comment="TNW Subscriptions Sales Order Aggregated Updated">
+    <table name="tnw_subscriptions_sales_order_aggregated_updated" resource="sales" engine="innodb" comment="TNW Subscriptions Sales Order Aggregated Updated">
         <column xsi:type="int" name="id" unsigned="true" nullable="false" identity="true" comment="ID"/>
         <column xsi:type="date" name="period" comment="Period"/>
-        <column xsi:type="smallint" name="store_id" unsigned="true" nullable="true" identity="false"
-                comment="Store ID"/>
+        <column xsi:type="smallint" name="store_id" unsigned="true" nullable="true" identity="false" comment="Store ID"/>
         <column xsi:type="varchar" name="order_status" nullable="false" length="50" comment="Order Status"/>
-        <column xsi:type="int" name="orders_count" unsigned="false" nullable="false" identity="false"
-                default="0" comment="Orders Count"/>
-        <column xsi:type="decimal" name="total_qty_ordered" scale="4" precision="12" unsigned="false" nullable="false"
-                default="0" comment="Total Qty Ordered"/>
-        <column xsi:type="decimal" name="total_qty_invoiced" scale="4" precision="12" unsigned="false" nullable="false"
-                default="0" comment="Total Qty Invoiced"/>
-        <column xsi:type="decimal" name="total_income_amount" scale="4" precision="20" unsigned="false"
-                nullable="false" default="0" comment="Total Income Amount"/>
-        <column xsi:type="decimal" name="total_revenue_amount" scale="4" precision="20" unsigned="false"
-                nullable="false" default="0" comment="Total Revenue Amount"/>
-        <column xsi:type="decimal" name="total_profit_amount" scale="4" precision="20" unsigned="false"
-                nullable="false" default="0" comment="Total Profit Amount"/>
-        <column xsi:type="decimal" name="total_invoiced_amount" scale="4" precision="20" unsigned="false"
-                nullable="false" default="0" comment="Total Invoiced Amount"/>
-        <column xsi:type="decimal" name="total_canceled_amount" scale="4" precision="20" unsigned="false"
-                nullable="false" default="0" comment="Total Canceled Amount"/>
-        <column xsi:type="decimal" name="total_paid_amount" scale="4" precision="20" unsigned="false" nullable="false"
-                default="0" comment="Total Paid Amount"/>
-        <column xsi:type="decimal" name="total_refunded_amount" scale="4" precision="20" unsigned="false"
-                nullable="false" default="0" comment="Total Refunded Amount"/>
-        <column xsi:type="decimal" name="total_tax_amount" scale="4" precision="20" unsigned="false" nullable="false"
-                default="0" comment="Total Tax Amount"/>
-        <column xsi:type="decimal" name="total_tax_amount_actual" scale="4" precision="20" unsigned="false"
-                nullable="false" default="0" comment="Total Tax Amount Actual"/>
-        <column xsi:type="decimal" name="total_shipping_amount" scale="4" precision="20" unsigned="false"
-                nullable="false" default="0" comment="Total Shipping Amount"/>
-        <column xsi:type="decimal" name="total_shipping_amount_actual" scale="4" precision="20" unsigned="false"
-                nullable="false" default="0" comment="Total Shipping Amount Actual"/>
-        <column xsi:type="decimal" name="total_discount_amount" scale="4" precision="20" unsigned="false"
-                nullable="false" default="0" comment="Total Discount Amount"/>
-        <column xsi:type="decimal" name="total_discount_amount_actual" scale="4" precision="20" unsigned="false"
-                nullable="false" default="0" comment="Total Discount Amount Actual"/>
+        <column xsi:type="int" name="orders_count" unsigned="false" nullable="false" identity="false" default="0" comment="Orders Count"/>
+        <column xsi:type="decimal" name="total_qty_ordered" scale="4" precision="12" unsigned="false" nullable="false" default="0" comment="Total Qty Ordered"/>
+        <column xsi:type="decimal" name="total_qty_invoiced" scale="4" precision="12" unsigned="false" nullable="false" default="0" comment="Total Qty Invoiced"/>
+        <column xsi:type="decimal" name="total_income_amount" scale="4" precision="20" unsigned="false" nullable="false" default="0" comment="Total Income Amount"/>
+        <column xsi:type="decimal" name="total_revenue_amount" scale="4" precision="20" unsigned="false" nullable="false" default="0" comment="Total Revenue Amount"/>
+        <column xsi:type="decimal" name="total_profit_amount" scale="4" precision="20" unsigned="false" nullable="false" default="0" comment="Total Profit Amount"/>
+        <column xsi:type="decimal" name="total_invoiced_amount" scale="4" precision="20" unsigned="false" nullable="false" default="0" comment="Total Invoiced Amount"/>
+        <column xsi:type="decimal" name="total_canceled_amount" scale="4" precision="20" unsigned="false" nullable="false" default="0" comment="Total Canceled Amount"/>
+        <column xsi:type="decimal" name="total_paid_amount" scale="4" precision="20" unsigned="false" nullable="false" default="0" comment="Total Paid Amount"/>
+        <column xsi:type="decimal" name="total_refunded_amount" scale="4" precision="20" unsigned="false" nullable="false" default="0" comment="Total Refunded Amount"/>
+        <column xsi:type="decimal" name="total_tax_amount" scale="4" precision="20" unsigned="false" nullable="false" default="0" comment="Total Tax Amount"/>
+        <column xsi:type="decimal" name="total_tax_amount_actual" scale="4" precision="20" unsigned="false" nullable="false" default="0" comment="Total Tax Amount Actual"/>
+        <column xsi:type="decimal" name="total_shipping_amount" scale="4" precision="20" unsigned="false" nullable="false" default="0" comment="Total Shipping Amount"/>
+        <column xsi:type="decimal" name="total_shipping_amount_actual" scale="4" precision="20" unsigned="false" nullable="false" default="0" comment="Total Shipping Amount Actual"/>
+        <column xsi:type="decimal" name="total_discount_amount" scale="4" precision="20" unsigned="false" nullable="false" default="0" comment="Total Discount Amount"/>
+        <column xsi:type="decimal" name="total_discount_amount_actual" scale="4" precision="20" unsigned="false" nullable="false" default="0" comment="Total Discount Amount Actual"/>
         <constraint xsi:type="primary" referenceId="PRIMARY">
             <column name="id"/>
         </constraint>
-        <constraint xsi:type="foreign" referenceId="TNW_SUBSCRIPTIONS_SALES_ORDER_AGGREGATED_UPDATED_STORE_ID_STORE_STORE_ID"
-                    table="tnw_subscriptions_sales_order_aggregated_updated" column="store_id" referenceTable="store"
-                    referenceColumn="store_id" onDelete="SET NULL"/>
+        <constraint xsi:type="foreign" referenceId="TNW_SUBSCRIPTIONS_SALES_ORDER_AGGREGATED_UPDATED_STORE_ID_STORE_STORE_ID" table="tnw_subscriptions_sales_order_aggregated_updated" column="store_id" referenceTable="store" referenceColumn="store_id" onDelete="SET NULL"/>
         <constraint xsi:type="unique" referenceId="TNW_SUBSCRIPTIONS_SALES_ORDER_AGGREGATED_UPDATED_PERIOD_STORE_ID_ORDER_STATUS">
             <column name="period"/>
             <column name="store_id"/>
@@ -108,5 +67,595 @@
         <index referenceId="TNW_SUBSCRIPTIONS_SALES_ORDER_AGGREGATED_UPDATED_STORE_ID" indexType="btree">
             <column name="store_id"/>
         </index>
+    </table>
+    <table name="tnw_subscriptions_billing_frequency" resource="default" engine="innodb" comment="tnw_subscriptions_billing_frequency">
+        <column xsi:type="int" name="id" padding="10" unsigned="true" nullable="false" identity="true" comment="Entity ID"/>
+        <column xsi:type="smallint" name="unit" padding="5" unsigned="true" nullable="false" identity="false" comment="unit"/>
+        <column xsi:type="text" name="label" nullable="false" comment="label"/>
+        <column xsi:type="boolean" name="status" nullable="false" comment="status"/>
+        <column xsi:type="smallint" name="frequency" padding="5" unsigned="true" nullable="false" identity="false" comment="frequency"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="id"/>
+        </constraint>
+    </table>
+    <table name="tnw_subscriptions_product_billing_frequency" resource="default" engine="innodb" comment="tnw_subscriptions_product_billing_frequency">
+        <column xsi:type="int" name="id" padding="10" unsigned="true" nullable="false" identity="true" comment="Entity ID"/>
+        <column xsi:type="int" name="billing_frequency_id" padding="10" unsigned="true" nullable="false" identity="false" comment="billing_frequency_id"/>
+        <column xsi:type="int" name="magento_product_id" padding="10" unsigned="true" nullable="false" identity="false" comment="magento_product_id"/>
+        <column xsi:type="boolean" name="default_billing_frequency" nullable="false" default="0" comment="default_billing_frequency"/>
+        <column xsi:type="decimal" name="price" scale="2" precision="12" unsigned="false" nullable="false" comment="price"/>
+        <column xsi:type="decimal" name="initial_fee" scale="2" precision="12" unsigned="false" nullable="false" comment="initial_fee"/>
+        <column xsi:type="int" name="sort_order" padding="10" unsigned="true" nullable="false" identity="false" comment="Sort order"/>
+        <column xsi:type="int" name="preset_qty" padding="10" unsigned="true" nullable="true" identity="false" comment="Preset Qty"/>
+        <column xsi:type="boolean" name="is_disabled" nullable="false" default="0" comment="Is Disabled"/>
+        <column xsi:type="longtext" name="subscription_profile_ids" nullable="true" comment="Store Subscription profiles id for grid on remove BF"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="id"/>
+        </constraint>
+        <constraint xsi:type="foreign" referenceId="FK_875B313E0C614D70CE41BAB3D151649A" table="tnw_subscriptions_product_billing_frequency" column="billing_frequency_id" referenceTable="tnw_subscriptions_billing_frequency" referenceColumn="id" onDelete="CASCADE"/>
+        <constraint xsi:type="unique" referenceId="IDX_5088FC29991DE924B3B092F10816140D">
+            <column name="billing_frequency_id"/>
+            <column name="magento_product_id"/>
+        </constraint>
+    </table>
+    <table name="tnw_subscriptions_subscription_profile_order" resource="default" engine="innodb" comment="tnw_subscriptions_subscription_profile_order">
+        <column xsi:type="int" name="id" padding="10" unsigned="true" nullable="false" identity="true" comment="Entity ID"/>
+        <column xsi:type="int" name="subscription_profile_id" padding="10" unsigned="true" nullable="false" identity="false" comment="Subscription profile id"/>
+        <column xsi:type="int" name="magento_order_id" padding="10" unsigned="true" nullable="true" identity="false" comment="Magento order id"/>
+        <column xsi:type="int" name="magento_quote_id" padding="10" unsigned="true" nullable="true" identity="false" comment="Magento quote id"/>
+        <column xsi:type="datetime" name="scheduled_at" on_update="false" nullable="true" comment="Scheduled at"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="id"/>
+        </constraint>
+        <constraint xsi:type="foreign" referenceId="FK_974724824020F917A3017B41E95DE77D" table="tnw_subscriptions_subscription_profile_order" column="subscription_profile_id" referenceTable="tnw_subscriptions_subscription_profile_entity" referenceColumn="entity_id" onDelete="CASCADE"/>
+        <constraint xsi:type="unique" referenceId="TNW_SUBSCRIPTIONS_SUBSCRIPTION_PROFILE_ORDER_MAGENTO_ORDER_ID" disabled="true">
+            <column name="magento_order_id"/>
+        </constraint>
+    </table>
+    <table name="tnw_subscriptions_subscription_profile_message_history" resource="default" engine="innodb" comment="Subscription profile message history table.">
+        <column xsi:type="int" name="entity_id" padding="10" unsigned="true" nullable="false" identity="true" comment="Entity Id"/>
+        <column xsi:type="int" name="parent_id" padding="10" unsigned="true" nullable="false" identity="false" comment="Parent Id"/>
+        <column xsi:type="smallint" name="is_visible_on_front" padding="5" unsigned="true" nullable="false" identity="false" default="0" comment="Is Visible On Front"/>
+        <column xsi:type="text" name="message" nullable="true" comment="Message"/>
+        <column xsi:type="smallint" name="is_comment" padding="5" unsigned="true" nullable="false" identity="false" default="0" comment="Is it comment or message."/>
+        <column xsi:type="timestamp" name="created_at" on_update="false" nullable="false" default="CURRENT_TIMESTAMP" comment="Created At"/>
+        <column xsi:type="int" name="user_id" padding="11" unsigned="false" nullable="true" identity="false" comment="User id whose message it is"/>
+        <column xsi:type="int" name="customer_id" padding="11" unsigned="false" nullable="true" identity="false" comment="Customer id whose message it is"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="entity_id"/>
+        </constraint>
+        <constraint xsi:type="foreign" referenceId="FK_BDBA6A9FC5E7E9D376ADA5166CE92556" table="tnw_subscriptions_subscription_profile_message_history" column="parent_id" referenceTable="tnw_subscriptions_subscription_profile_entity" referenceColumn="entity_id" onDelete="CASCADE"/>
+        <index referenceId="TNW_SUBSCRIPTIONS_SUBSCRIPTION_PROFILE_MESSAGE_HISTORY_PARENT_ID" indexType="btree">
+            <column name="parent_id"/>
+        </index>
+    </table>
+    <table name="tnw_subscriptions_quote_item_extension_entity" resource="default" engine="innodb" comment="tnw_subscriptions_quote_item_extension_entity">
+        <column xsi:type="int" name="item_id" padding="10" unsigned="true" nullable="false" identity="true" comment="Magento quote item ID"/>
+        <column xsi:type="decimal" name="subs_initial_fee" scale="4" precision="12" unsigned="false" nullable="false" default="0" comment="Initial fee"/>
+        <column xsi:type="decimal" name="base_subs_initial_fee" scale="4" precision="12" unsigned="false" nullable="false" default="0" comment="Base initial fee"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="item_id"/>
+        </constraint>
+    </table>
+    <table name="tnw_subscriptions_order_item_extension_entity" resource="default" engine="innodb" comment="tnw_subscriptions_order_item_extension_entity">
+        <column xsi:type="int" name="item_id" padding="10" unsigned="true" nullable="false" identity="true" comment="Magento order item ID" disabled="true"/>
+        <column xsi:type="decimal" name="subs_initial_fee" scale="4" precision="12" unsigned="false" nullable="false" default="0" comment="Initial fee"/>
+        <column xsi:type="decimal" name="base_subs_initial_fee" scale="4" precision="12" unsigned="false" nullable="false" default="0" comment="Base initial fee"/>
+        <column xsi:type="decimal" name="subs_initial_fee_invoiced" scale="4" precision="12" unsigned="false" nullable="false" default="0" comment="Invoiced initial fee"/>
+        <column xsi:type="decimal" name="base_subs_initial_fee_invoiced" scale="4" precision="12" unsigned="false" nullable="false" default="0" comment="Base invoiced initial fee"/>
+        <column xsi:type="decimal" name="subs_initial_fee_refunded" scale="4" precision="12" unsigned="false" nullable="false" default="0" comment="Refunded initial fee"/>
+        <column xsi:type="decimal" name="base_subs_initial_fee_refunded" scale="4" precision="12" unsigned="false" nullable="false" default="0" comment="Base refunded initial fee"/>
+        <column xsi:type="int" name="magento_item_id" padding="10" unsigned="true" nullable="false" identity="true" comment="Magento order item ID" onCreate="migrateDataFrom(item_id)"/>
+        <constraint xsi:type="primary" referenceId="STAGING_PRIMARY">
+            <column name="magento_item_id"/>
+        </constraint>
+    </table>
+    <table name="tnw_subscriptions_customer_quote" resource="default" engine="innodb" comment="tnw_subscriptions_customer_quote">
+        <column xsi:type="int" name="id" padding="10" unsigned="true" nullable="false" identity="true" comment="Id"/>
+        <column xsi:type="int" name="customer_id" padding="10" unsigned="true" nullable="false" identity="false" comment="Customer_id"/>
+        <column xsi:type="int" name="quote_id" padding="10" unsigned="true" nullable="false" identity="false" comment="Quote_id"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="id"/>
+        </constraint>
+        <constraint xsi:type="foreign" referenceId="TNW_SUBSCRIPTIONS_CSTR_QUOTE_CSTR_ID_CSTR_ENTT_ENTT_ID" table="tnw_subscriptions_customer_quote" column="customer_id" referenceTable="customer_entity" referenceColumn="entity_id" onDelete="CASCADE"/>
+        <constraint xsi:type="foreign" referenceId="TNW_SUBSCRIPTIONS_CUSTOMER_QUOTE_QUOTE_ID_QUOTE_ENTITY_ID" table="tnw_subscriptions_customer_quote" column="quote_id" referenceTable="quote" referenceColumn="entity_id" onDelete="CASCADE"/>
+    </table>
+    <table name="tnw_subscriptions_subscription_profile_status_history" resource="default" engine="innodb" comment="tnw_subscriptions_subscription_profile_status_history">
+        <column xsi:type="int" name="id" padding="10" unsigned="true" nullable="false" identity="true" comment="Id"/>
+        <column xsi:type="int" name="subscription_profile_id" padding="10" unsigned="true" nullable="false" identity="false" comment="Subscription_profile_id"/>
+        <column xsi:type="smallint" name="status_old" padding="6" unsigned="false" nullable="true" identity="false" comment="Old status"/>
+        <column xsi:type="smallint" name="status_new" padding="6" unsigned="false" nullable="false" identity="false" comment="New status"/>
+        <column xsi:type="int" name="user_id" padding="10" unsigned="true" nullable="true" identity="false" comment="User id who changed status"/>
+        <column xsi:type="int" name="customer_id" padding="10" unsigned="true" nullable="true" identity="false" comment="Customer id who changed status"/>
+        <column xsi:type="datetime" name="changed_at" on_update="false" nullable="false" comment="Changed at"/>
+        <column xsi:type="bigint" name="changed_at_micro" padding="20" unsigned="true" nullable="false" identity="false" default="0" comment="Changed at microseconds"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="id"/>
+        </constraint>
+        <constraint xsi:type="foreign" referenceId="FK_D1FFB23DB58D24DB6FB55A39445D7EF7" table="tnw_subscriptions_subscription_profile_status_history" column="subscription_profile_id" referenceTable="tnw_subscriptions_subscription_profile_entity" referenceColumn="entity_id" onDelete="CASCADE"/>
+        <index referenceId="UNQ_DE07DA2CCF3E16715A8FAAB4B917E8DA" indexType="btree">
+            <column name="subscription_profile_id"/>
+        </index>
+        <index referenceId="TNW_SUBSCRIPTIONS_SUBSCRIPTION_PROFILE_STATUS_HISTORY_STATUS_OLD" indexType="btree">
+            <column name="status_old"/>
+        </index>
+        <index referenceId="TNW_SUBSCRIPTIONS_SUBSCRIPTION_PROFILE_STATUS_HISTORY_STATUS_NEW" indexType="btree">
+            <column name="status_new"/>
+        </index>
+        <index referenceId="TNW_SUBSCRIPTIONS_SUBSCRIPTION_PROFILE_STATUS_HISTORY_USER_ID" indexType="btree">
+            <column name="user_id"/>
+        </index>
+        <index referenceId="TNW_SUBSCRIPTIONS_SUBSCRIPTION_PROFILE_STS_HISTORY_CSTR_ID" indexType="btree">
+            <column name="customer_id"/>
+        </index>
+        <index referenceId="TNW_SUBSCRIPTIONS_SUBSCRIPTION_PROFILE_STATUS_HISTORY_CHANGED_AT" indexType="btree">
+            <column name="changed_at"/>
+        </index>
+        <index referenceId="IDX_EC3C5C0C790881F5F7E8BD3E9ED5AABD" indexType="btree">
+            <column name="changed_at_micro"/>
+        </index>
+    </table>
+    <table name="tnw_subscriptions_subscription_profile_address" resource="default" engine="innodb" comment="Subscription Profile Address">
+        <column xsi:type="int" name="id" padding="10" unsigned="true" nullable="false" identity="true" comment="Id"/>
+        <column xsi:type="int" name="profile_id" padding="10" unsigned="true" nullable="false" identity="false" default="0" comment="Profile Id"/>
+        <column xsi:type="timestamp" name="created_at" on_update="false" nullable="false" default="CURRENT_TIMESTAMP" comment="Created At"/>
+        <column xsi:type="timestamp" name="updated_at" on_update="true" nullable="false" default="0" comment="Updated At"/>
+        <column xsi:type="int" name="customer_address_id" padding="10" unsigned="true" nullable="true" identity="false" comment="Customer Address Id"/>
+        <column xsi:type="varchar" name="address_type" nullable="true" length="10" comment="Address Type"/>
+        <column xsi:type="varchar" name="prefix" nullable="true" length="40" comment="Prefix"/>
+        <column xsi:type="varchar" name="firstname" nullable="true" length="20" comment="Firstname"/>
+        <column xsi:type="varchar" name="middlename" nullable="true" length="20" comment="Middlename"/>
+        <column xsi:type="varchar" name="lastname" nullable="true" length="20" comment="Lastname"/>
+        <column xsi:type="varchar" name="suffix" nullable="true" length="40" comment="Suffix"/>
+        <column xsi:type="varchar" name="company" nullable="true" length="255" comment="Company"/>
+        <column xsi:type="varchar" name="street" nullable="true" length="40" comment="Street"/>
+        <column xsi:type="varchar" name="city" nullable="true" length="40" comment="City"/>
+        <column xsi:type="varchar" name="region" nullable="true" length="40" comment="Region"/>
+        <column xsi:type="int" name="region_id" padding="10" unsigned="true" nullable="true" identity="false" comment="Region Id"/>
+        <column xsi:type="varchar" name="postcode" nullable="true" length="20" comment="Postcode"/>
+        <column xsi:type="varchar" name="country_id" nullable="true" length="30" comment="Country Id"/>
+        <column xsi:type="varchar" name="telephone" nullable="true" length="20" comment="Phone Number"/>
+        <column xsi:type="varchar" name="fax" nullable="true" length="20" comment="Fax"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="id"/>
+        </constraint>
+        <constraint xsi:type="foreign" referenceId="FK_D920CC425DD533D8114F473F4A55EAA6" table="tnw_subscriptions_subscription_profile_address" column="profile_id" referenceTable="tnw_subscriptions_subscription_profile_entity" referenceColumn="entity_id" onDelete="CASCADE"/>
+        <index referenceId="TNW_SUBSCRIPTIONS_SUBSCRIPTION_PROFILE_ADDRESS_PROFILE_ID" indexType="btree">
+            <column name="profile_id"/>
+        </index>
+    </table>
+    <table name="tnw_subscriptions_subscription_profile_queue" resource="default" engine="innodb" comment="tnw_subscriptions_subscription_profile_queue">
+        <column xsi:type="int" name="id" padding="10" unsigned="true" nullable="false" identity="true" comment="Id"/>
+        <column xsi:type="int" name="profile_order_id" padding="10" unsigned="true" nullable="false" identity="false" comment="Profile_order_id"/>
+        <column xsi:type="varchar" name="status" nullable="false" length="255" default="new" comment="Status"/>
+        <column xsi:type="int" name="attempt_count" padding="10" unsigned="true" nullable="false" identity="false" default="0" comment="Attempt_count"/>
+        <column xsi:type="text" name="message" nullable="true" comment="Error when sync"/>
+        <column xsi:type="timestamp" name="created_at" on_update="false" nullable="false" default="CURRENT_TIMESTAMP" comment="Creation Time"/>
+        <column xsi:type="timestamp" name="updated_at" on_update="true" nullable="false" default="CURRENT_TIMESTAMP" comment="Update Time"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="id"/>
+        </constraint>
+        <constraint xsi:type="foreign" referenceId="FK_15AC8190AB05E1E61241C395A1F7E411" table="tnw_subscriptions_subscription_profile_queue" column="profile_order_id" referenceTable="tnw_subscriptions_subscription_profile_order" referenceColumn="id" onDelete="CASCADE"/>
+        <constraint xsi:type="unique" referenceId="TNW_SUBSCRIPTIONS_SUBSCRIPTION_PROFILE_QUEUE_PROFILE_ORDER_ID">
+            <column name="profile_order_id"/>
+        </constraint>
+        <index referenceId="TNW_SUBSCRIPTIONS_SUBSCRIPTION_PROFILE_QUEUE_CREATED_AT" indexType="btree">
+            <column name="created_at"/>
+        </index>
+        <index referenceId="TNW_SUBSCRIPTIONS_SUBSCRIPTION_PROFILE_QUEUE_UPDATED_AT" indexType="btree">
+            <column name="updated_at"/>
+        </index>
+        <index referenceId="TNW_SUBSCRIPTIONS_SUBSCRIPTION_PROFILE_QUEUE_STATUS" indexType="btree">
+            <column name="status"/>
+        </index>
+        <index referenceId="TNW_SUBSCRIPTIONS_SUBSCRIPTION_PROFILE_QUEUE_ATTEMPT_COUNT" indexType="btree">
+            <column name="attempt_count"/>
+        </index>
+    </table>
+    <table name="tnw_subscriptions_product_subscription_profile_entity" resource="default" engine="innodb" comment="Product Subscription Profile Table">
+        <column xsi:type="int" name="entity_id" padding="10" unsigned="true" nullable="false" identity="true" comment="Entity ID"/>
+        <column xsi:type="int" name="parent_id" padding="10" unsigned="true" nullable="true" identity="false" comment="Parent id"/>
+        <column xsi:type="int" name="subscription_profile_id" padding="10" unsigned="true" nullable="false" identity="false" comment="Subscription Profile ID"/>
+        <column xsi:type="int" name="magento_product_id" padding="10" unsigned="true" nullable="false" identity="false" comment="Product ID"/>
+        <column xsi:type="varchar" name="name" nullable="true" length="255" comment="Product name"/>
+        <column xsi:type="varchar" name="sku" nullable="true" length="64" comment="Product sku"/>
+        <column xsi:type="int" name="tnw_subscr_unlock_preset_qty" padding="11" unsigned="false" nullable="true" identity="false" comment="Preset qty"/>
+        <column xsi:type="decimal" name="price" scale="4" precision="12" unsigned="true" nullable="false" default="0" comment="Price"/>
+        <column xsi:type="decimal" name="initial_fee" scale="4" precision="12" unsigned="true" nullable="false" default="0" comment="Initial Fee"/>
+        <column xsi:type="decimal" name="qty" scale="4" precision="12" unsigned="true" nullable="false" default="0" comment="Qty"/>
+        <column xsi:type="smallint" name="purchase_type" padding="5" unsigned="true" nullable="false" identity="false" comment="Purchase Type"/>
+        <column xsi:type="boolean" name="trial_status" nullable="false" comment="Trial Status"/>
+        <column xsi:type="decimal" name="trial_price" scale="4" precision="12" unsigned="true" nullable="false" default="0" comment="Trial Price"/>
+        <column xsi:type="boolean" name="lock_product_price_status" nullable="false" comment="Lock product price"/>
+        <column xsi:type="boolean" name="offer_flat_discount_status" nullable="false" comment="Offer flat discount"/>
+        <column xsi:type="decimal" name="discount_amount" scale="4" precision="12" unsigned="true" nullable="false" default="0" comment="Discount amount"/>
+        <column xsi:type="smallint" name="discount_type" padding="5" unsigned="true" nullable="false" identity="false" comment="Discount type"/>
+        <column xsi:type="smallint" name="need_recollect" padding="5" unsigned="true" nullable="false" identity="false" default="0" comment="Need Recollect"/>
+        <column xsi:type="text" name="custom_options" nullable="true" comment="Custom Options"/>
+        <column xsi:type="timestamp" name="created_at" on_update="false" nullable="false" default="CURRENT_TIMESTAMP" comment="Creation time"/>
+        <column xsi:type="timestamp" name="updated_at" on_update="true" nullable="false" default="CURRENT_TIMESTAMP" comment="Update time"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="entity_id"/>
+        </constraint>
+        <constraint xsi:type="foreign" referenceId="FK_10D1E5EA7B3D387D37D55C6A25C2D9E9" table="tnw_subscriptions_product_subscription_profile_entity" column="subscription_profile_id" referenceTable="tnw_subscriptions_subscription_profile_entity" referenceColumn="entity_id" onDelete="CASCADE"/>
+        <constraint xsi:type="unique" referenceId="IDX_89CDDB9E2C569C50A6B86CA6DA46EC7E" disabled="true">
+            <column name="subscription_profile_id"/>
+            <column name="magento_product_id"/>
+        </constraint>
+        <index referenceId="IDX_59E387A6AEC7FBCFB156D5BE4E77EDF8" indexType="btree">
+            <column name="subscription_profile_id"/>
+        </index>
+        <index referenceId="TNW_SUBSCRIPTIONS_PRD_SUBSCRIPTION_PROFILE_ENTT_MAGENTO_PRD_ID" indexType="btree">
+            <column name="magento_product_id"/>
+        </index>
+    </table>
+    <table name="tnw_subscriptions_product_subscription_profile_entity_datetime" resource="default" engine="innodb" comment="Product Subscription Profile Datetime Attribute Backend Table">
+        <column xsi:type="int" name="value_id" padding="11" unsigned="false" nullable="false" identity="true" comment="Value ID"/>
+        <column xsi:type="smallint" name="attribute_id" padding="5" unsigned="true" nullable="false" identity="false" default="0" comment="Attribute ID"/>
+        <column xsi:type="smallint" name="store_id" padding="5" unsigned="true" nullable="false" identity="false" default="0" comment="Store ID"/>
+        <column xsi:type="int" name="entity_id" padding="10" unsigned="true" nullable="false" identity="false" default="0" comment="Entity ID"/>
+        <column xsi:type="datetime" name="value" on_update="false" nullable="true" comment="Value"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="value_id"/>
+        </constraint>
+        <constraint xsi:type="foreign" referenceId="FK_E6E60093DE17E596752D4C59FE6DB583" table="tnw_subscriptions_product_subscription_profile_entity_datetime" column="attribute_id" referenceTable="eav_attribute" referenceColumn="attribute_id" onDelete="CASCADE"/>
+        <constraint xsi:type="foreign" referenceId="FK_F9C0E822268F490F99AD72C9F114A8B6" table="tnw_subscriptions_product_subscription_profile_entity_datetime" column="entity_id" referenceTable="tnw_subscriptions_product_subscription_profile_entity" referenceColumn="entity_id" onDelete="CASCADE"/>
+        <constraint xsi:type="foreign" referenceId="FK_E4CD96AB6AD1075394F5F87ECBBC1700" table="tnw_subscriptions_product_subscription_profile_entity_datetime" column="store_id" referenceTable="store" referenceColumn="store_id" onDelete="CASCADE"/>
+        <constraint xsi:type="unique" referenceId="UNQ_2EDB54BBFEF4D1F01DFB20C1491F426D">
+            <column name="entity_id"/>
+            <column name="attribute_id"/>
+            <column name="store_id"/>
+        </constraint>
+        <index referenceId="TNW_SUBSCRIPTIONS_PRD_SUBSCRIPTION_PROFILE_ENTT_DTIME_ENTT_ID" indexType="btree">
+            <column name="entity_id"/>
+        </index>
+        <index referenceId="TNW_SUBSCRIPTIONS_PRD_SUBSCRIPTION_PROFILE_ENTT_DTIME_ATTR_ID" indexType="btree">
+            <column name="attribute_id"/>
+        </index>
+        <index referenceId="TNW_SUBSCRIPTIONS_PRD_SUBSCRIPTION_PROFILE_ENTT_DTIME_STORE_ID" indexType="btree">
+            <column name="store_id"/>
+        </index>
+    </table>
+    <table name="tnw_subscriptions_product_subscription_profile_entity_decimal" resource="default" engine="innodb" comment="Product Subscription Profile Decimal Attribute Backend Table">
+        <column xsi:type="int" name="value_id" padding="11" unsigned="false" nullable="false" identity="true" comment="Value ID"/>
+        <column xsi:type="smallint" name="attribute_id" padding="5" unsigned="true" nullable="false" identity="false" default="0" comment="Attribute ID"/>
+        <column xsi:type="smallint" name="store_id" padding="5" unsigned="true" nullable="false" identity="false" default="0" comment="Store ID"/>
+        <column xsi:type="int" name="entity_id" padding="10" unsigned="true" nullable="false" identity="false" default="0" comment="Entity ID"/>
+        <column xsi:type="decimal" name="value" scale="4" precision="12" unsigned="false" nullable="true" comment="Value"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="value_id"/>
+        </constraint>
+        <constraint xsi:type="foreign" referenceId="FK_3801BE3CFB1A79C812D933868EE970A7" table="tnw_subscriptions_product_subscription_profile_entity_decimal" column="attribute_id" referenceTable="eav_attribute" referenceColumn="attribute_id" onDelete="CASCADE"/>
+        <constraint xsi:type="foreign" referenceId="FK_07246D5E59F901260D6E82A99874FC36" table="tnw_subscriptions_product_subscription_profile_entity_decimal" column="entity_id" referenceTable="tnw_subscriptions_product_subscription_profile_entity" referenceColumn="entity_id" onDelete="CASCADE"/>
+        <constraint xsi:type="foreign" referenceId="FK_789906A40FF8A7722D32E8E34CBB293D" table="tnw_subscriptions_product_subscription_profile_entity_decimal" column="store_id" referenceTable="store" referenceColumn="store_id" onDelete="CASCADE"/>
+        <constraint xsi:type="unique" referenceId="UNQ_738380F7890C1E371453D3AC636A9D83">
+            <column name="entity_id"/>
+            <column name="attribute_id"/>
+            <column name="store_id"/>
+        </constraint>
+        <index referenceId="TNW_SUBSCRIPTIONS_PRD_SUBSCRIPTION_PROFILE_ENTT_DEC_ENTT_ID" indexType="btree">
+            <column name="entity_id"/>
+        </index>
+        <index referenceId="TNW_SUBSCRIPTIONS_PRD_SUBSCRIPTION_PROFILE_ENTT_DEC_ATTR_ID" indexType="btree">
+            <column name="attribute_id"/>
+        </index>
+        <index referenceId="TNW_SUBSCRIPTIONS_PRD_SUBSCRIPTION_PROFILE_ENTT_DEC_STORE_ID" indexType="btree">
+            <column name="store_id"/>
+        </index>
+    </table>
+    <table name="tnw_subscriptions_product_subscription_profile_entity_int" resource="default" engine="innodb" comment="Product Subscription Profile Integer Attribute Backend Table">
+        <column xsi:type="int" name="value_id" padding="11" unsigned="false" nullable="false" identity="true" comment="Value ID"/>
+        <column xsi:type="smallint" name="attribute_id" padding="5" unsigned="true" nullable="false" identity="false" default="0" comment="Attribute ID"/>
+        <column xsi:type="smallint" name="store_id" padding="5" unsigned="true" nullable="false" identity="false" default="0" comment="Store ID"/>
+        <column xsi:type="int" name="entity_id" padding="10" unsigned="true" nullable="false" identity="false" default="0" comment="Entity ID"/>
+        <column xsi:type="int" name="value" padding="11" unsigned="false" nullable="true" identity="false" comment="Value"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="value_id"/>
+        </constraint>
+        <constraint xsi:type="foreign" referenceId="FK_7625DC5675D97C2F0E8D5E93A9805E14" table="tnw_subscriptions_product_subscription_profile_entity_int" column="attribute_id" referenceTable="eav_attribute" referenceColumn="attribute_id" onDelete="CASCADE"/>
+        <constraint xsi:type="foreign" referenceId="FK_F900B4294930B0548ACD93295702536B" table="tnw_subscriptions_product_subscription_profile_entity_int" column="entity_id" referenceTable="catalog_category_entity" referenceColumn="entity_id" onDelete="CASCADE"/>
+        <constraint xsi:type="foreign" referenceId="FK_BD045D3D60C3F81004022AE02367C62E" table="tnw_subscriptions_product_subscription_profile_entity_int" column="store_id" referenceTable="store" referenceColumn="store_id" onDelete="CASCADE"/>
+        <constraint xsi:type="unique" referenceId="UNQ_95C3833FAA7232C16FA00D98CD7857E5">
+            <column name="entity_id"/>
+            <column name="attribute_id"/>
+            <column name="store_id"/>
+        </constraint>
+        <index referenceId="TNW_SUBSCRIPTIONS_PRD_SUBSCRIPTION_PROFILE_ENTT_INT_ENTT_ID" indexType="btree">
+            <column name="entity_id"/>
+        </index>
+        <index referenceId="TNW_SUBSCRIPTIONS_PRD_SUBSCRIPTION_PROFILE_ENTT_INT_ATTR_ID" indexType="btree">
+            <column name="attribute_id"/>
+        </index>
+        <index referenceId="TNW_SUBSCRIPTIONS_PRD_SUBSCRIPTION_PROFILE_ENTT_INT_STORE_ID" indexType="btree">
+            <column name="store_id"/>
+        </index>
+    </table>
+    <table name="tnw_subscriptions_product_subscription_profile_entity_text" resource="default" engine="innodb" comment="Product Subscription Profile Text Attribute Backend Table">
+        <column xsi:type="int" name="value_id" padding="11" unsigned="false" nullable="false" identity="true" comment="Value ID"/>
+        <column xsi:type="smallint" name="attribute_id" padding="5" unsigned="true" nullable="false" identity="false" default="0" comment="Attribute ID"/>
+        <column xsi:type="smallint" name="store_id" padding="5" unsigned="true" nullable="false" identity="false" default="0" comment="Store ID"/>
+        <column xsi:type="int" name="entity_id" padding="10" unsigned="true" nullable="false" identity="false" default="0" comment="Entity ID"/>
+        <column xsi:type="text" name="value" nullable="true" comment="Value"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="value_id"/>
+        </constraint>
+        <constraint xsi:type="foreign" referenceId="FK_0A338D0D577389796E3A82203D28613E" table="tnw_subscriptions_product_subscription_profile_entity_text" column="attribute_id" referenceTable="eav_attribute" referenceColumn="attribute_id" onDelete="CASCADE"/>
+        <constraint xsi:type="foreign" referenceId="FK_B15C178A28D81D4D47F79654891E56F6" table="tnw_subscriptions_product_subscription_profile_entity_text" column="entity_id" referenceTable="tnw_subscriptions_product_subscription_profile_entity" referenceColumn="entity_id" onDelete="CASCADE"/>
+        <constraint xsi:type="foreign" referenceId="FK_665651D0722F852E008AF46CB9DC40DD" table="tnw_subscriptions_product_subscription_profile_entity_text" column="store_id" referenceTable="store" referenceColumn="store_id" onDelete="CASCADE"/>
+        <constraint xsi:type="unique" referenceId="UNQ_343C86E0FE8EF4EE79887D358A58A645">
+            <column name="entity_id"/>
+            <column name="attribute_id"/>
+            <column name="store_id"/>
+        </constraint>
+        <index referenceId="TNW_SUBSCRIPTIONS_PRD_SUBSCRIPTION_PROFILE_ENTT_TEXT_ENTT_ID" indexType="btree">
+            <column name="entity_id"/>
+        </index>
+        <index referenceId="TNW_SUBSCRIPTIONS_PRD_SUBSCRIPTION_PROFILE_ENTT_TEXT_ATTR_ID" indexType="btree">
+            <column name="attribute_id"/>
+        </index>
+        <index referenceId="TNW_SUBSCRIPTIONS_PRD_SUBSCRIPTION_PROFILE_ENTT_TEXT_STORE_ID" indexType="btree">
+            <column name="store_id"/>
+        </index>
+    </table>
+    <table name="tnw_subscriptions_product_subscription_profile_entity_varchar" resource="default" engine="innodb" comment="Product Subscription Profile Varchar Attribute Backend Table">
+        <column xsi:type="int" name="value_id" padding="11" unsigned="false" nullable="false" identity="true" comment="Value ID"/>
+        <column xsi:type="smallint" name="attribute_id" padding="5" unsigned="true" nullable="false" identity="false" default="0" comment="Attribute ID"/>
+        <column xsi:type="smallint" name="store_id" padding="5" unsigned="true" nullable="false" identity="false" default="0" comment="Store ID"/>
+        <column xsi:type="int" name="entity_id" padding="10" unsigned="true" nullable="false" identity="false" default="0" comment="Entity ID"/>
+        <column xsi:type="varchar" name="value" nullable="true" length="255" comment="Value"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="value_id"/>
+        </constraint>
+        <constraint xsi:type="foreign" referenceId="FK_9A5DD43BB13F571224B10A53D0A146FB" table="tnw_subscriptions_product_subscription_profile_entity_varchar" column="attribute_id" referenceTable="eav_attribute" referenceColumn="attribute_id" onDelete="CASCADE"/>
+        <constraint xsi:type="foreign" referenceId="FK_B6E16A4AD4F7345E909458B6CB9AEE93" table="tnw_subscriptions_product_subscription_profile_entity_varchar" column="entity_id" referenceTable="tnw_subscriptions_product_subscription_profile_entity" referenceColumn="entity_id" onDelete="CASCADE"/>
+        <constraint xsi:type="foreign" referenceId="FK_57AA4F9598FBABCAB5E489C5F8AC62BE" table="tnw_subscriptions_product_subscription_profile_entity_varchar" column="store_id" referenceTable="store" referenceColumn="store_id" onDelete="CASCADE"/>
+        <constraint xsi:type="unique" referenceId="UNQ_66AE22609295F8AF00D1F98A4ADFA383">
+            <column name="entity_id"/>
+            <column name="attribute_id"/>
+            <column name="store_id"/>
+        </constraint>
+        <index referenceId="TNW_SUBSCRIPTIONS_PRD_SUBSCRIPTION_PROFILE_ENTT_VCHR_ENTT_ID" indexType="btree">
+            <column name="entity_id"/>
+        </index>
+        <index referenceId="TNW_SUBSCRIPTIONS_PRD_SUBSCRIPTION_PROFILE_ENTT_VCHR_ATTR_ID" indexType="btree">
+            <column name="attribute_id"/>
+        </index>
+        <index referenceId="TNW_SUBSCRIPTIONS_PRD_SUBSCRIPTION_PROFILE_ENTT_VCHR_STORE_ID" indexType="btree">
+            <column name="store_id"/>
+        </index>
+    </table>
+    <table name="tnw_subscriptions_subscription_profile_entity" resource="default" engine="innodb" comment="tnw_subscriptions_subscription_profile_entity">
+        <column xsi:type="int" name="entity_id" padding="10" unsigned="true" nullable="false" identity="true" comment="Entity Id"/>
+        <column xsi:type="int" name="customer_id" padding="10" unsigned="true" nullable="false" identity="false" comment="Customer Id"/>
+        <column xsi:type="int" name="billing_frequency_id" padding="10" unsigned="true" nullable="false" identity="false" comment="Billing Frequency Id"/>
+        <column xsi:type="smallint" name="unit" padding="5" unsigned="true" nullable="false" identity="false" comment="Customer Id"/>
+        <column xsi:type="smallint" name="website_id" padding="5" unsigned="true" nullable="false" identity="false" comment="Website Id"/>
+        <column xsi:type="smallint" name="status" padding="6" unsigned="false" nullable="false" identity="false" comment="Status"/>
+        <column xsi:type="smallint" name="frequency" padding="5" unsigned="true" nullable="false" identity="false" comment="Frequency"/>
+        <column xsi:type="varchar" name="engine_code" nullable="false" length="255" comment="Engine Code" disabled="true"/>
+        <column xsi:type="datetime" name="trial_start_date" on_update="false" nullable="true" comment="Trial Start Date"/>
+        <column xsi:type="datetime" name="start_date" on_update="false" nullable="true" comment="Start Date"/>
+        <column xsi:type="smallint" name="term" padding="5" unsigned="true" nullable="false" identity="false" default="0" comment="Term"/>
+        <column xsi:type="int" name="total_billing_cycles" padding="10" unsigned="true" nullable="false" identity="false" default="0" comment="Total Billing Cycles"/>
+        <column xsi:type="varchar" name="shipping_method" nullable="true" length="40" comment="Shipping Method"/>
+        <column xsi:type="varchar" name="shipping_description" nullable="true" length="255" comment="Shipping Description"/>
+        <column xsi:type="varchar" name="profile_currency_code" nullable="false" length="255" comment="Profile Currency Code"/>
+        <column xsi:type="smallint" name="trial_length" padding="5" unsigned="true" nullable="false" identity="false" default="0" comment="Trial Length"/>
+        <column xsi:type="smallint" name="trial_length_unit" padding="5" unsigned="true" nullable="false" identity="false" default="0" comment="Trial Length Unit"/>
+        <column xsi:type="smallint" name="is_virtual" padding="5" unsigned="true" nullable="false" identity="false" default="0" comment="Is virtual"/>
+        <column xsi:type="varchar" name="token_hash" nullable="true" length="128" comment="Token Hash" disabled="true"/>
+        <column xsi:type="text" name="payment_additional_info" nullable="true" comment="Payment Additional Info" disabled="true"/>
+        <column xsi:type="smallint" name="generate_quotes_state" padding="6" unsigned="false" nullable="false" identity="false" default="0" comment="Generate quotes state"/>
+        <column xsi:type="smallint" name="need_recollect" padding="6" unsigned="false" nullable="false" identity="false" default="0" comment="Need Recollect"/>
+        <column xsi:type="smallint" name="cancel_before_next_cycle" padding="6" unsigned="false" nullable="false" identity="false" default="0" comment="Cancel before next cycle"/>
+        <column xsi:type="timestamp" name="created_at" on_update="false" nullable="false" default="CURRENT_TIMESTAMP" comment="Created at"/>
+        <column xsi:type="timestamp" name="updated_at" on_update="true" nullable="false" default="CURRENT_TIMESTAMP" comment="Updated at"/>
+        <column xsi:type="decimal" name="subtotal" scale="4" precision="20" unsigned="false" nullable="false" default="0" comment="subtotal" onCreate="migrateDataFrom(subtotal)"/>
+        <column xsi:type="decimal" name="shipping" scale="4" precision="20" unsigned="false" nullable="false" default="0" comment="shipping" onCreate="migrateDataFrom(shipping)"/>
+        <column xsi:type="decimal" name="discount" scale="4" precision="20" unsigned="false" nullable="false" default="0" comment="discount" onCreate="migrateDataFrom(discount)"/>
+        <column xsi:type="decimal" name="tax" scale="4" precision="20" unsigned="false" nullable="false" default="0" comment="tax" onCreate="migrateDataFrom(tax)"/>
+        <column xsi:type="decimal" name="grand_total" scale="4" precision="20" unsigned="false" nullable="false" default="0" comment="grand_total" onCreate="migrateDataFrom(grand_total)"/>
+        <column xsi:type="datetime" name="original_start_date" on_update="false" nullable="true" comment="Original Start Date"/>
+        <column xsi:type="smallint" name="billing_cycles_to_skip" padding="6" unsigned="false" nullable="true" identity="false" default="0" comment="Billing Cycles To Skip"/>
+        <column xsi:type="varchar" name="coupon_code" nullable="true" length="255" comment="Coupon Code"/>
+        <column xsi:type="varchar" name="subscription_total_static_billing_cycles" nullable="true" length="255" comment="Static total billing cycles "/>
+        <column xsi:type="smallint" name="store_id" padding="5" unsigned="true" nullable="true" identity="false" comment="Store Id"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="entity_id"/>
+        </constraint>
+    </table>
+    <table name="tnw_subscriptions_subscription_profile_entity_datetime" resource="default" engine="innodb" comment="Subscription Profile Entity Datetime">
+        <column xsi:type="int" name="value_id" padding="11" unsigned="false" nullable="false" identity="true" comment="Value Id"/>
+        <column xsi:type="smallint" name="attribute_id" padding="5" unsigned="true" nullable="false" identity="false" default="0" comment="Attribute Id"/>
+        <column xsi:type="int" name="entity_id" padding="10" unsigned="true" nullable="false" identity="false" default="0" comment="Entity Id"/>
+        <column xsi:type="datetime" name="value" on_update="false" nullable="true" comment="Value"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="value_id"/>
+        </constraint>
+        <constraint xsi:type="foreign" referenceId="FK_5E44719E2E3BDBBF1133D80688F5BBF0" table="tnw_subscriptions_subscription_profile_entity_datetime" column="attribute_id" referenceTable="eav_attribute" referenceColumn="attribute_id" onDelete="CASCADE"/>
+        <constraint xsi:type="foreign" referenceId="FK_D7D3BC5F903429621DD79A8846A7C031" table="tnw_subscriptions_subscription_profile_entity_datetime" column="entity_id" referenceTable="tnw_subscriptions_subscription_profile_entity" referenceColumn="entity_id" onDelete="CASCADE"/>
+    </table>
+    <table name="tnw_subscriptions_subscription_profile_entity_decimal" resource="default" engine="innodb" comment="Subscription Profile Entity Decimal">
+        <column xsi:type="int" name="value_id" padding="11" unsigned="false" nullable="false" identity="true" comment="Value Id"/>
+        <column xsi:type="smallint" name="attribute_id" padding="5" unsigned="true" nullable="false" identity="false" default="0" comment="Attribute Id"/>
+        <column xsi:type="int" name="entity_id" padding="10" unsigned="true" nullable="false" identity="false" default="0" comment="Entity Id"/>
+        <column xsi:type="decimal" name="value" scale="4" precision="12" unsigned="false" nullable="false" default="0" comment="Value"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="value_id"/>
+        </constraint>
+        <constraint xsi:type="foreign" referenceId="FK_91F08345F5A85BB65B28E51AD54C31D2" table="tnw_subscriptions_subscription_profile_entity_decimal" column="attribute_id" referenceTable="eav_attribute" referenceColumn="attribute_id" onDelete="CASCADE"/>
+        <constraint xsi:type="foreign" referenceId="FK_526446F57E6D46B7092AAF67E4B0BE0C" table="tnw_subscriptions_subscription_profile_entity_decimal" column="entity_id" referenceTable="tnw_subscriptions_subscription_profile_entity" referenceColumn="entity_id" onDelete="CASCADE"/>
+    </table>
+    <table name="tnw_subscriptions_subscription_profile_entity_int" resource="default" engine="innodb" comment="Subscription Profile Entity Int">
+        <column xsi:type="int" name="value_id" padding="11" unsigned="false" nullable="false" identity="true" comment="Value Id"/>
+        <column xsi:type="smallint" name="attribute_id" padding="5" unsigned="true" nullable="false" identity="false" default="0" comment="Attribute Id"/>
+        <column xsi:type="int" name="entity_id" padding="10" unsigned="true" nullable="false" identity="false" default="0" comment="Entity Id"/>
+        <column xsi:type="int" name="value" padding="11" unsigned="false" nullable="false" identity="false" default="0" comment="Value"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="value_id"/>
+        </constraint>
+        <constraint xsi:type="foreign" referenceId="FK_42DCD6527998E54831A3BBE90788CEF4" table="tnw_subscriptions_subscription_profile_entity_int" column="attribute_id" referenceTable="eav_attribute" referenceColumn="attribute_id" onDelete="CASCADE"/>
+        <constraint xsi:type="foreign" referenceId="FK_23D695FE51690B7682E447591E557FEC" table="tnw_subscriptions_subscription_profile_entity_int" column="entity_id" referenceTable="tnw_subscriptions_subscription_profile_entity" referenceColumn="entity_id" onDelete="CASCADE"/>
+    </table>
+    <table name="tnw_subscriptions_subscription_profile_entity_text" resource="default" engine="innodb" comment="Subscription Profile Entity Text">
+        <column xsi:type="int" name="value_id" padding="11" unsigned="false" nullable="false" identity="true" comment="Value Id"/>
+        <column xsi:type="smallint" name="attribute_id" padding="5" unsigned="true" nullable="false" identity="false" default="0" comment="Attribute Id"/>
+        <column xsi:type="int" name="entity_id" padding="10" unsigned="true" nullable="false" identity="false" default="0" comment="Entity Id"/>
+        <column xsi:type="text" name="value" nullable="false" comment="Value"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="value_id"/>
+        </constraint>
+        <constraint xsi:type="foreign" referenceId="FK_8E894C4D93820B03D40565E192AB12CE" table="tnw_subscriptions_subscription_profile_entity_text" column="attribute_id" referenceTable="eav_attribute" referenceColumn="attribute_id" onDelete="CASCADE"/>
+        <constraint xsi:type="foreign" referenceId="FK_232C9DAC4DCE4F2A9236B6095AC1AB7A" table="tnw_subscriptions_subscription_profile_entity_text" column="entity_id" referenceTable="tnw_subscriptions_subscription_profile_entity" referenceColumn="entity_id" onDelete="CASCADE"/>
+    </table>
+    <table name="tnw_subscriptions_subscription_profile_entity_varchar" resource="default" engine="innodb" comment="Customer Address Entity Varchar">
+        <column xsi:type="int" name="value_id" padding="11" unsigned="false" nullable="false" identity="true" comment="Value Id"/>
+        <column xsi:type="smallint" name="attribute_id" padding="5" unsigned="true" nullable="false" identity="false" default="0" comment="Attribute Id"/>
+        <column xsi:type="int" name="entity_id" padding="10" unsigned="true" nullable="false" identity="false" default="0" comment="Entity Id"/>
+        <column xsi:type="varchar" name="value" nullable="true" length="255" comment="Value"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="value_id"/>
+        </constraint>
+        <constraint xsi:type="foreign" referenceId="FK_03851CC7BDEA782C2056967FD6004DCF" table="tnw_subscriptions_subscription_profile_entity_varchar" column="attribute_id" referenceTable="eav_attribute" referenceColumn="attribute_id" onDelete="CASCADE"/>
+        <constraint xsi:type="foreign" referenceId="FK_518352CBA02658DFDA277487321C7721" table="tnw_subscriptions_subscription_profile_entity_varchar" column="entity_id" referenceTable="tnw_subscriptions_subscription_profile_entity" referenceColumn="entity_id" onDelete="CASCADE"/>
+    </table>
+    <table name="sales_order_grid" resource="default">
+        <column xsi:type="varchar" name="subscription_profile_id" nullable="true" length="255" comment="subscription_profile_id"/>
+        <column xsi:type="varchar" name="subscription_paid_installment" nullable="true" length="255" comment="Recurring Paid Installment"/>
+        <column xsi:type="longtext" name="subscription_final_installment_date" nullable="true" comment="Recurring Final Installment Date" onCreate="migrateDataFrom(subscription_final_installment_date)"/>
+        <column xsi:type="longtext" name="subscription_first_installment_date" nullable="true" comment="Recurring 1st Installment Date" onCreate="migrateDataFrom(subscription_first_installment_date)"/>
+        <column xsi:type="varchar" name="subscription_expire_cc" nullable="true" length="255" comment="Will cc expire"/>
+        <column xsi:type="varchar" name="subscription_total_static_billing_cycles" nullable="true" length="255" comment="Static total billing cycles"/>
+    </table>
+    <table name="tnw_subscriptions_customer_product_history" resource="default" engine="innodb" comment="tnw_subscriptions_customer_product_history">
+        <column xsi:type="int" name="id" padding="10" unsigned="true" nullable="false" identity="true" comment="ID"/>
+        <column xsi:type="int" name="subscription_profile_id" padding="10" unsigned="true" nullable="false" identity="false" comment="Subscription Profile ID"/>
+        <column xsi:type="int" name="customer_id" padding="10" unsigned="true" nullable="false" identity="false" comment="Customer ID"/>
+        <column xsi:type="int" name="magento_product_id" padding="10" unsigned="true" nullable="false" identity="false" comment="Magento product ID"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="id"/>
+        </constraint>
+        <index referenceId="TNW_SUBSCRIPTIONS_CSTR_PRD_HISTORY_CSTR_ID_MAGENTO_PRD_ID" indexType="btree">
+            <column name="customer_id"/>
+            <column name="magento_product_id"/>
+        </index>
+    </table>
+    <table name="tnw_subscriptions_invoice_item_extension_entity" resource="default" engine="innodb" comment="tnw_subscriptions_invoice_item_extension_entity">
+        <column xsi:type="int" name="item_id" padding="10" unsigned="true" nullable="false" identity="true" comment="Magento quote item ID"/>
+        <column xsi:type="decimal" name="subs_initial_fee" scale="4" precision="12" unsigned="false" nullable="false" default="0" comment="Initial fee"/>
+        <column xsi:type="decimal" name="base_subs_initial_fee" scale="4" precision="12" unsigned="false" nullable="false" default="0" comment="Base initial fee"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="item_id"/>
+        </constraint>
+    </table>
+    <table name="tnw_subscriptions_creditmemo_item_extension_entity" resource="default" engine="innodb" comment="tnw_subscriptions_creditmemo_item_extension_entity">
+        <column xsi:type="int" name="item_id" padding="10" unsigned="true" nullable="false" identity="true" comment="Magento quote item ID"/>
+        <column xsi:type="decimal" name="subs_initial_fee" scale="4" precision="12" unsigned="false" nullable="false" default="0" comment="Initial fee"/>
+        <column xsi:type="decimal" name="base_subs_initial_fee" scale="4" precision="12" unsigned="false" nullable="false" default="0" comment="Base initial fee"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="item_id"/>
+        </constraint>
+    </table>
+    <table name="tnw_subscriptions_product_subscription_profile_eav_attribute" resource="default" engine="innodb" comment="Product Subscription Profile EAV Attribute Table">
+        <column xsi:type="smallint" name="attribute_id" padding="5" unsigned="true" nullable="false" identity="false" comment="Attribute ID"/>
+        <column xsi:type="smallint" name="is_visible_on_front" padding="5" unsigned="true" nullable="false" identity="false" default="0" comment="Is Visible On Front"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="attribute_id"/>
+        </constraint>
+        <constraint xsi:type="foreign" referenceId="FK_40DE8D2CC668D85D73133060958FA204" table="tnw_subscriptions_product_subscription_profile_eav_attribute" column="attribute_id" referenceTable="eav_attribute" referenceColumn="attribute_id" onDelete="CASCADE"/>
+    </table>
+    <table name="tnw_subscriptions_subscription_profile_payment" resource="default" engine="innodb" comment="tnw_subscriptions_subscription_profile_payment">
+        <column xsi:type="int" name="payment_id" padding="10" unsigned="true" nullable="false" identity="true" comment="Payment ID"/>
+        <column xsi:type="int" name="subscription_profile_id" padding="10" unsigned="true" nullable="false" identity="false" comment="Profile ID"/>
+        <column xsi:type="varchar" name="engine_code" nullable="false" length="255" comment="Engine Code"/>
+        <column xsi:type="varchar" name="token_hash" nullable="true" length="128" comment="Token Hash"/>
+        <column xsi:type="text" name="payment_additional_info" nullable="true" comment="Payment Additional Info"/>
+        <column xsi:type="timestamp" name="created_at" on_update="false" nullable="false" default="CURRENT_TIMESTAMP" comment="Created at"/>
+        <column xsi:type="timestamp" name="updated_at" on_update="true" nullable="false" default="CURRENT_TIMESTAMP" comment="Updated at"/>
+        <column xsi:type="boolean" name="sent_mail" nullable="false" default="0" comment="sent_mail"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="payment_id"/>
+        </constraint>
+        <constraint xsi:type="foreign" referenceId="FK_A83CC81915B56821ED740CA8F26B0889" table="tnw_subscriptions_subscription_profile_payment" column="subscription_profile_id" referenceTable="tnw_subscriptions_subscription_profile_entity" referenceColumn="entity_id" onDelete="CASCADE"/>
+    </table>
+    <table name="tnw_subscriptions_message" resource="default" engine="innodb" comment="tnw_subscriptions_message">
+        <column xsi:type="int" name="message_id" padding="10" unsigned="true" nullable="false" identity="true" comment="Message ID"/>
+        <column xsi:type="varchar" name="transaction_uid" nullable="true" length="32" comment="Transaction"/>
+        <column xsi:type="smallint" name="level" padding="5" unsigned="true" nullable="true" identity="false" comment="Level"/>
+        <column xsi:type="smallint" name="website_id" padding="5" unsigned="true" nullable="true" identity="false" comment="Website"/>
+        <column xsi:type="text" name="message" nullable="true" comment="Message"/>
+        <column xsi:type="timestamp" name="created_at" on_update="false" nullable="false" default="CURRENT_TIMESTAMP" comment="Create At"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="message_id"/>
+        </constraint>
+        <constraint xsi:type="foreign" referenceId="TNW_SUBSCRIPTIONS_MESSAGE_WEBSITE_ID_STORE_WEBSITE_WEBSITE_ID" table="tnw_subscriptions_message" column="website_id" referenceTable="store_website" referenceColumn="website_id" onDelete="CASCADE"/>
+        <index referenceId="TNW_SUBSCRIPTIONS_MESSAGE_WEBSITE_ID" indexType="btree">
+            <column name="website_id"/>
+        </index>
+    </table>
+    <table name="quote" resource="default">
+        <column xsi:type="boolean" name="is_tnw_subscription" nullable="false" comment="Is TNW Subscription Quote"/>
+        <column xsi:type="text" name="subscription_payment_data" nullable="true" comment="Subscription Payment Data" disabled="true"/>
+    </table>
+    <table name="tnw_subscriptions_profile_item_sales_item" resource="default" engine="innodb" comment="tnw_subscriptions_profile_item_sales_item">
+        <column xsi:type="int" name="profile_item_id" padding="10" unsigned="true" nullable="true" identity="false" comment="Profile Item"/>
+        <column xsi:type="int" name="quote_item_id" padding="10" unsigned="true" nullable="true" identity="false" comment="Quote Item"/>
+        <column xsi:type="int" name="order_item_id" padding="10" unsigned="true" nullable="true" identity="false" comment="Order Item"/>
+        <constraint xsi:type="foreign" referenceId="FK_FFB4A0B130B1F361FE39512EC4B4CA2B" table="tnw_subscriptions_profile_item_sales_item" column="profile_item_id" referenceTable="tnw_subscriptions_product_subscription_profile_entity" referenceColumn="entity_id" onDelete="CASCADE"/>
+        <constraint xsi:type="foreign" referenceId="FK_0E4CAC2D18991122D2E114BE36211EE1" table="tnw_subscriptions_profile_item_sales_item" column="quote_item_id" referenceTable="quote_item" referenceColumn="item_id" onDelete="SET NULL"/>
+        <constraint xsi:type="foreign" referenceId="FK_90E9801AECDBB4A7B7DA6BE695DD78F0" table="tnw_subscriptions_profile_item_sales_item" column="order_item_id" referenceTable="sales_order_item" referenceColumn="item_id" onDelete="CASCADE"/>
+        <constraint xsi:type="unique" referenceId="UNQ_121D5D108FA29C58071294AE01EEC4D8">
+            <column name="profile_item_id"/>
+            <column name="quote_item_id"/>
+            <column name="order_item_id"/>
+        </constraint>
+    </table>
+    <table name="tnw_subscriptions_order_extension_entity" resource="default" engine="innodb" comment="tnw_subscriptions_order_extension_entity">
+        <column xsi:type="int" name="entity_id" padding="10" unsigned="true" nullable="false" identity="false" comment="Profile Item"/>
+        <column xsi:type="decimal" name="subscription_initial_fee_refunded" scale="4" precision="12" unsigned="false" nullable="false" default="0" comment="Refunded initial fee"/>
+        <column xsi:type="decimal" name="base_subscription_initial_fee_refunded" scale="4" precision="12" unsigned="false" nullable="false" default="0" comment="Base refunded initial fee"/>
+        <constraint xsi:type="foreign" referenceId="FK_7C9D020D5E5B0E3FF5F782C507CD283D" table="tnw_subscriptions_order_extension_entity" column="entity_id" referenceTable="sales_order" referenceColumn="entity_id" onDelete="CASCADE"/>
+        <constraint xsi:type="unique" referenceId="TNW_SUBSCRIPTIONS_ORDER_EXTENSION_ENTITY_ENTITY_ID">
+            <column name="entity_id"/>
+        </constraint>
+    </table>
+    <table name="tnw_subscriptions_creditmemo_extension_entity" resource="default" engine="innodb" comment="tnw_subscriptions_creditmemo_extension_entity">
+        <column xsi:type="int" name="entity_id" padding="10" unsigned="true" nullable="false" identity="false" comment="Profile Item"/>
+        <column xsi:type="decimal" name="subscription_initial_fee" scale="4" precision="12" unsigned="false" nullable="false" default="0" comment="Initial fee"/>
+        <column xsi:type="decimal" name="base_subscription_initial_fee" scale="4" precision="12" unsigned="false" nullable="false" default="0" comment="Base initial fee"/>
+        <constraint xsi:type="foreign" referenceId="FK_C288C999B2D629B686C76229A87A7076" table="tnw_subscriptions_creditmemo_extension_entity" column="entity_id" referenceTable="sales_creditmemo" referenceColumn="entity_id" onDelete="CASCADE"/>
+        <constraint xsi:type="unique" referenceId="TNW_SUBSCRIPTIONS_CREDITMEMO_EXTENSION_ENTITY_ENTITY_ID">
+            <column name="entity_id"/>
+        </constraint>
+    </table>
+    <table name="sales_order" resource="default">
+        <column xsi:type="varchar" name="subscription_paid_installment" nullable="true" length="255" comment="Recurring Paid Installment"/>
+        <column xsi:type="longtext" name="subscription_final_installment_date" nullable="true" comment="Recurring Final Installment Date" onCreate="migrateDataFrom(subscription_final_installment_date)"/>
+        <column xsi:type="longtext" name="subscription_first_installment_date" nullable="true" comment="Recurring 1st Installment Date" onCreate="migrateDataFrom(subscription_first_installment_date)"/>
+        <column xsi:type="varchar" name="subscription_expire_cc" nullable="true" length="255" comment="Will cc expire"/>
+        <column xsi:type="varchar" name="subscription_total_static_billing_cycles" nullable="true" length="255" comment="Static total billing cycles"/>
+    </table>
+    <table name="tnw_subscriptions_profile_profit" resource="default" engine="innodb" comment="tnw_subscriptions_profile_profit">
+        <column xsi:type="int" name="entity_id" padding="10" unsigned="true" nullable="false" identity="true" comment="Entity ID"/>
+        <column xsi:type="int" name="profile_id" padding="11" unsigned="false" nullable="true" identity="false" comment="Subscription profile ID"/>
+        <column xsi:type="varchar" name="profit_type" nullable="true" length="255" comment="Profit type"/>
+        <column xsi:type="decimal" name="total_profit" scale="4" precision="12" unsigned="false" nullable="true" default="0" comment="Total profit"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="entity_id"/>
+        </constraint>
+    </table>
+    <table name="vault_payment_token" resource="default">
+        <column xsi:type="smallint" name="liability_shift_possible" padding="6" unsigned="false" nullable="true" identity="false" default="0" comment="Is Liability Shift Possible"/>
+        <column xsi:type="smallint" name="liability_shifted" padding="6" unsigned="false" nullable="true" identity="false" default="0" comment="Is Liability Shifted"/>
+    </table>
+    <table name="tnw_subscriptions_rebill_profiles" resource="default" engine="innodb" comment="tnw_subscriptions_rebill_profiles">
+        <column xsi:type="int" name="id" padding="10" unsigned="true" nullable="false" identity="true" comment="Entity ID"/>
+        <column xsi:type="int" name="customer_id" padding="11" unsigned="false" nullable="false" identity="false" comment="Customer id whose message it is"/>
+        <column xsi:type="text" name="subscription_profiles" nullable="false" comment="Subscription Profiles To Process"/>
+        <column xsi:type="text" name="queues" nullable="false" comment="Subscription Queues To Verify"/>
+        <column xsi:type="text" name="token" nullable="false" comment="Token"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="id"/>
+        </constraint>
     </table>
 </schema>
