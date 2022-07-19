@@ -63,7 +63,7 @@
             </argument>
         </arguments>
     </type>
-
+    <preference for="Magento\Framework\Setup\Declaration\Schema\Declaration\SchemaBuilder" type="TNW\Subscriptions\Setup\Declaration\Schema\Declaration\SchemaBuilder" />
     <preference for="TNW\Subscriptions\Model\QuoteSessionInterface" type="TNW\Subscriptions\Model\Session\Quote" />
     <preference for="TNW\Subscriptions\Api\Data\ReBillInterface"
                 type="TNW\Subscriptions\Model\SubscriptionProfile\ReBill" />
