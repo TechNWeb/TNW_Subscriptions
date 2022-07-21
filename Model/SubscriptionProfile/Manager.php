@@ -764,7 +764,10 @@ class Manager
 
                 $ccVeri = $this->propertyAdditionalInfo($additionalInfo, 'cc_cid');
                 $ccVeriOld = $this->propertyAdditionalInfo($additionalInfoOld, 'cc_cid');
-                if (strcasecmp($ccVeriOld, $ccVeri) !== 0) {
+                if (($ccVeriOld && $ccVeri && strcasecmp($ccVeriOld, $ccVeri) !== 0)
+                    || (!$ccVeriOld && $ccVeri)
+                    || ($ccVeriOld && !$ccVeri)
+                ) {
                     $message = __('Card Verification Number was changed');
                     $this->historyLogger->log($message, $this->getProfile()->getId());
                 }
