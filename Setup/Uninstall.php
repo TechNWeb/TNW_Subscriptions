@@ -4,6 +4,7 @@
  *  See TNW_LICENSE.txt for license details.
  *
  */
+
 namespace TNW\Subscriptions\Setup;
 
 use Magento\Catalog\Model\Product;
@@ -47,18 +48,14 @@ class Uninstall implements UninstallInterface
         $this->removeConfig($setup);
         $this->removeEntityAttributesAndType(SubscriptionProfile::ENTITY);
         $this->removeEntityAttributesAndType(ProductSubscriptionProfile::ENTITY);
-        $this->dropTables($setup);
-    }
 
-    /**
-     * Removes subscription tables.
-     *
-     * @param SchemaSetupInterface $setup
-     * @return $this
-     */
-    protected function dropTables(SchemaSetupInterface $setup)
-    {
-        $tnwTables = [
+        $tablesToDrop = [
+            'tnw_subscriptions_rebill_profiles',
+            'tnw_subscriptions_profile_profit',
+            'tnw_subscriptions_customer_product_history',
+            'tnw_subscriptions_rebill_profiles',
+            'tnw_subscriptions_sales_order_aggregated_created',
+            'tnw_subscriptions_sales_order_aggregated_updated',
             'tnw_subscriptions_product_billing_frequency',
             'tnw_subscriptions_billing_frequency',
             'tnw_subscriptions_customer_quote',
@@ -93,14 +90,44 @@ class Uninstall implements UninstallInterface
             'tnw_subscriptions_subscription_profile_entity_decimal',
             'tnw_subscriptions_subscription_profile_entity_datetime',
             'tnw_subscriptions_subscription_profile_entity',
-
         ];
+        $columnsToDrop = [
+            'sales_order_grid' => [
+                'subscription_paid_installment',
+                'subscription_final_installment_date',
+                'subscription_first_installment_date',
+                'subscription_expire_cc',
+                'subscription_total_static_billing_cycles',
+                'subscription_profile_id',
+            ],
+            'magento_sales_order_grid_archive' => [
+                'subscription_paid_installment',
+                'subscription_final_installment_date',
+                'subscription_first_installment_date',
+                'subscription_expire_cc',
+                'subscription_total_static_billing_cycles',
+                'subscription_profile_id',
+            ],
+            'sales_order' => [
+                'subscription_profile_id',
+                'subscription_paid_installment',
+                'subscription_final_installment_date',
+                'subscription_first_installment_date',
+                'subscription_expire_cc',
+                'subscription_total_static_billing_cycles',
+            ],
+            'vault_payment_token' => [
+                'liability_shift_possible',
+                'liability_shifted',
+            ],
+            'quote' => [
+                'is_tnw_subscription',
+            ],
+        ];
+        $indexesToDrop = [];
+        $constraintsToDrop = [];
 
-        foreach ($tnwTables as $tnwTable) {
-            $setup->getConnection()->dropTable($setup->getTable($tnwTable));
-        }
-
-        return $this;
+        $this->dropSchema($setup, $constraintsToDrop, $indexesToDrop, $columnsToDrop, $tablesToDrop);
     }
 
     /**
@@ -179,5 +206,73 @@ class Uninstall implements UninstallInterface
         $eavSetup->removeEntityType($entity);
 
         return $this;
+    }
+
+    private function dropSchema(
+        SchemaSetupInterface $setup,
+        array                $constraintsToDrop,
+        array                $indexesToDrop,
+        array                $columnsToDrop,
+        array                $tablesToDrop
+    ): void {
+        $this->dropForeignKey($setup, $constraintsToDrop);
+        $this->dropIndexes($setup, $indexesToDrop);
+        $this->dropColumns($setup, $columnsToDrop);
+        $this->dropTables($setup, $tablesToDrop);
+    }
+
+    private function dropForeignKey(SchemaSetupInterface $setup, array $constraintsData): void
+    {
+        array_walk(
+            $constraintsData,
+            function (array $constraints, string $table) use ($setup) {
+                array_map(
+                    function (string $constraint) use ($setup, $table) {
+                        $setup->getConnection()->dropForeignKey($setup->getTable($table), $constraint);
+                    },
+                    $constraints
+                );
+            }
+        );
+    }
+
+    private function dropIndexes(SchemaSetupInterface $setup, array $indexesData): void
+    {
+        array_walk(
+            $indexesData,
+            function (array $indexes, string $table) use ($setup) {
+                array_map(
+                    function (string $index) use ($setup, $table) {
+                        $setup->getConnection()->dropIndex($setup->getTable($table), $index);
+                    },
+                    $indexes
+                );
+            }
+        );
+    }
+
+    private function dropColumns(SchemaSetupInterface $setup, array $columnsData): void
+    {
+        array_walk(
+            $columnsData,
+            function (array $columns, string $table) use ($setup) {
+                array_map(
+                    function (string $column) use ($setup, $table) {
+                        $setup->getConnection()->dropColumn($setup->getTable($table), $column);
+                    },
+                    $columns
+                );
+            }
+        );
+    }
+
+    private function dropTables(SchemaSetupInterface $setup, array $tables): void
+    {
+        array_map(
+            function (string $table) use ($setup) {
+                $setup->getConnection()->dropTable($setup->getTable($table));
+            },
+            $tables
+        );
     }
 }
