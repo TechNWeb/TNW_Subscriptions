@@ -5,11 +5,12 @@ namespace TNW\Subscriptions\Setup\Patch\Data;
 use Magento\Framework\Setup\Patch\DataPatchInterface;
 use Magento\Config\Model\ResourceModel\ConfigFactory;
 use Magento\Config\Model\ResourceModel\Config\Data\CollectionFactory;
+use Magento\Framework\Setup\Patch\PatchRevertableInterface;
 
 /**
  * Class PopulateWebsiteModuleState - data patch to disable or enable module output on websties
  */
-class PopulateWebsiteModuleState implements DataPatchInterface
+class PopulateWebsiteModuleState implements DataPatchInterface, PatchRevertableInterface
 {
     /**
      * @var ConfigFactory
@@ -68,5 +69,10 @@ class PopulateWebsiteModuleState implements DataPatchInterface
                 $config->getScopeId()
             );
         }
+    }
+
+    public function revert()
+    {
+        // TODO: Implement revert() method.
     }
 }

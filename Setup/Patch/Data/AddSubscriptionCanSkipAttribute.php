@@ -11,12 +11,13 @@ use Magento\Eav\Model\Entity\Attribute\Source\Boolean;
 use Magento\Framework\Setup\Patch\DataPatchInterface;
 use Magento\Eav\Setup\EavSetupFactory;
 use Magento\Framework\Setup\ModuleDataSetupInterface;
+use Magento\Framework\Setup\Patch\PatchRevertableInterface;
 use TNW\Subscriptions\Model\Product\Attribute;
 
 /**
  * Class AddSubscriptionCanSkipAttribute - add EAV attribute
  */
-class AddSubscriptionCanSkipAttribute implements DataPatchInterface
+class AddSubscriptionCanSkipAttribute implements DataPatchInterface, PatchRevertableInterface
 {
     /**
      * @var EavSetupFactory
@@ -91,5 +92,10 @@ class AddSubscriptionCanSkipAttribute implements DataPatchInterface
                 'sort_order' => 25,
             ]
         );
+    }
+
+    public function revert()
+    {
+        // TODO: Implement revert() method.
     }
 }

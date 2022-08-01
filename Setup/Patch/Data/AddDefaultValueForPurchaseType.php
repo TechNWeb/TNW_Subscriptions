@@ -9,6 +9,7 @@ namespace TNW\Subscriptions\Setup\Patch\Data;
 use Magento\Catalog\Model\Product\Type;
 use Magento\Framework\Setup\ModuleDataSetupInterface;
 use Magento\Framework\Setup\Patch\DataPatchInterface;
+use Magento\Framework\Setup\Patch\PatchRevertableInterface;
 use TNW\Subscriptions\Model\Config\Source\PurchaseType;
 use TNW\Subscriptions\Model\Product\Attribute;
 use Magento\Catalog\Model\ResourceModel\Product\Collection;
@@ -24,7 +25,7 @@ use Magento\Framework\Exception\NoSuchEntityException;
  *
  * Class AddDefaultValueForPurchaseType
  */
-class AddDefaultValueForPurchaseType implements DataPatchInterface
+class AddDefaultValueForPurchaseType implements DataPatchInterface, PatchRevertableInterface
 {
     /**
      * @var Collection
@@ -117,5 +118,10 @@ class AddDefaultValueForPurchaseType implements DataPatchInterface
             PurchaseType::ONE_TIME_PURCHASE_TYPE,
             null
         );
+    }
+
+    public function revert()
+    {
+        // TODO: Implement revert() method.
     }
 }

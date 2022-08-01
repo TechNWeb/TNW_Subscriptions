@@ -8,6 +8,7 @@ namespace TNW\Subscriptions\Setup\Patch\Data;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Setup\ModuleDataSetupInterface;
 use Magento\Framework\Setup\Patch\DataPatchInterface;
+use Magento\Framework\Setup\Patch\PatchRevertableInterface;
 use TNW\Subscriptions\Api\SubscriptionProfileRepositoryInterface;
 use Magento\Framework\Api\SearchCriteriaBuilder;
 use TNW\Subscriptions\Model\ProductBillingFrequency\AvailableSubscriptionProfileGrid;
@@ -17,7 +18,7 @@ use TNW\Subscriptions\Model\ProductBillingFrequency\AvailableSubscriptionProfile
  *
  * Class StoreSubscriptionProfileIdsForGrid
  */
-class StoreSubscriptionProfileIdsForGrid implements DataPatchInterface
+class StoreSubscriptionProfileIdsForGrid implements DataPatchInterface, PatchRevertableInterface
 {
     /**
      * @var ModuleDataSetupInterface $moduleDataSetup
@@ -101,5 +102,10 @@ class StoreSubscriptionProfileIdsForGrid implements DataPatchInterface
             }
         }
         $this->moduleDataSetup->endSetup();
+    }
+
+    public function revert()
+    {
+        // TODO: Implement revert() method.
     }
 }

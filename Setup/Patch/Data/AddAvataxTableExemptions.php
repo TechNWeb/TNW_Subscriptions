@@ -5,12 +5,13 @@ namespace TNW\Subscriptions\Setup\Patch\Data;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\App\Config\Storage\WriterInterface;
 use Magento\Framework\Setup\Patch\DataPatchInterface;
+use Magento\Framework\Setup\Patch\PatchRevertableInterface;
 use TNW\Subscriptions\Api\Data\CreditmemoItemExtensionAttributesInterface;
 use TNW\Subscriptions\Api\Data\InvoiceItemExtensionAttributesInterface;
 use TNW\Subscriptions\Api\Data\OrderItemExtensionAttributesInterface;
 use TNW\Subscriptions\Api\Data\QuoteItemExtensionAttributesInterface;
 
-class AddAvataxTableExemptions implements DataPatchInterface
+class AddAvataxTableExemptions implements DataPatchInterface, PatchRevertableInterface
 {
     /**
      * @var WriterInterface
@@ -68,5 +69,10 @@ class AddAvataxTableExemptions implements DataPatchInterface
             'tax/avatax_advanced/avatax_table_exemptions',
             implode(',', [$default, $subscriptionExemptionList])
         );
+    }
+
+    public function revert()
+    {
+        // TODO: Implement revert() method.
     }
 }

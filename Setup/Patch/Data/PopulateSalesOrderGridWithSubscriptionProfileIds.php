@@ -10,6 +10,7 @@ namespace TNW\Subscriptions\Setup\Patch\Data;
 use Exception;
 use Magento\Framework\Setup\ModuleDataSetupInterface;
 use Magento\Framework\Setup\Patch\DataPatchInterface;
+use Magento\Framework\Setup\Patch\PatchRevertableInterface;
 use Psr\Log\LoggerInterface;
 use TNW\Subscriptions\Api\Data\SubscriptionProfileOrderInterface;
 
@@ -17,7 +18,7 @@ use TNW\Subscriptions\Api\Data\SubscriptionProfileOrderInterface;
  * Class PopulateSalesOrderGridWithSubscriptionProfileIds - populates sales_order_grid table
  * with Subscription Profile Ids
  */
-class PopulateSalesOrderGridWithSubscriptionProfileIds implements DataPatchInterface
+class PopulateSalesOrderGridWithSubscriptionProfileIds implements DataPatchInterface, PatchRevertableInterface
 {
     /**
      * @var ModuleDataSetupInterface $moduleDataSetup
@@ -94,5 +95,10 @@ class PopulateSalesOrderGridWithSubscriptionProfileIds implements DataPatchInter
     public static function getDependencies()
     {
         return [];
+    }
+
+    public function revert()
+    {
+        // TODO: Implement revert() method.
     }
 }

@@ -10,6 +10,7 @@ use Magento\Framework\Setup\Patch\DataPatchInterface;
 use Magento\Eav\Setup\EavSetup;
 use Magento\Eav\Setup\EavSetupFactory;
 use Magento\Catalog\Model\Product\Action;
+use Magento\Framework\Setup\Patch\PatchRevertableInterface;
 use Magento\Store\Model\StoreManagerInterface;
 use Magento\Catalog\Model\ResourceModel\Product\CollectionFactory;
 use Magento\Catalog\Model\Product;
@@ -18,7 +19,7 @@ use Magento\Eav\Model\Entity\Attribute\ScopedAttributeInterface;
 /**
  * Class CreateProductCycleAttribute - Data patch
  */
-class CreateProductCycleAttribute implements DataPatchInterface
+class CreateProductCycleAttribute implements DataPatchInterface, PatchRevertableInterface
 {
     /**
      * @var ModuleDataSetupInterface
@@ -121,5 +122,10 @@ class CreateProductCycleAttribute implements DataPatchInterface
     public function getAliases()
     {
         return [];
+    }
+
+    public function revert()
+    {
+        // TODO: Implement revert() method.
     }
 }

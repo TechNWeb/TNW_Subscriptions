@@ -8,6 +8,7 @@ namespace TNW\Subscriptions\Setup\Patch\Data;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Setup\Patch\DataPatchInterface;
 use Magento\Framework\Setup\ModuleDataSetupInterface;
+use Magento\Framework\Setup\Patch\PatchRevertableInterface;
 use TNW\Subscriptions\Model\Queue\Profit;
 use TNW\Subscriptions\Model\SubscriptionProfileRepository;
 use Psr\Log\LoggerInterface;
@@ -16,7 +17,7 @@ use Psr\Log\LoggerInterface;
  * Class CalculateExistingSubscriptionsProfitTypes force calculate profit types
  * for existing profile orders.
  */
-class CalculateExistingSubscriptionsProfitTypes implements DataPatchInterface
+class CalculateExistingSubscriptionsProfitTypes implements DataPatchInterface, PatchRevertableInterface
 {
     /**
      * @var ModuleDataSetupInterface
@@ -95,5 +96,10 @@ class CalculateExistingSubscriptionsProfitTypes implements DataPatchInterface
     public function getAliases()
     {
         return [];
+    }
+
+    public function revert()
+    {
+        // TODO: Implement revert() method.
     }
 }

@@ -10,12 +10,13 @@ use Magento\Catalog\Model\Product;
 use Magento\Eav\Setup\EavSetupFactory;
 use Magento\Framework\Setup\ModuleDataSetupInterface;
 use Magento\Framework\Setup\Patch\DataPatchInterface;
+use Magento\Framework\Setup\Patch\PatchRevertableInterface;
 use TNW\Subscriptions\Model\Product\Attribute;
 
 /**
  * Class For Update product attributes
  */
-class UpdateProductAttributes implements DataPatchInterface
+class UpdateProductAttributes implements DataPatchInterface, PatchRevertableInterface
 {
     /** @var ModuleDataSetupInterface */
     private $moduleDataSetup;
@@ -114,5 +115,10 @@ class UpdateProductAttributes implements DataPatchInterface
     public function getAliases()
     {
         return [];
+    }
+
+    public function revert()
+    {
+        // TODO: Implement revert() method.
     }
 }

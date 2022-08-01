@@ -9,6 +9,7 @@ use Magento\Framework\App\Area;
 use Magento\Framework\App\State;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Setup\Patch\DataPatchInterface;
+use Magento\Framework\Setup\Patch\PatchRevertableInterface;
 use Magento\Sales\Model\Order;
 use Magento\Sales\Model\ResourceModel\Order\CollectionFactoryInterface;
 use TNW\Subscriptions\Model\ResourceModel\SubscriptionProfile\CollectionFactory as SubscriptionProfileCollectionFactory;
@@ -17,7 +18,7 @@ use TNW\Subscriptions\Model\SubscriptionProfile;
 /**
  * Patch to populate store_id from first recurring order into profile
  */
-class PopulateProfileStoreId implements DataPatchInterface
+class PopulateProfileStoreId implements DataPatchInterface, PatchRevertableInterface
 {
     /**
      * @var SubscriptionProfileCollectionFactory
@@ -103,5 +104,10 @@ class PopulateProfileStoreId implements DataPatchInterface
     public function getAliases()
     {
         return [];
+    }
+
+    public function revert()
+    {
+        // TODO: Implement revert() method.
     }
 }

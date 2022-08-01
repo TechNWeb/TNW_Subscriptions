@@ -10,6 +10,7 @@ namespace TNW\Subscriptions\Setup\Patch\Data;
 use Exception;
 use Magento\Framework\Setup\ModuleDataSetupInterface;
 use Magento\Framework\Setup\Patch\DataPatchInterface;
+use Magento\Framework\Setup\Patch\PatchRevertableInterface;
 use Psr\Log\LoggerInterface;
 use TNW\Subscriptions\Api\Data\CustomerProductHistoryInterface;
 use TNW\Subscriptions\Api\Data\ProductSubscriptionProfileInterface;
@@ -19,7 +20,7 @@ use TNW\Subscriptions\Model\SubscriptionProfile;
  * Class PopulateCustomerProductHistoryWithAggregatedData - populates tnw_subscriptions_customer_product_history table
  * with aggregated data from subscription's tables
  */
-class PopulateCustomerProductHistoryWithAggregatedData implements DataPatchInterface
+class PopulateCustomerProductHistoryWithAggregatedData implements DataPatchInterface, PatchRevertableInterface
 {
     /**
      * @var ModuleDataSetupInterface
@@ -91,5 +92,10 @@ class PopulateCustomerProductHistoryWithAggregatedData implements DataPatchInter
     public static function getDependencies()
     {
         return [];
+    }
+
+    public function revert()
+    {
+        // TODO: Implement revert() method.
     }
 }
