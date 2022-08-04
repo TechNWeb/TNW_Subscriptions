@@ -17,16 +17,17 @@ class PreventSendInvoiceEmail
      * @param InvoiceSender $invoiceSender
      * @param $proceed
      * @param $invoice
-     * @return bool|mixed
+     * @param bool $forceSyncMode
+     * @return bool
      */
-    public function aroundSend(InvoiceSender $invoiceSender, $proceed, $invoice)
+    public function aroundSend(InvoiceSender $invoiceSender, $proceed, $invoice, $forceSyncMode = false)
     {
         if (array_key_exists('send_email', $invoice->getData())
             && $invoice->getData()['send_email'] === true
         ) {
             $result = true;
         } else {
-            $result = $proceed($invoice);
+            $result = $proceed($invoice, $forceSyncMode);
         }
         return $result;
     }

@@ -180,7 +180,7 @@ class Details extends Column
                     $item['payment_method'] = $this->getPaymentMethodTitle($itemId);
                     $item['payment_description'] = $this->getSubscriptionPaymentDescription($itemId);
                     //TODO: next date should consider locale & timezones
-                    $nextDate = new \DateTime($item['next_billing_cycle_date']);
+                    $nextDate = new \DateTime($item['next_billing_cycle_date'] ?? 'now');
                     $item['next_date'] = $nextDate->format('M d, Y');
                     $item['profile_actions'] = $this->getProfileActions($itemId);
                 }

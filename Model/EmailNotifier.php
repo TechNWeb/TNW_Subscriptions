@@ -178,8 +178,8 @@ class EmailNotifier
                             'id' => $subscriptionProfile->getId(),
                             'label' => $subscriptionProfile->getLabel()
                         ],
-                        'oldStatus' => $statusModel->getLabelByValue($oldStatus),
-                        'newStatus' => $statusModel->getLabelByValue($newStatus),
+                        'oldStatus' => (string) $statusModel->getLabelByValue($oldStatus) ?? '',
+                        'newStatus' => (string) $statusModel->getLabelByValue($newStatus) ?? '',
                         'date' => $date,
                         'customerName' => $customerName
                     ],
