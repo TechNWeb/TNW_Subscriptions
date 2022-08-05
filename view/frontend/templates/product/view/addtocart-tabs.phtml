@@ -16,17 +16,11 @@
             <div class="tnw-addtocart-container">
                 <div class="addtocart-subscribe">
                     <div class="box-tocart">
+                        <input type="hidden" name="addtocart_type" value="1"/>
                         <?= $block->getChildHtml('addtocart_subscribe') ?>
                     </div>
                 </div>
             </div>
-            <script type="text/x-magento-init">
-                {
-                    "#product_addtocart_form": {
-                        "Magento_Catalog/js/validate-product": {}
-                    }
-                }
-        </script>
     <?php elseif ($block->isOneTimeAndSubscribePurchase()): ?>
         <input type="hidden" name="subscribe_active" value="<?= $block->isSubscriptionDefault() ? 1 : 0 ?>" />
         <div class="tnw-addtocart-container">
