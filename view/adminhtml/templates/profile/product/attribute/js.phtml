@@ -31,13 +31,17 @@
 
         function checkOptionsPanelVisibility(){
             if($('manage-options-panel')){
-                var panel = $('manage-options-panel').up('.fieldset');
+                var panelFieldset = $('manage-options-panel').up('.fieldset'),
+                    activePanelClass = 'selected-type-options',
+                    panel = jQuery('#manage-options-panel');
 
                 if($('frontend_input') && ($('frontend_input').value ==='select' || $('frontend_input').value ==='multiselect')){
-                    panel.show();
+                    panelFieldset.show();
+                    panel.addClass(activePanelClass);
                 }
                 else {
-                    panel.hide();
+                    panelFieldset.hide();
+                    panel.removeClass(activePanelClass);
                 }
             }
         }

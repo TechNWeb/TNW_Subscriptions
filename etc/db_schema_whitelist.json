@@ -342,7 +342,8 @@
             "FK_7625DC5675D97C2F0E8D5E93A9805E14": true,
             "FK_9116FD66CAFA58556DFF2DADE59D6080": true,
             "FK_BD045D3D60C3F81004022AE02367C62E": true,
-            "UNQ_95C3833FAA7232C16FA00D98CD7857E5": true
+            "UNQ_95C3833FAA7232C16FA00D98CD7857E5": true,
+            "FK_F900B4294930B0548ACD93295702536B": true
         }
     },
     "tnw_subscriptions_product_subscription_profile_entity_text": {
@@ -541,7 +542,9 @@
     "tnw_subscriptions_product_subscription_profile_eav_attribute": {
         "column": {
             "attribute_id": true,
-            "is_visible_on_front": true
+            "is_visible_on_front": true,
+            "is_wysiwyg_enabled": true,
+            "is_pagebuilder_enabled": true
         },
         "constraint": {
             "PRIMARY": true,

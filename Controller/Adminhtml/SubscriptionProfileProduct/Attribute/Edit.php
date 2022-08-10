@@ -7,12 +7,28 @@ namespace TNW\Subscriptions\Controller\Adminhtml\SubscriptionProfileProduct\Attr
 
 use Magento\Backend\Model\Session;
 use Magento\Catalog\Model\ResourceModel\Eav\Attribute;
+use Magento\Catalog\Model\Product\Attribute\Frontend\Inputtype\Presentation;
+use Magento\Backend\App\Action\Context;
+use Magento\Framework\Registry;
+use Magento\Framework\View\Result\PageFactory;
 
 /**
  * Profile product attribute edit page controller.
  */
 class Edit extends \TNW\Subscriptions\Controller\Adminhtml\SubscriptionProfileProduct\Attribute
 {
+    protected $presentation;
+
+    public function __construct(
+        Context $context,
+        Registry $coreRegistry,
+        PageFactory $resultPageFactory,
+        Presentation $presentation
+    ) {
+        $this->presentation = $presentation;
+        parent::__construct($context, $coreRegistry, $resultPageFactory);
+    }
+
     /**
      * @inheritdoc
      * @SuppressWarnings(PHPMD.NPathComplexity)
@@ -45,6 +61,7 @@ class Edit extends \TNW\Subscriptions\Controller\Adminhtml\SubscriptionProfilePr
 
         // set entered data if was error when we do save.
         $data = $this->_objectManager->get(Session::class)->getAttributeData(true);
+        $model->setFrontendInput($this->presentation->getPresentationInputType($model));
         if (!empty($data)) {
             $model->addData($data);
         }

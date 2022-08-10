@@ -16,6 +16,16 @@ interface ProductSubscriptionProfileAttributeInterface extends \Magento\Eav\Api\
     const IS_VISIBLE_ON_FRONT = 'is_visible_on_front';
 
     /**
+     * Is wysiwyg enabled
+     */
+    const IS_WYSIWYG_ENABLED = 'is_wysiwyg_enabled';
+
+    /**
+     * Is pagebuilder enabled
+     */
+    const IS_PAGEBUILDER_ENABLED = 'is_pagebuilder_enabled';
+
+    /**
      * Whether the attribute is visible on the frontend
      *
      * @return string|null

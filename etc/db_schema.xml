@@ -353,7 +353,7 @@
             <column name="value_id"/>
         </constraint>
         <constraint xsi:type="foreign" referenceId="FK_7625DC5675D97C2F0E8D5E93A9805E14" table="tnw_subscriptions_product_subscription_profile_entity_int" column="attribute_id" referenceTable="eav_attribute" referenceColumn="attribute_id" onDelete="CASCADE"/>
-        <constraint xsi:type="foreign" referenceId="FK_F900B4294930B0548ACD93295702536B" table="tnw_subscriptions_product_subscription_profile_entity_int" column="entity_id" referenceTable="catalog_category_entity" referenceColumn="entity_id" onDelete="CASCADE"/>
+        <constraint xsi:type="foreign" referenceId="FK_F900B4294930B0548ACD93295702536B" table="tnw_subscriptions_product_subscription_profile_entity_int" column="entity_id" referenceTable="tnw_subscriptions_product_subscription_profile_entity" referenceColumn="entity_id" onDelete="CASCADE"/>
         <constraint xsi:type="foreign" referenceId="FK_BD045D3D60C3F81004022AE02367C62E" table="tnw_subscriptions_product_subscription_profile_entity_int" column="store_id" referenceTable="store" referenceColumn="store_id" onDelete="CASCADE"/>
         <constraint xsi:type="unique" referenceId="UNQ_95C3833FAA7232C16FA00D98CD7857E5">
             <column name="entity_id"/>
@@ -559,6 +559,8 @@
     <table name="tnw_subscriptions_product_subscription_profile_eav_attribute" resource="default" engine="innodb" comment="Product Subscription Profile EAV Attribute Table">
         <column xsi:type="smallint" name="attribute_id" padding="5" unsigned="true" nullable="false" identity="false" comment="Attribute ID"/>
         <column xsi:type="smallint" name="is_visible_on_front" padding="5" unsigned="true" nullable="false" identity="false" default="0" comment="Is Visible On Front"/>
+        <column xsi:type="smallint" name="is_wysiwyg_enabled" padding="5" unsigned="true" nullable="false" identity="false" default="0" comment="Is Wysiwyg Enabled"/>
+        <column xsi:type="smallint" name="is_pagebuilder_enabled" padding="5" unsigned="true" nullable="false" identity="false" default="0" comment="IIs Pagebuilder Enabled"/>
         <constraint xsi:type="primary" referenceId="PRIMARY">
             <column name="attribute_id"/>
         </constraint>
