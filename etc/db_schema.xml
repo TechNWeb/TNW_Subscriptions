@@ -560,11 +560,21 @@
         <column xsi:type="smallint" name="attribute_id" padding="5" unsigned="true" nullable="false" identity="false" comment="Attribute ID"/>
         <column xsi:type="smallint" name="is_visible_on_front" padding="5" unsigned="true" nullable="false" identity="false" default="0" comment="Is Visible On Front"/>
         <column xsi:type="smallint" name="is_wysiwyg_enabled" padding="5" unsigned="true" nullable="false" identity="false" default="0" comment="Is Wysiwyg Enabled"/>
-        <column xsi:type="smallint" name="is_pagebuilder_enabled" padding="5" unsigned="true" nullable="false" identity="false" default="0" comment="IIs Pagebuilder Enabled"/>
+        <column xsi:type="smallint" name="is_pagebuilder_enabled" padding="5" unsigned="true" nullable="false" identity="false" default="0" comment="Is Pagebuilder Enabled"/>
         <constraint xsi:type="primary" referenceId="PRIMARY">
             <column name="attribute_id"/>
         </constraint>
         <constraint xsi:type="foreign" referenceId="FK_40DE8D2CC668D85D73133060958FA204" table="tnw_subscriptions_product_subscription_profile_eav_attribute" column="attribute_id" referenceTable="eav_attribute" referenceColumn="attribute_id" onDelete="CASCADE"/>
+    </table>
+    <table name="tnw_subscriptions_subscription_profile_entity_attribute" resource="default" engine="innodb" comment="Subscription Profile EAV Attribute Table">
+        <column xsi:type="smallint" name="attribute_id" padding="5" unsigned="true" nullable="false" identity="false" comment="Attribute ID"/>
+        <column xsi:type="smallint" name="is_visible_on_front" padding="5" unsigned="true" nullable="false" identity="false" default="0" comment="Is Visible On Front"/>
+        <column xsi:type="smallint" name="is_wysiwyg_enabled" padding="5" unsigned="true" nullable="false" identity="false" default="0" comment="Is Wysiwyg Enabled"/>
+        <column xsi:type="smallint" name="is_pagebuilder_enabled" padding="5" unsigned="true" nullable="false" identity="false" default="0" comment="Is Pagebuilder Enabled"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="attribute_id"/>
+        </constraint>
+        <constraint xsi:type="foreign" referenceId="FK_40DE8D2CC668D85D73133060958FA204" table="tnw_subscriptions_subscription_profile_entity_attribute" column="attribute_id" referenceTable="eav_attribute" referenceColumn="attribute_id" onDelete="CASCADE"/>
     </table>
     <table name="tnw_subscriptions_subscription_profile_payment" resource="default" engine="innodb" comment="tnw_subscriptions_subscription_profile_payment">
         <column xsi:type="int" name="payment_id" padding="10" unsigned="true" nullable="false" identity="true" comment="Payment ID"/>

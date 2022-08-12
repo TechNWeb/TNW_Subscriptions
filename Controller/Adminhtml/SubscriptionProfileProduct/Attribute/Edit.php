@@ -17,8 +17,18 @@ use Magento\Framework\View\Result\PageFactory;
  */
 class Edit extends \TNW\Subscriptions\Controller\Adminhtml\SubscriptionProfileProduct\Attribute
 {
+    /**
+     * @var Presentation
+     */
     protected $presentation;
 
+    /**
+     * Edit constructor.
+     * @param Context $context
+     * @param Registry $coreRegistry
+     * @param PageFactory $resultPageFactory
+     * @param Presentation $presentation
+     */
     public function __construct(
         Context $context,
         Registry $coreRegistry,

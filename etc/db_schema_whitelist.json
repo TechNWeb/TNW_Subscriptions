@@ -551,6 +551,18 @@
             "FK_40DE8D2CC668D85D73133060958FA204": true
         }
     },
+    "tnw_subscriptions_subscription_profile_entity_attribute": {
+        "column": {
+            "attribute_id": true,
+            "is_visible_on_front": true,
+            "is_wysiwyg_enabled": true,
+            "is_pagebuilder_enabled": true
+        },
+        "constraint": {
+            "PRIMARY": true,
+            "FK_40DE8D2CC668D85D73133060958FA204": true
+        }
+    },
     "tnw_subscriptions_subscription_profile_payment": {
         "column": {
             "payment_id": true,

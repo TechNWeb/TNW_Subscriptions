@@ -159,9 +159,12 @@ class AdditionalDataProvider extends \Magento\Ui\DataProvider\AbstractDataProvid
      */
     public function setupAttributeMeta($attribute, $groupCode, $sortOrder)
     {
-        $meta = $this->arrayManager->set('arguments/data/config', [], [
+        $input = $attribute->getFrontendInput();
+        $config = [
             'dataType' => $attribute->getFrontendInput(),
-            'formElement' => $this->getFormElementsMapValue($attribute->getFrontendInput()),
+            'formElement' =>$this->getFormElementsMapValue(
+                $attribute->getFrontendInput() == 'datetime' ? 'date': $attribute->getFrontendInput()
+            ),
             'required' => $attribute->getIsRequired(),
             'notice' => $attribute->getNote(),
             'default' => $attribute->getDefaultValue(),
@@ -171,7 +174,12 @@ class AdditionalDataProvider extends \Magento\Ui\DataProvider\AbstractDataProvid
             'globalScope' => true,
             'sortOrder' => $sortOrder,
             'componentType' => Form\Field::NAME,
-        ]);
+            'validation' => ['required-entry' => (bool) $attribute->getIsRequired()]
+        ];
+        if ($input =='datetime') {
+            $config['options'] = ['showsTime' => true];
+        }
+        $meta = $this->arrayManager->set('arguments/data/config', [], $config);
 
         if ($attribute->usesSource()) {
             $meta = $this->arrayManager->merge('arguments/data/config', $meta, [
