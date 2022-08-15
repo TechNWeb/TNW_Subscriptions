@@ -268,14 +268,14 @@ class SubscriptionProfileRepository implements SubscriptionProfileRepositoryInte
                 ));
             }
             if ($oldStatus) {
-                if ($this->registry->registry('tnw_status_change') == null) {
+                if ($this->registry->registry('tnw_status_change_' . $subscriptionProfile->getId()) == null) {
                     try {
                         $this->emailNotifierFactory->create()->profileStatusChange(
                             $subscriptionProfile,
                             $oldStatus,
                             $newStatus
                         );
-                        $this->registry->register('tnw_status_change', true);
+                        $this->registry->register('tnw_status_change_' . $subscriptionProfile->getId(), true);
                     } catch (\Exception $exception) {
                         $this->messageHistoryLogger->log(
                             __('Profile Status change email was not send due to some email sender error.'),
