@@ -14,13 +14,17 @@ use Magento\Framework\Filter\FilterManager;
 use Magento\Framework\Registry;
 use Magento\Framework\View\LayoutFactory;
 use Magento\Framework\View\Result\PageFactory;
+use Magento\Catalog\Model\Product\Attribute\Frontend\Inputtype\Presentation;
+use Magento\Framework\App\ObjectManager;
+use Magento\Framework\Serialize\Serializer\FormData;
+use TNW\Subscriptions\Controller\Adminhtml\SubscriptionProfileProduct\Attribute;
 
 /**
  * Profile product attribute save controller.
  *
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  */
-class Save extends \TNW\Subscriptions\Controller\Adminhtml\SubscriptionProfileProduct\Attribute
+class Save extends Attribute
 {
     /**
      * @var FilterManager
@@ -48,8 +52,17 @@ class Save extends \TNW\Subscriptions\Controller\Adminhtml\SubscriptionProfilePr
     private $layoutFactory;
 
     /**
+     * @var mixed
+     */
+    private $presentation;
+
+    /**
+     * @var FormData|null
+     */
+    private $formDataSerializer;
+
+    /**
      * Save constructor.
-     *
      * @param Context $context
      * @param Registry $coreRegistry
      * @param PageFactory $resultPageFactory
@@ -58,6 +71,8 @@ class Save extends \TNW\Subscriptions\Controller\Adminhtml\SubscriptionProfilePr
      * @param FilterManager $filterManager
      * @param Product $productHelper
      * @param LayoutFactory $layoutFactory
+     * @param Presentation|null $presentation
+     * @param FormData|null $formDataSerializer
      */
     public function __construct(
         Context $context,
@@ -67,7 +82,9 @@ class Save extends \TNW\Subscriptions\Controller\Adminhtml\SubscriptionProfilePr
         ValidatorFactory $validatorFactory,
         FilterManager $filterManager,
         Product $productHelper,
-        LayoutFactory $layoutFactory
+        LayoutFactory $layoutFactory,
+        Presentation $presentation = null,
+        FormData $formDataSerializer = null
     ) {
         parent::__construct($context, $coreRegistry, $resultPageFactory);
         $this->filterManager = $filterManager;
@@ -75,6 +92,9 @@ class Save extends \TNW\Subscriptions\Controller\Adminhtml\SubscriptionProfilePr
         $this->attributeFactory = $attributeFactory;
         $this->validatorFactory = $validatorFactory;
         $this->layoutFactory = $layoutFactory;
+        $this->presentation = $presentation ?: ObjectManager::getInstance()->get(Presentation::class);
+        $this->formDataSerializer = $formDataSerializer
+            ?: ObjectManager::getInstance()->get(FormData::class);
     }
 
     /**
@@ -88,6 +108,19 @@ class Save extends \TNW\Subscriptions\Controller\Adminhtml\SubscriptionProfilePr
     {
         $data = $this->getRequest()->getPostValue();
         if ($data) {
+            try {
+                $optionData = $this->formDataSerializer
+                    ->unserialize($this->getRequest()->getParam('serialized_options', '[]'));
+            } catch (\InvalidArgumentException $e) {
+                $message = __("The attribute couldn't be saved due to an error. Verify your information and try again. "
+                    . "If the error persists, please try again later.");
+                $this->messageManager->addErrorMessage($message);
+                return $this->returnResult('*/*/edit', ['_current' => true], ['error' => true]);
+            }
+            $data = array_replace_recursive(
+                $data,
+                $optionData
+            );
             $attributeId = $this->getRequest()->getParam('attribute_id');
 
             /** @var $model \Magento\Catalog\Model\ResourceModel\Eav\Attribute */
@@ -108,7 +141,7 @@ class Save extends \TNW\Subscriptions\Controller\Adminhtml\SubscriptionProfilePr
 
                 $data['attribute_code'] = $model->getAttributeCode();
                 $data['is_user_defined'] = $model->getIsUserDefined();
-                $data['frontend_input'] = $model->getFrontendInput();
+                $data['frontend_input'] = $data['frontend_input'] ?? $model->getFrontendInput();
             } else {
                 $attributeCode = $this->getRequest()->getParam('attribute_code')
                     ?: $this->generateCode($this->getRequest()->getParam('frontend_label')[0]);
@@ -159,7 +192,7 @@ class Save extends \TNW\Subscriptions\Controller\Adminhtml\SubscriptionProfilePr
                     $data['source_model'] = \Magento\Eav\Model\Entity\Attribute\Source\Table::class;
                 }
             }
-
+            $data = $this->presentation->convertPresentationDataToInputType($data);
             if ($model->getIsUserDefined() === null || $model->getIsUserDefined() != 0) {
                 $data['backend_type'] = $model->getBackendTypeByInput($data['frontend_input']);
             }

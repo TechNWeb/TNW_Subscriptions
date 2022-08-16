@@ -5,11 +5,40 @@
  */
 namespace TNW\Subscriptions\Controller\Adminhtml\SubscriptionProfile\Attribute;
 
+use Magento\PageBuilder\Model\Config;
+use Magento\Backend\App\Action\Context;
+use Magento\Framework\Registry;
+use Magento\Framework\View\Result\PageFactory;
+
 /**
  * Class Edit - controller
  */
 class Edit extends \TNW\Subscriptions\Controller\Adminhtml\SubscriptionProfile\Attribute
 {
+    /**
+     * PageBuilder config
+     *
+     * @var Config
+     */
+    private $config;
+
+    /**
+     * Edit constructor.
+     * @param Context $context
+     * @param Registry $coreRegistry
+     * @param PageFactory $resultPageFactory
+     * @param Config $config
+     */
+    public function __construct(
+        Context $context,
+        Registry $coreRegistry,
+        PageFactory $resultPageFactory,
+        Config $config
+    ) {
+        $this->config = $config;
+        parent::__construct($context, $coreRegistry, $resultPageFactory);
+    }
+
     /**
      * @return \Magento\Framework\Controller\ResultInterface
      * @SuppressWarnings(PHPMD.NPathComplexity)
@@ -44,6 +73,18 @@ class Edit extends \TNW\Subscriptions\Controller\Adminhtml\SubscriptionProfile\A
 
         // set entered data if was error when we do save
         $data = $this->_objectManager->get(\Magento\Backend\Model\Session::class)->getAttributeData(true);
+        $inputType = $model->getFrontendInput();
+        if ($inputType === 'textarea' && $model->getIsWysiwygEnabled()) {
+            if ($model->getIsPagebuilderEnabled() && $this->config->isEnabled()) {
+                $model->setFrontendInput('pagebuilder');
+            } else {
+                $model->setFrontendInput('texteditor');
+            }
+        }
+        if ($model->getFrontendInput() == 'textarea' && $model->getIsWysiwygEnabled()) {
+            $model->setFrontendInput('texteditor');
+        }
+
         if (!empty($data)) {
             $model->addData($data);
         }

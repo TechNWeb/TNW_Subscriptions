@@ -6,6 +6,8 @@
 namespace TNW\Subscriptions\Controller\Adminhtml\SubscriptionProfile\Attribute;
 
 use Magento\Framework\Controller\ResultFactory;
+use Magento\Framework\Serialize\Serializer\FormData;
+use Magento\Framework\App\ObjectManager;
 
 /**
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
@@ -34,6 +36,12 @@ class Save extends \TNW\Subscriptions\Controller\Adminhtml\SubscriptionProfile\A
     private $layoutFactory;
 
     /**
+     * @var FormData|null
+     */
+    private $formDataSerializer;
+
+    /**
+     * Save constructor.
      * @param \Magento\Backend\App\Action\Context $context
      * @param \Magento\Framework\Registry $coreRegistry
      * @param \Magento\Framework\View\Result\PageFactory $resultPageFactory
@@ -41,7 +49,7 @@ class Save extends \TNW\Subscriptions\Controller\Adminhtml\SubscriptionProfile\A
      * @param \Magento\Eav\Model\Adminhtml\System\Config\Source\Inputtype\ValidatorFactory $validatorFactory
      * @param \Magento\Catalog\Helper\Product $productHelper
      * @param \Magento\Framework\View\LayoutFactory $layoutFactory
-     * @SuppressWarnings(PHPMD.ExcessiveParameterList)
+     * @param FormData|null $formDataSerializer
      */
     public function __construct(
         \Magento\Backend\App\Action\Context $context,
@@ -50,13 +58,16 @@ class Save extends \TNW\Subscriptions\Controller\Adminhtml\SubscriptionProfile\A
         \Magento\Eav\Model\Entity\AttributeFactory $attributeFactory,
         \Magento\Eav\Model\Adminhtml\System\Config\Source\Inputtype\ValidatorFactory $validatorFactory,
         \Magento\Catalog\Helper\Product $productHelper,
-        \Magento\Framework\View\LayoutFactory $layoutFactory
+        \Magento\Framework\View\LayoutFactory $layoutFactory,
+        FormData $formDataSerializer = null
     ) {
         parent::__construct($context, $coreRegistry, $resultPageFactory);
         $this->productHelper = $productHelper;
         $this->attributeFactory = $attributeFactory;
         $this->validatorFactory = $validatorFactory;
         $this->layoutFactory = $layoutFactory;
+        $this->formDataSerializer = $formDataSerializer
+            ?: ObjectManager::getInstance()->get(FormData::class);
     }
 
     /**
@@ -67,6 +78,19 @@ class Save extends \TNW\Subscriptions\Controller\Adminhtml\SubscriptionProfile\A
     {
         $data = $this->getRequest()->getPostValue();
         if ($data) {
+            try {
+                $optionData = $this->formDataSerializer
+                    ->unserialize($this->getRequest()->getParam('serialized_options', '[]'));
+            } catch (\InvalidArgumentException $e) {
+                $message = __("The attribute couldn't be saved due to an error. Verify your information and try again. "
+                    . "If the error persists, please try again later.");
+                $this->messageManager->addErrorMessage($message);
+                return $this->returnResult('*/*/edit', ['_current' => true], ['error' => true]);
+            }
+            $data = array_replace_recursive(
+                $data,
+                $optionData
+            );
             $attributeSet = null;
             $attributeId = $this->getRequest()->getParam('attribute_id');
             $attributeCode = $this->getRequest()->getParam('attribute_code')
@@ -128,7 +152,7 @@ class Save extends \TNW\Subscriptions\Controller\Adminhtml\SubscriptionProfile\A
 
                 $data['attribute_code'] = $model->getAttributeCode();
                 $data['is_user_defined'] = $model->getIsUserDefined();
-                $data['frontend_input'] = $model->getFrontendInput();
+                $data['frontend_input'] = $data['frontend_input'] ?? $model->getFrontendInput();
             } else {
                 /**
                  * @todo add to helper and specify all relations for properties
@@ -139,6 +163,22 @@ class Save extends \TNW\Subscriptions\Controller\Adminhtml\SubscriptionProfile\A
                 $data['backend_model'] = $this->productHelper->getAttributeBackendModelByInputType(
                     $data['frontend_input']
                 );
+            }
+            if (strcasecmp($data['frontend_input'], 'multiselect') === 0) {
+                $data['source_model'] = \Magento\Eav\Model\Entity\Attribute\Source\Table::class;
+            }
+
+            if (isset($data['frontend_input']) && $data['frontend_input'] === 'texteditor') {
+                $data['is_wysiwyg_enabled'] = 1;
+                $data['frontend_input'] = 'textarea';
+            } elseif (isset($data['frontend_input']) && $data['frontend_input'] === 'textarea') {
+                $data['is_wysiwyg_enabled'] = 0;
+            }
+            $data['is_pagebuilder_enabled'] = 0;
+            if (isset($data['frontend_input']) && $data['frontend_input'] === 'pagebuilder') {
+                $data['is_wysiwyg_enabled'] = 1;
+                $data['is_pagebuilder_enabled'] = 1;
+                $data['frontend_input'] = 'textarea';
             }
 
             if ($model->getIsUserDefined() === null || $model->getIsUserDefined() != 0) {

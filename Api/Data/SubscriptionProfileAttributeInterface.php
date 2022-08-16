@@ -8,7 +8,7 @@ namespace TNW\Subscriptions\Api\Data;
 /**
  * Interface for subscription profile product attribute.
  */
-interface ProductSubscriptionProfileAttributeInterface extends \Magento\Eav\Api\Data\AttributeInterface
+interface SubscriptionProfileAttributeInterface extends \Magento\Eav\Api\Data\AttributeInterface
 {
     /**
      * Is visible on front field name

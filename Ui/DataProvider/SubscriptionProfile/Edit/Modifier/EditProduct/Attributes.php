@@ -224,10 +224,12 @@ class Attributes extends Base
 
         foreach ($this->loadAttributes() as $attribute) {
             $iterator++;
-
-            $meta = $this->arrayManager->set('arguments/data/config', [], [
-                'dataType' => $attribute->getFrontendInput(),
-                'formElement' => $this->getFormElementsMapValue($attribute->getFrontendInput()),
+            $input = $attribute->getFrontendInput();
+            $config = [
+                'dataType' => $input,
+                'formElement' => $this->getFormElementsMapValue(
+                    $input == 'datetime' ? 'date' : $input
+                ),
                 'required' => $attribute->getIsRequired(),
                 'notice' => $attribute->getNote(),
                 'default' => $attribute->getDefaultValue(),
@@ -239,7 +241,12 @@ class Attributes extends Base
                 'componentType' => Form\Field::NAME,
                 'previewElementTmpl' => 'TNW_Subscriptions/form/element/simple-label',
                 'template' => 'TNW_Subscriptions/form/element/template/field-with-preview',
-            ]);
+                'validation' => ['required-entry' => (bool) $attribute->getIsRequired()]
+            ];
+            if ($input =='datetime') {
+                $config['options'] = ['showsTime' => true];
+            }
+            $meta = $this->arrayManager->set('arguments/data/config', [], $config);
 
             if ($this->editAllow) {
                 $meta = $this->arrayManager->merge('arguments/data/config', $meta, [
@@ -257,6 +264,7 @@ class Attributes extends Base
 
             if ($attribute->getFrontendInput() === 'boolean') {
                 $meta['arguments']['data']['config']['prefer'] = 'toggle';
+                $meta['arguments']['data']['config']['component'] = 'TNW_Subscriptions/js/form/element/boolean';
                 $meta['arguments']['data']['config']['valueMap'] = [
                     'true' => '1',
                     'false' => '0',

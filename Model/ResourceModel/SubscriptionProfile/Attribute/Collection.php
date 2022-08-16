@@ -4,10 +4,10 @@
  * See TNW_LICENSE.txt for license details.
  */
 
-namespace TNW\Subscriptions\Model\ResourceModel\ProductSubscriptionProfile\Attribute;
+namespace TNW\Subscriptions\Model\ResourceModel\SubscriptionProfile\Attribute;
 
 /**
- * Product subscription profile attribute resource collection
+ * Subscription profile attribute resource collection
  */
 class Collection extends \Magento\Eav\Model\ResourceModel\Entity\Attribute\Collection
 {
@@ -50,18 +50,24 @@ class Collection extends \Magento\Eav\Model\ResourceModel\Entity\Attribute\Colle
     protected function _construct()
     {
         $this->_init(
-            \TNW\Subscriptions\Model\ResourceModel\Eav\ProductSubscriptionProfileAttribute::class,
+            \TNW\Subscriptions\Model\ResourceModel\Eav\SubscriptionProfileAttribute::class,
             \Magento\Eav\Model\ResourceModel\Entity\Attribute::class
         );
     }
 
+    /**
+     * @return $this|\Magento\Eav\Model\ResourceModel\Entity\Attribute\Collection|void
+     * @throws \Magento\Framework\Exception\LocalizedException
+     */
     protected function _initSelect()
     {
         $entityTypeId = (int)$this->eavEntityFactory->create()->setType(
-            \TNW\Subscriptions\Model\ProductSubscriptionProfile::ENTITY
+            \TNW\Subscriptions\Model\SubscriptionProfile::ENTITY
         )->getTypeId();
         $columns = $this->getConnection()->describeTable($this->getResource()->getMainTable());
-        unset($columns['attribute_id']);
+        $additionalColumns = $this->getConnection()
+            ->describeTable($this->getTable('tnw_subscriptions_subscription_profile_entity_attribute'));
+        unset($additionalColumns['attribute_id']);
         $retColumns = [];
         foreach ($columns as $labelColumn => $columnData) {
             $retColumns[$labelColumn] = $labelColumn;
@@ -69,12 +75,17 @@ class Collection extends \Magento\Eav\Model\ResourceModel\Entity\Attribute\Colle
                 $retColumns[$labelColumn] = 'main_table.' . $labelColumn;
             }
         }
+        $retColumnsAdditional = [];
+        foreach ($additionalColumns as $labelColumn => $columnData) {
+            $retColumnsAdditional[$labelColumn] = $labelColumn;
+        }
         $this->getSelect()->from(
             ['main_table' => $this->getResource()->getMainTable()],
             $retColumns
-        )->join(
-            ['additional_table' => $this->getTable('tnw_subscriptions_product_subscription_profile_eav_attribute')],
-            'additional_table.attribute_id = main_table.attribute_id'
+        )->joinLeft(
+            ['additional_table' => $this->getTable('tnw_subscriptions_subscription_profile_entity_attribute')],
+            'additional_table.attribute_id = main_table.attribute_id',
+            $retColumnsAdditional
         )->where(
             'main_table.entity_type_id = ?',
             $entityTypeId

@@ -48,7 +48,9 @@ class Main extends AbstractMain
         }
 
         $additionalTypes = [];
-        if (strcasecmp('gallery', $attributeObject->getFrontendInput()) === 0) {
+        if ($attributeObject->getFrontendInput()
+            && strcasecmp('gallery', $attributeObject->getFrontendInput()) === 0
+        ) {
             $additionalTypes[] = [
                 'value' => $attributeObject->getFrontendInput(),
                 'label' => __('Gallery'),
