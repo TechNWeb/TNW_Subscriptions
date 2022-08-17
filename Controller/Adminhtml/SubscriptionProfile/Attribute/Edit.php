@@ -5,10 +5,11 @@
  */
 namespace TNW\Subscriptions\Controller\Adminhtml\SubscriptionProfile\Attribute;
 
-use Magento\PageBuilder\Model\Config;
 use Magento\Backend\App\Action\Context;
 use Magento\Framework\Registry;
 use Magento\Framework\View\Result\PageFactory;
+use Magento\Framework\Module\Manager;
+use Magento\Framework\ObjectManagerInterface;
 
 /**
  * Class Edit - controller
@@ -16,26 +17,28 @@ use Magento\Framework\View\Result\PageFactory;
 class Edit extends \TNW\Subscriptions\Controller\Adminhtml\SubscriptionProfile\Attribute
 {
     /**
-     * PageBuilder config
-     *
-     * @var Config
+     * @var mixed|null
      */
-    private $config;
+    private $config = null;
 
     /**
      * Edit constructor.
      * @param Context $context
      * @param Registry $coreRegistry
      * @param PageFactory $resultPageFactory
-     * @param Config $config
+     * @param Manager $moduleManager
+     * @param ObjectManagerInterface $objectManager
      */
     public function __construct(
         Context $context,
         Registry $coreRegistry,
         PageFactory $resultPageFactory,
-        Config $config
+        Manager $moduleManager,
+        ObjectManagerInterface $objectManager
     ) {
-        $this->config = $config;
+        if ($moduleManager->isEnabled("Magento_PageBuilder")) {
+            $this->config = $objectManager->get(\Magento\PageBuilder\Model\Config::class);
+        }
         parent::__construct($context, $coreRegistry, $resultPageFactory);
     }
 
@@ -75,7 +78,7 @@ class Edit extends \TNW\Subscriptions\Controller\Adminhtml\SubscriptionProfile\A
         $data = $this->_objectManager->get(\Magento\Backend\Model\Session::class)->getAttributeData(true);
         $inputType = $model->getFrontendInput();
         if ($inputType === 'textarea' && $model->getIsWysiwygEnabled()) {
-            if ($model->getIsPagebuilderEnabled() && $this->config->isEnabled()) {
+            if ($this->config && $model->getIsPagebuilderEnabled() && $this->config->isEnabled()) {
                 $model->setFrontendInput('pagebuilder');
             } else {
                 $model->setFrontendInput('texteditor');
