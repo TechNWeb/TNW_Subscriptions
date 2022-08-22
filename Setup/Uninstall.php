@@ -49,6 +49,12 @@ class Uninstall implements UninstallInterface
         $this->removeEntityAttributesAndType(SubscriptionProfile::ENTITY);
         $this->removeEntityAttributesAndType(ProductSubscriptionProfile::ENTITY);
 
+        $configsToDrop = [
+            'tnw_subscriptions%',
+            'advanced/modules_disable_output/TNW_Subscriptions',
+            'carriers/tnwautoship/%',
+        ];
+
         $tablesToDrop = [
             'tnw_subscriptions_rebill_profiles',
             'tnw_subscriptions_profile_profit',
@@ -127,6 +133,7 @@ class Uninstall implements UninstallInterface
         $indexesToDrop = [];
         $constraintsToDrop = [];
 
+        $this->dropConfigs($setup, $configsToDrop);
         $this->dropSchema($setup, $constraintsToDrop, $indexesToDrop, $columnsToDrop, $tablesToDrop);
     }
 
@@ -206,6 +213,19 @@ class Uninstall implements UninstallInterface
         $eavSetup->removeEntityType($entity);
 
         return $this;
+    }
+
+    private function dropConfigs(SchemaSetupInterface $setup, array $configs): void
+    {
+        array_map(
+            function (string $config) use ($setup) {
+                $setup->getConnection()->delete(
+                    $setup->getTable('core_config_data'),
+                    $setup->getConnection()->quoteInto('value like ?', $config)
+                );
+            },
+            $configs
+        );
     }
 
     private function dropSchema(
