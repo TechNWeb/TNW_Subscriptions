@@ -54,7 +54,10 @@ class AuthorizenetPaymentDataBuilder extends \TNW\Subscriptions\Model\Payment\Da
             'transaction_request' => [
                 'customer' => [
                     'type' => 'individual',
-                    'email' => $billingAddress->getEmail() ? : $paymentData['customer_guest_email']
+                    'email' => $billingAddress->getEmail() ?: $paymentData['customer_guest_email'],
+                    'id' => $order->getCustomerId() ?: $this->generateEmailHash(
+                        $billingAddress->getEmail() ?: $paymentData['customer_guest_email']
+                    )
                 ],
                 'amount' => $this->formatPrice($this->getAmount($order)),
                 'currency_code' => $order->getCurrencyCode(),
@@ -107,5 +110,16 @@ class AuthorizenetPaymentDataBuilder extends \TNW\Subscriptions\Model\Payment\Da
         }
 
         return $result;
+    }
+
+    /**
+     * Generates email hash for use as merchant customer id for guest customers
+     *
+     * @param string $email
+     * @return false|string
+     */
+    private function generateEmailHash(string $email)
+    {
+        return hash('crc32', $email);
     }
 }

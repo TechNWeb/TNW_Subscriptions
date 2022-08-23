@@ -22,7 +22,9 @@ define([
             ccNumber: null,
             availableCardTypes: null,
             imports: {
-                setCardType: '${ $.provider }:${ $.dataScope }.additional.cc_number'
+                setCardType: '${ $.provider }:${ $.dataScope }.additional.cc_number',
+                billingInfo: 'tnw_subscriptionprofile_create_shipping_and_billing_form.tnw_subscriptionprofile_create_shipping_and_billing_form_data_source:data.billing_info',
+                billingAddress: 'tnw_subscriptionprofile_create_shipping_and_billing_form.tnw_subscriptionprofile_create_shipping_and_billing_form_data_source:data.billing_address'
             }
         },
 
@@ -56,6 +58,8 @@ define([
                     );
                     self.source.set(self.dataScope+'.additional.cc_number', 'XXXX');
                     self.source.set(self.dataScope+'.additional.cc_cid', 'XXX');
+                    self.source.set('data.billing_info', self.billingInfo);
+                    self.source.set('data.billing_address', self.billingAddress);
                     $('body').trigger('processStop');
                     form.triggerSave([]);
                 })
@@ -82,7 +86,14 @@ define([
                         clientKey: this.acceptConfig.clientKey,
                         apiLoginID: this.acceptConfig.apiLoginID
                     }
-                };
+                },
+                paymentForm = registry.get('tnw_subscriptionprofile_create_shipping_and_billing_form.tnw_subscriptionprofile_create_shipping_and_billing_form');
+
+            paymentForm.validate();
+            if (paymentForm.source.get('params.invalid')) {
+                state.reject([]);
+                return state.promise();
+            }
 
             this.accept.dispatchData(paymentData, function (response) {
                 if (response.messages.resultCode === "Error") {
