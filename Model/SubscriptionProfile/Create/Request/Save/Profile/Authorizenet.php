@@ -9,6 +9,8 @@ use Magento\Customer\Api\Data\CustomerInterface;
 use Magento\Framework\Api\ExtensibleDataInterface;
 use Magento\Framework\Encryption\EncryptorInterface;
 use Magento\Framework\Exception\LocalizedException;
+use Magento\Framework\Module\Manager;
+use Magento\Framework\ObjectManagerInterface;
 use Magento\Framework\Serialize\Serializer\Json;
 use Magento\Payment\Gateway\Command\CommandException;
 use Magento\Payment\Gateway\Http\ClientException;
@@ -97,12 +99,11 @@ class Authorizenet extends Base
      * @param VaultPaymentAuthorization $vaultPaymentAuthorization
      * @param EncryptorInterface $encryptor
      * @param PaymentTokenRepositoryInterface $paymentTokenRepository
-     * @param TransferFactory $transferFactory
-     * @param GetCustomerProfile $getCustomerProfileClient
      * @param PaymentTokenManagementInterface $tokenManagement
      * @param PaymentTokenFactoryInterface $paymentTokenFactory
      * @param Json $jsonSerializer
-     * @param CreateCustomerPaymentProfile $createCustomerProfileClient
+     * @param ObjectManagerInterface $objectManager
+     * @param Manager $moduleManager
      */
     public function __construct(
         CreateProfile $createModel,
@@ -110,22 +111,23 @@ class Authorizenet extends Base
         VaultPaymentAuthorization $vaultPaymentAuthorization,
         EncryptorInterface $encryptor,
         PaymentTokenRepositoryInterface $paymentTokenRepository,
-        TransferFactory $transferFactory,
-        GetCustomerProfile $getCustomerProfileClient,
         PaymentTokenManagementInterface $tokenManagement,
         PaymentTokenFactoryInterface $paymentTokenFactory,
         Json $jsonSerializer,
-        CreateCustomerPaymentProfile $createCustomerProfileClient
+        ObjectManagerInterface $objectManager,
+        Manager $moduleManager
     ) {
         $this->paymentTokenRepository = $paymentTokenRepository;
         $this->encryptor = $encryptor;
         $this->vaultPaymentAuthorization = $vaultPaymentAuthorization;
-        $this->transferFactory = $transferFactory;
-        $this->getCustomerProfileClient = $getCustomerProfileClient;
         $this->paymentTokenManagement = $tokenManagement;
         $this->paymentTokenFactory = $paymentTokenFactory;
         $this->jsonSerializer = $jsonSerializer;
-        $this->createCustomerPaymentProfileClient = $createCustomerProfileClient;
+        if ($moduleManager->isEnabled('TNW_AuthorizeCim')) {
+            $this->transferFactory = $objectManager->get(TransferFactory::class);
+            $this->getCustomerProfileClient = $objectManager->get(GetCustomerProfile::class);
+            $this->createCustomerPaymentProfileClient = $objectManager->get(CreateCustomerPaymentProfile::class);
+        }
         parent::__construct($createModel, $session);
     }
 
@@ -299,7 +301,7 @@ class Authorizenet extends Base
                     $paymentData['additional']['cc_exp_month']
                 );
                 return substr($creditCard->getCardNumber(), 4, 4) === $paymentData['cc_last_4'] &&
-                $creditCard->getExpirationDate() === $expDate &&
+                    $creditCard->getExpirationDate() === $expDate &&
                     $creditCard->getCardType() === $this->getCreditCardType($paymentData['additional']['cc_type']);
             }
         );
