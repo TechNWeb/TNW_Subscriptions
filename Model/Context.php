@@ -297,7 +297,7 @@ class Context
             'requiredPrecision' => $priceFormat['precision'],
             'integerRequired' => $priceFormat['integerRequired'],
             'decimalSymbol' => $priceFormat['decimalSymbol'],
-            'groupSymbol' => $priceFormat['groupSymbol'],
+            'groupSymbol' => '',
             'groupLength' => $priceFormat['groupLength'],
             'pattern' => $priceFormat['pattern'],
         ];
