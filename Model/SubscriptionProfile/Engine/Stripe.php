@@ -45,6 +45,11 @@ class Stripe extends Base
     private $adapterFactory;
 
     /**
+     * @var \Magento\Framework\UrlInterface
+     */
+    private $url;
+
+    /**
      * Stripe constructor.
      * @param \TNW\Subscriptions\Model\Config $config
      * @param \TNW\Subscriptions\Model\Context $context
@@ -59,6 +64,7 @@ class Stripe extends Base
      * @param \Magento\Vault\Api\PaymentTokenRepositoryInterface $paymentTokenRepository
      * @param \TNW\Subscriptions\Model\SubscriptionProfile\Manager $manager
      * @param \TNW\Subscriptions\Model\Payment\VaultPaymentAuthorization $vaultPaymentAuthorization
+     * @param \Magento\Framework\UrlInterface $url
      */
     public function __construct(
         \TNW\Subscriptions\Model\Config $config,
@@ -73,7 +79,8 @@ class Stripe extends Base
         \Magento\Framework\Encryption\EncryptorInterface $encryptor,
         \Magento\Vault\Api\PaymentTokenRepositoryInterface $paymentTokenRepository,
         \TNW\Subscriptions\Model\SubscriptionProfile\Manager $manager,
-        \TNW\Subscriptions\Model\Payment\VaultPaymentAuthorization $vaultPaymentAuthorization
+        \TNW\Subscriptions\Model\Payment\VaultPaymentAuthorization $vaultPaymentAuthorization,
+        \Magento\Framework\UrlInterface $url
     ) {
         parent::__construct(
             $config,
@@ -90,6 +97,7 @@ class Stripe extends Base
         if ($moduleManager->isEnabled("TNW_Stripe")) {
             $this->adapterFactory = $objectManager->get(\TNW\Stripe\Model\Adapter\StripeAdapterFactory::class);
         }
+        $this->url = $url;
         $this->transactionCustomer = $transactionCustomer;
     }
 
@@ -259,7 +267,13 @@ class Stripe extends Base
         $currency = $quote->getQuoteCurrencyCode();
         $paymentId = $payment['id'];
         $stripeAdapter = $this->adapterFactory->create();
-        $cs = $stripeAdapter->customer(['payment_method' => $paymentId]);
+        $cs = $stripeAdapter->customer(
+            [
+                'payment_method' => $paymentId,
+                'email' => $this->getProfile()->getCustomer()->getEmail(),
+                'metadata' => ['site' => $this->url->getBaseUrl()]
+            ]
+        );
         $params = [
             self::CUSTOMER => $cs->id,
             self::AMOUNT => $this->formatPrice($amount),
