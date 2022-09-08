@@ -492,6 +492,12 @@ class Manager
         ));
         $product->setPrice($requestPrice);
         if (isset($requestData['admin_modification'])) {
+            $options = $product->getCustomOptions();
+            if (isset($options['info_buyRequest']['price'])) {
+                $options['info_buyRequest']['price'] = $requestPrice;
+
+            }
+            $product->setCustomOptions($options);
             $product->setData('admin_modification', $requestData['admin_modification']);
         }
         return $product;
