@@ -59,6 +59,8 @@ class StripePaymentDataBuilder extends \TNW\Subscriptions\Model\Payment\DataBuil
      */
     private $transferFactory;
 
+    private $vaultTokenProcessor;
+
     /**
      * StripePaymentDataBuilder constructor.
      * @param SubscriptionConfig $subscriptionConfig
@@ -79,6 +81,7 @@ class StripePaymentDataBuilder extends \TNW\Subscriptions\Model\Payment\DataBuil
             $this->adapterFactory = $objectManager->get(\TNW\Stripe\Model\Adapter\StripeAdapterFactory::class);
             $this->customerClient = $objectManager->get(\TNW\Stripe\Gateway\Http\Client\TransactionCustomer::class);
             $this->transferFactory = $objectManager->get(\TNW\Stripe\Gateway\Http\TransferFactory::class);
+            $this->vaultTokenProcessor = $objectManager->get(\TNW\Stripe\Model\VaultTokenProcessor::class);
         }
         $this->manager = $manager;
         $this->subscriptionConfig = $subscriptionConfig;
@@ -124,7 +127,7 @@ class StripePaymentDataBuilder extends \TNW\Subscriptions\Model\Payment\DataBuil
         }
 
         $shippingAddress = $order->getShippingAddress();
-        if ($shippingAddress) {
+        if ($shippingAddress && !$order->getIsVirtual()) {
             $result[self::SHIPPING_ADDRESS] = [
                 'address' => [
                     self::STREET_ADDRESS => $shippingAddress->getStreetLine1(),
@@ -144,12 +147,10 @@ class StripePaymentDataBuilder extends \TNW\Subscriptions\Model\Payment\DataBuil
                 $order->getCustomerId()
             );
             if ($paymentToken) {
-                $gateWayToken = $paymentToken->getGatewayToken();
-                $result[self::CUSTOMER] = $gateWayToken;
-                $stripeAdapter = $this->adapterFactory->create();
-                $customer = $stripeAdapter->retrieveCustomer($result[self::CUSTOMER]);
-                $pm = $customer->invoice_settings->default_payment_method;
-                $result['payment_method'] = $pm;
+                list($paymentMethod, $customer) = $this->vaultTokenProcessor
+                    ->getPaymentMethodByVaultToken($paymentToken);
+                $result[self::CUSTOMER] = $customer;
+                $result['payment_method'] = $paymentMethod;
             }
         } else {
             $customerRequestData = [

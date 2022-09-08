@@ -852,7 +852,10 @@ class RecurringOptions extends BaseModifier
 
         /** @var \Magento\Framework\Currency $currency */
         $currency = $this->getCurrency();
-        $value = $currency->toCurrency($value, ['display' => \Magento\Framework\Currency::NO_SYMBOL]);
+        $value = $currency->toCurrency($value, [
+            'display' => \Magento\Framework\Currency::NO_SYMBOL,
+            'format' => "¤###0.00"
+        ]);
 
         return $value;
     }

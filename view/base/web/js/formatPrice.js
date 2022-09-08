@@ -37,7 +37,7 @@ define([
         }
         if (typeof amount === 'string') {
             var decimalSymbol = format.decimalSymbol === undefined ? ',' : format.decimalSymbol,
-                groupSymbol = format.groupSymbol === undefined ? ',' : format.groupSymbol,
+                groupSymbol = format.groupSymbol === undefined ? '' : format.groupSymbol,
                 groupRegEx = new RegExp(groupSymbol, 'g');
             amount = parseFloat(amount.replace(decimalSymbol, '.').replace(groupRegEx, ''));
         }

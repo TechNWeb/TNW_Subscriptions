@@ -424,7 +424,9 @@ class Subscribe extends View
                     'frequency_unit_type' => $frequency->getUnit(),
                     'is_default' => $productBillingFrequency->getDefaultBillingFrequency(),
                     'price' => $frequencyPrice,
-                    'preset_qty' => $productBillingFrequency->getPresetQty(),
+                    'preset_qty' => $productDataObject->getData('tnw_subscr_unlock_preset_qty')
+                        ? $productBillingFrequency->getPresetQty()
+                        : null,
                     'initial_fee' => (float)$productBillingFrequency->getInitialFee()
                 ];
                 $result[] = $data;

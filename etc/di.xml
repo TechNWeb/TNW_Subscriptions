@@ -1368,6 +1368,7 @@
     </type>
     <type name="Magento\Quote\Model\Quote">
         <plugin name="tnw_subscriptions_update_quote_item" type="TNW\Subscriptions\Plugin\Quote\Model\UpdateQuoteItem"/>
+        <plugin name="tnw_subscriptions_sort_quote_addresses" type="TNW\Subscriptions\Plugin\Quote\Model\SortQuoteAddresses"/>
         <plugin name="validate_tnw_billing_frequency" type="TNW\Subscriptions\Plugin\Quote\Model\ValidateBillingFrequency"/>
     </type>
     <type name="Magento\Checkout\Model\Cart">

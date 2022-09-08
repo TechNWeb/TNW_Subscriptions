@@ -31,7 +31,9 @@ define([
          * Cancel & close wizard with modal.
          */
         cancel: function () {
-            uiRegistry.get('index = recurring_options').restoreToDefault();
+            var recurringOptionsStep = uiRegistry.get('index = recurring_options');
+            recurringOptionsStep.restoreToDefault();
+            recurringOptionsStep.checkAddingBillingFrequency(1);
             this.modalComponent.setPrevValues(this);
             this.wizard.cleanErrorNotificationMessage();
             this.wizard.cleanNotificationMessage();

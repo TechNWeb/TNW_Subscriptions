@@ -5,6 +5,7 @@
  */
 namespace TNW\Subscriptions\Model\Payment\Authorizenet;
 
+use Magento\Customer\Api\CustomerRepositoryInterface;
 use Magento\Framework\Serialize\SerializerInterface;
 use Magento\Vault\Api\Data\PaymentTokenInterface;
 use Magento\Vault\Api\PaymentTokenManagementInterface;
@@ -51,19 +52,26 @@ class TokenExtractor
     private $serializer;
 
     /**
+     * @var CustomerRepositoryInterface
+     */
+    private $customerRepository;
+
+    /**
      * TokenExtractor constructor.
      * @param PaymentTokenManagementInterface $tokenManagement
      * @param CreditCardTokenFactory $creditCardTokenFactory
      * @param \Magento\Framework\Module\Manager $moduleManager
      * @param \Magento\Framework\ObjectManagerInterface $objectManager
      * @param SerializerInterface $serializer
+     * @param CustomerRepositoryInterface $customerRepository
      */
     public function __construct(
         PaymentTokenManagementInterface $tokenManagement,
         CreditCardTokenFactory $creditCardTokenFactory,
         \Magento\Framework\Module\Manager $moduleManager,
         \Magento\Framework\ObjectManagerInterface $objectManager,
-        SerializerInterface $serializer
+        SerializerInterface $serializer,
+        CustomerRepositoryInterface $customerRepository
     ) {
         $this->paymentTokenFactory = $creditCardTokenFactory;
         $this->tokenManagement = $tokenManagement;
@@ -77,6 +85,7 @@ class TokenExtractor
         }
 
         $this->serializer = $serializer;
+        $this->customerRepository = $customerRepository;
     }
 
     /**
@@ -116,6 +125,12 @@ class TokenExtractor
         $profileId = $transaction->getCustomerProfileId();
         $paymentProfileIdList = $transaction->getCustomerPaymentProfileIdList() ?: [];
         $gateWayToken = sprintf('%s/%s', $profileId, reset($paymentProfileIdList));
+
+        if ($customerId) {
+            $customer = $this->customerRepository->getById($customerId);
+            $customer->setCustomAttribute('customer_profile_id', $profileId);
+            $this->customerRepository->save($customer);
+        }
 
         if (!$paymentToken = $this->tokenManagement->getByGatewayToken(
             $gateWayToken,

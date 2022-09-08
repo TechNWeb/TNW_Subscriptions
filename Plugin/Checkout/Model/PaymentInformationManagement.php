@@ -57,7 +57,15 @@ class PaymentInformationManagement
     ) {
         $quote = $this->quoteRepository->get($cartId);
         $additionalData = $paymentMethod->getAdditionalData();
-        if ($quote->getData('is_tnw_subscription')) {
+        $isSubscription = false;
+        foreach ($quote->getItems() as $item) {
+            $options = $item->getBuyRequest();
+            if (!isset($options['subscribe_active']) || !$options['subscribe_active']) {
+                continue;
+            }
+            $isSubscription = true;
+        }
+        if ($quote->getData('is_tnw_subscription') || $isSubscription) {
             $additionalData['is_active_payment_token_enabler'] = 1;
             $paymentMethod->setAdditionalData($additionalData);
 

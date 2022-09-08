@@ -294,7 +294,7 @@ define([
                     / (price * qty);
             } else {
                 //formula for any retail / physical product
-                saving = ((price - recurringPrice) * qty * 100) / price;
+                saving = ((price - recurringPrice) * 100) / price;
             }
             saving = parseInt(saving);
             if (saving > 0) {

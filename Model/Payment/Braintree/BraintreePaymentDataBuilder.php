@@ -323,12 +323,10 @@ class BraintreePaymentDataBuilder extends \TNW\Subscriptions\Model\Payment\DataB
             $result['options']['threeDSecure'] = ['required' => true];
         }
 
-        if (!$this->braintreeConfig->hasFraudProtection()) {
-            $data = isset($paymentData['additional_data']) ? $paymentData['additional_data'] : [];
+        $data = isset($paymentData['additional_data']) ? $paymentData['additional_data'] : [];
 
-            if (isset($data[self::DATA_DEVICE_DATA])) {
-                $result[self::DEVICE_DATA] = $data[self::DATA_DEVICE_DATA];
-            }
+        if (isset($data[self::DATA_DEVICE_DATA])) {
+            $result[self::DEVICE_DATA] = $data[self::DATA_DEVICE_DATA];
         }
 
         $values = $this->braintreeConfig->getDynamicDescriptors();

@@ -1121,7 +1121,6 @@ class Manager
         if (!$quote->getCustomerId() && !$quote->getCustomerIsGuest()) {
             $this->assignCustomerToQuote($quote, $profile);
         }
-
         //Add products
         foreach ($profile->getVisibleProducts() as $profileProduct) {
             $magentoProduct = $profileProduct->getMagentoProduct();
@@ -1141,6 +1140,7 @@ class Manager
             $quoteItemCreated = true;
             try {
                 if (!$isProductDelented) {
+                   $this->checkBundleProductAvailability($magentoProduct, $profileProduct);
                     $quoteItem = $quote->addProduct(
                         $magentoProduct,
                         $this->getProductAddRequest($profileProduct, $isReBill)
@@ -1577,6 +1577,29 @@ class Manager
         }
 
         return $additionalInfo[$property];
+    }
+
+    /**
+     * @param $product
+     * @param $profileProduct
+     * @return $this
+     * @throws LocalizedException
+     */
+    private function checkBundleProductAvailability($product, $profileProduct)
+    {
+        if ($product->getTypeId() == 'bundle') {
+            $profileProduct->getChildren();
+            if ($profileProduct->getChildren()) {
+                foreach ($profileProduct->getChildren() as $child) {
+                    If ($child->getMagentoProduct() && !$child->getMagentoProduct()->isSalable()) {
+                        throw new LocalizedException(__('One of bundle product options not available'));
+                    }
+
+                }
+            }
+
+        }
+        return $this;
     }
 
     /**
