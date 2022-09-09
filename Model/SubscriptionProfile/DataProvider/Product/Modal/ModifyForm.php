@@ -1009,6 +1009,10 @@ class ModifyForm extends Form
                 $isTrial = true;
             }
         }
+        $disabled = false;
+        if (isset($this->currentProduct)) {
+            $disabled = $this->currentProduct->getData('tnw_subscr_lock_product_price') ? true : false;
+        }
         $unlockQty = (bool)$this->getSubAttributeFromItem(Attribute::SUBSCRIPTION_UNLOCK_PRESET_QTY);
         $notice = $unlockQty
             ? __('The price is fo all items, excluding tax (if any)')
@@ -1031,6 +1035,7 @@ class ModifyForm extends Form
                         'addSymbol' => false,
                         'addbefore' => $this->getCurrentCurrencySymbol(),
                         'notice' => $notice,
+                        'disabled' => $disabled,
                         'component' => 'TNW_Subscriptions/js/components/add-product-form-price',
                         'template' => 'TNW_Subscriptions/form/element/template/field-with-preview',
                         'previewLabel' => $this->getCurrentCurrencySymbol() . '%s',
