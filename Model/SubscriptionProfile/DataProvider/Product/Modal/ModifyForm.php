@@ -178,7 +178,7 @@ class ModifyForm extends Form
                 $presetQty = $this->getSubAttributeFromItem(Attribute::SUBSCRIPTION_UNLOCK_PRESET_QTY);
                 $itemPrice = $this->getItemPrice(
                     $presetQty,
-                    $subBuyRequest[Create::NON_UNIQUE]['price'],
+                    $subBuyRequest[Create::NON_UNIQUE]['current_price'],
                     $item
                 );
                 $itemData = [
