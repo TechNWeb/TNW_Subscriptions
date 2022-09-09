@@ -266,7 +266,7 @@ class BraintreePaymentDataBuilder extends \TNW\Subscriptions\Model\Payment\DataB
         ) {
             $paymentData['additional_data'][self::DATA_PAYMENT_METHOD_NONCE] = $this->paymentNonceCommand
                 ->execute([
-                    PaymentTokenInterface::CUSTOMER_ID => $paymentAdditionalData[PaymentTokenInterface::CUSTOMER_ID],
+                    PaymentTokenInterface::CUSTOMER_ID => $paymentAdditionalData[PaymentTokenInterface::CUSTOMER_ID] ?? 0,
                     PaymentTokenInterface::PUBLIC_HASH => $paymentAdditionalData[PaymentTokenInterface::PUBLIC_HASH],
                 ])->get()['paymentMethodNonce'];
         }
