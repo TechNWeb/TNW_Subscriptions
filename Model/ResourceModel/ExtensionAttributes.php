@@ -65,6 +65,9 @@ class ExtensionAttributes
         if (array_key_exists('negotiable_quote', $cartAttributeConfig)) {
             unset($cartAttributeConfig['negotiable_quote']);
         }
+        if (array_key_exists('bill_quote', $cartAttributeConfig)) {
+            unset($cartAttributeConfig['bill_quote']);
+        }
         return array_filter(array_map(function ($attributeConfig) {
             if (empty($attributeConfig[ExtensionAttribute\Config\Converter::JOIN_DIRECTIVE])) {
                 return false;
