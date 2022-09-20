@@ -745,19 +745,19 @@ class Manager
             } else {
                 $ccTypeOld = isset($additionalInfoOld['cc_type']) ? $additionalInfoOld['cc_type'] : null;
                 $ccTypeOld = $ccTypeOld ? $this->processCardType($types, $ccTypeOld) : $ccTypeOld;
-                if (strcasecmp($ccType, $ccTypeOld) !== 0) {
+                if ($ccType && $ccTypeOld && strcasecmp($ccType, $ccTypeOld) !== 0) {
                     $message = __('Card type was changed from <b>%1</b> to <b>%2</b>', $ccTypeOld, $ccType);
                     $this->historyLogger->log($message, $this->getProfile()->getId());
                 }
                 $ccNumberOld = isset($additionalInfoOld['cc_type']) ? $additionalInfoOld['cc_last_4'] : null;
-                if (strcasecmp($ccNumber, $ccNumberOld) !== 0) {
+                if ($ccNumber && $ccNumberOld && strcasecmp($ccNumber, $ccNumberOld) !== 0) {
                     $message = __('Credit Card number was changed to <b>%1</b>', sprintf('XXXX%s', $ccNumber));
                     $this->historyLogger->log($message, $this->getProfile()->getId());
                 }
 
                 $ccExpOld = $this->propertyAdditionalInfo($additionalInfoOld, 'cc_exp_month') . '/'
                     . $this->propertyAdditionalInfo($additionalInfoOld, 'cc_exp_year');
-                if (strcasecmp($ccExpOld, $ccExp) !== 0) {
+                if ($ccExpOld && $ccExp&& strcasecmp($ccExpOld, $ccExp) !== 0) {
                     $message = __('Exp. Date was changed to <b>%1</b>', $ccExp);
                     $this->historyLogger->log($message, $this->getProfile()->getId());
                 }
