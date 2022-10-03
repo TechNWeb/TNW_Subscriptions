@@ -207,7 +207,7 @@ class SubscriptionProfile extends AbstractEntity
                 ->joinInner(
                     ['profileItem' => $this->getTable('tnw_subscriptions_product_subscription_profile_entity')],
                     'salesRelative.profile_item_id = profileItem.entity_id',
-                    []
+                    ['initial_fee']
                 )
                 ->joinInner(
                     ['orderItem' => $this->getTable('sales_order_item')],

@@ -202,12 +202,12 @@ class Profit
             $initialFeeAdded = false;
             foreach ($invoiceItems as $item) {
                 if (!$initialFeeAdded
-                    && isset($recurringOption['initial_fee'])
-                    && (float)$recurringOption['initial_fee']
+                    && isset($item['initial_fee'])
+                    && (float)$item['initial_fee']
                 ) {
                     $initialFeeAdded = true;
-                    $profit += $recurringOption['initial_fee'];
-                    $lifetimeValue += $recurringOption['initial_fee'];
+                    $profit += $item['initial_fee'];
+                    $lifetimeValue += $item['initial_fee'];
                 }
                 $profit += ($item['base_price_incl_tax'] - $item['base_cost']) * $item['qty'];
                 $lifetimeValue += $item['base_price_incl_tax'] * $item['qty'];
