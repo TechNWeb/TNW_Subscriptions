@@ -811,7 +811,6 @@ class Config
     /**
      * @param $storeId
      * @return mixed
-     * @throws NoSuchEntityException
      */
     public function getPrefix($storeId = null)
     {
