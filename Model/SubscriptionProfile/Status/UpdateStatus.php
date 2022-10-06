@@ -103,20 +103,20 @@ class UpdateStatus
     }
 
     /**
-     * Update Subscription Profile Status
      * @param $profileId
      * @param $newStatus
      * @param int $billingCycles
+     * @param bool $customerChange
      * @return SubscriptionProfile|null
      * @throws \Magento\Framework\Exception\CouldNotSaveException
      * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
-    public function updateStatus($profileId, $newStatus, $billingCycles = 0)
+    public function updateStatus($profileId, $newStatus, $billingCycles = 0, $customerChange = false)
     {
         /* @var SubscriptionProfile $model */
         $model = $this->profileRepository->getById($profileId);
 
-        if (!$this->statusManager->canChangeStatus($model, $newStatus)
+        if (!$this->statusManager->canChangeStatus($model, $newStatus, $customerChange)
             || (int) $model->getData('status') === ProfileStatus::STATUS_TRIAL
         ) {
             $this->messageManager->addErrorMessage(

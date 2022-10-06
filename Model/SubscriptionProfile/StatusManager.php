@@ -87,18 +87,60 @@ class StatusManager
     }
 
     /**
-     * Retrieve can you change status in Subscription Profile instance
+     * Get allowed next statuses for Subscription Profile instance for Customer
      *
+     * @param int $fromStatus
+     * @return array
+     */
+    public function getAllowedStatusesForCustomer($fromStatus)
+    {
+        $result = [];
+        switch ($fromStatus) {
+            case ProfileStatus::STATUS_ACTIVE:
+            case ProfileStatus::STATUS_PAST_DUE:
+            case ProfileStatus::STATUS_TRIAL:
+                $result = [
+                    ProfileStatus::STATUS_HOLDED,
+                    ProfileStatus::STATUS_CANCELED,
+                ];
+                break;
+            case ProfileStatus::STATUS_SUSPENDED:
+                $result = [
+                    ProfileStatus::STATUS_CANCELED
+                ];
+                break;
+            case ProfileStatus::STATUS_HOLDED:
+                $result = [
+                    ProfileStatus::STATUS_CANCELED,
+                    ProfileStatus::STATUS_ACTIVE,
+                ];
+                break;
+            case ProfileStatus::STATUS_PENDING:
+                $result = [
+                    ProfileStatus::STATUS_CANCELED,
+                ];
+                break;
+        }
+
+        return $result;
+    }
+
+    /**
      * @param SubscriptionProfile $profile
-     * @param int $nextStatus
+     * @param $nextStatus
+     * @param bool $customerChange
      * @return bool
      */
-    public function canChangeStatus(SubscriptionProfile $profile, $nextStatus)
+    public function canChangeStatus(SubscriptionProfile $profile, $nextStatus, $customerChange = false)
     {
         if (!$profile || !$profile->getId()) {
             return false;
         }
-        $allowedStatuses = $this->getAllowedStatuses($profile->getStatus());
+        if ($customerChange) {
+            $allowedStatuses = $this->getAllowedStatusesForCustomer($profile->getStatus());
+        } else {
+            $allowedStatuses = $this->getAllowedStatuses($profile->getStatus());
+        }
 
         return in_array($nextStatus, $allowedStatuses);
     }
