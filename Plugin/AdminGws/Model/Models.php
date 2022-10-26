@@ -6,11 +6,12 @@
  */
 namespace TNW\Subscriptions\Plugin\AdminGws\Model;
 
-use Magento\AdminGws\Model\Role;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Customer\Model\Config\Share;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\App\Request\DataPersistorInterface;
+use Magento\Framework\Module\Manager;
+use Magento\Framework\ObjectManagerInterface;
 
 /**
  * Class Models - plugin to grant acces for customer model loading if customer sharing is global
@@ -18,7 +19,7 @@ use Magento\Framework\App\Request\DataPersistorInterface;
 class Models
 {
     /**
-     * @var Role
+     * @var mixed
      */
     protected $role;
 
@@ -34,18 +35,23 @@ class Models
 
     /**
      * Models constructor.
-     * @param Role $role
      * @param ScopeConfigInterface $scopeConfig
      * @param DataPersistorInterface $dataPersistor
+     * @param Manager $moduleManager
+     * @param ObjectManagerInterface $objectManager
      */
     public function __construct(
-        Role $role,
         ScopeConfigInterface $scopeConfig,
-        DataPersistorInterface $dataPersistor
+        DataPersistorInterface $dataPersistor,
+        Manager $moduleManager,
+        ObjectManagerInterface $objectManager
     ) {
+        if ($moduleManager->isEnabled("Magento_AdminGws")) {
+            $this->role = $objectManager
+                ->get(\Magento\AdminGws\Model\Role::class);
+        }
         $this->dataPersistor = $dataPersistor;
         $this->scopeConfig = $scopeConfig;
-        $this->role = $role;
     }
 
     /**
