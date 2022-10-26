@@ -63,8 +63,7 @@ class Base implements \Magento\Ui\DataProvider\Modifier\ModifierInterface
     protected function isUsedModifier()
     {
         if ($this->getProduct()) {
-            $options = $this->getProduct()->getOptions();
-            return !empty($options) || $this->getProduct()->getTypeId() === $this::PRODUCT_TYPE;
+            return $this->getProduct()->getTypeId() === $this::PRODUCT_TYPE;
         }
 
         return false;
