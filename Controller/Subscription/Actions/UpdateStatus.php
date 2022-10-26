@@ -75,7 +75,8 @@ class UpdateStatus extends \Magento\Framework\App\Action\Action
                 $newStatus,
                 $this->getRequest()->getParam('suspension_type') == 'billing_cycles'
                     ? $this->getRequest()->getParam('cycles_count')
-                    : 0
+                    : 0,
+                true
             );
             if ($model != null && $this->_request->isAjax()) {
                 $this->messageManager->addComplexSuccessMessage(

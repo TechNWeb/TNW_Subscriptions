@@ -24,6 +24,7 @@ use TNW\Subscriptions\Exception\NewRelationException;
 use TNW\Subscriptions\Exception\ChangeProfileStatusException;
 use TNW\Subscriptions\Exception\AssignOrderToRelationException;
 use TNW\Subscriptions\Exception\CalculateProfitException;
+use Magento\Framework\App\Request\DataPersistorInterface;
 
 /**
  * Class Process- controller
@@ -64,16 +65,8 @@ class Process extends Action
      */
     private $subscriptionProfileOrderRepository;
 
-    /**
-     * Process constructor.
-     * @param Context $context
-     * @param Manager $queueManager
-     * @param ProfileProcessor $profileProcessor
-     * @param SubscriptionProfileRepository $profileRepository
-     * @param ProfileStatus $profileStatus
-     * @param SubscriptionProfileQueueRepositoryInterface $queueRepository
-     * @param SubscriptionProfileOrderRepositoryInterface $subscriptionProfileOrderRepository
-     */
+    private $dataPersistor;
+
     public function __construct(
         Context $context,
         Manager $queueManager,
@@ -81,8 +74,10 @@ class Process extends Action
         SubscriptionProfileRepository $profileRepository,
         ProfileStatus $profileStatus,
         SubscriptionProfileQueueRepositoryInterface $queueRepository,
-        SubscriptionProfileOrderRepositoryInterface $subscriptionProfileOrderRepository
+        SubscriptionProfileOrderRepositoryInterface $subscriptionProfileOrderRepository,
+        DataPersistorInterface $dataPersistor
     ) {
+        $this->dataPersistor = $dataPersistor;
         $this->subscriptionProfileOrderRepository = $subscriptionProfileOrderRepository;
         $this->queueRepository = $queueRepository;
         $this->queueManager = $queueManager;
@@ -133,6 +128,7 @@ class Process extends Action
                         throw new \Exception('Can`t process completed profile.');
                     }
                     $this->queueManager->makeRunning($queueId);
+                    $this->dataPersistor->set('manual_queue_processing', true);
                     try {
                         $this->queueManager->placeOrderByGroupQueue([$item]);
                         $this->queueManager->makeCompleted($item->getId());
@@ -166,6 +162,7 @@ class Process extends Action
                             'backend'
                         );
                     }
+                    $this->dataPersistor->clear('manual_queue_processing');
                 } else {
                     $statusLabel = '';
                     foreach ($this->profileStatus->getAllOptions() as $option) {

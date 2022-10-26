@@ -308,7 +308,12 @@
                 sortOrder="100"
                 disabled="false"/>
     </type>
-
+    <type name="Magento\AdminGws\Model\Models">
+        <plugin name="global_customer_restriction_prevention"
+                type="TNW\Subscriptions\Plugin\AdminGws\Model\Models"
+                sortOrder="100"
+                disabled="false"/>
+    </type>
     <virtualType name="TNW\Subscriptions\Model\Payflow\Service\Response\Transaction"
                  type="Magento\Paypal\Model\Payflow\Service\Response\Transaction">
         <arguments>
