@@ -56,6 +56,9 @@ var config = {
             },
             'PayPal_Braintree/js/view/payment/method-renderer/hosted-fields' : {
                 'TNW_Subscriptions/js/payment/method-render/hosted-fields-mixin' : true
+            },
+            'PayPal_Braintree/js/view/payment/3d-secure' : {
+                'TNW_Subscriptions/js/payment/braintree-3d-secure-mixin' : true
             }
 
         }

@@ -7,6 +7,7 @@ namespace TNW\Subscriptions\Model\Payment\Braintree;
 
 use Magento\Framework\App\ProductMetadataInterface;
 use Magento\Payment\Gateway\Config\Config;
+use Magento\Quote\Model\Quote;
 use Magento\Store\Model\StoreManagerInterface;
 use TNW\Subscriptions\Model\Config as SubscriptionConfig;
 use TNW\Subscriptions\Model\SubscriptionProfile\Manager;
@@ -259,6 +260,12 @@ class BraintreePaymentDataBuilder extends \TNW\Subscriptions\Model\Payment\DataB
         $billingAddress = $order->getBillingAddress();
         $channel = $this->config->getValue('channel');
 
+        if (!array_key_exists(self::DATA_PAYMENT_METHOD_NONCE, $paymentData['additional_data'])
+            && isset($paymentData['nonce'])
+        ) {
+            $paymentData['additional_data'][self::DATA_PAYMENT_METHOD_NONCE] = $paymentData['nonce'];
+        }
+
         $paymentAdditionalData = $paymentData['additional_data'];
         if (!array_key_exists(self::DATA_PAYMENT_METHOD_NONCE, $paymentAdditionalData)
             && array_key_exists(PaymentTokenInterface::CUSTOMER_ID, $paymentAdditionalData)
@@ -317,12 +324,6 @@ class BraintreePaymentDataBuilder extends \TNW\Subscriptions\Model\Payment\DataB
             ];
         }
 
-        $amount = $this->formatPrice($this->subjectReader->readAmount($amount));
-
-        if ($this->is3DSecureEnabled($order, $amount)) {
-            $result['options']['threeDSecure'] = ['required' => true];
-        }
-
         $data = isset($paymentData['additional_data']) ? $paymentData['additional_data'] : [];
 
         if (isset($data[self::DATA_DEVICE_DATA])) {
@@ -366,5 +367,28 @@ class BraintreePaymentDataBuilder extends \TNW\Subscriptions\Model\Payment\DataB
         }
 
         return true;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getAmount($order)
+    {
+        if ($this->subscriptionConfig->isStaticTrialAuth($order->getStoreId()) && !$this->is3DSecureEnabled($order)) {
+            return $this->subscriptionConfig->getStaticAuthAmount($order->getStoreId());
+        }
+        return parent::getAmount($order);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getAmountByProfile($profile, $quote = null)
+    {
+        /** @var Quote $quote */
+        if ($quote && $this->is3DSecureEnabled($quote)) {
+            return $this->subscriptionConfig->getStaticAuthAmount($quote->getStoreId());
+        }
+        return parent::getAmountByProfile($profile, $quote);
     }
 }

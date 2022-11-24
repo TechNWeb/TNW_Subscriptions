@@ -126,12 +126,17 @@ define([
 
         validate3DSecure: function () {
             var self = this,
-                form = registry.get('index = ' + self.options.formName);
+                form = registry.get('index = ' + self.options.formName),
+                totalAmount = self.totalAmount;
+
+            if (parseFloat(totalAmount) < 0.001) {
+                totalAmount = self.source.get('static_auth_amount');
+            }
 
             verify3DSecure.setConfig({
                 'braintree' : self.braintree,
                 'useCvvVault' : self.useCvvVault,
-                'totalAmount' : self.totalAmount,
+                'totalAmount' : totalAmount,
                 'thresholdAmount' : self.thresholdAmount,
                 'specificCountries' : self.specificCountries
             });
