@@ -9,6 +9,7 @@ use Magento\Customer\Model\ResourceModel\Grid\CollectionFactory;
 use Magento\Ui\DataProvider\AbstractDataProvider;
 use TNW\Subscriptions\Model\Config;
 use TNW\Subscriptions\Model\Backend\Session\Quote;
+use \Magento\Customer\Model\Config\Share;
 
 /**
  * Class CustomerGrid - dataProvider for customer grid
@@ -26,11 +27,17 @@ class CustomerGrid extends AbstractDataProvider
     private $quote;
 
     /**
+     * @var Share
+     */
+    private $customerShare;
+
+    /**
      * CustomerGrid constructor.
      * @param string $name
      * @param string $primaryFieldName
      * @param string $requestFieldName
      * @param Config $subscriptionConfig
+     * @param Share $customerShare
      * @param Quote $quote
      * @param CollectionFactory $collectionFactory
      * @param array $meta
@@ -41,6 +48,7 @@ class CustomerGrid extends AbstractDataProvider
         $primaryFieldName,
         $requestFieldName,
         Config $subscriptionConfig,
+        Share $customerShare,
         Quote $quote,
         CollectionFactory $collectionFactory,
         array $meta = [],
@@ -53,6 +61,7 @@ class CustomerGrid extends AbstractDataProvider
             $meta,
             $data
         );
+        $this->customerShare = $customerShare;
         $this->subscriptionConfig = $subscriptionConfig;
         $this->quote = $quote;
         $this->collection = $collectionFactory->create();
@@ -69,8 +78,10 @@ class CustomerGrid extends AbstractDataProvider
                 $customerGroups = $this->subscriptionConfig->getCustomerGroupLimit($websiteId);
                 if ($customerGroups != null) {
                     $customerGroupArray = explode(',', $customerGroups);
-                    $this->collection->addFieldToFilter('group_id', ['in' => $customerGroupArray])
-                        ->addFieldToFilter('website_id', $websiteId);
+                    $this->collection->addFieldToFilter('group_id', ['in' => $customerGroupArray]);
+                    if ($this->customerShare->isWebsiteScope()) {
+                        $this->collection->addFieldToFilter('website_id', $websiteId);
+                    }
                 }
             }
         }
