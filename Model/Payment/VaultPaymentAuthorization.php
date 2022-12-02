@@ -79,7 +79,7 @@ class VaultPaymentAuthorization
     /**
      * @param $paymentData
      * @param $quote
-     * @param null $email
+     * @param string|null $email
      * @return array
      * @throws CommandException
      */

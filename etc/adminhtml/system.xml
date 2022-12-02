@@ -627,9 +627,6 @@
                 <field id="cheapest_name" translate="label" type="text" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Cheapest method title</label>
                 </field>
-<!--                <field id="fastest_name" translate="label" type="text" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">-->
-<!--                    <label>Fastest method title</label>-->
-<!--                </field>-->
                 <field id="sort_order" translate="label" type="text" sortOrder="90" showInDefault="1" showInWebsite="1" showInStore="0">
                     <label>Sort Order</label>
                 </field>

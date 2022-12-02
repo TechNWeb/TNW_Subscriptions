@@ -1031,9 +1031,15 @@
         <plugin name="tnw_subscription" type="TNW\Subscriptions\Plugin\Braintree\Gateway\Response\PaymentDetailsHandler" />
     </type>
     <type name="Magento\Checkout\Model\PaymentInformationManagement">
+        <plugin
+            name="create_braintree_payment_account"
+            type="TNW\Subscriptions\Plugin\Checkout\Model\PaymentInformationManagement\CreateBraintreePaymentAccount" />
         <plugin name="subscription_payment" type="TNW\Subscriptions\Plugin\Checkout\Model\PaymentInformationManagement" />
     </type>
     <type name="Magento\Checkout\Model\GuestPaymentInformationManagement">
+        <plugin
+            name="create_braintree_payment_account"
+            type="TNW\Subscriptions\Plugin\Checkout\Model\GuestPaymentInformationManagement\CreateBraintreePaymentAccount" />
         <plugin name="subscription_payment" type="TNW\Subscriptions\Plugin\Checkout\Model\GuestPaymentInformationManagement" />
     </type>
 

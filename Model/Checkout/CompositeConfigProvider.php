@@ -35,6 +35,7 @@ class CompositeConfigProvider implements ConfigProviderInterface
     {
         $configs = [
             'isSubscriptionEnabled' => (bool) $this->config->isSubscriptionsActiveCurrent(),
+            'staticAuthAmount' => $this->config->getStaticAuthAmount(),
         ];
 
         return $configs;
