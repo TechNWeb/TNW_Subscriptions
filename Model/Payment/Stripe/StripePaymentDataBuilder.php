@@ -125,6 +125,10 @@ class StripePaymentDataBuilder extends \TNW\Subscriptions\Model\Payment\DataBuil
                 $result[self::PAYMENT_METHOD] = $token;
             }
         }
+        if (isset($paymentData['additional_data']['vault_card_change'])) {
+            $result['set_pm'] = true;
+            unset($paymentData['additional_data']['vault_card_change']);
+        }
 
         $shippingAddress = $order->getShippingAddress();
         if ($shippingAddress && !$order->getIsVirtual()) {
@@ -177,7 +181,9 @@ class StripePaymentDataBuilder extends \TNW\Subscriptions\Model\Payment\DataBuil
             try {
                 $this->customerClient->placeRequest($this->transferFactory->create($customerRequestData));
             } catch (\Magento\Payment\Gateway\Http\ClientException $e) {
-                $result[self::CUSTOMER] = $paymentData['additional_data']['customer'];
+                if (isset($paymentData['additional_data']['customer'])) {
+                    $result[self::CUSTOMER] = $paymentData['additional_data']['customer'];
+                }
             }
         }
 

@@ -301,6 +301,18 @@ class Base implements EngineInterface
         $paymentData['method'] = $this->getVaultPaymentCode();
         $paymentData['additional_data'] = array_merge($paymentData, $additionalData);
 
+        if (isset($requestData['payment'][$this->getVaultPaymentCode()]['paymentMethod'])) {
+            $payment = json_decode(
+                $requestData['payment'][$this->getVaultPaymentCode()]['paymentMethod'],
+                true
+            );
+            if (isset($payment['object'])
+                && $payment['object'] == 'payment_intent'
+            ) {
+                $paymentData['additional_data']['cc_token'] = $payment['id'];
+                $paymentData['additional_data']['vault_card_change'] = true;
+            }
+        }
         if ($paymentToken->getGatewayToken() !== $this->getProfile()->getPayment()->getPaymentToken()) {
             $this->vaultPaymentAuthorization->processPreAuthForTrial(
                 $paymentData,
@@ -350,8 +362,21 @@ class Base implements EngineInterface
         /** @var Payment $payment */
         $payment = $quote->getPayment();
         $payment->importData($this->getPaymentInfo($this->getProfile()));
+        if ($payment->getAdditionalInformation('is_admin_subscription_creation')) {
+            $isAdminSubscriptionCreation = true;
+            if ($payment->getAdditionalInformation('paymentMethod')) {
+                $paymentMethod = json_decode($payment->getAdditionalInformation('paymentMethod'), true);
+            }
+        }
         $payment->setAdditionalInformation($this->getPaymentAdditionalInfo($this->getProfile()));
 
+        if (isset($isAdminSubscriptionCreation)) {
+            $payment->setAdditionalInformation('is_admin_subscription_creation', true);
+            if (isset($paymentMethod)) {
+                $payment->setAdditionalInformation('cc_token', $paymentMethod['id']);
+                $payment->setAdditionalInformation('set_pm', true);
+            }
+        }
         // check quote total
         if (!$this->zeroTotalValidator->isApplicable($payment->getMethodInstance(), $quote)) {
             $payment->importData(['method' => Free::PAYMENT_METHOD_FREE_CODE]);

@@ -1192,6 +1192,9 @@ class Manager
                     //Set payment method
                     if (!$this->customPaymentData) {
                         $paymentAdditionalInfo = $this->getEngine()->getPaymentAdditionalInfo($profile);
+                    } elseif (method_exists($this->getEngine(),'set3dsCustomPaymentInformation')) {
+                        $paymentAdditionalInfo = $this->getEngine()
+                            ->set3dsCustomPaymentInformation($this->customPaymentData, $profile);
                     } else {
                         $paymentAdditionalInfo = $this->customPaymentData;
                     }

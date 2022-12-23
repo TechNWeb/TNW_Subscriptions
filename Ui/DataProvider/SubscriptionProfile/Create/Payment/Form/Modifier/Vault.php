@@ -100,6 +100,11 @@ class Vault extends Base
     private $braintreeConfig;
 
     /**
+     * @var mixed
+     */
+    private $stripeConfig;
+
+    /**
      * @var DataBuilder
      */
     private $dataBuilder;
@@ -142,6 +147,7 @@ class Vault extends Base
      * @param AdapterFactory $braintreeAdapterFactory
      * @param UrlInterface $urlBuilder
      * @param StoreManagerInterface $storeManager
+     * @param SubscriptionProfileManager $subscriptionProfileManager
      * @param string $tokensConfigClass
      */
     public function __construct(
@@ -179,6 +185,10 @@ class Vault extends Base
         $this->sessionManager = $sessionManager;
         if ($moduleManager->isEnabled("PayPal_Braintree")) {
             $this->braintreeConfig = $objectManager->get(\PayPal\Braintree\Gateway\Config\Config::class);
+        }
+        if ($moduleManager->isEnabled("TNW_Stripe")) {
+            $this->stripeConfig
+                = $objectManager->get(\TNW\Stripe\Gateway\Config\Config::class);
         }
         $this->dataBuilder = $dataBuilder;
         $this->braintreeAdapterFactory = $braintreeAdapterFactory;
@@ -383,6 +393,25 @@ class Vault extends Base
                 'useCvvVault' => $this->braintreeConfig->isCvvEnabledVault(),
             ];
         }
+        if ($this->getPaymentCode() === 'tnw_stripe_vault') {
+            if ($this->session->getFirstQuote() && !$this->getProfile()) {
+                $totalAmount = $this->session->getFirstQuote()->collectTotals()->getGrandTotal();
+            }
+            return [
+                'component' => 'TNW_Subscriptions/js/form/subscription-profile/payment/stripe',
+                'options' => [
+                    'formName' => $this->getPaymentFormName(),
+                ],
+                'createUrl' => $this->getCreatePaymentIntentUrl(),
+                'sdkUrl' => $this->stripeConfig->getSdkUrl(),
+                'stripe' => [
+                    'publishableKey' => $this->stripeConfig->getPublishableKey(),
+                ],
+                'clientToken' => $this->stripeConfig->getPublishableKey(),
+                'totalAmount' => $totalAmount ?? $this->dataBuilder->getAmountByProfile($this->getProfile()),
+                'currency' => $this->getCurrencyCode()
+            ];
+        }
         return [
             'component' => 'TNW_Subscriptions/js/form/subscription-profile/payment/base',
             'options' => [
@@ -454,5 +483,13 @@ class Vault extends Base
     private function getNonceRetrieveUrl()
     {
         return $this->urlBuilder->getUrl('braintree/payment/getnonce', ['_secure' => true]);
+    }
+
+    /**
+     * @return string
+     */
+    private function getCreatePaymentIntentUrl()
+    {
+        return $this->urlBuilder->getUrl('tnw_stripe/paymentintent/create', ['_secure' => true]);
     }
 }

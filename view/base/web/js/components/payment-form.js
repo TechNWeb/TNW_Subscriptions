@@ -126,6 +126,7 @@ define(
                                 break;
                         }
                         current.save();
+                        return;
                     }
                 });
                 $('body').trigger('processStop');

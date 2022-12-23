@@ -112,6 +112,11 @@ class QueueProcess implements ArgumentInterface
     private $braintreeConfig;
 
     /**
+     * @var mixed
+     */
+    private $stripeConfig;
+
+    /**
      * @var AdapterFactory
      */
     private $braintreeAdapterFactory;
@@ -188,10 +193,15 @@ class QueueProcess implements ArgumentInterface
         if ($moduleManager->isEnabled("PayPal_Braintree")) {
             $this->braintreeConfig = $objectManager->get(\PayPal\Braintree\Gateway\Config\Config::class);
         }
+        if ($moduleManager->isEnabled("TNW_Stripe")) {
+            $this->stripeConfig
+                = $objectManager->get(\TNW\Stripe\Gateway\Config\Config::class);
+        }
     }
 
     /**
      * Get token from request
+     *
      * @return string
      */
     private function getToken()
@@ -201,6 +211,7 @@ class QueueProcess implements ArgumentInterface
 
     /**
      * Get Json config for queue-process component
+     *
      * @return bool|string
      */
     public function getJsConfig()
@@ -228,12 +239,37 @@ class QueueProcess implements ArgumentInterface
                 $this->logger->critical($e);
                 return '{}';
             }
+        } elseif ($this->getProfile()->getPayment()->getEngineCode() === 'tnw_stripe_vault') {
+            try {
+                return $this->serializer->serialize(
+                    [
+                        'component' => 'TNW_Subscriptions/js/components/rebill/queue-process-tnw-stripe',
+                        'config' => [
+                            'createUrl' => $this->getCreatePaymentIntentUrl(),
+                            'sdkUrl' => $this->stripeConfig->getSdkUrl(),
+                            'stripe' => [
+                                'publishableKey' => $this->stripeConfig->getPublishableKey(
+                                    $this->getProfile()->getStoreId()
+                                ),
+                            ],
+                            'totalAmount' => $this->getTempQuote()->getGrandTotal(),
+                            'publicHash' => $this->getVaultedCardPublicHash(),
+                            'processUrl' => $this->getProcessUrl(),
+                            'token' => $this->getToken()
+                        ]
+                    ]
+                );
+            } catch (\Exception $e) {
+                $this->logger->critical($e);
+                return '{}';
+            }
         }
         return '{}';
     }
 
     /**
      * Get rebill object
+     *
      * @return ReBillInterface|bool
      */
     private function getRebill()
@@ -251,6 +287,7 @@ class QueueProcess implements ArgumentInterface
 
     /**
      * Get profile links by ids
+     *
      * @return string
      */
     public function getProfileLinks()
@@ -286,6 +323,7 @@ class QueueProcess implements ArgumentInterface
     }
 
     /**
+     * @param string $addressType
      * @return mixed
      */
     public function getAddressHtml($addressType = 'billing')
@@ -399,6 +437,14 @@ class QueueProcess implements ArgumentInterface
     /**
      * @return string
      */
+    private function getCreatePaymentIntentUrl()
+    {
+        return $this->url->getUrl('tnw_stripe/paymentintent/create', ['_secure' => true]);
+    }
+
+    /**
+     * @return string
+     */
     private function getProcessUrl()
     {
         return $this->url->getUrl('tnw_subscriptions/subscription_queue/processPost', ['_secure' => true]);
@@ -409,6 +455,20 @@ class QueueProcess implements ArgumentInterface
      */
     private function getVaultedCardPublicHash()
     {
+        if (!$this->getProfile()->getPayment()->getPaymentToken()
+            || !$this->paymentTokenManagement->getByGatewayToken(
+                $this->getProfile()->getPayment()->getPaymentToken(),
+                $this->getPaymentMethodCode(),
+                $this->getProfile()->getCustomerId()
+            )
+        ) {
+            $profilePayment = $this->profileManager->getEngine()->getPaymentAdditionalInfo($this->getProfile());
+            if (isset($profilePayment['public_hash'])) {
+                return $profilePayment['public_hash'];
+            } else {
+                return null;
+            }
+        }
         return $this->paymentTokenManagement->getByGatewayToken(
             $this->getProfile()->getPayment()->getPaymentToken(),
             $this->getPaymentMethodCode(),

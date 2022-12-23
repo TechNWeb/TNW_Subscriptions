@@ -29,9 +29,22 @@
         <plugin name="before_create_payment_intent"
                 type="TNW\Subscriptions\Plugin\Stripe\Model\Adapter\StripeAdapter" />
     </type>
+    <type name="TNW\Stripe\Gateway\Request\PaymentDataBuilder">
+        <plugin name="after_build_rebill"
+                type="TNW\Subscriptions\Plugin\Stripe\Gateway\Request\PaymentDataBuilder" />
+    </type>
     <type name="Magento\Quote\Model\Quote\Item">
         <plugin name="after_represent_product"
                 type="TNW\Subscriptions\Plugin\Quote\Model\Quote\Item" />
+    </type>
+    <type name="TNW\Subscriptions\Model\Queue\Manager">
+        <arguments>
+            <argument name="orderPlacementExceptionProcessors" xsi:type="array">
+                <item name="braintree_processor" xsi:type="object">TNW\Subscriptions\Model\Queue\Manager\BraintreeExceptionProcessor</item>
+                <item name="stripe_processor" xsi:type="object">TNW\Subscriptions\Model\Queue\Manager\StripeExceptionProcessor</item>
+                <item name="payment_processor" xsi:type="object">TNW\Subscriptions\Model\Queue\Manager\PaymentExceptionProcessor</item>
+            </argument>
+        </arguments>
     </type>
     <type name="Magento\Framework\View\Element\UiComponent\DataProvider\CollectionFactory">
         <arguments>

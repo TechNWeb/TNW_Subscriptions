@@ -666,7 +666,7 @@ class CreateProfile extends BaseCreate
             $this->profileManager->populatePaymentData($subQuote->getPayment());
 
             $oldStatus = $this->profileManager->getProfile()->getStatus();
-
+            $subQuote->getPayment()->setAdditionalInformation('is_admin_subscription_creation', true);
             try {
                 // Process profile
                 /** @var \Magento\Sales\Model\Order $order */

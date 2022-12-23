@@ -549,4 +549,12 @@
         <plugin name="tnw_subscriptions_report_add_subscriptions_to_refresh_collection"
                 type="TNW\Subscriptions\Plugin\Report\Model\ResourceModel\Refresh\AddSubscriptionsToCollection"/>
     </type>
+    <type name="Magento\Reports\Model\ResourceModel\Refresh\Collection">
+        <plugin name="tnw_subscriptions_report_add_subscriptions_to_refresh_collection"
+                type="TNW\Subscriptions\Plugin\Report\Model\ResourceModel\Refresh\AddSubscriptionsToCollection"/>
+    </type>
+    <type name="TNW\Subscriptions\Block\Adminhtml\System\Config\PaymentMethods\ActiveMethods">
+        <plugin name="tnw_stripe_dependency"
+                type="TNW\Subscriptions\Plugin\PaymentMethods\ActiveMethods"/>
+    </type>
 </config>

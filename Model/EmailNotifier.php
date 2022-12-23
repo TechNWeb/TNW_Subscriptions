@@ -109,6 +109,8 @@ class EmailNotifier
      */
     private $profileManager;
 
+    private $paymentNotificationErrorSent = [];
+
     /**
      * EmailNotifier constructor.
      * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
@@ -322,7 +324,10 @@ class EmailNotifier
                 \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
                 $storeId
             );
-            if ($enableEmailNotification == 1 && $moduleEnable == 1) {
+            if ($enableEmailNotification == 1
+                && $moduleEnable == 1
+                && !isset($this->paymentNotificationErrorSent[$subscriptionProfile->getId()])
+            ) {
                 $copyTo = $this->getEmailCopyTo(self::XML_PATH_PAYMENT_FAILED_COPY_TO, $storeId);
                 $copyMethod = $this->getCopyMethod(self::XML_PATH_PAYMENT_FAILED_COPY_METHOD, $storeId);
                 $this->sendNotificationEmail(
@@ -352,6 +357,7 @@ class EmailNotifier
                     $copyTo,
                     $copyMethod
                 );
+                $this->paymentNotificationErrorSent[$subscriptionProfile->getId()] = true;
             }
         }
     }
@@ -376,7 +382,10 @@ class EmailNotifier
                 \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
                 $storeId
             );
-            if ($enableEmailNotification == 1 && $moduleEnable == 1) {
+            if ($enableEmailNotification == 1
+                && $moduleEnable == 1
+                && !isset($this->paymentNotificationErrorSent[$subscriptionProfile->getId()])
+            ) {
                 $copyTo = $this->getEmailCopyTo(self::XML_PATH_PAYMENT_FAILED_COPY_TO, $storeId);
                 $copyMethod = $this->getCopyMethod(self::XML_PATH_PAYMENT_FAILED_COPY_METHOD, $storeId);
                 $this->sendNotificationEmail(
@@ -407,6 +416,7 @@ class EmailNotifier
                     $copyTo,
                     $copyMethod
                 );
+                $this->paymentNotificationErrorSent[$subscriptionProfile->getId()] = true;
             }
         }
     }

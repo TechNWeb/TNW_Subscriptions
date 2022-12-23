@@ -158,7 +158,13 @@ class CreateProfile implements ObserverInterface
         if (!$order instanceof Order || !$order->getEntityId()) {
             return;
         }
-
+        $paymentAdditionalInfo = $order->getPayment()->getAdditionalInformation();
+        if (is_array($paymentAdditionalInfo)
+            && isset($paymentAdditionalInfo['is_rebill'])
+            && $paymentAdditionalInfo['is_rebill']
+        ) {
+            return;
+        }
         $indexedGroups = array_filter($this->quoteItemGroup->groups($quote->getAllVisibleItems()), function ($key) {
             return strcasecmp($key, 'no_option') !== 0;
         }, ARRAY_FILTER_USE_KEY);
