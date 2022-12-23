@@ -11,7 +11,7 @@ define([
 ], function (Element, $, $t, verify3DSecure, alert) {
     return Element.extend({
         defaults: {
-            template: 'TNW_Subscriptions/rebill/queue-process-braintree',
+            template: 'TNW_Subscriptions/rebill/queue-process',
             braintree: {
                 client: null
             },

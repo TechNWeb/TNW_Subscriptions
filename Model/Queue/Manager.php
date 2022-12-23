@@ -136,26 +136,8 @@ class Manager
      */
     private $reBillManager;
 
-    /**
-     * Manager constructor.
-     * @param CollectionFactory $collectionFactory
-     * @param Config $config
-     * @param SubscriptionProfile\Manager $profileManager
-     * @param RelationManager $relationManager
-     * @param CartRepositoryInterface $cartRepository
-     * @param SubscriptionProfileRepository $profileRepository
-     * @param SubscriptionProfile\Status\HistoryManager $statusHistoryManager
-     * @param SubscriptionProfile\MessageHistoryLogger $messageHistoryLogger
-     * @param ProfileStatus $profileStatus
-     * @param \TNW\Subscriptions\Model\ResourceModel\Queue $resourceQueue
-     * @param \Magento\Framework\Stdlib\DateTime\TimezoneInterface $timezone
-     * @param \Magento\Quote\Model\QuoteFactory $quoteFactory
-     * @param \TNW\Subscriptions\Model\ResourceModel\SalesItemRelation $relationResource
-     * @param EmailNotifierFactory $emailNotifierFactory
-     * @param BillingCyclesManagerFactory $billingCyclesManagerFactory
-     * @param \Magento\Sales\Model\Order\Email\Sender\OrderSender $orderSender
-     * @param ReBillManager $reBillManager
-     */
+    private $orderPlacementExceptionProcessors;
+
     public function __construct(
         CollectionFactory $collectionFactory,
         Config $config,
@@ -173,8 +155,10 @@ class Manager
         EmailNotifierFactory $emailNotifierFactory,
         BillingCyclesManagerFactory $billingCyclesManagerFactory,
         \Magento\Sales\Model\Order\Email\Sender\OrderSender $orderSender,
-        ReBillManager $reBillManager
+        ReBillManager $reBillManager,
+        $orderPlacementExceptionProcessors = []
     ) {
+        $this->orderPlacementExceptionProcessors = $orderPlacementExceptionProcessors;
         $this->reBillManager = $reBillManager;
         $this->orderSender = $orderSender;
         $this->billingCyclesManagerFactory = $billingCyclesManagerFactory;
@@ -530,12 +514,13 @@ class Manager
                     ->getCartManagement()
                     ->submit($quote);
             } catch (\Exception $e) {
-                if ($e instanceof CommandException && $e->getCode() == 2099) {
-                    $reBill = $this->reBillManager->createReBillByFailedGroupQueue($groupQueue);
+                foreach ($this->orderPlacementExceptionProcessors as $processor) {
+                    if ($processor->process($e, $groupQueue, $quote, $this)) {
+                        break;
+                    }
                 }
                 foreach ($groupQueue as $queue) {
                     $profile = $this->profileRepository->getById($queue->getData('subscription_profile_id'));
-
                     $oldStatus = $profile->getStatus();
                     $profile->setStatus(ProfileStatus::STATUS_PAST_DUE);
                     $this->profileRepository->save($profile);
@@ -553,13 +538,6 @@ class Manager
                             false,
                             true
                         );
-                    }
-                    if ($e instanceof CommandException) {
-                        if (isset($reBill) && $reBill->getId()) {
-                            $this->emailNotifierFactory->create()->paymentVerificationFailed($profile, $reBill);
-                        } else {
-                            $this->emailNotifierFactory->create()->paymentFailed($profile);
-                        }
                     }
                 }
                 throw $e;

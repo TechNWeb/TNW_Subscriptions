@@ -139,6 +139,9 @@ class Stripe extends Base
                     : $expirationDate[1],
                 'stripe_data' => $additionalInfo
         ];
+        if (isset($additionalInfo['public_hash']) && $result['engine_code'] == $this->getVaultPaymentCode()) {
+            $result['payment_token'] = $additionalInfo['public_hash'];
+        }
         return $result;
     }
 
@@ -179,6 +182,22 @@ class Stripe extends Base
         }
         $payment->setData('method', $this->getPaymentMethodCode() . '_vault');
         return $this;
+    }
+
+    /**
+     * @param $customPaymentInfo
+     * @param $profile
+     * @return array|mixed|null
+     */
+    public function set3dsCustomPaymentInformation($customPaymentInfo, $profile)
+    {
+        $result = $this->getPaymentAdditionalInfo($profile);
+        if (isset($customPaymentInfo['payment_method_nonce'])) {
+            $paymentIntent = json_decode($customPaymentInfo['payment_method_nonce'], true);
+            $result['cc_token'] = $paymentIntent['id'];
+        }
+
+        return $result;
     }
 
     /**
@@ -267,6 +286,13 @@ class Stripe extends Base
         $currency = $quote->getQuoteCurrencyCode();
         $paymentId = $payment['id'];
         $stripeAdapter = $this->adapterFactory->create();
+        if (isset($payment['object'])
+            && $payment['object'] == 'payment_intent'
+        ) {
+            $requestData['payment'][$this->getPaymentMethodCode()]['cc_token'] = $paymentId;
+            return parent::processProfileByRequestData($requestData);
+        }
+
         $cs = $stripeAdapter->customer(
             [
                 'payment_method' => $paymentId,

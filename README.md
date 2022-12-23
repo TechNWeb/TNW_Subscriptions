@@ -19,4 +19,4 @@ php bin/magento setup:di:compile
 Configuration of crons is the same as configuration of default magento cron. See http://devdocs.magento.com/guides/v2.0/comp-mgr/prereq/prereq_cron.html
 Example:
 
-12 * * * * php <magento install dir>/bin/magento tnw_subscriptions:process >> <magento install dir>/var/log/sub-processing.cron.log
+12 * * * * php <magento install dir>/bin/magento tnw_subscriptions:process --bootstrap=custom_entry_point=1 >> <magento install dir>/var/log/sub-processing.cron.log

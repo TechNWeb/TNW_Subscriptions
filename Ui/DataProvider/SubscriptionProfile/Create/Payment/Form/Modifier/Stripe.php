@@ -7,14 +7,16 @@ namespace TNW\Subscriptions\Ui\DataProvider\SubscriptionProfile\Create\Payment\F
 
 use Magento\Framework\Module\Manager;
 use Magento\Framework\ObjectManagerInterface;
+use Magento\Framework\UrlInterface;
 use Magento\Payment\Model\Config;
 use Magento\Quote\Api\CartRepositoryInterface;
 use Magento\Store\Model\StoreManagerInterface;
 use Magento\Ui\Component\Form;
+use Magento\Ui\Component\Form\Fieldset;
+use TNW\Subscriptions\Model\Payment\DataBuilder;
 use TNW\Subscriptions\Model\QuoteSessionInterface;
 use TNW\Subscriptions\Model\SubscriptionProfileOrder\Manager as OrderRelationManager;
 use TNW\Subscriptions\Model\SubscriptionProfileRepository;
-use Magento\Framework\View\LayoutFactory;
 
 /**
  * Stripe payment methods form modifier.
@@ -37,9 +39,19 @@ class Stripe extends Base
     private $stripeConfig;
 
     /**
-     * @var LayoutFactory
+     * @var UrlInterface
      */
-    private $layoutFactory;
+    private $url;
+
+    /**
+     * @var DataBuilder
+     */
+    private $dataBuilder;
+
+    /**
+     * @var QuoteSessionInterface
+     */
+    private $session;
 
     /**
      * Stripe constructor.
@@ -49,10 +61,11 @@ class Stripe extends Base
      * @param OrderRelationManager $relationManager
      * @param CartRepositoryInterface $cartRepository
      * @param Config $paymentConfig
-     * @param LayoutFactory $layoutFactory
      * @param Manager $moduleManager
      * @param ObjectManagerInterface $objectManager
      * @param StoreManagerInterface $storeManager
+     * @param UrlInterface $url
+     * @param DataBuilder $dataBuilder
      */
     public function __construct(
         \TNW\Subscriptions\Model\Config $config,
@@ -61,19 +74,21 @@ class Stripe extends Base
         OrderRelationManager $relationManager,
         CartRepositoryInterface $cartRepository,
         Config $paymentConfig,
-        LayoutFactory $layoutFactory,
         Manager $moduleManager,
         ObjectManagerInterface $objectManager,
-        StoreManagerInterface $storeManager
+        StoreManagerInterface $storeManager,
+        UrlInterface $url,
+        DataBuilder $dataBuilder
     ) {
         parent::__construct($config, $session, $profileRepository, $relationManager, $cartRepository, $storeManager);
         if ($moduleManager->isEnabled("TNW_Stripe")) {
             $this->stripeConfig
                 = $objectManager->get(\TNW\Stripe\Gateway\Config\Config::class);
         }
-
+        $this->session = $session;
         $this->paymentConfig = $paymentConfig;
-        $this->layoutFactory = $layoutFactory;
+        $this->url = $url;
+        $this->dataBuilder = $dataBuilder;
     }
 
     /**
@@ -193,12 +208,16 @@ class Stripe extends Base
      */
     protected function getAdditionalConfig()
     {
+        if ($this->session->getFirstQuote() && !$this->getProfile()) {
+            $totalAmount = $this->session->getFirstQuote()->collectTotals()->getGrandTotal();
+        }
         return [
             'component' => 'TNW_Subscriptions/js/form/subscription-profile/payment/stripe',
             'listens' => $this->getListens(),
             'dataContainer' => $this->getPaymentCode() . '-transparent-iframe',
             'code' => $this->getPaymentCode(),
             'sdkUrl' => $this->stripeConfig->getSdkUrl(),
+            'createUrl' => $this->url->getUrl('tnw_stripe/paymentintent/create'),
             'stripe' => [
                 'publishableKey' => $this->stripeConfig->getPublishableKey(),
             ],
@@ -209,6 +228,8 @@ class Stripe extends Base
             'options' => [
                 'formName' => $this->getPaymentFormName(),
             ],
+            'totalAmount' => $totalAmount ?? $this->dataBuilder->getAmountByProfile($this->getProfile()),
+            'currencyCode' => mb_strtolower($this->getCurrencyCode())
         ];
     }
 
@@ -229,7 +250,7 @@ class Stripe extends Base
             'arguments' => [
                 'data' => [
                     'config' => [
-                        'componentType' => \Magento\Ui\Component\Form\Fieldset::NAME,
+                        'componentType' => Fieldset::NAME,
                         'component' => 'TNW_Subscriptions/js/form/subscription-profile/payment/'
                             . 'additional-fields-fieldset',
                         'template' => 'TNW_Subscriptions/form/subscription-profile/payment/stripe',

@@ -127,6 +127,10 @@ class Vault extends Base
                 ->setCcLast4($details['maskedCC'])
                 ->setCcExpMonth($expirationPeriods[0])
                 ->setCcExpYear($expirationPeriods[1]);
+            if (isset($paymentData['paymentMethod'])) {
+                $subQuote->getPayment()
+                    ->setAdditionalInformation('paymentMethod', $paymentData['paymentMethod']);
+            }
         }
 
         $this->getSubCreateModel()->setNeedCollect(true);

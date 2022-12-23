@@ -212,7 +212,7 @@ class ActiveMethods extends Fieldset
      * @param $inherit
      * @return array
      */
-    private function getFieldConfig($method, $data, $inherit)
+    public function getFieldConfig($method, $data, $inherit)
     {
         return [
             'name' => 'groups[' . self::GROUP_ID . '][fields]['

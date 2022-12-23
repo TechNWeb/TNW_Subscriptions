@@ -18,6 +18,7 @@ use TNW\Subscriptions\Model\Payment\VaultPaymentAuthorization;
 use TNW\Subscriptions\Model\QuoteSessionInterface;
 use TNW\Subscriptions\Model\SubscriptionProfile\CreateProfile;
 use TNW\Subscriptions\Model\SubscriptionProfile\Engine\Stripe as StripeEngine;
+use TNW\Subscriptions\Model\Payment\Stripe\TokenExtractor;
 
 /**
  * Class Stripe - used to save the stripe payed subscription profile
@@ -50,6 +51,11 @@ class Stripe extends Base
     private $url;
 
     /**
+     * @var TokenExtractor
+     */
+    private $tokenExtractor;
+
+    /**
      * Stripe constructor.
      * @param CreateProfile $createModel
      * @param QuoteSessionInterface $session
@@ -59,6 +65,7 @@ class Stripe extends Base
      * @param Manager $moduleManager
      * @param ObjectManagerInterface $objectManager
      * @param UrlInterface $url
+     * @param TokenExtractor $tokenExtractor
      */
     public function __construct(
         CreateProfile $createModel,
@@ -68,8 +75,10 @@ class Stripe extends Base
         PaymentTokenRepositoryInterface $paymentTokenRepository,
         Manager $moduleManager,
         ObjectManagerInterface $objectManager,
-        UrlInterface $url
+        UrlInterface $url,
+        TokenExtractor $tokenExtractor
     ) {
+        $this->tokenExtractor = $tokenExtractor;
         $this->paymentTokenRepository = $paymentTokenRepository;
         $this->encryptor = $encryptor;
         $this->vaultPaymentAuthorization = $vaultPaymentAuthorization;
@@ -107,16 +116,37 @@ class Stripe extends Base
         );
         $amount = '1';
         $currency = $quote->getQuoteCurrencyCode();
-        $paymentId = $payment['id'];
         $stripeAdapter = $this->adapterFactory->create();
-        $cs = $stripeAdapter->customer([
-            'email' => $guestEmail ?: $quote->getCustomerEmail(),
-            'payment_method' => $paymentId,
-            'invoice_settings' => ['default_payment_method' => $paymentId],
-            'metadata' => ['site' => $this->url->getBaseUrl()]
-        ]);
+        if (isset($payment['object'])
+            && $payment['object'] == 'payment_intent'
+        ) {
+            $paymentId = $payment['payment_method'];
+            $paymentIntent = $stripeAdapter->retrievePaymentIntent($payment['id']);
+            if (isset($paymentIntent->customer) && $paymentIntent->customer) {
+                $customerId = $paymentIntent->customer;
+                $stripeAdapter->updateCustomer($customerId, ['email' => $guestEmail ?: $quote->getCustomerEmail()]);
+            } else {
+                $cs = $stripeAdapter->customer([
+                    'email' => $guestEmail ?: $quote->getCustomerEmail(),
+                    'payment_method' => $paymentId,
+                    'invoice_settings' => ['default_payment_method' => $paymentId],
+                    'metadata' => ['site' => $this->url->getBaseUrl()]
+                ]);
+            }
+        } else {
+            $paymentId = $payment['id'];
+            $cs = $stripeAdapter->customer([
+                'email' => $guestEmail ?: $quote->getCustomerEmail(),
+                'payment_method' => $paymentId,
+                'invoice_settings' => ['default_payment_method' => $paymentId],
+                'metadata' => ['site' => $this->url->getBaseUrl()]
+            ]);
+        }
+        if (isset($cs)) {
+            $customerId = $cs->id;
+        }
         $params = [
-            StripeEngine::CUSTOMER => $cs->id,
+            StripeEngine::CUSTOMER => $customerId,
             StripeEngine::AMOUNT => $this->formatPrice($amount),
             StripeEngine::CURRENCY => $currency,
             StripeEngine::PAYMENT_METHOD_TYPES => ['card'],
@@ -124,16 +154,39 @@ class Stripe extends Base
             StripeEngine::CAPTURE_METHOD => 'manual',
             StripeEngine::SETUP_FUTURE_USAGE => 'off_session'
         ];
-        $params[StripeEngine::PAYMENT_METHOD] = $paymentId;
-        $paymentIntent = $stripeAdapter->createPaymentIntent($params);
+        if (isset($payment['object'])
+            && $payment['object'] == 'payment_intent'
+        ) {
+            $paymentMethod = $payment['payment_method'];
+            $params[StripeEngine::PAYMENT_METHOD] = $paymentMethod;
+            $paymentData['cc_token'] = $payment['id'];
+            $paymentData['additional_data']['cc_token'] = $payment['id'];
+        } else {
+            $params[StripeEngine::PAYMENT_METHOD] = $paymentId;
+            $paymentIntent = $stripeAdapter->createPaymentIntent($params);
+            $paymentMethod = $paymentIntent->payment_method;
+            $paymentData['cc_token'] = $paymentMethod;
+            $paymentData['additional_data']['cc_token'] = $paymentMethod;
+            $paymentData['additional_data']['customer'] = $customerId;
+        }
+        if (isset($payment['object'])
+            && $payment['object'] == 'payment_intent'
+            && $payment['status'] == 'requires_confirmation'
+        ) {
+            $magentoCustomerId = $quote->getCustomerId() ?? 0;
+            $transactionData = [
+                'customer' => $customerId,
+                'charges' => false,
+                'payment_method' => $payment['payment_method']
+            ];
+            $paymentToken = $this->tokenExtractor
+                ->getVaultPaymentToken($paymentData, $transactionData, $magentoCustomerId);
 
-        $paymentMethod = $paymentIntent->payment_method;
-        $paymentData['cc_token'] = $paymentMethod;
-        $paymentData['additional_data']['cc_token'] = $paymentMethod;
-        $paymentData['additional_data']['customer'] = $cs->id;
-
-        $result = $this->vaultPaymentAuthorization->processPreAuthForTrial($paymentData, $quote, $guestEmail);
-        $paymentToken = $result['payment_token'];
+            $tempPaymentMethod = $paymentData['paymentMethod'];
+        } else {
+            $result = $this->vaultPaymentAuthorization->processPreAuthForTrial($paymentData, $quote, $guestEmail);
+            $paymentToken = $result['payment_token'];
+        }
         $paymentToken->setPublicHash($this->generatePublicHash($paymentToken));
         $paymentToken->setCustomerId($quote->getCustomerId());
         $paymentToken->setPaymentMethodCode('tnw_stripe');
@@ -148,6 +201,11 @@ class Stripe extends Base
                 ->setCcLast4($paymentData['cc_last_4'])
                 ->setCcExpMonth($paymentData['additional']['cc_exp_month'])
                 ->setCcExpYear($paymentData['additional']['cc_exp_year']);
+            if (isset($tempPaymentMethod)) {
+                $subQuote->getPayment()
+                    ->setAdditionalInformation('cc_3ds', true)
+                    ->setAdditionalInformation('paymentMethod', $paymentData['paymentMethod']);
+            }
         }
 
         $this->getSubCreateModel()->setNeedCollect(true);

@@ -98,7 +98,7 @@ class TokenExtractor
      * @param int $customerId
      * @return PaymentTokenInterface|null
      */
-    private function getVaultPaymentToken($paymentData, $transaction, $customerId = 0)
+    public function getVaultPaymentToken($paymentData, $transaction, $customerId = 0)
     {
         $gateWayToken = $transaction['customer'] . '/' . $transaction['payment_method'];
 

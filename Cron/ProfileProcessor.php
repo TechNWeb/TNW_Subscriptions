@@ -21,6 +21,8 @@ use TNW\Subscriptions\Exception\NewRelationException;
 use TNW\Subscriptions\Exception\ChangeProfileStatusException;
 use TNW\Subscriptions\Exception\AssignOrderToRelationException;
 use TNW\Subscriptions\Exception\CalculateProfitException;
+use Magento\Payment\Gateway\Http\ClientException;
+use Magento\Payment\Gateway\Command\CommandException;
 
 /**
  * Class ProfileProcessor - cron
@@ -131,14 +133,8 @@ class ProfileProcessor
                 $this->context->messageError($e->getMessage());
                 $this->queueManager->makeCompleted($queueIds, $e->getMessage());
                 $orderProcessHasError = false;
-            } catch (\Magento\Payment\Gateway\Command\CommandException $e) {
-                //TODO: add payment error processor for each payment engine
+            } catch (CommandException | ClientException $e) {
                 $this->context->messageError($e->getMessage());
-                if ($e->getCode() == 2099) {
-                    $this->queueManager->makeVerification($queueIds, $e->getMessage(), false);
-                } else {
-                    $this->queueManager->makeError($queueIds, $e->getMessage(), true);
-                }
                 $orderProcessHasError = false;
             } catch (\Exception $e) {
                 $this->context->messageError('Error on processing profile: %s', $e);

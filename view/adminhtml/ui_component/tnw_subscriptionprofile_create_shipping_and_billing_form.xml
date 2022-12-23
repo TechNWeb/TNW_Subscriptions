@@ -16,6 +16,7 @@
             <item name="component" xsi:type="string">TNW_Subscriptions/js/components/shipping-and-billing-form</item>
             <item name="dataScope" xsi:type="string">data</item>
             <item name="namespace" xsi:type="string">tnw_subscriptionprofile_create_shipping_and_billing_form</item>
+            <item name="processUrl" xsi:type="url" path="tnw_subscriptions/subscriptionprofile_create/process"/>
         </item>
         <item name="template" xsi:type="string">templates/form/collapsible</item>
         <item name="buttons" xsi:type="array">
@@ -24,6 +25,11 @@
             <item name="continue" xsi:type="string">TNW\Subscriptions\Block\Adminhtml\SubscriptionProfile\Create\Buttons\ContinueButton</item>
         </item>
     </argument>
+    <settings>
+        <listens>
+            <link name="${ $.provider }:data.shipping_method">process</link>
+        </listens>
+    </settings>
     <dataSource name="tnw_subscriptionprofile_create_shipping_and_billing_form_data_source">
         <argument name="dataProvider" xsi:type="configurableObject">
             <argument name="class" xsi:type="string">TNW\Subscriptions\Model\SubscriptionProfile\DataProvider\ShippingAndBilling</argument>
@@ -102,7 +108,7 @@
         </argument>
         <settings>
             <listens>
-                <link name="${ $.parentName }_data_source:data.shipping_method">reRender</link>
+                <link name="${ $.parentName }:processTime">reRender</link>
             </listens>
             <exports>
                 <link name="responseData">${ $.parentName }:onPaymentFormResponse</link>
@@ -113,7 +119,7 @@
                 <param name="buttons">0</param>
             </renderUrl>
             <loading>true</loading>
-            <autoRender>false</autoRender>
+            <autoRender>true</autoRender>
             <toolbarContainer>${ $.parentName }</toolbarContainer>
             <ns>tnw_subscriptionprofile_create_payment_form</ns>
         </settings>

@@ -14,6 +14,7 @@ use Magento\Framework\ObjectManagerInterface;
 use Magento\Framework\Stdlib\DateTime\TimezoneInterface;
 use Magento\Store\Model\StoreManagerInterface;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use TNW\Subscriptions\Cron\ProfileProcessorFactory;
 use TNW\Subscriptions\Model\Config;
@@ -27,6 +28,11 @@ class ProcessCommand extends Base
      * Name of process lock file.
      */
     const PROCESS_LOCK_FILE = 'subscription_process.lock';
+
+    /**
+     * Input option bootstrap
+     */
+    const INPUT_KEY_BOOTSTRAP = 'bootstrap';
 
     /**
      * Profile processor Factory.
@@ -68,7 +74,12 @@ class ProcessCommand extends Base
     {
         $this->setName('tnw_subscriptions:process')
             ->setDescription('Runs order creation for subscriptions.');
-
+        $this->addOption(
+            self::INPUT_KEY_BOOTSTRAP,
+            null,
+            InputOption::VALUE_REQUIRED,
+            'add or override parameters of the bootstrap'
+        );
         parent::configure();
     }
 
