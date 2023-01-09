@@ -62,7 +62,7 @@ class PaymentMethodIsActive implements ObserverInterface
      * @param $quote
      * @return bool
      */
-    private function checkIsSubscriptionQuote($quote)
+    public function checkIsSubscriptionQuote($quote)
     {
         $result = false;
         foreach ($quote->getAllVisibleItems() as $item) {

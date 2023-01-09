@@ -211,7 +211,13 @@ class SummaryNextPaymentDateForm extends AbstractDataProvider
             if ((int)$this->profile->getStatus() === ProfileStatus::STATUS_TRIAL) {
                 $maxDate = $this->localeDate->date($this->profile->getStartDate())->format('m/d/Y');
             } else {
-                $lastOrderDate = $this->profileManager->getLastSuccessfulProfileRelation()->getScheduledAt();
+                $lastSuccessfulRelation = $this->profileManager->getLastSuccessfulProfileRelation();
+                if (!$lastSuccessfulRelation) {
+                   return [
+                       'minDate' => $minDate,
+                   ];
+                }
+                $lastOrderDate = $lastSuccessfulRelation->getScheduledAt();
                 $frequency = (int)$this->profile->getFrequency();
                 $unit = (int)$this->profileManager->getProfile()->getUnit() === BillingFrequencyUnitType::DAYS
                     ? 'D'

@@ -191,12 +191,13 @@ class NotificationProcessor
     }
 
     /**
-     * Get order with Cc payment method
      *
+     * @param array $nonCcMethods
      * @return bool
      */
-    private function getOrderWithCcPayment()
-    {
+    public function getOrderWithCcPayment(
+        $nonCcMethods = ['checkmo', 'banktransfer', 'purchaseorder', 'cashondelivery']
+    ) {
         try {
             return $this->loadedCollections[] = $this->paymentFactory->create()
                 ->join(
@@ -207,7 +208,7 @@ class NotificationProcessor
                 )
                 ->addFieldToFilter(
                     'engine_code',
-                    ['nin' => ['checkmo', 'banktransfer', 'purchaseorder', 'cashondelivery']]
+                    ['nin' => $nonCcMethods]
                 )
                 ->addFieldToFilter('payment_additional_info', ['notnull' => true])
                 ->addFieldToFilter('sent_mail', 0)

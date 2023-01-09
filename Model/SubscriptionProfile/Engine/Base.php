@@ -387,7 +387,7 @@ class Base implements EngineInterface
     /**
      * Updates profile status after order processing
      */
-    private function updateProfileStatus()
+    public function updateProfileStatus()
     {
         $status = ProfileStatus::STATUS_ACTIVE;
         $trialStartDate = $this->getProfile()->getTrialStartDate();
