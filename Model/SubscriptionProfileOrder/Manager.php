@@ -357,6 +357,35 @@ class Manager
     }
 
     /**
+     * @param SubscriptionProfileInterface $profile
+     * @param $quoteId
+     * @return bool|mixed|SubscriptionProfileOrderInterface
+     * @throws LocalizedException
+     */
+    public function getProfileRelationByQuoteId(SubscriptionProfileInterface $profile, $quoteId)
+    {
+        $result = false;
+        /** @var \Magento\Framework\Api\SortOrder $sortOrder */
+        $sortOrder = $this->sortOrderBuilder
+            ->setField(SubscriptionProfileOrderInterface::SCHEDULED_AT)
+            ->setDirection(SortOrder::SORT_ASC)
+            ->create();
+        $this->criteriaBuilder
+            ->addFilter(SubscriptionProfileOrderInterface::SUBSCRIPTION_PROFILE_ID, $profile->getId())
+            ->addFilter(SubscriptionProfileOrderInterface::MAGENTO_QUOTE_ID, $quoteId)
+            ->setSortOrders([$sortOrder]);
+        /** @var SearchCriteriaInterface $searchCriteria */
+        $searchCriteria = $this->criteriaBuilder->create();
+
+        $results = $this->profileOrderRepository->getList($searchCriteria)->getItems();
+        if (count($results)) {
+            $result = reset($results);
+        }
+
+        return $result;
+    }
+
+    /**
      * Retrieve Subscription profile ID by Order ID
      *
      * @param int $orderId
