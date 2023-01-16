@@ -185,7 +185,7 @@ abstract class AbstractView extends AbstractAccount
             $this->getFilterByProfileId($subscriptionProfileId)
         )->getItems();
         $subscriptionProfile = end($subscriptionData);
-        if ($subscriptionProfile === null) {
+        if ($subscriptionProfile === null || !$subscriptionProfile) {
             throw new NoSuchEntityException();
         }
         $magentoOrder = $this->orderFactory->create()->load($subscriptionProfile->getMagentoOrderId());
