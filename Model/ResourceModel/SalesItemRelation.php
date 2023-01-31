@@ -5,6 +5,7 @@
  */
 namespace TNW\Subscriptions\Model\ResourceModel;
 
+use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Model\ResourceModel\Db\AbstractDb;
 
 /**
@@ -32,7 +33,7 @@ class SalesItemRelation extends AbstractDb
     /**
      * @param array $data
      * @param bool $quoteOnly
-     * @throws \Magento\Framework\Exception\LocalizedException
+     * @throws LocalizedException
      */
     public function insertSales(array $data, $quoteOnly = false)
     {
@@ -57,10 +58,29 @@ class SalesItemRelation extends AbstractDb
     }
 
     /**
+     * Deletes sales items by profile item ID and quote item ID.
+     *
+     * @param int $profileItemId
+     * @param int $quoteItemId
+     * @return void
+     * @throws LocalizedException
+     */
+    public function deleteSalesItems(int $profileItemId, int $quoteItemId)
+    {
+        $this->getConnection()->delete(
+            $this->getMainTable(),
+            [
+                'profile_item_id = ?' => $profileItemId,
+                'quote_item_id = ?' => $quoteItemId
+            ]
+        );
+    }
+
+    /**
      * @param int $orderItemId
      *
      * @return array
-     * @throws \Magento\Framework\Exception\LocalizedException
+     * @throws LocalizedException
      */
     public function profileIdsByOrderItemId($orderItemId)
     {
