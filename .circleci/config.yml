@@ -255,8 +255,8 @@ jobs:
           command: |
             cd ~/magento2
             docker-compose run --rm test mftf-command build:project
-            docker-compose run --rm test mftf-command generate:tests $MFTF_TEST_LIST
-            docker-compose run --rm test mftf-command run:test $MFTF_TEST_LIST
+            docker-compose run --rm test mftf-command generate:tests $MFTF_TESTS_LIST_CE
+            docker-compose run --rm test mftf-command run:test $MFTF_TESTS_LIST_CE
             docker-compose stop
       - run:
           name: Copy files
