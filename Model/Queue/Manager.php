@@ -390,16 +390,14 @@ class Manager
     }
 
     /**
-     * Changes status to synced queue items.
-     *
-     * @param array|int $ids
+     * @param $ids
      * @param string $message
-     *
-     * @throws \Magento\Framework\Exception\LocalizedException
+     * @param bool $incrementAttemptCount
+     * @throws LocalizedException
      */
-    public function makeSkipped($ids, $message = '')
+    public function makeSkipped($ids, $message = '', $incrementAttemptCount = false)
     {
-        $this->resourceQueue->updateStatus($ids, QueueStatus::QUEUE_STATUS_SKIPPED, $message);
+        $this->resourceQueue->updateStatus($ids, QueueStatus::QUEUE_STATUS_SKIPPED, $message, $incrementAttemptCount);
     }
 
     /**
