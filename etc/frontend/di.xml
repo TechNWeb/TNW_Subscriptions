@@ -148,4 +148,8 @@
             </argument>
         </arguments>
     </type>
+    <type name="TNW\Stripe\Controller\PaymentIntent\Create">
+        <plugin name="disable_payment_intent_for_guest_with_registered_email"
+                type="TNW\Subscriptions\Plugin\Stripe\Controller\PaymentIntent\Create"/>
+    </type>
 </config>
