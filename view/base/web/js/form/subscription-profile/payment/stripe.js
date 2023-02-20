@@ -219,10 +219,6 @@ define([
                     self.set('payment_errors', ['Could not save card.']);
                     return;
                 }
-                if (!result.paymentMethod.card.three_d_secure_usage.supported) {
-                    form.triggerSave([]);
-                    return;
-                }
 
                 self.createPaymentIntent({
                     paymentMethod: result.paymentMethod,
