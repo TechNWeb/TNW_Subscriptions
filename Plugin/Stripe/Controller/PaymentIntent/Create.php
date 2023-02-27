@@ -1,11 +1,13 @@
 <?php
-
+/**
+ * Copyright © 2023 TechNWeb, Inc. All rights reserved.
+ * See TNW_LICENSE.txt for license details.
+ */
 namespace TNW\Subscriptions\Plugin\Stripe\Controller\PaymentIntent;
 
 use Magento\Checkout\Model\Session;
 use Magento\Customer\Api\CustomerRepositoryInterface;
 use Magento\Framework\App\RequestInterface;
-use Magento\Framework\App\ResponseInterface;
 use Magento\Framework\Controller\ResultFactory;
 use Magento\Framework\Controller\ResultInterface;
 use Magento\Framework\Exception\NoSuchEntityException;
@@ -14,6 +16,9 @@ use Magento\Quote\Api\Data\CartInterface;
 use Psr\Log\LoggerInterface;
 use TNW\Stripe\Controller\PaymentIntent\Create as CreateController;
 use TNW\Stripe\Model\Adapter\StripeAdapterFactory;
+use Magento\Framework\Module\Manager;
+use Magento\Framework\ObjectManagerInterface;
+use Magento\Framework\Exception\LocalizedException;
 
 /**
  * Plugin class. Prevents Stripe payment intent creation for guest customers with already registered email.
@@ -56,37 +61,43 @@ class Create
     private $logger;
 
     /**
+     * Create constructor.
      * @param ResultFactory $resultFactory
      * @param RequestInterface $request
      * @param Json $jsonSerializer
-     * @param StripeAdapterFactory $stripeAdapterFactory
      * @param Session $checkoutSession
      * @param CustomerRepositoryInterface $customerRepository
      * @param LoggerInterface $logger
+     * @param Manager $moduleManager
+     * @param ObjectManagerInterface $objectManager
      */
     public function __construct(
         ResultFactory $resultFactory,
         RequestInterface $request,
         Json $jsonSerializer,
-        StripeAdapterFactory $stripeAdapterFactory,
         Session $checkoutSession,
         CustomerRepositoryInterface $customerRepository,
-        LoggerInterface $logger
+        LoggerInterface $logger,
+        Manager $moduleManager,
+        ObjectManagerInterface $objectManager
     ) {
+        if ($moduleManager->isEnabled("TNW_Stripe")) {
+            $this->stripeAdapterFactory = $objectManager->get(StripeAdapterFactory::class);
+        }
         $this->resultFactory = $resultFactory;
         $this->request = $request;
         $this->jsonSerializer = $jsonSerializer;
-        $this->stripeAdapterFactory = $stripeAdapterFactory;
         $this->checkoutSession = $checkoutSession;
         $this->customerRepository = $customerRepository;
         $this->logger = $logger;
     }
 
-
     /**
      * @param CreateController $subject
      * @param callable $proceed
-     * @return ResponseInterface|ResultInterface
+     * @return ResultInterface
+     * @throws NoSuchEntityException
+     * @throws LocalizedException
      */
     public function aroundExecute(CreateController $subject, callable $proceed)
     {
