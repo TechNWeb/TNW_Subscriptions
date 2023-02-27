@@ -34,6 +34,7 @@ define([
                 'data' : JSON.stringify({
                     'public_hash': self.publicHash,
                     'amount' : self.totalAmount,
+                    'currency': self.currency
                 })
             }).done(function (response) {
                 // Disable Payment Token

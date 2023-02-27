@@ -253,6 +253,7 @@ class QueueProcess implements ArgumentInterface
                                 ),
                             ],
                             'totalAmount' => $this->getTempQuote()->getGrandTotal(),
+                            'currency' => $this->getTempQuote()->getCurrency()->getQuoteCurrencyCode(),
                             'publicHash' => $this->getVaultedCardPublicHash(),
                             'processUrl' => $this->getProcessUrl(),
                             'token' => $this->getToken()
