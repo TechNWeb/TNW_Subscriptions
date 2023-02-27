@@ -65,7 +65,6 @@ class Create
      * @param ResultFactory $resultFactory
      * @param RequestInterface $request
      * @param Json $jsonSerializer
-     * @param StripeAdapterFactory $stripeAdapterFactory
      * @param Session $checkoutSession
      * @param CustomerRepositoryInterface $customerRepository
      * @param LoggerInterface $logger
@@ -76,7 +75,6 @@ class Create
         ResultFactory $resultFactory,
         RequestInterface $request,
         Json $jsonSerializer,
-        StripeAdapterFactory $stripeAdapterFactory,
         Session $checkoutSession,
         CustomerRepositoryInterface $customerRepository,
         LoggerInterface $logger,
@@ -89,7 +87,6 @@ class Create
         $this->resultFactory = $resultFactory;
         $this->request = $request;
         $this->jsonSerializer = $jsonSerializer;
-        $this->stripeAdapterFactory = $stripeAdapterFactory;
         $this->checkoutSession = $checkoutSession;
         $this->customerRepository = $customerRepository;
         $this->logger = $logger;
