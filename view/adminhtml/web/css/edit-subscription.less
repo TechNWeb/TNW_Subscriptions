@@ -358,7 +358,7 @@ button.profile__cancel-edit_button {
         .field-description {
             margin-top: 0.5rem;
             .admin__field-control {
-                width: calc( (100%) - 30px );
+                width: 70%;
             }
         }
         .qty-container {
@@ -394,10 +394,10 @@ button.profile__cancel-edit_button {
         }
     }
     .edit-fieldset {
-        float: left;
+        float: right;
         width: 79%;
         padding: 0;
-        margin: 2rem 0 !important;
+        margin: 2rem 0 !important;;
         position: relative;
         &__left,
         &__right {
@@ -483,7 +483,7 @@ button.profile__cancel-edit_button {
         position: relative;
     }
     .field_without_legend {
-        width: calc( (100%) * .7 - 30px);
+        width: 40%;
     }
 }
 [data-index = "account_info"] {
@@ -738,7 +738,7 @@ button.profile__cancel-edit_button {
     .admin__fieldset {
         .admin__field-simple-container {
             float: left;
-            width: calc( (100%) * .49 );
+            width: 49%;
             &:first-child {
                 margin-right: 1%;
             }
@@ -1001,7 +1001,7 @@ button.action-editor.active {
 }
 .admin__field.shipping-methods-fieldset {
     >.admin__field-control {
-        width: calc(100% - 30px );
+        width: 70%;
     }
 }
 #co-transparent-form-braintree {
@@ -1042,18 +1042,21 @@ button.action-editor.active {
 }
 .product-attributes {
     margin-top: 1.5rem;
+    margin-left: 30px;
+    margin-bottom: 1.5rem;
     .admin__fieldset {
         >.admin__field.edit-product {
             margin-top: 0;
             padding-top: 0.3rem;
             padding-bottom: .3rem;
+            margin-bottom: 0;
             &:nth-child(2n) {
                 background-color: #f5f5f5;
             }
             >.admin__field-label {
                 margin-left: 18px;
                 text-align: left;
-                width: calc( (100%) * .50 - 5px ) !important;
+                width: 45% !important;
             }
         }
     }
