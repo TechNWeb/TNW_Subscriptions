@@ -509,10 +509,13 @@ class EmailNotifier
                     \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
                     $storeId
                 );
-                if ($subscriptionProfile->getStatus() == ProfileStatus::STATUS_PAST_DUE
-                    || $subscriptionProfile->getStatus() == ProfileStatus::STATUS_ACTIVE
+                if (
+                    ($subscriptionProfile->getStatus() == ProfileStatus::STATUS_PAST_DUE
+                        || $subscriptionProfile->getStatus() == ProfileStatus::STATUS_ACTIVE
+                        && $enableEmailNotification == 1 && $moduleEnable == 1
+                    )
                     && !$subscriptionProfile->getCancelBeforeNextCycle()
-                    && $enableEmailNotification == 1 && $moduleEnable == 1) {
+                ) {
                     $copyTo = $this->getEmailCopyTo(self::XML_PATH_PAYMENT_RENEWAL_COPY_TO, $storeId);
                     $copyMethod = $this->getCopyMethod(self::XML_PATH_PAYMENT_RENEWAL_COPY_METHOD, $storeId);
                     $this->sendNotificationEmail(

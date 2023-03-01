@@ -180,9 +180,9 @@ class NotificationProcessor
                     && (
                         $profile->getStatus() == ProfileStatus::STATUS_ACTIVE
                         || $profile->getStatus() == ProfileStatus::STATUS_TRIAL
-                        && !$profile->getCancelBeforeNextCycle()
                     )
                     && $this->ccUtilsFactory->create()->isCcExpireBy($profile, $item->getScheduledAt(), true)
+                    && !$profile->getCancelBeforeNextCycle()
                 ) {
                     $this->emailNotifierFactory->create()->cardExpire($profile, $item->getScheduledAt());
                     $profile->getPayment()->setSentMail(1)->save();
