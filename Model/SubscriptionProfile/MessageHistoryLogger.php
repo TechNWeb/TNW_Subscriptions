@@ -28,6 +28,7 @@ class MessageHistoryLogger
     const MESSAGE_SUBSCRIPTION_PRODUCT_STOCK = 9;
     const PAYMENT_METHOD_DATA_CHANGED = 10;
     const COUPON_INVALID = 11;
+    const MESSAGE_SUBSCRIPTION_STATUS_DELAYED_CHANGED = 12;
     /**#@-*/
 
     /**#@+
@@ -90,7 +91,8 @@ class MessageHistoryLogger
         self::MESSAGE_SUBSCRIPTION_PRODUCT_CHANGED => 'Changed [Product %s] to [Product %s]',
         self::MESSAGE_SUBSCRIPTION_PRODUCT_STOCK => 'Products %s were out of stock and not ordered.',
         self::PAYMENT_METHOD_DATA_CHANGED => 'Payment data changed for %s from %s to %s',
-        self::COUPON_INVALID => 'Applied coupon %s is not eligible for this order and was skipped.'
+        self::COUPON_INVALID => 'Applied coupon %s is not eligible for this order and was skipped.',
+        self::MESSAGE_SUBSCRIPTION_STATUS_DELAYED_CHANGED => "Subscription cancellation was scheduled."
     ];
 
     /**

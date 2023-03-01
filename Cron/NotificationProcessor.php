@@ -180,6 +180,7 @@ class NotificationProcessor
                     && (
                         $profile->getStatus() == ProfileStatus::STATUS_ACTIVE
                         || $profile->getStatus() == ProfileStatus::STATUS_TRIAL
+                        && !$profile->getCancelBeforeNextCycle()
                     )
                     && $this->ccUtilsFactory->create()->isCcExpireBy($profile, $item->getScheduledAt(), true)
                 ) {
