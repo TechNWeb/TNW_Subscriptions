@@ -455,7 +455,7 @@ class ProductsForm extends SummaryProductsForm
                         'componentType' => UiContainer::NAME,
                         'component' => 'TNW_Subscriptions/js/components/edit-button',
                         'additionalClasses' => $additionalClasses,
-                        'title' => 'Modify',
+                        'title' => __('Modify Product Options'),
                         'actions' => [
                             [
                                 'targetName' => $this->currentFormName,
