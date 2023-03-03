@@ -25,6 +25,7 @@ use TNW\Subscriptions\Exception\ChangeProfileStatusException;
 use TNW\Subscriptions\Exception\AssignOrderToRelationException;
 use TNW\Subscriptions\Exception\CalculateProfitException;
 use Magento\Framework\App\Request\DataPersistorInterface;
+use Magento\Payment\Gateway\Http\ClientException;
 
 /**
  * Class Process- controller
@@ -149,8 +150,7 @@ class Process extends Action
                     ) {
                         $this->messageManager->addErrorMessage($e->getMessage());
                         $this->queueManager->makeCompleted($item->getId(), $e->getMessage());
-                    } catch (CommandException $e) {
-                        $this->queueManager->makeError($item->getId(), $e->getMessage(), true);
+                    } catch (CommandException | ClientException $e) {
                         $this->messageManager->addErrorMessage(
                             $e->getMessage(),
                             'backend'
