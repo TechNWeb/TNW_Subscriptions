@@ -1057,6 +1057,9 @@
             }
         }
     }
+    .overview-content {
+        .lib-vendor-prefix-display(flex);
+    }
 }
 
 @media (min-width: @screen-xs) and (max-width: 1024px) {
@@ -1404,9 +1407,8 @@
 
     .next-payment {
         width: 30%;
-        height: 100%;
-        float: left;
         margin-bottom: 15px;
+        margin-right: 15px;
 
         .date.day {
             padding-top: 10px;
@@ -1435,8 +1437,11 @@
     }
 
     .status-message {
-        width: 67%;
-        float: right;
+        width: ~'calc(70% - 15px)';
+        .lib-vendor-prefix-display(flex);
+        .lib-vendor-prefix-flex-direction(column);
+        justify-content: space-between;
+        margin-bottom: 15px;
 
         &.full-block {
             width: 100%;
@@ -1475,6 +1480,7 @@
     .subscription-status {
         vertical-align: top;
         color: white;
+        flex-grow: 1;
 
         .title {
             font-size: 3rem;
