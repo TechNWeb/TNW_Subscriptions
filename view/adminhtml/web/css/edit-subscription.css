@@ -39,7 +39,7 @@ button.profile__cancel-edit_button:before {
 .admin__fieldset > .admin__field.field-wide:not(.admin__field-option) > .admin__field-label {
   display: block;
   line-height: 1.4rem;
-  margin-bottom: .86rem;
+  margin-bottom: 0.86rem;
   margin-top: -0.14rem;
   text-align: left;
   width: 100%;
@@ -194,8 +194,8 @@ button.profile__cancel-edit_button:before {
   max-width: 100%;
 }
 .subscription-profile-products-container .sub-button-left {
-  padding-top: .6875em;
-  padding-bottom: .6875em;
+  padding-top: 0.6875em;
+  padding-bottom: 0.6875em;
   font-size: 16px;
   display: inline-block;
   float: none !important;
@@ -203,8 +203,8 @@ button.profile__cancel-edit_button:before {
   margin-right: 1.3rem;
 }
 .subscription-profile-products-container .sub-button-right {
-  padding-top: .6875em;
-  padding-bottom: .6875em;
+  padding-top: 0.6875em;
+  padding-bottom: 0.6875em;
   font-size: 16px;
   display: inline-block;
   float: none !important;
@@ -213,15 +213,15 @@ button.profile__cancel-edit_button:before {
   padding-top: 0;
 }
 .fieldset-wrapper .admin__fieldset .sub-button-left {
-  padding-top: .6875em;
-  padding-bottom: .6875em;
+  padding-top: 0.6875em;
+  padding-bottom: 0.6875em;
   font-size: 16px;
   float: left;
   margin-right: 1.5rem;
 }
 .fieldset-wrapper .admin__fieldset .sub-button-right {
-  padding-top: .6875em;
-  padding-bottom: .6875em;
+  padding-top: 0.6875em;
+  padding-bottom: 0.6875em;
   font-size: 16px;
   float: right;
 }
@@ -278,7 +278,7 @@ button.profile__cancel-edit_button:before {
   margin-top: 0.5rem;
 }
 .subscription-item-form .description-fieldset .field-description .admin__field-control {
-  width: calc(70%);
+  width: 70%;
 }
 .subscription-item-form .description-fieldset .qty-container {
   width: inherit;
@@ -312,7 +312,7 @@ button.profile__cancel-edit_button:before {
   padding-left: 30px;
 }
 .subscription-item-form .edit-fieldset {
-  float: left;
+  float: right;
   width: 79%;
   padding: 0;
   margin: 2rem 0 !important;
@@ -391,7 +391,7 @@ button.profile__cancel-edit_button:before {
   float: none;
 }
 #anchor-content .field_without_legend {
-  width: calc(40%);
+  width: 40%;
 }
 [data-index="account_info"] legend {
   display: none;
@@ -414,7 +414,7 @@ button.profile__cancel-edit_button:before {
   font-weight: 500;
   line-height: 1;
   margin-left: 10px;
-  margin-top: .2rem;
+  margin-top: 0.2rem;
   position: absolute;
   z-index: 1;
 }
@@ -460,7 +460,7 @@ button.profile__cancel-edit_button:before {
   margin-left: 0;
 }
 .admin__payment-details-preview .admin__fieldset > .admin__field > .admin__field-label {
-  width: calc(50%);
+  width: calc(100% * 0.5);
   text-align: left;
   margin-left: 0;
   padding: 0.5rem 0 0.5rem 1rem;
@@ -587,7 +587,7 @@ button.profile__cancel-edit_button:before {
 }
 .radio-options-one-column .admin__field-control > .admin__field-option:nth-child(2):nth-last-child(1) {
   display: block;
-  margin-top: .9rem;
+  margin-top: 0.9rem;
 }
 .radio-options-one-column .admin__field-control > .admin__field-option:nth-child(2):nth-last-child(1) + .admin__field-option {
   display: block;
@@ -601,7 +601,7 @@ button.profile__cancel-edit_button:before {
 }
 .admin__subscription-account-information .admin__fieldset .admin__field-simple-container {
   float: left;
-  width: calc(49%);
+  width: 49%;
 }
 .admin__subscription-account-information .admin__fieldset .admin__field-simple-container:first-child {
   margin-right: 1%;
@@ -827,7 +827,7 @@ button.action-editor.active:before {
   text-align: left;
 }
 .admin__field.shipping-methods-fieldset > .admin__field-control {
-  width: calc(70%);
+  width: 70%;
 }
 #co-transparent-form-braintree .admin__control-text {
   height: 33px;
@@ -857,11 +857,14 @@ button.action-editor.active:before {
 }
 .product-attributes {
   margin-top: 1.5rem;
+  margin-left: 30px;
+  margin-bottom: 1.5rem;
 }
 .product-attributes .admin__fieldset > .admin__field.edit-product {
   margin-top: 0;
   padding-top: 0.3rem;
-  padding-bottom: .3rem;
+  padding-bottom: 0.3rem;
+  margin-bottom: 0;
 }
 .product-attributes .admin__fieldset > .admin__field.edit-product:nth-child(2n) {
   background-color: #f5f5f5;
@@ -869,7 +872,7 @@ button.action-editor.active:before {
 .product-attributes .admin__fieldset > .admin__field.edit-product > .admin__field-label {
   margin-left: 18px;
   text-align: left;
-  width: calc(45%) !important;
+  width: 45% !important;
 }
 .product-attributes .edit-product div.admin__field-control {
   margin-left: 13px;
@@ -882,4 +885,3 @@ button.action-editor.active:before {
 .admin__field-control._with-tooltip.tnw-field-control .admin__field-option {
   display: block;
 }
-/*# sourceMappingURL=edit-subscription.css.map */

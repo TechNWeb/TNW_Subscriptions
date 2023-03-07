@@ -152,6 +152,11 @@ class UpdateStatus
         $model->setData(SubscriptionProfile::CANCEL_BEFORE_NEXT_CYCLE, 1);
 
         $this->profileRepository->save($model);
+        $this->messageHistoryLogger->message(
+            SubscriptionProfile\MessageHistoryLogger::MESSAGE_SUBSCRIPTION_STATUS_DELAYED_CHANGED,
+            [],
+            $profileId
+        );
 
         $this->messageManager->addSuccessMessage(__(
             'Status will be changed before next billing cycle.'
