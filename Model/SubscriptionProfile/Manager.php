@@ -717,7 +717,7 @@ class Manager
             $this->getEngine()->processProfileByRequestData($requestData);
             $additionalInfo = $this->getProfile()->getPayment()->getDecodedPaymentAdditionalInfo();
             $ccType = isset($additionalInfo['cc_type']) ? $additionalInfo['cc_type'] : null;
-            $ccType = $ccType ? $types[$ccType] : $ccType;
+            $ccType = $ccType && array_key_exists($ccType, $types) ? $types[$ccType] : $ccType;
             $ccNumber = isset($additionalInfo['cc_type']) ? $additionalInfo['cc_last_4'] : null;
             $ccExp = $this->propertyAdditionalInfo($additionalInfo, 'cc_exp_month') . '/'
                 . $this->propertyAdditionalInfo($additionalInfo, 'cc_exp_year');
