@@ -1350,6 +1350,9 @@ class Manager
         if ($isRebill
             && $this->profile->getOrigData('billing_frequency_id') == $this->profile->getData('billing_frequency_id')
         ) {
+            if (isset($data['initial_fee'])) {
+                unset($data['initial_fee']);
+            }
             $data['rebill_processing'] = $data['modify_profile'] = $isRebill;
         } elseif ($isRebill) {
             $data['modify_profile'] = $isRebill;

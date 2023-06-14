@@ -57,7 +57,9 @@ class Processor
             if (!isset($request['bundle_option'])
                 || $candidate->getTypeId() === TypeBundle::TYPE_CODE
             ) {
-                $this->productModifier->setInitialFeeToItem($item);
+                if (!isset($request['rebill_processing']) || !$request['rebill_processing']) {
+                    $this->productModifier->setInitialFeeToItem($item);
+                }
             }
 
             // In case of grouped product child items, we need to set custom price from their buyRequest

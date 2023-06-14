@@ -530,7 +530,11 @@ class Product extends Create
      */
     private function addPricesToRequest(array $data, array $productData)
     {
-        $initialFee = $this->getInitialFee($productData, true);
+        if (array_key_exists('rebill_processing', $productData) && $productData['rebill_processing']) {
+            $initialFee = 0;
+        } else {
+            $initialFee = $this->getInitialFee($productData, true);
+        }
         $data = array_merge_recursive(
             $data,
             [
