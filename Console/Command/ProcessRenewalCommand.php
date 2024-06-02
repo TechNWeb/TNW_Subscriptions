@@ -5,7 +5,6 @@
  */
 namespace TNW\Subscriptions\Console\Command;
 
-use Magento\Framework\Console\Cli;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -52,7 +51,7 @@ class ProcessRenewalCommand extends \Symfony\Component\Console\Command\Command
      * @param OutputInterface $output
      * @return int
      */
-    protected function execute(InputInterface $input, OutputInterface $output): int
+    protected function execute(InputInterface $input, OutputInterface $output)
     {
         try {
             $this->appState->setAreaCode(\Magento\Framework\App\Area::AREA_ADMINHTML);
@@ -64,6 +63,5 @@ class ProcessRenewalCommand extends \Symfony\Component\Console\Command\Command
         }
         $output->write("\n");
         $output->writeln("<info>Renewal Notifications Successfully Sent</info>");
-        return Cli::RETURN_SUCCESS;
     }
 }

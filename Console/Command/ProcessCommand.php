@@ -86,7 +86,7 @@ class ProcessCommand extends Base
     /**
      * {@inheritdoc}
      */
-    protected function execute(InputInterface $input, OutputInterface $output): int
+    protected function execute(InputInterface $input, OutputInterface $output)
     {
         if (!$this->getConfig()->isSubscriptionsActive()) {
             $output->writeln($this->getDateTime() . ': TNW Subscriptions integration is disabled.');

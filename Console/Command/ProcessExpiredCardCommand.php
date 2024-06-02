@@ -5,7 +5,6 @@
  */
 namespace TNW\Subscriptions\Console\Command;
 
-use Magento\Framework\Console\Cli;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -50,9 +49,9 @@ class ProcessExpiredCardCommand extends \Symfony\Component\Console\Command\Comma
     /**
      * @param InputInterface $input
      * @param OutputInterface $output
-     * @return int
+     * @return int|void|null
      */
-    protected function execute(InputInterface $input, OutputInterface $output): int
+    protected function execute(InputInterface $input, OutputInterface $output)
     {
         try {
             $this->appState->setAreaCode(\Magento\Framework\App\Area::AREA_ADMINHTML);
@@ -64,6 +63,5 @@ class ProcessExpiredCardCommand extends \Symfony\Component\Console\Command\Comma
         }
         $output->write("\n");
         $output->writeln("<info>Expired Card Notifications Successfully Sent</info>");
-        return Cli::RETURN_SUCCESS;
     }
 }
