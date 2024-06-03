@@ -130,6 +130,11 @@ class Vault extends Base
     private $subscriptionProfileManager;
 
     /**
+     * @var $clientToken
+     */
+    private $clientToken;
+
+    /**
      * Vault constructor.
      * @param ObjectManagerInterface $objectManager
      * @param CcConfig $ccConfig

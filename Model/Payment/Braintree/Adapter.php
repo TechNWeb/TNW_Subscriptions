@@ -53,6 +53,11 @@ class Adapter
     private $storeId;
 
     /**
+     * @var RequestHttp
+     */
+    private $http;
+
+    /**
      * Adapter constructor.
      * @param LoggerInterface $logger
      * @param Manager $moduleManager
