@@ -12,6 +12,11 @@ class Customer implements \Magento\Framework\Option\ArrayInterface
     protected $options;
 
     /**
+     * @var CollectionFactory
+     */
+    protected CollectionFactory $groupCollectionFactory;
+
+    /**
      * Customer constructor.
      * @param CollectionFactory $groupCollectionFactory
      */
