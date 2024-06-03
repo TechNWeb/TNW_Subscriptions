@@ -5,6 +5,7 @@
  */
 namespace TNW\Subscriptions\Plugin\PaymentMethods;
 
+use Laminas\Json\Json;
 use Magento\Framework\Filesystem;
 use Magento\Framework\Component\ComponentRegistrar;
 
@@ -67,7 +68,7 @@ class ActiveMethods
         }
         try {
             $json = $this->filesystem->getDirectoryReadByPath($path)->readFile('composer.json');
-            $data = \Zend_Json::decode($json);
+            $data = Json::decode($json);
             if (array_key_exists('version', $data)) {
                 $version = $data['version'];
             }

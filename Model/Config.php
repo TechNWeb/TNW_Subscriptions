@@ -6,6 +6,7 @@
  */
 namespace TNW\Subscriptions\Model;
 
+use Laminas\Json\Json;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Store\Model\StoreManagerInterface;
@@ -831,7 +832,7 @@ class Config
         if (!$version) {
             try {
                 $json = $this->filesystem->getDirectoryReadByPath(__DIR__ . '/..')->readFile('composer.json');
-                $data = \Zend_Json::decode($json);
+                $data = Json::decode($json);
                 if (array_key_exists('version', $data)) {
                     $version = $data['version'];
                 }

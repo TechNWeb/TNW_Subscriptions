@@ -8,7 +8,7 @@ define(['jquery'], function($) {
         $.widget('mage.configurable', originalConfigurable, {
 
             options: {
-                priceHolderSelector: '.price-box:not(.subscription-price-container)',
+                selectorProductPrice: '[data-role=priceBox]:not(.subscription-price-container)',
             },
 
             /**
