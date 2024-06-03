@@ -5,6 +5,7 @@
  */
 namespace TNW\Subscriptions\Console\Command;
 
+use Magento\Framework\Console\Cli;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -63,5 +64,6 @@ class ProcessRenewalCommand extends \Symfony\Component\Console\Command\Command
         }
         $output->write("\n");
         $output->writeln("<info>Renewal Notifications Successfully Sent</info>");
+        return Cli::RETURN_SUCCESS;
     }
 }
