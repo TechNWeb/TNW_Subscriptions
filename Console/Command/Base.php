@@ -181,7 +181,7 @@ abstract class Base extends Command
     /**
      * {@inheritdoc}
      */
-    public function run(InputInterface $input, OutputInterface $output)
+    public function run(InputInterface $input, OutputInterface $output): int
     {
         $result = parent::run($input, $output);
         $this->eventManager->dispatch('tnw_salesforce_entities_sync');
