@@ -63,6 +63,11 @@ class Manager
     private $addressMapper;
 
     /**
+     * @var DataObjectHelper
+     */
+    private DataObjectHelper $dataObjectHelper;
+
+    /**
      * Manager constructor.
      * @param DataObjectHelper $dataObjectHelper
      * @param CustomerRepositoryInterface $customerRepository
