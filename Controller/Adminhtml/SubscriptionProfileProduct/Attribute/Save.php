@@ -12,6 +12,7 @@ use Magento\Eav\Model\Adminhtml\System\Config\Source\Inputtype\ValidatorFactory;
 use Magento\Framework\Controller\ResultFactory;
 use Magento\Framework\Filter\FilterManager;
 use Magento\Framework\Registry;
+use Magento\Framework\Validator\ValidatorChain;
 use Magento\Framework\View\LayoutFactory;
 use Magento\Framework\View\Result\PageFactory;
 use Magento\Catalog\Model\Product\Attribute\Frontend\Inputtype\Presentation;
@@ -102,7 +103,7 @@ class Save extends Attribute
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      * @SuppressWarnings(PHPMD.NPathComplexity)
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
-     * @throws \Zend_Validate_Exception
+     * @throws \RuntimeException
      */
     public function execute()
     {
@@ -146,7 +147,7 @@ class Save extends Attribute
                 $attributeCode = $this->getRequest()->getParam('attribute_code')
                     ?: $this->generateCode($this->getRequest()->getParam('frontend_label')[0]);
 
-                if (!\Zend_Validate::is($attributeCode, 'Regex', ['pattern' => '/^[a-z][a-z_0-9]{0,30}$/'])) {
+                if (!ValidatorChain::is($attributeCode, 'Regex', ['pattern' => '/^[a-z][a-z_0-9]{0,30}$/'])) {
                     $this->messageManager->addErrorMessage(
                         __(
                             'Attribute code "%1" is invalid. Please use only letters (a-z), ' .
