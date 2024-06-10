@@ -5,6 +5,7 @@
  */
 namespace TNW\Subscriptions\Controller\Adminhtml\SubscriptionProfile\Attribute;
 
+use Laminas\Validator\Regex;
 use Magento\Framework\Controller\ResultFactory;
 use Magento\Framework\Serialize\Serializer\FormData;
 use Magento\Framework\App\ObjectManager;
@@ -72,7 +73,7 @@ class Save extends \TNW\Subscriptions\Controller\Adminhtml\SubscriptionProfile\A
 
     /**
      * @return \Magento\Backend\Model\View\Result\Redirect|\Magento\Framework\App\ResponseInterface|\Magento\Framework\Controller\Result\Json|\Magento\Framework\Controller\ResultInterface
-     * @throws \Zend_Validate_Exception
+     * @throws \RuntimeException
      */
     public function execute()
     {
@@ -96,7 +97,7 @@ class Save extends \TNW\Subscriptions\Controller\Adminhtml\SubscriptionProfile\A
             $attributeCode = $this->getRequest()->getParam('attribute_code')
                 ?: $this->generateCode($this->getRequest()->getParam('frontend_label')[0]);
             if (strlen($attributeCode) > 0) {
-                $validatorAttrCode = new \Zend_Validate_Regex(['pattern' => '/^[a-z][a-z_0-9]{0,30}$/']);
+                $validatorAttrCode = new Regex(['pattern' => '/^[a-z][a-z_0-9]{0,30}$/']);
                 if (!$validatorAttrCode->isValid($attributeCode)) {
                     $this->messageManager->addError(
                         __(

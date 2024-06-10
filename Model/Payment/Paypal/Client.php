@@ -5,6 +5,7 @@
  */
 namespace TNW\Subscriptions\Model\Payment\Paypal;
 
+use Laminas\Http\Exception\RuntimeException;
 use Magento\Framework\Module\Manager;
 use Magento\Framework\ObjectManagerInterface;
 
@@ -41,7 +42,7 @@ class Client
     {
         try {
             return $this->gateway->postRequest($requestData['request'], $requestData['config']);
-        } catch (\Zend_Http_Client_Exception $e) {
+        } catch (RuntimeException $e) {
             throw new \Magento\Framework\Exception\LocalizedException(
                 __('Payment Gateway is unreachable at the moment. Please use another payment option.'),
                 $e
