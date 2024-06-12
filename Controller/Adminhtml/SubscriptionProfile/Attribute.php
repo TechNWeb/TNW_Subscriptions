@@ -5,6 +5,7 @@
  */
 namespace TNW\Subscriptions\Controller\Adminhtml\SubscriptionProfile;
 
+use Laminas\Validator\Regex;
 use Magento\Framework\View\Result\PageFactory;
 
 /**
@@ -97,7 +98,7 @@ abstract class Attribute extends \Magento\Backend\App\Action
      *
      * @param $label
      * @return bool|string
-     * @throws \Zend_Validate_Exception
+     * @throws \RuntimeException
      */
     protected function generateCode($label)
     {
@@ -110,7 +111,7 @@ abstract class Attribute extends \Magento\Backend\App\Action
             0,
             30
         );
-        $validatorAttrCode = new \Zend_Validate_Regex(['pattern' => '/^[a-z][a-z_0-9]{0,29}[a-z0-9]$/']);
+        $validatorAttrCode = new Regex(['pattern' => '/^[a-z][a-z_0-9]{0,29}[a-z0-9]$/']);
         if (!$validatorAttrCode->isValid($code)) {
             $code = 'attr_' . ($code ?: substr(hash('sha512', time()), 0, 8));
         }

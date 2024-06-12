@@ -55,12 +55,8 @@
              module="TNW_Subscriptions" parent="TNW_Subscriptions::top_level" sortOrder="100"
              resource="TNW_Subscriptions::tnw_subscriptions_attributes"/>
         <!-- Subscription -> Attributes -> Subscription - manage profile attributes -->
-        <add id="TNW_Subscriptions::tnw_subscriptions_attributes_subscription" title="Subscription Profiles"
-             translate="title" module="TNW_Subscriptions" sortOrder="110" parent="TNW_Subscriptions::tnw_subscriptions_attributes"
-             action="tnw_subscriptions/subscriptionprofile_attribute/index" resource="TNW_Subscriptions::SubscriptionProfile_attributes"/>
-        <!-- Subscription -> Attributes -> Subscription Product - manage profile product attributes -->
         <add id="TNW_Subscriptions::tnw_subscriptions_attributes_subscription_profile" title="Subscription Profile Products"
-             translate="title" module="TNW_Subscriptions" sortOrder="120" parent="TNW_Subscriptions::tnw_subscriptions_attributes"
+             translate="title" module="TNW_Subscriptions" sortOrder="110" parent="TNW_Subscriptions::tnw_subscriptions_attributes"
              action="tnw_subscriptions/subscriptionprofileproduct_attribute/index" resource="TNW_Subscriptions::ProductSubscriptionProfile_attributes"/>
 
         <!-- Sales -> Operations -> Subscriptions - Subscription profile grid -->

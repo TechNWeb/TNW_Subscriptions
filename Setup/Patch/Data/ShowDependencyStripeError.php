@@ -5,6 +5,7 @@
  */
 namespace TNW\Subscriptions\Setup\Patch\Data;
 
+use Laminas\Json\Json;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Setup\Patch\DataPatchInterface;
 use TNW\Subscriptions\Setup\SubscriptionSetupFactory;
@@ -106,7 +107,7 @@ class ShowDependencyStripeError implements DataPatchInterface
         }
         try {
             $json = $this->filesystem->getDirectoryReadByPath($path)->readFile('composer.json');
-            $data = \Zend_Json::decode($json);
+            $data = Json::decode($json);
             if (array_key_exists('version', $data)) {
                 $version = $data['version'];
             }

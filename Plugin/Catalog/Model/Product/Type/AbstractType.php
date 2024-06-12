@@ -10,6 +10,7 @@ use Magento\Catalog\Model\Product;
 use Magento\Framework\Controller\ResultFactory;
 use Magento\Framework\DataObject;
 use Magento\Framework\Exception\LocalizedException;
+use Magento\Framework\Filter\LocalizedToNormalized;
 use Magento\Framework\Locale\ResolverInterface;
 use TNW\Subscriptions\Model\Config\Product\SubscriptionProductView;
 use TNW\Subscriptions\Model\SubscriptionProfile\Admin\Create\Product as SubscriptionProduct;
@@ -67,7 +68,6 @@ class AbstractType
      *
      * @return mixed
      * @throws LocalizedException
-     * @throws \Zend_Filter_Exception
      */
     public function aroundPrepareForCartAdvanced(
         Product\Type\AbstractType $subject,
@@ -87,11 +87,10 @@ class AbstractType
             && !($buyRequest->getBundleOption() && $product->getTypeId() !== Type::TYPE_CODE)
         ) {
             if (isset($buyRequest['subscribe_qty'])) {
-                $buyRequest['qty'] = \Zend_Filter::filterStatic(
-                    (string)$buyRequest['subscribe_qty'],
-                    'LocalizedToNormalized',
-                    [['locale' => $this->localeResolver->getLocale()]]
+                $filter = new LocalizedToNormalized(
+                    ['locale' => $this->localeResolver->getLocale()]
                 );
+                $buyRequest['qty'] = $filter->filter($buyRequest['subscribe_qty']);
 
                 unset($buyRequest['subscribe_qty']);
             }
