@@ -115,6 +115,7 @@ define([
                     return false;
                 }
                 self.paymentMethodNonce = payload.nonce;
+                self.paymentMethodBin = payload.details.bin;
                 if (self.three_d_enabled) {
                     self.validate3DSecure();
                 } else {
