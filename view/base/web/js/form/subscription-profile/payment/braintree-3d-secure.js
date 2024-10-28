@@ -65,6 +65,7 @@ define([
                     threeDSecureInstance.verifyCard({
                         amount: totalAmount,
                         nonce: context.paymentMethodNonce,
+                        bin: context.paymentMethodBin,
                         onLookupComplete: function (data, next) {
                             next();
                         },
