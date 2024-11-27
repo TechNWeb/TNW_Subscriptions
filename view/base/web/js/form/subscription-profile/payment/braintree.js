@@ -96,6 +96,7 @@ define([
                         'public_hash': self.source.get(self.dataScope + '.additional.publicHash')
                     }).done(function (response) {
                         self.paymentMethodNonce = response.paymentMethodNonce;
+                        self.paymentMethodBin = response.details.bin;
                         self.validate3DSecure()
                     })
                     return
