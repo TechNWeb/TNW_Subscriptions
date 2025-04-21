@@ -204,12 +204,10 @@ define([
                 productQty = presetQty ? presetQty : productQty;
                 if (this.getSavingsCalculationType() === 2) {
                     //formula for service
-                    discount = ((productPrice * calculatedUnit - currentFrequencyPrice) * productQty * 100)
-                        / (productPrice * calculatedUnit);
+                    discount = ((productPrice * calculatedUnit - currentFrequencyPrice) * productQty * 100) / (productPrice * calculatedUnit);
                 } else if (this.getSavingsCalculationType() === 1) {
                     //formula for any retail / physical product with preset qty
-                    discount = ((productPrice * productQty - currentFrequencyPrice) * 100)
-                        / (productPrice * productQty);
+                    discount = ((productPrice * productQty - currentFrequencyPrice) * 100) / (productPrice * productQty);
                 } else {
                     //formula for any retail / physical product
                     discount = ((productPrice - currentFrequencyPrice) * productQty * 100) / productPrice;
