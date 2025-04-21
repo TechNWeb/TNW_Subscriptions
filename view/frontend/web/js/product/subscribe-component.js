@@ -286,12 +286,10 @@ define([
                 if (unitType === '5') {
                     frequencyUnit *= 30;
                 }
-                saving = ((price * frequencyUnit - recurringPrice) * qty * 100)
-                    / (price * frequencyUnit);
+                saving = ((price * frequencyUnit - recurringPrice) * qty * 100) / (price * frequencyUnit);
             } else if (type === 1) {
                 //formula for any retail / physical product with preset qty
-                saving = ((price * qty - recurringPrice) * 100)
-                    / (price * qty);
+                saving = ((price * qty - recurringPrice) * 100) / (price * qty);
             } else {
                 //formula for any retail / physical product
                 saving = ((price - recurringPrice) * 100) / price;
