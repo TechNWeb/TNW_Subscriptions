@@ -2,6 +2,7 @@
   "name": "tnw/subscriptions",
   "description": "Magento 2 Subscriptions",
   "require": {
+    "tnw/marketing": "~2",
     "magento/framework": "^103.0",
     "magento/module-catalog": "^104.0",
     "magento/module-wishlist": "^101.2",
@@ -33,7 +34,7 @@
     "magento/module-webapi": "^100.4"
   },
   "type": "magento2-module",
-  "version": "2.3.94",
+  "version": "2.3.95",
   "autoload": {
     "files": [
       "registration.php"
