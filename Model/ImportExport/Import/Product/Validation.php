@@ -76,6 +76,10 @@ class Validation extends Validator
             return $valid;
         }
 
+        if (!$rowData[$attrCode]) {
+            return true;
+        }
+
         if (!strlen(trim($rowData[$attrCode]))) {
             return true;
         }
