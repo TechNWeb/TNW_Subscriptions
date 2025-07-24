@@ -10,13 +10,13 @@
      data-mage-init='{
         "tnwSubscribeShipment":{
             "saveAddressUrl": "<?= $block->escapeUrl($block->getSaveUrl()) ?>",
-            "showEdit": "<?= $block->isShowEditAddress() ?>",
-            "customerAddressesData": "<?= $block->escapeQuote($block->getCustomerAddressesData())?>",
-            "emptyCountryLabel": "<?= __('Country') ?>"
+            "showEdit": "<?= /* @noEscape */ $block->isShowEditAddress() ?>",
+            "customerAddressesData": "<?= /* @noEscape */ $block->escapeQuote($block->getCustomerAddressesData())?>",
+            "emptyCountryLabel": "<?= /* @noEscape */ __('Country') ?>"
         },
         "tnwSubscribeShipmentDetails":{
             "saveUrl": "<?= $block->escapeUrl($block->getSaveUrl()) ?>",
-            "showEdit": "<?= $block->isShowEditDetails() ?>"
+            "showEdit": "<?= /* @noEscape */ $block->isShowEditDetails() ?>"
         }
      }'>
     <?= $block->getTabMessagesHtml(); ?>

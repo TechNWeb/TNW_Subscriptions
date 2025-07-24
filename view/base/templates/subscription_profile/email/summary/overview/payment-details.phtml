@@ -1,40 +1,40 @@
 <?php
 /* @var \TNW\Subscriptions\Block\Subscription\Summary\Payment\EmailDetails $block */
 ?>
-<h3><?= __("Payment Details") ?></h3>
+<h3><?= /* @noEscape */ __("Payment Details") ?></h3>
 <p>
-    <strong><?= __('Payment Type') ?>:</strong>
+    <strong><?= /* @noEscape */ __('Payment Type') ?>:</strong>
     <br>
-    <?= $block->getPaymentMethodTitle() ?>
+    <?= /* @noEscape */ $block->getPaymentMethodTitle() ?>
 </p>
 <?php if ($additionalInfo = $block->getPaymentAdditionalInfo()):?>
     <?php if (isset($additionalInfo['cc_type']) || isset($additionalInfo['cc_last_4'])): ?>
     <p>
-        <strong><?= __('Card Type') ?></strong>
+        <strong><?= /* @noEscape */ __('Card Type') ?></strong>
         <br>
-        <?= $block->getCreditCardTypeLabel() ?>
+        <?= /* @noEscape */ $block->getCreditCardTypeLabel() ?>
     </p>
     <p>
-        <strong><?= __('Card Number') ?></strong>
+        <strong><?= /* @noEscape */ __('Card Number') ?></strong>
         <br>
-        <?= $block->getCreditCardNumber() ?>
+        <?= /* @noEscape */ $block->getCreditCardNumber() ?>
     </p>
     <p>
-        <strong><?= __('Exp. Date') ?></strong>
+        <strong><?= /* @noEscape */ __('Exp. Date') ?></strong>
         <br>
-        <?= $block->getCreditCardExpDate() ?>
+        <?= /* @noEscape */ $block->getCreditCardExpDate() ?>
     </p>
     <?php endif; ?>
     <?php if (isset($additionalInfo['po_number'])): ?>
         <p>
-            <strong><?= __('Purchase Order Number') ?></strong>
+            <strong><?= /* @noEscape */ __('Purchase Order Number') ?></strong>
             <br>
-            <?= $block->getPurchaseOrderNumber() ?>
+            <?= /* @noEscape */ $block->getPurchaseOrderNumber() ?>
         </p>
     <?php endif; ?>
 <?php endif; ?>
 <p>
-    <strong><?= __('Currency') ?></strong>
+    <strong><?= /* @noEscape */ __('Currency') ?></strong>
     <br>
-    <?= $block->getProfileCurrencyCode() ?>
+    <?= /* @noEscape */ $block->getProfileCurrencyCode() ?>
 </p>

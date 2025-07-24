@@ -84,8 +84,8 @@ class Save extends Attribute
         FilterManager $filterManager,
         Product $productHelper,
         LayoutFactory $layoutFactory,
-        Presentation $presentation = null,
-        FormData $formDataSerializer = null
+        ?Presentation $presentation = null,
+        ?FormData $formDataSerializer = null
     ) {
         parent::__construct($context, $coreRegistry, $resultPageFactory);
         $this->filterManager = $filterManager;

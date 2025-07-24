@@ -75,7 +75,7 @@ class Collection extends Customer\Collection implements Api\Search\SearchResultI
     /**
      * @inheritdoc
      */
-    public function setItems(array $items = null)
+    public function setItems(?array $items = null)
     {
         if ($items) {
             foreach ($items as $item) {

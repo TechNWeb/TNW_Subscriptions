@@ -10,18 +10,18 @@
         <table class="table-secondary data-table">
             <tbody>
             <tr class="col-0">
-                <td class="label"><?= __('Code') ?>:</td>
-                <td class="right"><span class="text"><?= $block->getCouponCode() ?></span></td>
+                <td class="label"><?= /* @noEscape */ __('Code') ?>:</td>
+                <td class="right"><span class="text"><?= /* @noEscape */ $block->getCouponCode() ?></span></td>
             </tr>
             <tr class="col-1">
-                <td class="label"><?= __('Status') ?>:</td>
-                <td class="right"><span class="text"><?= $block->isCouponValid() ? __('Valid') : __('Not valid') ?></span></td>
+                <td class="label"><?= /* @noEscape */ __('Status') ?>:</td>
+                <td class="right"><span class="text"><?= /* @noEscape */ $block->isCouponValid() ? __('Valid') : __('Not valid') ?></span></td>
             </tr>
             </tbody>
         </table>
         <?php else: ?>
         <div>
-            <?= __('Coupon not used') ?>
+            <?= /* @noEscape */ __('Coupon not used') ?>
         </div>
         <?php endif; ?>
     </div>

@@ -226,7 +226,7 @@ class BraintreePaymentDataBuilder extends \TNW\Subscriptions\Model\Payment\DataB
         ModuleManager $moduleManager,
         ObjectManagerInterface $objectManager,
         StoreManagerInterface $storeManager,
-        Config $config = null
+        ?Config $config = null
     ) {
         if ($moduleManager->isEnabled("PayPal_Braintree")) {
             $this->braintreeConfig = $objectManager->get(\PayPal\Braintree\Gateway\Config\Config::class);

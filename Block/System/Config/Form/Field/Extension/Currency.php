@@ -47,10 +47,10 @@ class Currency extends \Magento\Config\Block\System\Config\Form\Field
      * @param ScopeCodeResolver|null $scopeCodeResolver
      */
     protected function _construct(
-        PriceCurrencyInterface $priceCurrency = null,
-        CurrencyInterface $localeCurrency = null,
-        StoreManagerInterface $storeManager = null,
-        ScopeCodeResolver $scopeCodeResolver = null
+        ?PriceCurrencyInterface $priceCurrency = null,
+        ?CurrencyInterface $localeCurrency = null,
+        ?StoreManagerInterface $storeManager = null,
+        ?ScopeCodeResolver $scopeCodeResolver = null
     ) {
         $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
         $this->priceCurrency = $objectManager->create(PriceCurrencyInterface::class);

@@ -38,7 +38,7 @@ class VaultDataBuilder extends \TNW\Subscriptions\Model\Payment\DataBuilder
         SubscriptionConfig $subscriptionConfig,
         Manager $manager,
         ObjectManager $objectManager,
-        Config $config = null
+        ?Config $config = null
     ) {
         $this->tokenManagement = $tokenManagement;
         $this->manager = $manager;

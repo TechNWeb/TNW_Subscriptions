@@ -74,7 +74,7 @@ class AccountPaymentTokenCreator
      * @throws InputException
      * @throws NoSuchEntityException
      */
-    public function create(CreditCard $creditCard, int $customerId = null)
+    public function create(CreditCard $creditCard, ?int $customerId = null)
     {
         $paymentData = [
             'payment_token' => $creditCard->token,

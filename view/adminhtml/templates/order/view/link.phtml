@@ -8,7 +8,7 @@
 ?>
 <?php if ($block->canShow()): ?>
 <tr data-mage-init='{"orderProfileLink":{}}' style="display:none">
-    <th><?= __('Subscription Profile') ?></th>
-    <td><a target="_blank" href="<?= $block->getLinkUrl() ?>"><?= $block->getLinkLabel() ?></a></td>
+    <th><?= /* @noEscape */ __('Subscription Profile') ?></th>
+    <td><a target="_blank" href="<?= /* @noEscape */ $block->getLinkUrl() ?>"><?= /* @noEscape */ $block->getLinkLabel() ?></a></td>
 </tr>
 <?php endif; ?>

@@ -148,8 +148,8 @@ class ProductSubscriptionProfile extends AbstractExtensibleModel implements Prod
         GroupRepository $groupRepository,
         SerializerInterface $serializer,
         GroupManagementInterface $groupManagement,
-        Resource $resource = null,
-        AbstractDb $resourceCollection = null,
+        ?Resource $resource = null,
+        ?AbstractDb $resourceCollection = null,
         array $data = []
     ) {
         parent::__construct(

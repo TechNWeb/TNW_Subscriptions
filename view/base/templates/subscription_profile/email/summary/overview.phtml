@@ -1,6 +1,6 @@
 <?php /* @var \TNW\Subscriptions\Block\Subscription\Summary\EmailOverview $block */ ?>
 <?= $block->getProductsHtml() ?>
-<?= $block->getCouponDetails() ?>
+<?= /* @noEscape */ $block->getCouponDetails() ?>
 
 <table class="order-details">
     <tbody>

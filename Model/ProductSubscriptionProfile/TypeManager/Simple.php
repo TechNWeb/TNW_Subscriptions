@@ -69,7 +69,7 @@ class Simple extends Base
     /**
      * @inheritdoc
      */
-    public function getProductDataObject(SaleableInterface $product, array $arguments = null)
+    public function getProductDataObject(SaleableInterface $product, ?array $arguments = null)
     {
         $productData = parent::getProductDataObject($product, $arguments);
         $productId = $product->getId();

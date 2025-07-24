@@ -7,4 +7,4 @@
 /* @var TNW\Subscriptions\Block\Adminhtml\Sales\Order\Items\Price\Renderer $block */?>
 <?php
 $_item = $block->getItem();
-echo $block->displayPrices($block->getItemBaseInitialFee($_item), $block->getItemInitialFee($_item));
+/* @noEscape */ echo $block->displayPrices($block->getItemBaseInitialFee($_item), $block->getItemInitialFee($_item));

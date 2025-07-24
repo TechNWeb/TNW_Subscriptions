@@ -15,17 +15,17 @@
                 <?php foreach ($messagesCollection as $messageItem): ?>
                     <li class="history-row">
                         <div class="message-type">
-                            <?= $messageItem->getCommentType();?>
+                            <?= /* @noEscape */ $messageItem->getCommentType();?>
                         </div>
 
                         <div class="message-text <?= $messageItem->getIsComment()?'comment':''; ?>">
-                            <?= $messageItem->formatMessage();?>
+                            <?= /* @noEscape */ $messageItem->formatMessage();?>
                         </div>
                         <div class="message-source">
-                            <?= sprintf(__('by %s'), $block->getMessageSource($messageItem)); ?>
+                            <?= /* @noEscape */ sprintf(__('by %s'), $block->getMessageSource($messageItem)); ?>
                         </div>
                         <div class="message-date">
-                            <?= $block->getFormattedDate($messageItem->getCreatedAt()); ?>
+                            <?= /* @noEscape */ $block->getFormattedDate($messageItem->getCreatedAt()); ?>
                         </div>
                         <div class="message-clear"/>
                     </li>

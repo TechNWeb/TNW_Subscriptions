@@ -35,7 +35,7 @@ class Price extends Column
      * @param PriceCurrencyInterface $priceFormatter
      * @param array $components
      * @param array $data
-     * @param Currency $currency
+     * @param Currency|null $currency
      */
     public function __construct(
         ContextInterface $context,
@@ -43,7 +43,7 @@ class Price extends Column
         PriceCurrencyInterface $priceFormatter,
         array $components = [],
         array $data = [],
-        Currency $currency = null
+        ?Currency $currency = null
     ) {
         $this->priceFormatter = $priceFormatter;
         $this->currency = $currency ?: \Magento\Framework\App\ObjectManager::getInstance()

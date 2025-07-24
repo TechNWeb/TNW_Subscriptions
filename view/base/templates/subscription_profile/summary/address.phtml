@@ -1,12 +1,12 @@
 <?php /* @var \TNW\Subscriptions\Block\Subscription\Summary\Address $block */ ?>
 <div class="block">
     <div class="block-title">
-        <strong><?= $block->getAddressTitle() ?></strong>
+        <strong><?= /* @noEscape */ $block->getAddressTitle() ?></strong>
         <?php if ($block->isShowEditLink()): ?>
-            <a href="<?= $block->getEditUrl() ?>" class="profile__edit_button" id="shipping-edit-button"></a>
+            <a href="<?= /* @noEscape */ $block->getEditUrl() ?>" class="profile__edit_button" id="shipping-edit-button"></a>
         <?php endif;?>
     </div>
-    <div class="block-content subscription-profile-<?= $this->getAddressType() ?>-address">
+    <div class="block-content subscription-profile-<?= /* @noEscape */ $this->getAddressType() ?>-address">
         <address>
             <?= $block->getAddressHtml() ?>
         </address>

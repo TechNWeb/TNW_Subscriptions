@@ -133,7 +133,7 @@ class Manager
         SubscriptionProfileRepositoryInterface $profileRepository,
         ResourceSubscriptionProfileOrder $resource,
         Json $serializer,
-        LoggerInterface $logger = null
+        ?LoggerInterface $logger = null
     ) {
         $this->serializer = $serializer;
         $this->resource = $resource;

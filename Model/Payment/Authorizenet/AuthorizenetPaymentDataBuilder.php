@@ -31,7 +31,7 @@ class AuthorizenetPaymentDataBuilder extends \TNW\Subscriptions\Model\Payment\Da
         ObjectManager $objectManager,
         SubscriptionConfig $subscriptionConfig,
         Manager $manager,
-        Config $config = null
+        ?Config $config = null
     ) {
         $this->manager = $manager;
         $this->subscriptionConfig = $subscriptionConfig;

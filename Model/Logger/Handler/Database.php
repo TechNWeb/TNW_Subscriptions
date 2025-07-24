@@ -6,6 +6,7 @@
 namespace TNW\Subscriptions\Model\Logger\Handler;
 
 use Monolog\Handler\AbstractProcessingHandler;
+use Monolog\LogRecord;
 
 /**
  * Class Database - db log
@@ -47,14 +48,9 @@ class Database extends AbstractProcessingHandler
         parent::__construct();
     }
 
-    /**
-     * Writes the record down to the log of the implementing handler
-     *
-     * @param  array $record
-     * @return void
-     */
-    protected function write(array $record): void
+    protected function write(LogRecord $record): void
     {
+        $recordArray = $record->toArray();
         if (!$this->subscriptionsConfig->getDbLogStatus()) {
             return;
         }
@@ -63,13 +59,13 @@ class Database extends AbstractProcessingHandler
             do {
                 $this->resourceMessage
                     ->saveRecord(
-                        $record['extra']['uid'],
-                        $record['level'],
-                        substr($record['message'], 0, self::MESSAGE_LIMIT_SIZE)
+                        $recordArray['extra']['uid'],
+                        $recordArray['level'],
+                        substr($recordArray['message'], 0, self::MESSAGE_LIMIT_SIZE)
                     );
 
-                $record['message'] = substr($record['message'], self::MESSAGE_LIMIT_SIZE);
-            } while (!empty($record['message']));
+                $recordArray['message'] = substr($recordArray['message'], self::MESSAGE_LIMIT_SIZE);
+            } while (!empty($recordArray['message']));
 
         } catch (\Exception $e) {
             $this->systemLogger->error($e);

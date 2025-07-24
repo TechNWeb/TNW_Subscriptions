@@ -25,7 +25,7 @@ $code = 'tnw_stripe';
     ], function ($, stripes) {
             var self = this,
                 stripeCardElement;
-            var stripe = window.Stripe("<?= $block->getPublishableKey(); ?>");
+            var stripe = window.Stripe("<?= /* @noEscape */ $block->getPublishableKey(); ?>");
             stripeCardElement = stripe.elements();
             var style = {
                 base: {

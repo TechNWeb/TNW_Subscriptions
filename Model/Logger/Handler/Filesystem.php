@@ -8,6 +8,7 @@ namespace TNW\Subscriptions\Model\Logger\Handler;
 use Magento\Framework\Logger\Handler\Base;
 use Monolog\Formatter\LineFormatter;
 use Monolog\Logger;
+use Monolog\LogRecord;
 
 /**
  * Class Filesystem - file log
@@ -46,10 +47,7 @@ class Filesystem extends Base
         $this->setFormatter(new LineFormatter("[%datetime%] [%extra.uid%] %level_name%: %message%\n"));
     }
 
-    /**
-     * @param array $record
-     */
-    public function write(array $record): void
+    protected function write(LogRecord $record): void
     {
         if (!$this->salesforceConfig->getLogStatus()) {
             return;
