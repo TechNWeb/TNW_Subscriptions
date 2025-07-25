@@ -32,9 +32,7 @@ class UidProcessor
 
     public function __invoke(LogRecord $record)
     {
-        $recordArray = $record->toArray();
-        $recordArray['extra']['uid'] = $this->uid;
-
+        $record->extra['uid'] = $this->uid;
         return $record;
     }
 
