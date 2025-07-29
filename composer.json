@@ -34,7 +34,7 @@
     "magento/module-webapi": "^100.4"
   },
   "type": "magento2-module",
-  "version": "2.4.0",
+  "version": "2.4.0.5",
   "autoload": {
     "files": [
       "registration.php"
