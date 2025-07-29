@@ -9,10 +9,10 @@
 <div class="subscription-data-wrapper"
      data-mage-init='{"tnwSubscribeBilling":{
         "saveAddressUrl": "<?= $block->escapeUrl($block->getSaveAddressUrl()) ?>",
-        "showEdit": "<?= $block->isShowEdit() ?>",
-        "showEditDetails": "<?= $block->isShowEditDetails() ?>",
+        "showEdit": "<?= /* @noEscape */ $block->isShowEdit() ?>",
+        "showEditDetails": "<?= /* @noEscape */ $block->isShowEditDetails() ?>",
         "customerAddressesData": "<?= $block->escapeQuote($block->getCustomerAddressesData())?>",
-        "emptyCountryLabel": "<?= __('Country') ?>"
+        "emptyCountryLabel": "<?= /* @noEscape */ __('Country') ?>"
     }}'>
     <?= $block->getTabMessagesHtml(); ?>
     <div class="grid-row">

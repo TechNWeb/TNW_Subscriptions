@@ -6,6 +6,7 @@
 namespace TNW\Subscriptions\Model\Logger\Handler;
 
 use Monolog\Handler\AbstractProcessingHandler;
+use Monolog\LogRecord;
 
 /**
  * Class Admin - admin logger
@@ -44,15 +45,9 @@ class Admin extends AbstractProcessingHandler
         parent::__construct(\Monolog\Logger::INFO);
     }
 
-    /**
-     * Writes the record down to the log of the implementing handler
-     *
-     * @param  array $record
-     * @return void
-     * @throws \Magento\Framework\Exception\LocalizedException
-     */
-    protected function write(array $record): void
+    protected function write(LogRecord $record): void
     {
+        $recordArray = $record->toArray();
         if ($this->appState->getAreaCode()
             && strcasecmp($this->appState->getAreaCode(), \Magento\Framework\App\Area::AREA_ADMINHTML) !== 0
         ) {
@@ -65,21 +60,21 @@ class Admin extends AbstractProcessingHandler
             return;
         }
 
-        switch ($record['level']) {
+        switch ($recordArray['level']) {
             case \Monolog\Logger::ERROR:
-                $this->messageManager->addErrorMessage($record['message'], 'backend');
+                $this->messageManager->addErrorMessage($recordArray['message'], 'backend');
                 break;
 
             case \Monolog\Logger::WARNING:
-                $this->messageManager->addWarningMessage($record['message'], 'backend');
+                $this->messageManager->addWarningMessage($recordArray['message'], 'backend');
                 break;
 
             case \Monolog\Logger::INFO:
-                $this->messageManager->addSuccessMessage($record['message'], 'backend');
+                $this->messageManager->addSuccessMessage($recordArray['message'], 'backend');
                 break;
 
             case \Monolog\Logger::NOTICE:
-                $this->messageManager->addNoticeMessage($record['message'], 'backend');
+                $this->messageManager->addNoticeMessage($recordArray['message'], 'backend');
                 break;
         }
     }

@@ -142,7 +142,7 @@ abstract class Base implements TypeInterface
     /**
      * @inheritdoc
      */
-    public function getProductDataObject(SaleableInterface $product, array $arguments = null)
+    public function getProductDataObject(SaleableInterface $product, ?array $arguments = null)
     {
         $data = [
             'price' => $product->getOrigData('price'),

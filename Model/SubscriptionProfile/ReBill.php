@@ -37,8 +37,8 @@ class ReBill extends AbstractModel implements ReBillInterface
         Context $context,
         Registry $registry,
         Json $serializer,
-        AbstractResource $resource = null,
-        AbstractDb $resourceCollection = null,
+        ?AbstractResource $resource = null,
+        ?AbstractDb $resourceCollection = null,
         array $data = []
     ) {
         parent::__construct($context, $registry, $resource, $resourceCollection, $data);

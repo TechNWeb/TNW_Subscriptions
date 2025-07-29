@@ -28,7 +28,7 @@ class Grouped extends Base
      * @param array|null $arguments
      * @return \Magento\Framework\DataObject
      */
-    public function getProductDataObject(SaleableInterface $product, array $arguments = null)
+    public function getProductDataObject(SaleableInterface $product, ?array $arguments = null)
     {
         $data = parent::getProductDataObject($product, $arguments);
         $groupedPurchaseTypes = [];

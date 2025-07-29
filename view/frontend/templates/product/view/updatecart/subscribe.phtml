@@ -21,16 +21,16 @@ $customerProductsHistoryListViewModel = $block->getData('customerProductsHistory
                     "recurringAddToCart": {
                         "component": "TNW_Subscriptions/js/product/subscribe-component",
                         "config": {
-                            "defaultFrequency" : "<?= $block->getDefaultFrequency() ?>",
+                            "defaultFrequency" : "<?= /* @noEscape */ $block->getDefaultFrequency() ?>",
                             "buttonLabel" : "<?= $block->escapeHtml(__('Update cart')) ?>",
-                            "dateFormat": "<?= $block->getDateFormat() ?>",
-                            "minStartOn" : "<?= $block->getMinStartOn() ?>",
-                            "defaultPeriod" : "<?= $block->getDefaultPeriod() ?>",
-                            "defaultUntilCancelled" : "<?= $block->getDefaultUntilCancelled() ?>",
-                            "defaultSubscribeQty" : "<?= $block->getDefaultSubscribeQty() ?>",
-                            "defaultStartOn" : "<?= $block->getDefaultStartOn() ?>",
-                            "products" : <?= $block->getProductDataArray() ?>,
-                            "defaultIsTrial" : <?= $block->getIsTrial() ?>,
+                            "dateFormat": "<?= /* @noEscape */ $block->getDateFormat() ?>",
+                            "minStartOn" : "<?= /* @noEscape */ $block->getMinStartOn() ?>",
+                            "defaultPeriod" : "<?= /* @noEscape */ $block->getDefaultPeriod() ?>",
+                            "defaultUntilCancelled" : "<?= /* @noEscape */ $block->getDefaultUntilCancelled() ?>",
+                            "defaultSubscribeQty" : "<?= /* @noEscape */ $block->getDefaultSubscribeQty() ?>",
+                            "defaultStartOn" : "<?= /* @noEscape */ $block->getDefaultStartOn() ?>",
+                            "products" : <?= /* @noEscape */ $block->getProductDataArray() ?>,
+                            "defaultIsTrial" : <?= /* @noEscape */ $block->getIsTrial() ?>,
                             "isTrialAvailableForUser" : "<?= /* @noEscape */ $customerProductsHistoryListViewModel->isProductTrialAvailableForCurrentCustomer($block->getProduct()->getId()) ?>"
                         }
                     }

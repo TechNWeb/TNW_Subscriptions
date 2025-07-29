@@ -5,11 +5,11 @@
         <?php if ($block->getCanShowNextPayment()): ?>
             <div class="summary-item next-payment"><?= $block->getNextPaymentHtml() ?></div>
         <?php endif ?>
-        <div class="summary-item status-message <?= $block->getStatusMessageBlockClass() ?>">
-            <div class="bordered subscription-message <?= $block->getBlockMessage()->getStatusClass() ?>">
+        <div class="summary-item status-message <?= /* @noEscape */ $block->getStatusMessageBlockClass() ?>">
+            <div class="bordered subscription-message <?= /* @noEscape */ $block->getBlockMessage()->getStatusClass() ?>">
                 <?= $block->getMessageHtml() ?>
             </div>
-            <div class="bordered subscription-status <?= $block->getBlockStatus()->getStatusClass() ?>">
+            <div class="bordered subscription-status <?= /* @noEscape */ $block->getBlockStatus()->getStatusClass() ?>">
                 <?= $block->getStatusHtml() ?>
             </div>
         </div>

@@ -15,16 +15,16 @@
 <?php if (key_exists('subscription_data', $itemOptions['info_buyRequest'])): ?>
     <table>
         <tr>
-            <td><img class="product-image" src="<?= $block->getImageThumbnail($magentoProduct) ?>"></td>
+            <td><img class="product-image" src="<?= /* @noEscape */ $block->getImageThumbnail($magentoProduct) ?>"></td>
             <td class="item-subscription-info">
-                <dt><?= __('Billing Frequency') ?></dt>
-                <dd><?= $block->getBillingFrequencyLabel($itemOptions['info_buyRequest']['billing_frequency']) ?></dd>
-                <dt><?= __('Term') ?></dt>
-                <dd><?= $block->getTerm($itemOptions['info_buyRequest']) ?></dd>
-                <dt><?= __('Start on') ?></dt>
-                <dd><?= date("d M, Y", strtotime($itemOptions['info_buyRequest']['subscription_data']['unique']['start_on'])) ?></dd>
-                <dt><?= __('Next payment') ?></dt>
-                <dd><?= date("d M, Y", strtotime($block->getNextPayment($itemOptions['info_buyRequest']))) ?></dd>
+                <dt><?= /* @noEscape */ __('Billing Frequency') ?></dt>
+                <dd><?= /* @noEscape */ $block->getBillingFrequencyLabel($itemOptions['info_buyRequest']['billing_frequency']) ?></dd>
+                <dt><?= /* @noEscape */ __('Term') ?></dt>
+                <dd><?= /* @noEscape */ $block->getTerm($itemOptions['info_buyRequest']) ?></dd>
+                <dt><?= /* @noEscape */ __('Start on') ?></dt>
+                <dd><?= /* @noEscape */ date("d M, Y", strtotime($itemOptions['info_buyRequest']['subscription_data']['unique']['start_on'])) ?></dd>
+                <dt><?= /* @noEscape */ __('Next payment') ?></dt>
+                <dd><?= /* @noEscape */ date("d M, Y", strtotime($block->getNextPayment($itemOptions['info_buyRequest']))) ?></dd>
             </td>
         </tr>
     </table>
@@ -32,7 +32,7 @@
 <?php else: ?>
     <table>
         <tr>
-            <td><img class="product-image" src="<?= $block->getImageThumbnail($magentoProduct) ?>"></td>
+            <td><img class="product-image" src="<?= /* @noEscape */ $block->getImageThumbnail($magentoProduct) ?>"></td>
         </tr>
     </table>
 <?php endif; ?>

@@ -121,7 +121,7 @@ $canApplyMsrp = $helper->isShowBeforeOrderConfirm($product) && $helper->isMinima
 
         <?php if ($groupsViewModel->isSubscriptionItem($_item)): ?>
         <td class="col subtotal subscription" data-th="<?= $block->escapeHtmlAttr(__('Subtotal')) ?>">
-            <span><?= $groupsViewModel->getSubscriptionItemPrice($_item)?></span>
+            <span><?= /* @noEscape */ $groupsViewModel->getSubscriptionItemPrice($_item)?></span>
         <?php else: ?>
         <td class="col subtotal" data-th="<?= $block->escapeHtmlAttr(__('Subtotal')) ?>">
             <?php if ($canApplyMsrp):?>

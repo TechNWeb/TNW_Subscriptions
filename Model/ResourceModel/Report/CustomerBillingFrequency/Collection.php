@@ -55,7 +55,7 @@ class Collection extends BillingFrequency\Collection implements Api\Search\Searc
     /**
      * @inheritdoc
      */
-    public function setItems(array $items = null)
+    public function setItems(?array $items = null)
     {
         if ($items) {
             foreach ($items as $item) {

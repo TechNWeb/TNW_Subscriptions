@@ -14,7 +14,7 @@
                        name="shipping_method_id"
                        value="<?= $block->escapeHtml($shippingMethod['value'])?>"
                        id="<?= $block->escapeHtml($shippingMethod['value'])?>"
-                       <?= $block->isSubscriptionShippingMethod($shippingMethod['value'])?>>
+                       <?= /* @noEscape */ $block->isSubscriptionShippingMethod($shippingMethod['value'])?>>
                 <label for="<?= $block->escapeHtml($shippingMethod['value'])?>">
                     <?= $block->escapeHtml($shippingMethod['label'])?>
                 </label>

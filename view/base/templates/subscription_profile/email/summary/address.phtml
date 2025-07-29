@@ -1,5 +1,5 @@
 <?php
 /* @var \TNW\Subscriptions\Block\Subscription\Summary\Address $block */
 ?>
-<h3><?= $block->getAddressTitle() ?></h3>
-<p><?= $block->getAddressHtml() ?></p>
+<h3><?= /* @noEscape */ $block->getAddressTitle() ?></h3>
+<p><?= /* @noEscape */ $block->getAddressHtml() ?></p>

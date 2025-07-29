@@ -41,8 +41,8 @@ class Payment extends AbstractModel implements SubscriptionProfilePaymentInterfa
      * @param Registry $registry
      * @param JsonHelper $jsonHelper
      * @param EncryptorInterface $encryptor
-     * @param AbstractResource $resource
-     * @param AbstractDb $resourceCollection
+     * @param AbstractResource|null $resource
+     * @param AbstractDb|null $resourceCollection
      * @param array $data
      */
     public function __construct(
@@ -50,8 +50,8 @@ class Payment extends AbstractModel implements SubscriptionProfilePaymentInterfa
         Registry $registry,
         JsonHelper $jsonHelper,
         EncryptorInterface $encryptor,
-        AbstractResource $resource = null,
-        AbstractDb $resourceCollection = null,
+        ?AbstractResource $resource = null,
+        ?AbstractDb $resourceCollection = null,
         array $data = []
     ) {
         parent::__construct($context, $registry, $resource, $resourceCollection, $data);

@@ -1,5 +1,5 @@
 <?php /* @var \TNW\Subscriptions\Block\Subscription\Summary\Overview\MissedPayments $block */ ?>
 <div class="block-missed-payments">
-    <div class="title"><?= __('Total missed payments') ?></div>
-    <div class="value"><?= $block->getCountOfMissedPayments() ?></div>
+    <div class="title"><?= /* @noEscape */ __('Total missed payments') ?></div>
+    <div class="value"><?= /* @noEscape */ $block->getCountOfMissedPayments() ?></div>
 </div>

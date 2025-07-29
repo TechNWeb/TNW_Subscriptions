@@ -256,7 +256,7 @@ class Manager
     public function populateProductDataFromCartCandidate(
         $cartCandidate,
         $requestData,
-        DataObject $product = null,
+        ?DataObject $product = null,
         $zeroPrices = false
     ) {
         $product = $product ?: $cartCandidate;
@@ -291,13 +291,13 @@ class Manager
      * Sets to profile product data from quote item.
      *
      * @param Item $item
-     * @param DataObject $product
+     * @param DataObject|null $product
      * @param bool $zeroPrices
      * @return $this
      */
     public function populateProductDataFromQuoteItem(
         Item $item,
-        DataObject $product = null,
+        ?DataObject $product = null,
         $zeroPrices = false
     ) {
         $product = $product ?: $item->getProduct();

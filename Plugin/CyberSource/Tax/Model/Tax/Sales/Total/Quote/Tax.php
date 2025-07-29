@@ -44,7 +44,7 @@ class Tax
     public function __construct(
         TaxClassKeyInterfaceFactory $taxClassKeyDataObjectFactory,
         QuoteDetailsItemExtensionInterfaceFactory $quoteDetailsItemExtensionFactory,
-        TaxHelper $taxHelper = null
+        ?TaxHelper $taxHelper = null
     ) {
         $this->taxClassKeyDataObjectFactory = $taxClassKeyDataObjectFactory;
         $this->quoteDetailsItemExtensionFactory = $quoteDetailsItemExtensionFactory;

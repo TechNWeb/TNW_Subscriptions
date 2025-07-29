@@ -27,14 +27,14 @@
                 <tr>
                     <td data-th="" class="sub-icons-container">
                         <?php if ($block->getIconSubClass($subscription)): ?>
-                            <div class="sub-icon tooltip-toggle <?= $block->getIconSubClass($subscription) ?>"></div>
+                            <div class="sub-icon tooltip-toggle <?= /* @noEscape */ $block->getIconSubClass($subscription) ?>"></div>
                         <?php endif; ?>
                         <div class="sub-message tooltip-content">
-                            <?= $block->getStatusMessage($subscription) ?>
+                            <?= /* @noEscape */ $block->getStatusMessage($subscription) ?>
                         </div>
                     </td>
                     <td data-th="<?= $block->escapeHtml(__('Subscription #')) ?>" class="col id">
-                        <a href="<?= $block->getEditUrl($subscription) ?>">
+                        <a href="<?= /* @noEscape */ $block->getEditUrl($subscription) ?>">
                             <?= /* @escapeNotVerified */ $subscription->getLabel() ?>
                         </a>
                     </td>
@@ -45,7 +45,7 @@
                         <?= /* @escapeNotVerified */ $block->getBillingFrequency($subscription->getId()); ?>
                     </td>
                     <td data-th="<?= $block->escapeHtml(__('Status')) ?>"
-                        class="col status <?= $block->getStatusClass($subscription->getStatus())?>">
+                        class="col status <?= /* @noEscape */ $block->getStatusClass($subscription->getStatus())?>">
                         <?= /* @escapeNotVerified */ $block->getStatusLabel($subscription->getStatus()) ?>
                     </td>
                     <td data-th="<?= $block->escapeHtml(__('Next Payment')) ?>" class="col next-payment">

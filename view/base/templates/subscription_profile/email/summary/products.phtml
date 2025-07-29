@@ -22,12 +22,12 @@
             <?php foreach ($block->getItems() as $item): ?>
                 <tr>
                     <td class="item-info">
-                        <p class="product-name"><?= $block->getName($item) ?></p>
-                        <img class="product-image" src="<?= $block->getImageUrl($item) ?>" alt="<?= $block->getName($item) ?>"/>
+                        <p class="product-name"><?= /* @noEscape */ $block->getName($item) ?></p>
+                        <img class="product-image" src="<?= /* @noEscape */ $block->getImageUrl($item) ?>" alt="<?= /* @noEscape */ $block->getName($item) ?>"/>
                     </td>
                     <td class="item-additional">
                         <dl class="item-options custom-attributes">
-                            <dt class="qty"><?= __('Qty') ?></dt>
+                            <dt class="qty"><?= /* @noEscape */ __('Qty') ?></dt>
                             <dd><?= (int)$item->getQty() ?></dd>
                             <?php foreach ($block->getItemOptions($item) as $option): ?>
                                 <dt><?= $block->escapeHtml($option['label']) ?></dt>
@@ -47,22 +47,22 @@
                         </dl>
                     </td>
                     <td class="item-subscription-info">
-                        <dt><?= __('Billing Frequency') ?></dt>
-                        <dd><?= $block->getBillingFrequencyLabel() ?></dd>
-                        <dt><?= __('Term') ?></dt>
-                        <dd><?= $block->getTerm() ?></dd>
-                        <dt><?= __('Start on') ?></dt>
-                        <dd><?= $block->getStartOnFormatted() ?></dd>
-                        <dt><?= __('Price') ?></dt>
+                        <dt><?= /* @noEscape */ __('Billing Frequency') ?></dt>
+                        <dd><?= /* @noEscape */ $block->getBillingFrequencyLabel() ?></dd>
+                        <dt><?= /* @noEscape */ __('Term') ?></dt>
+                        <dd><?= /* @noEscape */ $block->getTerm() ?></dd>
+                        <dt><?= /* @noEscape */ __('Start on') ?></dt>
+                        <dd><?= /* @noEscape */ $block->getStartOnFormatted() ?></dd>
+                        <dt><?= /* @noEscape */ __('Price') ?></dt>
                         <?php $taxAmount = (float) $item->getTaxAmount($subscriptionProfile) ?>
                         <dd>
-                            <?= $block->formatPrice($item->getPrice() + $taxAmount) ?>
+                            <?= /* @noEscape */ $block->formatPrice($item->getPrice() + $taxAmount) ?>
                             <?php if ($taxAmount): ?>
-                                <?= '(' .  __('Incl. Tax') . ')' ?>
+                                <?= /* @noEscape */ '(' .  __('Incl. Tax') . ')' ?>
                             <?php endif; ?>
                         </dd>
-                        <dt><?= __('Subtotal') ?></dt>
-                        <dd><?= $block->getProfileFrequencyDescription() ?></dd>
+                        <dt><?= /* @noEscape */ __('Subtotal') ?></dt>
+                        <dd><?= /* @noEscape */ $block->getProfileFrequencyDescription() ?></dd>
                     </td>
                 </tr>
             <?php endforeach; ?>

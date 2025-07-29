@@ -72,7 +72,7 @@ class Configurable extends Base
     /**
      * @inheritdoc
      */
-    public function getProductDataObject(SaleableInterface $product, array $arguments = null)
+    public function getProductDataObject(SaleableInterface $product, ?array $arguments = null)
     {
         $productData = parent::getProductDataObject($product, $arguments);
         $childProduct = $product;

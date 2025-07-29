@@ -1,7 +1,7 @@
 <?php
 /* @var \TNW\Subscriptions\Block\Subscription\Summary\Shipping\Details $block */
 ?>
-<h3><?= __("Shipping Details") ?></h3>
-<strong><?= __("Shipping Method") ?></strong>
+<h3><?= /* @noEscape */ __("Shipping Details") ?></h3>
+<strong><?= /* @noEscape */ __("Shipping Method") ?></strong>
 <br>
-<?= $block->getShippingDescription() ?>
+<?= /* @noEscape */ $block->getShippingDescription() ?>

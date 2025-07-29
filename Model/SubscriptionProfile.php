@@ -201,8 +201,8 @@ class SubscriptionProfile extends AbstractExtensibleModel implements Subscriptio
         SubscriptionProfileProfit $profileProfit,
         SubscriptionProfileOrder $subscriptionProfileOrder,
         Config $config,
-        Resource $resource = null,
-        AbstractDb $resourceCollection = null,
+        ?Resource $resource = null,
+        ?AbstractDb $resourceCollection = null,
         array $data = []
     ) {
         parent::__construct(

@@ -64,7 +64,7 @@ class AccountManager
     public function createFromBillingAddress(
         AddressInterface $billingAddress,
         string $paymentMethodNonce,
-        int $storeId = null
+        ?int $storeId = null
     ) {
         $transfer = $this->buildTransferObject($billingAddress, $paymentMethodNonce, $storeId);
         $response = $this->transactionCustomer->placeRequest($transfer);
@@ -83,7 +83,7 @@ class AccountManager
     private function buildTransferObject(
         AddressInterface $billingAddress,
         string $paymentMethodNonce,
-        int $storeId = null
+        ?int $storeId = null
     ) {
         return $this->transferFactory->create([
             'firstName' => $billingAddress->getFirstname(),

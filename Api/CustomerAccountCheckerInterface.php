@@ -22,5 +22,5 @@ interface CustomerAccountCheckerInterface
      * @throws LocalizedException
      * @throws NoSuchEntityException
      */
-    public function isCustomerExistsAndShouldBeLoggedIn(string $customerEmail, string $cartId = null): int;
+    public function isCustomerExistsAndShouldBeLoggedIn(string $customerEmail, ?string $cartId = null): int;
 }

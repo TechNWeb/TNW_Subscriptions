@@ -674,7 +674,7 @@ class Form extends AbstractDataProvider
      * @return array
      * @throws NoSuchEntityException
      */
-    protected function getFrequenciesData($needProductValues, $productId, array $additionalData = null)
+    protected function getFrequenciesData($needProductValues, $productId, ?array $additionalData = null)
     {
         $data = [];
         $addedDefault = false;

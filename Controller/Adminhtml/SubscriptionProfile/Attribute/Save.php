@@ -60,7 +60,7 @@ class Save extends \TNW\Subscriptions\Controller\Adminhtml\SubscriptionProfile\A
         \Magento\Eav\Model\Adminhtml\System\Config\Source\Inputtype\ValidatorFactory $validatorFactory,
         \Magento\Catalog\Helper\Product $productHelper,
         \Magento\Framework\View\LayoutFactory $layoutFactory,
-        FormData $formDataSerializer = null
+        ?FormData $formDataSerializer = null
     ) {
         parent::__construct($context, $coreRegistry, $resultPageFactory);
         $this->productHelper = $productHelper;

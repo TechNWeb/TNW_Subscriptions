@@ -82,7 +82,7 @@ interface TypeInterface
      * @param array|null $arguments
      * @return DataObject
      */
-    public function getProductDataObject(SaleableInterface $product, array $arguments = null);
+    public function getProductDataObject(SaleableInterface $product, ?array $arguments = null);
 
     /**
      * Check if billing frequency exist for products.

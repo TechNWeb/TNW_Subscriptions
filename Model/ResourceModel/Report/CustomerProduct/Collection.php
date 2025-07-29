@@ -96,11 +96,11 @@ class Collection extends Product\Collection implements Api\Search\SearchResultIn
     /**
      * Set items list.
      *
-     * @param \Magento\Framework\Api\Search\DocumentInterface[] $items
+     * @param \Magento\Framework\Api\Search\DocumentInterface[]|null $items
      * @return $this
      * @throws \Magento\Framework\Exception\LocalizedException
      */
-    public function setItems(array $items = null)
+    public function setItems(?array $items = null)
     {
         if ($items) {
             foreach ($items as $item) {

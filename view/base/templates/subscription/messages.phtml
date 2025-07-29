@@ -10,8 +10,8 @@
     <?php $types = $block->getMessageTypes(); ?>
     <?php foreach ($types as $type): ?>
         <?php foreach ($block->getGroupMessages($type) as $message): ?>
-            <div class="message-<?= $type ?> <?= $type ?> message">
-                <div><?= $message; ?></div>
+            <div class="message-<?=  /* @noEscape */ $type ?> <?=  /* @noEscape */ $type ?> message">
+                <div><?= /* @noEscape */ $message; ?></div>
             </div>
         <?php endforeach; ?>
     <?php endforeach; ?>

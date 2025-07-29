@@ -53,7 +53,7 @@ class CustomerAccountChecker implements CustomerAccountCheckerInterface
     /**
      * {@inheritdoc}
      */
-    public function isCustomerExistsAndShouldBeLoggedIn(string $customerEmail, string $cartId = null): int
+    public function isCustomerExistsAndShouldBeLoggedIn(string $customerEmail, ?string $cartId = null): int
     {
         $result = self::IS_CUSTOMER_GUEST;
         if (!$this->accountManagement->isEmailAvailable($customerEmail)) {

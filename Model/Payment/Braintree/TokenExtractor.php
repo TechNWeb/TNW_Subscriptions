@@ -47,7 +47,7 @@ class TokenExtractor
         PaymentTokenFactoryInterface $paymentTokenFactory,
         ModuleManager $moduleManager,
         ObjectManager $objectManager,
-        SerializerInterface $serializer = null
+        ?SerializerInterface $serializer = null
     ) {
         if ($moduleManager->isEnabled("PayPal_Braintree")) {
             $this->config = $objectManager->get(\PayPal\Braintree\Gateway\Config\Config::class);
