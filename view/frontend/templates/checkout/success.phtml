@@ -16,7 +16,7 @@ $profileSuccessViewModel = $block->getProfileSuccessViewModel();
     <?php if ($block->getData('order_id')):?>
         <?php if ($block->getData('can_view_order')) :?>
             <ul>
-                <li><span><?= __('Order %1 placed', sprintf('<a href="%s" class="order-number"><strong>%s</strong></a>', $block->escapeHtml($block->getViewOrderUrl()), $block->escapeHtml($block->getOrderId()))) ?></span></li>
+                <li><span><?= /* @noEscape */ __('Order %1 placed', sprintf('<a href="%s" class="order-number"><strong>%s</strong></a>', $block->escapeHtml($block->getViewOrderUrl()), $block->escapeHtml($block->getOrderId()))) ?></span></li>
                 <?php foreach ($profileSuccessViewModel->getProfileOrders() as $profileOrder): ?>
                     <li>
                         <span><?= /* @escapeNotVerified */ __('Subscription %1 created,', sprintf('<a href="%s" class="profile-number"><strong>%s</strong></a>', $block->escapeHtml($profileSuccessViewModel->getEditUrl($profileOrder)), $block->escapeHtml($profileSuccessViewModel->getEditLabel($profileOrder))))?></span>
@@ -26,7 +26,7 @@ $profileSuccessViewModel = $block->getProfileSuccessViewModel();
             </ul>
         <?php  else :?>
             <ul>
-                <li><span><?= __('Order %1 placed', $block->escapeHtml($block->getOrderId())) ?></span></li>
+                <li><span><?= /* @noEscape */ __('Order %1 placed', $block->escapeHtml($block->getOrderId())) ?></span></li>
                 <?php foreach ($profileSuccessViewModel->getProfileOrders() as $profileOrder): ?>
                     <li>
                         <span><?= /* @escapeNotVerified */ __('Subscription %1 created,', $block->escapeHtml($profileSuccessViewModel->getEditLabel($profileOrder))) ?></span>
