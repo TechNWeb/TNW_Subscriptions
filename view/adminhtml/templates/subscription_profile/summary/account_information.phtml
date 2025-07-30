@@ -14,24 +14,24 @@
             <table class="admin__table-secondary data-table">
                 <tbody>
                 <tr class="col-0">
-                    <td class="label"><?= __("Status") ?></td>
-                    <td><span class="text"><?= $block->getStatus() ?></span></td>
+                    <td class="label"><?= /* @noEscape */ __("Status") ?></td>
+                    <td><span class="text"><?= /* @noEscape */ $block->getStatus() ?></span></td>
                 </tr>
                 <tr class="col-1">
-                    <td class="label"><?= __('Created On') ?></td>
-                    <td><span class="date"><?= $block->getCreatedOn() ?></span></td>
+                    <td class="label"><?= /* @noEscape */ __('Created On') ?></td>
+                    <td><span class="date"><?= /* @noEscape */ $block->getCreatedOn() ?></span></td>
                 </tr>
                 <tr class="col-2">
-                    <td class="label"><?= __('Last Successful Order') ?></td>
-                    <td><span class="date"><?= $block->getLastSuccessfulOrder() ?></span></td>
+                    <td class="label"><?= /* @noEscape */ __('Last Successful Order') ?></td>
+                    <td><span class="date"><?= /* @noEscape */ $block->getLastSuccessfulOrder() ?></span></td>
                 </tr>
                 <tr class="col-3">
-                    <td class="label"><?= __('Trial Ends On') ?></td>
-                    <td><span class="date"><?= $block->getTrialEndsOn() ?></span></td>
+                    <td class="label"><?= /* @noEscape */ __('Trial Ends On') ?></td>
+                    <td><span class="date"><?= /* @noEscape */ $block->getTrialEndsOn() ?></span></td>
                 </tr>
                 <tr class="col-4">
-                    <td class="label"><?= __('Subscription Ends On') ?></td>
-                    <td><span class="date"><?= $block->getSubscriptionEndsOn() ?></span></td>
+                    <td class="label"><?= /* @noEscape */ __('Subscription Ends On') ?></td>
+                    <td><span class="date"><?= /* @noEscape */ $block->getSubscriptionEndsOn() ?></span></td>
                 </tr>
                 </tbody>
             </table>
@@ -40,27 +40,27 @@
             <table class="admin__table-secondary data-table">
                 <tbody>
                 <tr class="col-0">
-                    <td class="label"><?= __("Customer Name") ?></td>
-                    <td><span class="text"><a href="<?= $this->getCustomerUrl(); ?>" ><?= $block->getCustomerName() ?></a></span></td>
+                    <td class="label"><?= /* @noEscape */ __("Customer Name") ?></td>
+                    <td><span class="text"><a href="<?= /* @noEscape */ $this->getCustomerUrl(); ?>" ><?= /* @noEscape */ $block->getCustomerName() ?></a></span></td>
                 </tr>
                 <tr class="col-1">
-                    <td class="label"><?= __('Email') ?></td>
+                    <td class="label"><?= /* @noEscape */ __('Email') ?></td>
                     <td><span class="text">
-                            <a href="mailto:<?= $block->getEmail() ?>"><?= $block->getEmail() ?></a>
+                            <a href="mailto:<?= /* @noEscape */ $block->getEmail() ?>"><?= /* @noEscape */ $block->getEmail() ?></a>
                         </span>
                     </td>
                 </tr>
                 <tr class="col-2">
-                    <td class="label"><?= __('Customer Group') ?></td>
-                    <td><span class="text"><?= $block->getCustomerGroup() ?></span></td>
+                    <td class="label"><?= /* @noEscape */ __('Customer Group') ?></td>
+                    <td><span class="text"><?= /* @noEscape */ $block->getCustomerGroup() ?></span></td>
                 </tr>
                 <tr class="col-3">
-                    <td class="label"><?= __('Currency') ?></td>
-                    <td><span class="text"><?= $block->getCurrency() ?></span></td>
+                    <td class="label"><?= /* @noEscape */ __('Currency') ?></td>
+                    <td><span class="text"><?= /* @noEscape */ $block->getCurrency() ?></span></td>
                 </tr>
                 <tr class="col-4">
-                    <td class="label"><?= __('Website') ?></td>
-                    <td><span class="text"><?= $block->getWebsite() ?></span></td>
+                    <td class="label"><?= /* @noEscape */ __('Website') ?></td>
+                    <td><span class="text"><?= /* @noEscape */ $block->getWebsite() ?></span></td>
                 </tr>
                 </tbody>
             </table>
