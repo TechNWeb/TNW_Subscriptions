@@ -32,7 +32,7 @@ $jsonOnly = ($block->getZone() == 'grouped_view') ? true : false;
     $data = $block->getEncodedData($data);
 ?>
 <?php if ($jsonOnly): ?>
-<?= $data ?>
+<?= /* @noEscape */ $data ?>
 <?php else: ?>
 <script type="text/x-magento-init">
 {
