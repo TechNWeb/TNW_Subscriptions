@@ -61,7 +61,7 @@ $customerAddressHelper = $this->helper(\Magento\Customer\Helper\Address::class);
 
 <fieldset class="fieldset-shipping">
     <legend class="legend"><span><?= /* @escapeNotVerified */ __('Shipping Address') ?></span></legend>
-    <div class="customer-addresses"><?= $block->getCustomerAddressesSelect() ?></div>
+    <div class="customer-addresses"><?= /* @escapeNotVerified */ $block->getCustomerAddressesSelect() ?></div>
     <div class="shipping-actions">
         <a id="pick" class="action" href="javascript:"><div><?= /* @escapeNotVerified */ __('Pick from saved addresses') ?></div></a>
         <a id="add-new" class="action" href="javascript:"><div><?= /* @escapeNotVerified */ __('Add New Address') ?></div></a>
