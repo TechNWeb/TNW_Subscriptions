@@ -1,6 +1,6 @@
 {
-  "name": "tnw/subscriptions",
-  "description": "Magento 2 Subscriptions",
+  "name": "tnw/subscriptions-marketplace",
+  "description": "Magento 2 Subscriptions Marketplace",
   "require": {
     "tnw/marketing": "~2",
     "magento/framework": "^103.0.8",
